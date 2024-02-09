@@ -1,82 +1,64 @@
-.parameters <- list()
+options(parameters = list(
+  extract_type = list(),
+  map_type = list(),
+  mapper = list()
+))
 
-define_parameter_type <- function(name, regexp, transformer) {
-  .parameters[[name]] <<- structure(
-    list(
-      regexp = regexp,
-      transformer = transformer
-    ),
-    class = "parameter"
-  )
+parameter_wrap <- function(x) {
+  paste0("\\{", x, "\\}")
 }
 
-get_parameter <- function(name) {
+regex_wrap <- function(x) {
+  paste0("(", x, ")")
+}
 
+define_parameter_type <- function(name, regexp, transformer) {
+  parameters <- getOption("parameters")
+  parameters$extract_type[[name]] <- regex_wrap(regexp)
+  parameters$map_type[[name]] <- transformer
+  parameters$mapper[[parameter_wrap(name)]] <- regex_wrap(regexp)
+  options(parameters = parameters)
 }
 
 define_parameter_type(
   name = "int",
-  regexp = "([0-9]+)",
+  regexp = "[0-9]+",
   transformer = as.integer
 )
 
 define_parameter_type(
   name = "float",
-  regexp = "([0-9]+\\.[0-9]+)",
+  regexp = "[0-9]+\\.[0-9]+",
   transformer = as.double
 )
 
 define_parameter_type(
   name = "string",
-  regexp = "([a-zA-Z]+)",
+  regexp = "[a-zA-Z]+",
   transformer = as.character
 )
 
-extract_type <- list(
-  "{int}" = "([0-9]+)",
-  "{float}" = "([0-9]+\\.[0-9]+)",
-  "{string}" = "([a-zA-Z]+)"
-)
-
-map_type <- list(
-  "{int}" = as.integer,
-  "{float}" = as.double,
-  "{string}" = as.character
-)
-
-extract_type <- list(
-  "{int}" = "([0-9]+)",
-  "{float}" = "([0-9]+\\.[0-9]+)",
-  "{string}" = "([a-zA-Z]+)"
-)
-
-map_type <- list(
-  "{int}" = as.integer,
-  "{float}" = as.double,
-  "{string}" = as.character
-)
-
-#' @importFrom stringr str_extract_all str_extract str_remove_all
-#' @importFrom purrr map_chr map2
+#' @import stringr
+#' @import purrr
 extract_params <- function(input, template) {
-  # Extract the types of the parameters
-  types <- str_extract_all(template, "\\{[a-z]+\\}")[[1]]
-  types_regexes <- map_chr(types, \(x) extract_type[[x]])
-  types_regexes <- paste0("'", types_regexes, "'")
-
-  # Use regex to match the template pattern in the input
-  matches <- str_extract(input, types_regexes)
-  matches <- str_remove_all(matches, "^'|'$")
-  map2(matches, types, \(value, type) map_type[[type]](value))
+  parameters <- getOption("parameters")
+  mapper <- unlist(parameters$mapper)
+  match_template <- str_replace_all(template, mapper)
+  find_types_pattern <- paste0(names(mapper), collapse = "|")
+  types <- str_extract_all(template, find_types_pattern, TRUE) |>
+    str_remove_all("\\{|\\}")
+  values <- str_match_all(input, match_template)[[1]][, -1]
+  map2(values, types, \(value, type) parameters$map_type[[type]](value))
 }
 
-#' @importFrom stringr str_replace_all
+#' @import stringr
 find_definition <- function(input, template) {
-  types <- str_extract_all(template, "\\{[a-z]+\\}")[[1]]
-  types_regexes <- map_chr(types, \(x) extract_type[[x]])
-  types <- str_replace_all(types, c("\\{" = "\\\\{", "\\}" = "\\\\}"))
-  types_regexes <- paste0("'", types_regexes, "'")
-  names(types_regexes) <- types
+  parameters <- getOption("parameters")
+  find_types_pattern <- paste0(names(parameters$map_type), collapse = "|")
+  types <- str_extract_all(template, find_types_pattern, TRUE)
+  types_regexes <- map_chr(types, \(x) parameters$extract_type[[x]])
+
+  names(types_regexes) <- paste0("\\{", types, "\\}")
   types_regexes <- types_regexes[!duplicated(types_regexes)]
   match_template <- str_replace_all(template, types_regexes)
 

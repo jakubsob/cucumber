@@ -4,9 +4,9 @@ describe("step", {
       c(
         "Feature: Add",
         "  Scenario: Adding 1 + 1",
-        "    Given I have numbers '1' and '1'",
-        "    When I add numbers '1' and '1'",
-        "    Then the result is '2'"
+        "    Given I have numbers 1 and 1",
+        "    When I add numbers 1 and 1",
+        "    Then the result is 2"
       ),
       context = new.env()
     )
