@@ -23,24 +23,6 @@ define_parameter_type <- function(name, regexp, transformer) {
   invisible(parameters)
 }
 
-define_parameter_type(
-  name = "int",
-  regexp = "[0-9]+",
-  transformer = as.integer
-)
-
-define_parameter_type(
-  name = "float",
-  regexp = "[0-9]+\\.[0-9]+",
-  transformer = as.double
-)
-
-define_parameter_type(
-  name = "string",
-  regexp = "[a-zA-Z]+",
-  transformer = as.character
-)
-
 #' @import stringr
 #' @import purrr
 extract_params <- function(input, template) {
