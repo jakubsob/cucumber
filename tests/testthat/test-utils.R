@@ -120,4 +120,30 @@ describe("extract_params", {
     # Assert
     expect_equal(result, list(1L, 1.1))
   })
+
+  it("should extract custom type", {
+    withr::with_options(
+      define_parameter_type(
+        name = "color",
+        regexp = "red|green|blue",
+        transformer = function(x) structure(x, class = "color")
+      ), {
+        # Arrange
+        input <- "When I add numbers red and green"
+        template <- "When I add numbers {color} and {color}"
+
+        # Act
+        result <- extract_params(input, template)
+
+        # Assert
+        expect_equal(
+          result,
+          list(
+            structure("red", class = "color"),
+            structure("green", class = "color")
+          )
+        )
+      }
+    )
+  })
 })

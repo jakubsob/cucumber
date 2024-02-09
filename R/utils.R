@@ -1,8 +1,10 @@
-options(parameters = list(
-  extract_type = list(),
-  map_type = list(),
-  mapper = list()
-))
+options(
+  parameters = list(
+    extract_type = list(),
+    map_type = list(),
+    mapper = list()
+  )
+)
 
 parameter_wrap <- function(x) {
   paste0("\\{", x, "\\}")
@@ -18,6 +20,7 @@ define_parameter_type <- function(name, regexp, transformer) {
   parameters$map_type[[name]] <- transformer
   parameters$mapper[[parameter_wrap(name)]] <- regex_wrap(regexp)
   options(parameters = parameters)
+  invisible(parameters)
 }
 
 define_parameter_type(
