@@ -3,3 +3,4 @@
 import(purrr)
 import(stringr)
 importFrom(rlang,exec)
+importFrom(stringr,str_replace_all)

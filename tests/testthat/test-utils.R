@@ -147,3 +147,84 @@ describe("extract_params", {
     )
   })
 })
+
+describe("replace_docstring", {
+  it("should replace {int} with corresponding regexp", {
+    withr::with_options(
+      define_parameter_type(
+        name = "int",
+        regexp = "[0-9]+",
+        transformer = as.integer
+      ), {
+        # Arrange
+        input <- "Given I have numbers {int} and {int}"
+
+        # Act
+        result <- replace_docstring(input)
+
+        # Assert
+        expect_equal(result, "Given I have numbers ([0-9]+) and ([0-9]+)")
+      }
+    )
+  })
+
+  it("should replace {float} with corresponding regexp", {
+    withr::with_options(
+      define_parameter_type(
+        name = "float",
+        regexp = "[+-]?([0-9]*[.])?[0-9]+",
+        transformer = as.numeric
+      ), {
+        # Arrange
+        input <- "Given I have numbers {float} and {float}"
+
+        # Act
+        result <- replace_docstring(input)
+
+        # Assert
+        expect_equal(
+          result,
+          "Given I have numbers ([+-]?([0-9]*[.])?[0-9]+) and ([+-]?([0-9]*[.])?[0-9]+)"
+        )
+      }
+    )
+  })
+
+  it("should replace {string} with corresponding regexp", {
+    withr::with_options(
+      define_parameter_type(
+        name = "string",
+        regexp = "[a-z]+",
+        transformer = as.character
+      ), {
+        # Arrange
+        input <- "Given I have numbers {string} and {string}"
+
+        # Act
+        result <- replace_docstring(input)
+
+        # Assert
+        expect_equal(result, "Given I have numbers ([a-z]+) and ([a-z]+)")
+      }
+    )
+  })
+
+  it("should replace custom type with corresponding regexp", {
+    withr::with_options(
+      define_parameter_type(
+        name = "color",
+        regexp = "red|green|blue",
+        transformer = function(x) structure(x, class = "color")
+      ), {
+        # Arrange
+        input <- "Given I have colors {color} and {color}"
+
+        # Act
+        result <- replace_docstring(input)
+
+        # Assert
+        expect_equal(result, "Given I have colors (red|green|blue) and (red|green|blue)")
+      }
+    )
+  })
+})
