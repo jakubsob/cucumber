@@ -24,23 +24,30 @@ make_step <- function(prefix) {
   }
 }
 
+#' Step
+#'
+#' @rdname step
+#' @param description
+#'   A description of the step.
+#' @param implementation
+#'   A function that will be run when the step is executed.
+step <- NULL
+
+#' @rdname step
 #' @export
 given <- make_step("Given")
 
+#' @rdname step
 #' @export
 when <- make_step("When")
 
+#' @rdname step
 #' @export
 then <- make_step("Then")
 
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang exec
-run.step <- function(x, input, context) {
-  params <- extract_params(input, x$description)
-  exec(
-    x$implementation,
-    !!!params,
-    context = context
-  )
+run <- function(x, input, context) {
+
 }
