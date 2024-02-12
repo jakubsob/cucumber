@@ -14,6 +14,7 @@ Suggests:
     withr
 Config/testthat/edition: 3
 Imports: 
+    checkmate,
     purrr,
     rlang,
     stringr

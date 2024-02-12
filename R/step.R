@@ -9,8 +9,11 @@ step_regex <- function(step_name, description) {
 
 #' @keywords internal
 #' @importFrom rlang exec
+#' @importFrom checkmate assert_subset
 make_step <- function(prefix) {
   function(description, implementation) {
+    args <- formals(implementation)
+    assert_subset("context", names(args[length(args)]))
     structure(
       list(
         description = step_regex(prefix, description),
@@ -21,17 +24,22 @@ make_step <- function(prefix) {
   }
 }
 
+#' @export
 given <- make_step("Given")
 
+#' @export
 when <- make_step("When")
 
+#' @export
 then <- make_step("Then")
 
+#' @keywords internal
+#' @noRd
 #' @importFrom rlang exec
-run.step <- function(step, input, context) {
-  params <- extract_params(input, step$description)
+run.step <- function(x, input, context) {
+  params <- extract_params(input, x$description)
   exec(
-    step$implementation,
+    x$implementation,
     !!!params,
     context = context
   )
