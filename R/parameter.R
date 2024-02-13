@@ -3,7 +3,11 @@
   structure(list2(...), class = "parameters")
 }
 
+#' @importFrom checkmate assert_string assert_function
 .parameter <- function(name, regexp, transformer) {
+  assert_string(name)
+  assert_string(regexp)
+  assert_function(transformer)
   structure(
     list(
       name = name,
@@ -27,7 +31,7 @@
 define_parameter_type <- function(name, regexp, transformer) {
   parameters <- getOption("parameters", default = .parameters())
   parameter <- .parameter(name, regexp, transformer)
-  parameters <- .parameters(!!!parameters$parameters, list(parameter))
+  parameters <- .parameters(!!!parameters, list(parameter))
   options(parameters = parameters)
   invisible(parameter)
 }
