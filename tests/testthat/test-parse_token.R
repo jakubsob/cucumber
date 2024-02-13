@@ -2,10 +2,12 @@ describe("parse_token", {
   it("should throw an error if the token type is unknown", {
     # Arrange
     token <- list(
-      type = "Unknown",
-      value = "the Maker has the word 'silky'",
-      children = NULL,
-      data = NULL
+      list(
+        type = "Unknown",
+        value = "the Maker has the word 'silky'",
+        children = NULL,
+        data = NULL
+      )
     )
     steps <- list(
       given("the Maker has the word '{string}'", function(word, context) {
@@ -30,10 +32,12 @@ describe("parse_token", {
   it("should throw an arror if no step definition has been found", {
     # Arrange
     token <- list(
-      type = "Given",
-      value = "the Maker has '{string}'",
-      children = NULL,
-      data = NULL
+      list(
+        type = "Given",
+        value = "the Maker has '{string}'",
+        children = NULL,
+        data = NULL
+      )
     )
     steps <- list(
       given("the Maker has the word '{string}'", function(word, context) {
@@ -58,10 +62,12 @@ describe("parse_token", {
   it("should throw an error if multiple step definitions have been found", {
     # Arrange
     token <- list(
-      type = "Given",
-      value = "the Maker has the word 'silky'",
-      children = NULL,
-      data = NULL
+      list(
+        type = "Given",
+        value = "the Maker has the word 'silky'",
+        children = NULL,
+        data = NULL
+      )
     )
     steps <- list(
       given("the Maker has the word '{string}'", function(word, context) {
@@ -84,16 +90,17 @@ describe("parse_token", {
       parse_token(token, steps, parameters),
       regexp = "Multiple steps found for: Given the Maker has the word 'silky'"
     )
-
   })
 
   it("should parse a token to a function", {
     # Arrange
     token <- list(
-      type = "Given",
-      value = "the Maker has the word 'silky' and number 44",
-      children = NULL,
-      data = NULL
+      list(
+        type = "Given",
+        value = "the Maker has the word 'silky' and number 44",
+        children = NULL,
+        data = NULL
+      )
     )
     spies <- list(mockery::mock(), mockery::mock())
     steps <- list(
@@ -119,7 +126,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    callable()
+    callable[[1]]()
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
@@ -129,15 +136,17 @@ describe("parse_token", {
   it("should parse ", {
     # Arrange
     token <- list(
-      type = "Scenario",
-      value = "the test scenario with 1 step",
-      data = NULL,
-      children = list(
-        list(
-          type = "Given",
-          value = "the Maker has the word 'silky' and number 44",
-          children = NULL,
-          data = NULL
+      list(
+        type = "Scenario",
+        value = "the test scenario with 1 step",
+        data = NULL,
+        children = list(
+          list(
+            type = "Given",
+            value = "the Maker has the word 'silky' and number 44",
+            children = NULL,
+            data = NULL
+          )
         )
       )
     )

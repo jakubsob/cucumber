@@ -1,12 +1,18 @@
 #' @importFrom rlang abort
 #' @importFrom glue glue
-parse_token <- function(token, steps, parameters = getOption("parameters")) {
-  switch(
-    token$type,
-    "Scenario" = map(token$children, parse_token, steps = steps, parameters = parameters),
-    "Given" = parse_step(token, steps, parameters),
-    abort(glue("Unknown token type: {token$type}"))
-  )
+parse_token <- function(tokens, steps, parameters = getOption("parameters")) {
+  map(tokens, \(token) {
+    switch(
+      token$type,
+      "Scenario" = parse_token(token$children, steps, parameters),
+      "Feature" = parse_token(token$children, steps, parameters),
+      "Given" = parse_step(token, steps, parameters),
+      "When" = parse_step(token, steps, parameters),
+      "Then" = parse_step(token, steps, parameters),
+      abort(glue("Unknown token type: {token$type}"))
+    )
+  }) |>
+    unlist()
 }
 
 #' @importFrom purrr map_chr map map2 keep pluck

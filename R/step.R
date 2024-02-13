@@ -44,10 +44,3 @@ when <- make_step("When")
 #' @rdname step
 #' @export
 then <- make_step("Then")
-
-#' @keywords internal
-#' @noRd
-#' @importFrom rlang exec
-run <- function(x, input, context) {
-
-}
