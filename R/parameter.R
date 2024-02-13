@@ -1,5 +1,6 @@
-.parameters <- function(lst = list()) {
-  structure(lst, class = "parameters")
+#' @importFrom rlang list2
+.parameters <- function(...) {
+  structure(list2(...), class = "parameters")
 }
 
 .parameter <- function(name, regexp, transformer) {
@@ -26,7 +27,7 @@
 define_parameter_type <- function(name, regexp, transformer) {
   parameters <- getOption("parameters", default = .parameters())
   parameter <- .parameter(name, regexp, transformer)
-  parameters <- .parameters(append(parameters$parameters, list(parameter)))
+  parameters <- .parameters(!!!parameters$parameters, list(parameter))
   options(parameters = parameters)
   invisible(parameter)
 }
