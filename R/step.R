@@ -14,13 +14,15 @@ make_step <- function(prefix) {
   function(description, implementation) {
     args <- formals(implementation)
     assert_subset("context", names(args[length(args)]))
-    structure(
+    step <- structure(
       list(
         description = step_regex(prefix, description),
         implementation = implementation
       ),
       class = "step"
     )
+    register_step(step)
+    invisible(step)
   }
 }
 
@@ -44,3 +46,18 @@ when <- make_step("When")
 #' @rdname step
 #' @export
 then <- make_step("Then")
+
+.steps <- function(...) {
+  structure(list2(...), class = "steps")
+}
+
+register_step <- function(step) {
+  steps <- getOption("steps", default = .steps())
+  steps <- .steps(!!!steps, step)
+  options(steps = steps)
+  invisible(step)
+}
+
+get_steps <- function() {
+  getOption("steps", default = .steps())
+}

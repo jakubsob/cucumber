@@ -2,7 +2,7 @@
 run <- function(
   feature,
   steps,
-  parameters = getOption("parameters"),
+  parameters = get_parameters(),
   context = new.env()
 ) {
   tokens <- tokenize(feature)

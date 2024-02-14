@@ -29,9 +29,17 @@
 #'  Must be a funcion that requires only a single argument.
 #' @export
 define_parameter_type <- function(name, regexp, transformer) {
-  parameters <- getOption("parameters", default = .parameters())
+  parameters <- get_parameters()
   parameter <- .parameter(name, regexp, transformer)
   parameters <- .parameters(!!!parameters, list(parameter))
-  options(parameters = parameters)
+  set_parameters(parameters)
   invisible(parameter)
+}
+
+get_parameters <- function() {
+  getOption("parameters", default = .parameters())
+}
+
+set_parameters <- function(parameters) {
+  options(parameters = parameters)
 }

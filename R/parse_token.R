@@ -41,7 +41,7 @@ parse_step <- function(token, steps, parameters = getOption("parameters")) {
   parameter_names <- parameters |> map_chr("name") |> paste(collapse = "|")
   parameter_names <- str_match_all(step$description, paste0("\\{(", parameter_names, ")\\}"))[[1]][, 2]
   # Extract parameters values
-  values_character <- str_match_all(description, detect)[[1]][, -1]
+  values_character <- str_match_all(description, detect[step_mask])[[1]][, -1]
   params <- map2(values_character, parameter_names, \(value, parameter_name) {
     transformer <- parameters |>
       keep(~ .x$name == parameter_name) |>
@@ -50,6 +50,7 @@ parse_step <- function(token, steps, parameters = getOption("parameters")) {
   })
 
   function(context = new.env()) {
-    exec(step$implementation, !!!params, context = context)
+    names(params) <- names(formals(step$implementation))[-length(formals(step$implementation))]
+    exec(step$implementation, context = context, !!!params)
   }
 }
