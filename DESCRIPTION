@@ -1,12 +1,13 @@
 Package: cucumber
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
+Title: An Implementation Of Cucumber Framework For R
+Version: 0.0.0.9000
+Authors@R: person("Jakub", "Sobolewski", email = "jakupsob@gmail.com", role = c("aut", "cre"))
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
 License: MIT + file LICENSE
+URL: https://github.com/jakubsob/cucumber
+BugReports: https://github.com/jakubsob/cucumber
 Encoding: UTF-8
 LazyData: true
 Suggests:
