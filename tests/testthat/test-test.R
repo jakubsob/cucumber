@@ -8,10 +8,9 @@ describe("test", {
           .parameter("int", "[0-9]+", as.integer),
         )
       ), {
-        test(
-          system.file("examples/one_feature", package = "cucumber"),
-          system.file("examples/one_feature/steps", package = "cucumber")
-        )
+        withr::with_dir(system.file("examples/one_feature", package = "cucumber"), {
+          test()
+        })
       }
     )
   })
@@ -26,10 +25,9 @@ describe("test", {
           .parameter("float", "[0-9]+[.][0-9]+", as.numeric)
         )
       ), {
-        test(
-          system.file("examples/multiple_features", package = "cucumber"),
-          system.file("examples/multiple_features/steps", package = "cucumber")
-        )
+        withr::with_dir(system.file("examples/multiple_features", package = "cucumber"), {
+          test()
+        })
       }
     )
   })
