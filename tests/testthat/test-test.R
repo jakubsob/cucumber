@@ -9,8 +9,8 @@ describe("test", {
         )
       ), {
         test(
-          "../../inst/examples/one_feature",
-          "../../inst/examples/one_feature/steps"
+          system.file("examples/one_feature", package = "cucumber"),
+          system.file("examples/one_feature/steps", package = "cucumber")
         )
       }
     )
@@ -27,8 +27,8 @@ describe("test", {
         )
       ), {
         test(
-          "../../inst/examples/multiple_features",
-          "../../inst/examples/multiple_features/steps"
+          system.file("examples/multiple_features", package = "cucumber"),
+          system.file("examples/multiple_features/steps", package = "cucumber")
         )
       }
     )
