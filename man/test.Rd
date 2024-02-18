@@ -4,7 +4,7 @@
 \alias{test}
 \title{Test}
 \usage{
-test(features_dir, steps_dir = features_dir)
+test(features_dir = "tests/testthat", steps_dir = "tests/testthat/steps")
 }
 \arguments{
 \item{features_dir}{A character string of the directory containing the feature files.}
