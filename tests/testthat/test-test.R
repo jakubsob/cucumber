@@ -1,5 +1,5 @@
 describe("test", {
-  it("should run single a feature", {
+  it("should run one feature", {
     withr::with_options(
       list(
         steps = .steps(),
@@ -9,8 +9,8 @@ describe("test", {
         )
       ), {
         test(
-          "test/one_feature",
-          "test/one_feature/steps"
+          "../../inst/examples/one_feature",
+          "../../inst/examples/one_feature/steps"
         )
       }
     )
