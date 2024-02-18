@@ -33,4 +33,21 @@ describe("test", {
       }
     )
   })
+
+  it("should run with box", {
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = .parameters(
+          .parameter("string", "[:print:]+", as.character),
+          .parameter("int", "[0-9]+", as.integer),
+          .parameter("float", "[0-9]+[.][0-9]+", as.numeric)
+        )
+      ), {
+        withr::with_dir(system.file("examples/box_support", package = "cucumber"), {
+          test()
+        })
+      }
+    )
+  })
 })
