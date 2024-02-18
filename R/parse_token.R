@@ -42,7 +42,7 @@ parse_step <- function(token, steps, parameters = getOption("parameters")) {
   parameter_names <- str_match_all(step$description, paste0("\\{(", parameter_names, ")\\}"))[[1]][, 2]
   # Extract parameters values
   values_character <- str_match_all(description, detect[step_mask])[[1]][, -1]
-  params <- map2(values_character, parameter_names, \(value, parameter_name) {
+  params <- map2(values_character, parameter_names, \(value, parameter_name) { # nolint: object_usage_linter
     transformer <- parameters |>
       keep(~ .x$name == parameter_name) |>
       pluck(1, "transformer")
