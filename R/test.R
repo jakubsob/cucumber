@@ -6,10 +6,13 @@
 #' @export
 #' @importFrom fs dir_ls
 #' @importFrom purrr map walk
+#' @importFrom checkmate assert_directory_exists
 test <- function(
   features_dir = "tests/testthat",
   steps_dir = "tests/testthat/steps"
 ) {
+  assert_directory_exists(features_dir)
+  assert_directory_exists(steps_dir)
   feature_files <- dir_ls(features_dir, glob = "*.feature$", type = "file")
   steps_files <- dir_ls(steps_dir, glob = "*.R$", type = "file")
   walk(steps_files, source)
