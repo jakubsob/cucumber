@@ -15,4 +15,22 @@ describe("test", {
       }
     )
   })
+
+  it("should run multiple features", {
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = .parameters(
+          .parameter("string", "[:print:]+", as.character),
+          .parameter("int", "[0-9]+", as.integer),
+          .parameter("float", "[0-9]+[.][0-9]+", as.numeric)
+        )
+      ), {
+        test(
+          "../../inst/examples/multiple_features",
+          "../../inst/examples/multiple_features/steps"
+        )
+      }
+    )
+  })
 })
