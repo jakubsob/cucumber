@@ -31,7 +31,6 @@ Feature: Addition
 # tests/testthat/steps/steps_definitions.R
 when("I add {int} and {int}", function(x, y, context) {
   context$result <- x + y
-  context
 })
 
 then("the result is {int}", function(expected, context) {
@@ -54,11 +53,46 @@ then("the result is {float}", function(expected, context) {
 and running them with:
 
 ```r
-cucumber::cucumber()
+cucumber::test()
 ```
 
 By default this command will look for Feature files in `tests/testthat` directory and step definitions in `tests/testthat/steps` directory. You can change these defaults by providing `feature_path` and `steps_path` arguments to `cucumber()` function.
 
+## How it works
+
+The `.feature` files are parsed and matched against step definitions.
+
+Step functions are defined using:
+- `description`: a [cucumber expression](https://github.com/cucumber/cucumber-expressions).
+- and an implementation function. It must have the parameters that will be matched in the description and a `context` parameter - an environment for managing state between steps.
+
+If a step parsed from one of `.feature` files is not found, an error will be thrown.
+
+### Parameter types
+
+See `cucumber::define_parameter_type()` how to define your own parameter types.
+
+## Supported Gherkin syntax:
+
+- [x] Feature
+- [x] Scenario
+- [ ] Example
+- [x] Given
+- [x] When
+- [x] Then
+- [ ] And
+- [ ] But
+- [ ] Background
+- [ ] Scenario Outline (or Scenario Template)
+- [ ] Examples (or Scenarios)
+- [ ] `"""` (Doc Strings)
+- [ ] `|` (Data Tables)
+- [ ] `@` (Tags)
+- [x] `#` (Comments)
+
+The goal is to support all listed features.
+
+See the [Gherkin Reference](https://cucumber.io/docs/gherkin/reference/) on how to write Gherkin documents.
 
 ## Installation
 
