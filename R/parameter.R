@@ -20,6 +20,8 @@
 
 #' Define Parameter Type
 #'
+#' Add a new parameter to the list of parameters that can be used in step definitions.
+#'
 #' @param name
 #'  The name of the parameter.
 #' @param regexp
@@ -27,6 +29,12 @@
 #' @param transformer
 #'  A function that will transform the parameter from a string to the desired type.
 #'  Must be a funcion that requires only a single argument.
+#'
+#' @examples
+#' define_parameter_type("int", "\\d+", as.numeric)
+#' define_parameter_type("string", "[:print:]+", as.character)
+#' define_parameter_type("color", "red|blue|green", as.character)
+#'
 #' @export
 define_parameter_type <- function(name, regexp, transformer) {
   parameters <- get_parameters()
