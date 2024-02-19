@@ -25,5 +25,6 @@ test <- function(
   walk(steps_files, source)
   feature_files |>
     map(readLines) |>
+    map(normalize_feature) |>
     walk(run, steps = get_steps(), parameters = get_parameters())
 }

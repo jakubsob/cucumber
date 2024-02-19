@@ -76,12 +76,12 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 
 - [x] Feature
 - [x] Scenario
-- [ ] Example
+- [x] Example
 - [x] Given
 - [x] When
 - [x] Then
-- [ ] And
-- [ ] But
+- [x] And
+- [x] But
 - [ ] Background
 - [ ] Scenario Outline (or Scenario Template)
 - [ ] Examples (or Scenarios)

@@ -63,4 +63,19 @@ describe("test", {
       }
     )
   })
+
+  it("should run a Scenario with Given, When, Then, And, But keywords", {
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = .parameters(
+          .parameter("int", "[0-9]+", as.integer)
+        )
+      ), {
+        withr::with_dir(system.file("examples/long_scenario", package = "cucumber"), {
+          test()
+        })
+      }
+    )
+  })
 })
