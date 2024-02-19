@@ -2,15 +2,23 @@
 % Please edit documentation in R/test.R
 \name{test}
 \alias{test}
-\title{Test}
+\title{Run all Cucumber tests}
 \usage{
-test(features_dir = "tests/testthat", steps_dir = "tests/testthat/steps")
+test(
+  features_dir = getOption("cucumber_features_dir", "tests/testthat"),
+  steps_dir = getOption("cucumber_steps_dir", "tests/testthat/steps")
+)
 }
 \arguments{
-\item{features_dir}{A character string of the directory containing the feature files.}
+\item{features_dir}{A character string of the directory containing the feature files.
+By default it checks "tests/testthat" directory. To setup a different, default directory
+use `option(cucumber_features_dir = "path/to/your/features")`.}
 
-\item{steps_dir}{A character string of the directory containing the step files.}
+\item{steps_dir}{A character string of the directory containing the step files.
+By default it checks "tests/testthat/steps" directory. To setup a different, default directory
+use `option(cucumber_steps_dir = "path/to/your/steps")`.}
 }
 \description{
-Test
+This command runs all Cucumber tests. It takes all .feature files
+from the `features_dir` and runs them using the steps from the `steps_dir`.
 }
