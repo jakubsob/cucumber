@@ -48,4 +48,19 @@ describe("test", {
       }
     )
   })
+
+  it("should run with shinytest2", {
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = .parameters(
+          .parameter("string", "[:print:]+", as.character)
+        )
+      ), {
+        withr::with_dir(system.file("examples/shinytest2", package = "cucumber"), {
+          test()
+        })
+      }
+    )
+  })
 })
