@@ -2,11 +2,9 @@
 run <- function(
   feature,
   steps,
-  parameters = get_parameters(),
-  context = new.env()
+  parameters = get_parameters()
 ) {
   tokens <- tokenize(feature)
   call_queue <- parse_token(tokens, steps, parameters)
-  walk(call_queue, \(x) x(context))
-  context
+  walk(call_queue, \(x) x())
 }

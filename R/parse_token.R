@@ -1,11 +1,23 @@
 #' @importFrom rlang abort
 #' @importFrom glue glue
-parse_token <- function(tokens, steps, parameters = getOption("parameters")) {
+#' @importFrom purrr map walk
+parse_token <- function(tokens, steps, parameters = get_parameters()) {
   map(tokens, \(token) {
     switch(
       token$type,
-      "Scenario" = parse_token(token$children, steps, parameters),
-      "Feature" = parse_token(token$children, steps, parameters),
+      "Scenario" = function(context = new.env()) {
+        context <- new.env()
+        walk(
+          parse_token(token$children, steps, parameters),
+          \(x) x(context)
+        )
+      },
+      "Feature" = function(context = new.env()) {
+        walk(
+          parse_token(token$children, steps, parameters),
+          \(x) x(context)
+        )
+      },
       "Given" = parse_step(token, steps, parameters),
       "When" = parse_step(token, steps, parameters),
       "Then" = parse_step(token, steps, parameters),
@@ -19,7 +31,7 @@ parse_token <- function(tokens, steps, parameters = getOption("parameters")) {
 #' @importFrom stringr str_detect str_match_all
 #' @importFrom rlang exec
 #' @importFrom glue glue
-parse_step <- function(token, steps, parameters = getOption("parameters")) {
+parse_step <- function(token, steps, parameters = get_parameters()) {
   # Pattern to detect the step
   detect <- steps |>
     map_chr("description") |>
