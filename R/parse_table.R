@@ -1,0 +1,33 @@
+#' @importFrom stringr str_trim str_split
+#' @importFrom purrr map set_names
+#' @importFrom tibble as_tibble tibble
+#' @importFrom dplyr bind_cols
+parse_table <- function(lines) {
+  rows <- lines |>
+    map(\(x) str_split(x, "\\|")[[1]]) |>
+    # Remove first and last pipe split
+    map(\(x) x[c(-1, -length(x))]) |>
+    map(str_trim)
+
+
+  ncols <- length(rows[[1]])
+  nrow <- length(rows) - 1
+  if (nrow == 0) {
+    header <- set_names(rows[[1]], rows[[1]]) |>
+      map(\(x) character()) |>
+      bind_cols()
+    return(header)
+  }
+
+  matrix(
+    unlist(rows[-1]),
+    dimnames = list(
+      seq_len(nrow),
+      unlist(rows[1])
+    ),
+    byrow = TRUE,
+    nrow = nrow,
+    ncol = ncols
+  ) |>
+    as_tibble()
+}
