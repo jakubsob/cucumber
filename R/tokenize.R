@@ -63,9 +63,6 @@ tokenize <- function(x) {
   x <- remove_comments(x)
   indices <- detect_node(x)
   groups <- seq_len(max(cumsum(indices)))
-  if (sum(groups) == 0) {
-    return(x)
-  }
   groups |>
     map(\(ind) {
       text <- x[which(cumsum(indices) == ind)]
