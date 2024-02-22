@@ -2,7 +2,9 @@
 #' @importFrom purrr map set_names
 #' @importFrom tibble as_tibble tibble
 #' @importFrom dplyr bind_cols
+#' @importFrom checkmate assert_character
 parse_table <- function(lines) {
+  assert_character(lines, min.len = 1)
   rows <- lines |>
     map(\(x) str_split(x, "\\|")[[1]]) |>
     # Remove first and last pipe split

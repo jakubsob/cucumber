@@ -28,12 +28,26 @@ make_step <- function(prefix) {
 
 #' Step
 #'
-#' @rdname step
+#' The implementation function should always have the last parameter named `context`.
+#' It holds the environment where state is stored.
+#'
+#' Named arguments that precede `context` are considered parameters.
+#'
+#' If a step has a description "I have {int} cucumbers in my basket" then the implementation
+#' function should be a `function(n_cucumbers, context)`. The {int} value will be passed to
+#' `n_cucumbers`, this parameter can have any name.
+#'
+#' If a step has a table, then the table will be passed as an argument next after inline parameters
+#' and before `context`. See `inst/examples/table` how write implemntation that uses tables.
+#'
+#' @name step
 #' @param description
 #'   A description of the step.
 #' @param implementation
 #'   A function that will be run when the step is executed.
-step <- NULL
+#'
+#' @return None, funcion called for side effects.
+NULL
 
 #' @rdname step
 #' @export

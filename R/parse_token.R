@@ -61,6 +61,10 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
     transformer(value)
   })
 
+  if (detect_table(token$data)) {
+    params <- append(params, list(parse_table(token$data)))
+  }
+
   function(context = new.env()) {
     names(params) <- names(formals(step$implementation))[-length(formals(step$implementation))]
     exec(step$implementation, context = context, !!!params)

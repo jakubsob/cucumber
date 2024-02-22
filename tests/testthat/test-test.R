@@ -78,4 +78,20 @@ describe("test", {
       }
     )
   })
+
+  it("should run a Scenario with a Table", {
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = .parameters(
+          .parameter("int", "[0-9]+", as.integer),
+          .parameter("string", "[:print:]+", as.character)
+        )
+      ), {
+        withr::with_dir(system.file("examples/table", package = "cucumber"), {
+          test()
+        })
+      }
+    )
+  })
 })
