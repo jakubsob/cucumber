@@ -15,5 +15,5 @@ when("the Breaker joins the Maker's game", function(context) {
 })
 
 then("the Breaker must guess a word with {int} characters", function(n, context) {
-  # expect_equal(nzchar(context$word), n)
+  expect_equal(nchar(context$word), n)
 })
