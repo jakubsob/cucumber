@@ -1,19 +1,19 @@
 .onLoad <- function(libname, pkgname) {
   define_parameter_type(
     name = "int",
-    regexp = "[0-9]+",
+    regexp = "[-+]?[:digit:]+",
     transformer = as.integer
   )
 
   define_parameter_type(
     name = "float",
-    regexp = "[0-9]+\\.[0-9]+",
+    regexp = "[-+]?[:digit:]+\\.[:digit:]+",
     transformer = as.double
   )
 
   define_parameter_type(
     name = "string",
-    regexp = "[a-zA-Z]+",
+    regexp = "[:print:]+",
     transformer = as.character
   )
 }
