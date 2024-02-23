@@ -94,4 +94,19 @@ describe("test", {
       }
     )
   })
+
+  it("should run a Scenario with a docstring", {
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = .parameters(
+          .parameter("string", "[:print:]+", as.character)
+        )
+      ), {
+        withr::with_dir(system.file("examples/docstring", package = "cucumber"), {
+          test()
+        })
+      }
+    )
+  })
 })

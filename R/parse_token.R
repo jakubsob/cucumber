@@ -63,6 +63,8 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
 
   if (detect_table(token$data)) {
     params <- append(params, list(parse_table(token$data)))
+  } else if (detect_docstring(token$data)) {
+    params <- append(params, list(parse_docstring(token$data)))
   }
 
   function(context = new.env()) {
