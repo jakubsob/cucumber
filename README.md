@@ -86,7 +86,7 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [ ] Scenario Outline (or Scenario Template)
 - [ ] Examples (or Scenarios)
 - [ ] `"""` (Doc Strings)
-- [ ] `|` (Data Tables)
+- [x] `|` (Data Tables)
 - [ ] `@` (Tags)
 - [x] `#` (Comments)
 
