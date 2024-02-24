@@ -18,8 +18,7 @@ Must be a funcion that requires only a single argument.}
 Add a new parameter to the list of parameters that can be used in step definitions.
 }
 \examples{
-define_parameter_type("int", "\\\\d+", as.numeric)
-define_parameter_type("string", "[:print:]+", as.character)
 define_parameter_type("color", "red|blue|green", as.character)
+define_parameter_type("sci_number", "[+-]?\\\\d*\\\\.?\\\\d+(e[+-]?\\\\d+)?", as.numeric)
 
 }

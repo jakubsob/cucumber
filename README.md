@@ -56,7 +56,7 @@ and running them with:
 cucumber::test()
 ```
 
-By default this command will look for Feature files in `tests/testthat` directory and step definitions in `tests/testthat/steps` directory. You can change these defaults by providing `feature_path` and `steps_path` arguments to `cucumber()` function.
+By default this command will look for Feature files in `tests/testthat` directory and step definitions in `tests/testthat/steps` directory. You can change these defaults by providing `feature_path` and `steps_path` arguments to `cucumber::test()` function.
 
 ## How it works
 
@@ -69,6 +69,16 @@ Step functions are defined using:
 If a step parsed from one of `.feature` files is not found, an error will be thrown.
 
 ### Parameter types
+
+Step implementations receive data from the `.feature` files as parameters. The values are detected via regular expressions and casted with a transformer function.
+
+The following parameter types are available by default:
+
+| Parameter Type |   Underlying regular expression   |                                     Description                                     |
+| -------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
+| `{int}`        | `[+-]?(?<![.])[:digit:]+(?![.])`  | Matches integers, for example `71` or `-19`. Converts value with `as.integer`.      |
+| `{float}`      | `[+-]?[[:digit:]+]?\\.[:digit:]+` | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`. |
+| `{string}`     | `[:print:]+`                      | Matches letters, numbers, punctuation and whitespace.                               |
 
 See `cucumber::define_parameter_type()` how to define your own parameter types.
 
