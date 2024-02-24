@@ -39,7 +39,7 @@
 define_parameter_type <- function(name, regexp, transformer) {
   parameters <- get_parameters()
   parameter <- .parameter(name, regexp, transformer)
-  parameters <- .parameters(!!!parameters, list(parameter))
+  parameters[[name]] <- parameter
   set_parameters(parameters)
   invisible(parameter)
 }

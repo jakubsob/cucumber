@@ -3,10 +3,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("string", "[:print:]+", as.character),
-          .parameter("int", "[0-9]+", as.integer),
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/one_feature", package = "cucumber"), {
           test()
@@ -19,11 +16,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("string", "[:print:]+", as.character),
-          .parameter("int", "[0-9]+", as.integer),
-          .parameter("float", "[0-9]+[.][0-9]+", as.numeric)
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/multiple_features", package = "cucumber"), {
           test()
@@ -36,11 +29,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("string", "[:print:]+", as.character),
-          .parameter("int", "[0-9]+", as.integer),
-          .parameter("float", "[0-9]+[.][0-9]+", as.numeric)
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/box_support", package = "cucumber"), {
           test()
@@ -53,9 +42,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("string", "[:print:]+", as.character)
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/shinytest2", package = "cucumber"), {
           test()
@@ -68,9 +55,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("int", "[0-9]+", as.integer)
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/long_scenario", package = "cucumber"), {
           test()
@@ -83,10 +68,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("int", "[0-9]+", as.integer),
-          .parameter("string", "[:print:]+", as.character)
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/table", package = "cucumber"), {
           test()
@@ -99,9 +81,7 @@ describe("test", {
     withr::with_options(
       list(
         steps = .steps(),
-        parameters = .parameters(
-          .parameter("string", "[:print:]+", as.character)
-        )
+        parameters = get_parameters()
       ), {
         withr::with_dir(system.file("examples/docstring", package = "cucumber"), {
           test()
