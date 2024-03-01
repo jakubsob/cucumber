@@ -6,5 +6,5 @@ run <- function(
 ) {
   tokens <- tokenize(feature)
   call_queue <- parse_token(tokens, steps, parameters)
-  walk(call_queue, \(x) x())
+  walk(call_queue, eval)
 }

@@ -1,4 +1,47 @@
 describe("test", {
+  it("should report success with `testthat::test_dir`", {
+    testthat::skip_if(testthat::is_checking())
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = get_parameters()
+      ), {
+        withr::with_dir(system.file("examples/with_testthat_success", package = "cucumber"), {
+          testthat::expect_snapshot(
+            capture.output(
+              testthat::test_dir(
+                "tests/testthat",
+                reporter = ProgressReporter$new(show_praise = FALSE)
+              )
+            )
+          )
+        })
+      }
+    )
+  })
+
+  it("should report failure with `testthat::test_dir`", {
+    testthat::skip_if(testthat::is_checking())
+    withr::with_options(
+      list(
+        steps = .steps(),
+        parameters = get_parameters()
+      ), {
+        withr::with_dir(system.file("examples/with_testthat_failure", package = "cucumber"), {
+          testthat::expect_snapshot(
+            capture.output(
+              testthat::test_dir(
+                "tests/testthat",
+                reporter = ProgressReporter$new(show_praise = FALSE),
+                stop_on_failure = FALSE
+              )
+            )
+          )
+        })
+      }
+    )
+  })
+
   it("should run one feature", {
     withr::with_options(
       list(

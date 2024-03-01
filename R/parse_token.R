@@ -1,23 +1,32 @@
-#' @importFrom rlang abort
+#' @importFrom rlang abort call_modify call2
 #' @importFrom glue glue
 #' @importFrom purrr map walk
+#' @importFrom testthat context_start_file test_that
 parse_token <- function(tokens, steps, parameters = get_parameters()) {
   map(tokens, \(token) {
     switch(
       token$type,
-      "Scenario" = function(context = new.env()) {
-        context <- new.env()
-        walk(
-          parse_token(token$children, steps, parameters),
-          \(x) x(context)
-        )
-      },
-      "Feature" = function(context = new.env()) {
-        walk(
-          parse_token(token$children, steps, parameters),
-          \(x) x(context)
-        )
-      },
+      "Scenario" = call2(
+        function() {
+          test_that(glue("Scenario: {token$value}"), {
+            context <- new.env()
+            calls <- parse_token(token$children, steps, parameters) |>
+              map(\(x) call_modify(x, context = context))
+
+            # Use `for` for better error messages instead of purrr indexed ones
+            for (call in calls) {
+              eval(call)
+            }
+          })
+        }
+      ),
+      "Feature" = call2(
+        function(file_name = token$value) {
+          context_start_file(glue("Feature: {file_name}"))
+          parse_token(token$children, steps, parameters) |>
+            walk(eval)
+        }
+      ),
       "Given" = parse_step(token, steps, parameters),
       "When" = parse_step(token, steps, parameters),
       "Then" = parse_step(token, steps, parameters),
@@ -67,8 +76,7 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
     params <- append(params, list(parse_docstring(token$data)))
   }
 
-  function(context = new.env()) {
-    names(params) <- names(formals(step$implementation))[-length(formals(step$implementation))]
-    exec(step$implementation, context = context, !!!params)
-  }
+  impl_formals <- names(formals(step$implementation))
+  names(params) <- impl_formals[impl_formals != "context"]
+  rlang::call2(step$implementation, !!!params)
 }

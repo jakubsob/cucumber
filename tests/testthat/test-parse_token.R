@@ -92,7 +92,7 @@ describe("parse_token", {
     )
   })
 
-  it("should parse a token to a function", {
+  it("should parse a token to a call list", {
     # Arrange
     token <- list(
       list(
@@ -126,14 +126,14 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    callable[[1]]()
+    eval(callable[[1]])
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
     mockery::expect_called(spies[[2]], 0)
   })
 
-  it("should parse ", {
+  it("should parse a Scenario to a call list", {
     # Arrange
     token <- list(
       list(
@@ -154,6 +154,7 @@ describe("parse_token", {
     steps <- list(
       given("the Maker has the word '{string}' and number {int}", function(word, number, context) {
         spies[[1]]()
+        testthat::succeed()
       }),
       given("the Breaker joins the Maker's game", function(context) {
         spies[[2]]()
@@ -174,7 +175,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    callable[[1]]()
+    purrr::walk(callable, eval)
 
     # Assert
     mockery::expect_called(spies[[1]], 1)

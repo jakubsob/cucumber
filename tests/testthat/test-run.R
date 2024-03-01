@@ -16,12 +16,15 @@ describe("run", {
     steps <- list(
       given("the Maker has the word '{string}'", function(word, context) {
         spies[[1]]()
+        testthat::succeed()
       }),
       when("the Maker says '{string}'", function(word, context) {
         spies[[2]]()
+        testthat::succeed()
       }),
       then("the Maker should say '{string}'", function(word, context) {
         spies[[3]]()
+        testthat::succeed()
       })
     )
     parameters <- .parameters(
