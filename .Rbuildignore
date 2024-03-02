@@ -7,3 +7,6 @@
 ^codecov\.yml$
 ^\.covrignore$
 ^\.lintr$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
