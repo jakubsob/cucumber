@@ -1,4 +1,8 @@
 url: https://jakubsob.github.io/cucumber/
+home:
+  title: Behavior-Driven Development in R
 template:
   bootstrap: 5
-
+  primary: "#68D678"
+  base_font: {google: "Open Sans"}
+  code_font: {google: "Fira Code"}
