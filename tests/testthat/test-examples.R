@@ -69,4 +69,10 @@ describe("test", {
       test()
     })
   })
+
+  it("should run a Scenario with custom parameters", {
+    withr::with_dir(system.file("examples/custom_parameters", package = "cucumber"), {
+      testthat::test_dir("tests/testthat")
+    })
+  })
 })
