@@ -50,3 +50,24 @@ get_parameters <- function() {
 set_parameters <- function(parameters) {
   options(parameters = parameters)
 }
+
+set_default_parameters <- function() {
+  options(parameters = .parameters())
+  define_parameter_type(
+    name = "int",
+    regexp = "[+-]?(?<![.])[:digit:]+(?![.])",
+    transformer = as.integer
+  )
+
+  define_parameter_type(
+    name = "float",
+    regexp = "[+-]?[[:digit:]+]?\\.[:digit:]+",
+    transformer = as.double
+  )
+
+  define_parameter_type(
+    name = "string",
+    regexp = "[:print:]+",
+    transformer = as.character
+  )
+}

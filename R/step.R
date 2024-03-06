@@ -72,6 +72,10 @@ register_step <- function(step) {
   invisible(step)
 }
 
+clear_steps <- function() {
+  options(steps = .steps())
+}
+
 get_steps <- function() {
   getOption("steps", default = .steps())
 }

@@ -14,6 +14,7 @@
 #' @importFrom fs dir_ls
 #' @importFrom purrr map walk
 #' @importFrom checkmate assert_directory_exists
+#' @importFrom withr defer
 test <- function(
   features_dir = getOption("cucumber_features_dir", "tests/testthat"),
   steps_dir = getOption("cucumber_steps_dir", "tests/testthat/steps")
@@ -23,6 +24,8 @@ test <- function(
   feature_files <- dir_ls(features_dir, glob = "*.feature$", type = "file")
   steps_files <- dir_ls(steps_dir, glob = "*.R$", type = "file")
   walk(steps_files, source)
+  defer(clear_steps())
+  defer(set_default_parameters())
   feature_files |>
     map(readLines) |>
     map(normalize_feature) |>
