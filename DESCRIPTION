@@ -13,7 +13,8 @@ LazyData: true
 Suggests:
     mockery,
     box,
-    shinytest2
+    shinytest2,
+    chromote
 Config/testthat/edition: 3
 Imports:
     checkmate,
