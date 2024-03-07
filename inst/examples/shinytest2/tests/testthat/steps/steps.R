@@ -1,6 +1,6 @@
 given("I am on the main page", function(context) {
   context$driver <- shinytest2::AppDriver$new(
-    app = "."
+    app = testthat::test_path("../../")
   )
 })
 

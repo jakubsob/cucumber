@@ -1,20 +1,147 @@
+# test: should run one feature
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Guess the word                                        "
+      [5] "v |          2 | Feature: Guess the word"
+      [6] ""
+      [7] "== Results ====================================================================="
+      [8] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]"
+
+# test: should run multiple features
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Addition                                              "
+      [5] "v |          3 | Feature: Addition"
+      [6] ""
+      [7] "/ |          0 | Feature: Guess the word                                        "
+      [8] "v |          2 | Feature: Guess the word"
+      [9] ""
+      [10] "== Results ====================================================================="
+      [11] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 5 ]"
+
+# test: should run with box
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Addition                                              "
+      [5] "v |          3 | Feature: Addition"
+      [6] ""
+      [7] "== Results ====================================================================="
+      [8] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]"
+
+# test: should run with shinytest2
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Formula display                                       "
+      [5] "- |          1 | Feature: Formula display                                       "
+      [6] "\\ |          2 | Feature: Formula display                                       "
+      [7] "v |          2 | Feature: Formula display"
+      [8] ""
+      [9] "== Results ====================================================================="
+      [10] ""
+      [11] ""
+      [12] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]"
+
+# test: should run a Scenario with Given, When, Then, And, But keywords
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Addition                                              "
+      [5] "v |          3 | Feature: Addition"
+      [6] ""
+      [7] "== Results ====================================================================="
+      [8] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]"
+
+# test: should run a Scenario with a Table
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Column multiplication                                 "
+      [5] "v |          1 | Feature: Column multiplication"
+      [6] ""
+      [7] "== Results ====================================================================="
+      [8] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]"
+
+# test: should run a Scenario with a docstring
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Docstrings                                            "
+      [5] "v |          1 | Feature: Docstrings"
+      [6] ""
+      [7] "== Results ====================================================================="
+      [8] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]"
+
+# test: should run a Scenario with custom parameters
+
+    Code
+      capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
+        new(show_praise = FALSE), stop_on_failure = FALSE))
+    Output
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Addition                                              "
+      [5] "v |          1 | Feature: Addition"
+      [6] ""
+      [7] "== Results ====================================================================="
+      [8] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]"
+
 # test: should report success with `testthat::test_dir`
 
     Code
       capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
-        new(show_praise = FALSE)))
+        new(show_praise = FALSE), stop_on_failure = FALSE))
     Output
-       [1] "v | F W  S  OK | Context"                                                        
-       [2] ""                                                                                
-       [3] "/ |          0 | cucumber                                                       "
-       [4] "/ |          0 | Feature: Addition                                              "
-       [5] "v |          3 | Feature: Addition"                                              
-       [6] ""                                                                                
-       [7] "/ |          0 | Feature: Guess the word                                        "
-       [8] "v |          2 | Feature: Guess the word"                                        
-       [9] ""                                                                                
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Addition                                              "
+      [5] "v |          3 | Feature: Addition"
+      [6] ""
+      [7] "/ |          0 | Feature: Guess the word                                        "
+      [8] "v |          2 | Feature: Guess the word"
+      [9] ""
       [10] "== Results ====================================================================="
-      [11] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 5 ]"                                           
+      [11] "[ FAIL 0 | WARN 0 | SKIP 0 | PASS 5 ]"
 
 # test: should report failure with `testthat::test_dir`
 
@@ -22,78 +149,78 @@
       capture.output(testthat::test_dir("tests/testthat", reporter = ProgressReporter$
         new(show_praise = FALSE), stop_on_failure = FALSE))
     Output
-       [1] "v | F W  S  OK | Context"                                                                
-       [2] ""                                                                                        
-       [3] "/ |          0 | cucumber                                                       "        
-       [4] "/ |          0 | Feature: Addition                                              "        
-       [5] "x | 2        1 | Feature: Addition"                                                      
-       [6] "--------------------------------------------------------------------------------"        
-       [7] "Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float"                     
-       [8] "context$result (`actual`) not equal to `expected` (`expected`)."                         
-       [9] ""                                                                                        
-      [10] "  `actual`: 2"                                                                           
-      [11] "`expected`: 5"                                                                           
-      [12] "Backtrace:"                                                                              
-      [13] "    x"                                                                                   
-      [14] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"                                  
-      [15] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"     
-      [16] ""                                                                                        
-      [17] "Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float"                       
-      [18] "context$result (`actual`) not equal to `expected` (`expected`)."                         
-      [19] ""                                                                                        
-      [20] "  `actual`: 2"                                                                           
-      [21] "`expected`: 5"                                                                           
-      [22] "Backtrace:"                                                                              
-      [23] "    x"                                                                                   
-      [24] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"                                  
-      [25] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"     
-      [26] "--------------------------------------------------------------------------------"        
-      [27] ""                                                                                        
-      [28] "/ |          0 | Feature: Guess the word                                        "        
-      [29] "x | 1        1 | Feature: Guess the word"                                                
-      [30] "--------------------------------------------------------------------------------"        
-      [31] "Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game"                         
-      [32] "nchar(context$word) (`actual`) not equal to `n` (`expected`)."                           
-      [33] ""                                                                                        
-      [34] "  `actual`: 5"                                                                           
-      [35] "`expected`: 6"                                                                           
-      [36] "Backtrace:"                                                                              
-      [37] "    x"                                                                                   
-      [38] " 1. \\-global `<fn>`(n = 6L, context = `<env>`)"                                         
+      [1] "v | F W  S  OK | Context"
+      [2] ""
+      [3] "/ |          0 | cucumber                                                       "
+      [4] "/ |          0 | Feature: Addition                                              "
+      [5] "x | 2        1 | Feature: Addition"
+      [6] "--------------------------------------------------------------------------------"
+      [7] "Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float"
+      [8] "context$result (`actual`) not equal to `expected` (`expected`)."
+      [9] ""
+      [10] "  `actual`: 2"
+      [11] "`expected`: 5"
+      [12] "Backtrace:"
+      [13] "    x"
+      [14] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"
+      [15] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"
+      [16] ""
+      [17] "Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float"
+      [18] "context$result (`actual`) not equal to `expected` (`expected`)."
+      [19] ""
+      [20] "  `actual`: 2"
+      [21] "`expected`: 5"
+      [22] "Backtrace:"
+      [23] "    x"
+      [24] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"
+      [25] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"
+      [26] "--------------------------------------------------------------------------------"
+      [27] ""
+      [28] "/ |          0 | Feature: Guess the word                                        "
+      [29] "x | 1        1 | Feature: Guess the word"
+      [30] "--------------------------------------------------------------------------------"
+      [31] "Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game"
+      [32] "nchar(context$word) (`actual`) not equal to `n` (`expected`)."
+      [33] ""
+      [34] "  `actual`: 5"
+      [35] "`expected`: 6"
+      [36] "Backtrace:"
+      [37] "    x"
+      [38] " 1. \\-global `<fn>`(n = 6L, context = `<env>`)"
       [39] " 2.   \\-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:2"
-      [40] "--------------------------------------------------------------------------------"        
-      [41] ""                                                                                        
-      [42] "== Results ====================================================================="        
-      [43] "-- Failed tests ----------------------------------------------------------------"        
-      [44] "Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float"                     
-      [45] "context$result (`actual`) not equal to `expected` (`expected`)."                         
-      [46] ""                                                                                        
-      [47] "  `actual`: 2"                                                                           
-      [48] "`expected`: 5"                                                                           
-      [49] "Backtrace:"                                                                              
-      [50] "    x"                                                                                   
-      [51] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"                                  
-      [52] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"     
-      [53] ""                                                                                        
-      [54] "Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float"                       
-      [55] "context$result (`actual`) not equal to `expected` (`expected`)."                         
-      [56] ""                                                                                        
-      [57] "  `actual`: 2"                                                                           
-      [58] "`expected`: 5"                                                                           
-      [59] "Backtrace:"                                                                              
-      [60] "    x"                                                                                   
-      [61] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"                                  
-      [62] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"     
-      [63] ""                                                                                        
-      [64] "Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game"                         
-      [65] "nchar(context$word) (`actual`) not equal to `n` (`expected`)."                           
-      [66] ""                                                                                        
-      [67] "  `actual`: 5"                                                                           
-      [68] "`expected`: 6"                                                                           
-      [69] "Backtrace:"                                                                              
-      [70] "    x"                                                                                   
-      [71] " 1. \\-global `<fn>`(n = 6L, context = `<env>`)"                                         
+      [40] "--------------------------------------------------------------------------------"
+      [41] ""
+      [42] "== Results ====================================================================="
+      [43] "-- Failed tests ----------------------------------------------------------------"
+      [44] "Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float"
+      [45] "context$result (`actual`) not equal to `expected` (`expected`)."
+      [46] ""
+      [47] "  `actual`: 2"
+      [48] "`expected`: 5"
+      [49] "Backtrace:"
+      [50] "    x"
+      [51] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"
+      [52] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"
+      [53] ""
+      [54] "Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float"
+      [55] "context$result (`actual`) not equal to `expected` (`expected`)."
+      [56] ""
+      [57] "  `actual`: 2"
+      [58] "`expected`: 5"
+      [59] "Backtrace:"
+      [60] "    x"
+      [61] " 1. \\-global `<fn>`(expected = 5L, context = `<env>`)"
+      [62] " 2.   \\-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2"
+      [63] ""
+      [64] "Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game"
+      [65] "nchar(context$word) (`actual`) not equal to `n` (`expected`)."
+      [66] ""
+      [67] "  `actual`: 5"
+      [68] "`expected`: 6"
+      [69] "Backtrace:"
+      [70] "    x"
+      [71] " 1. \\-global `<fn>`(n = 6L, context = `<env>`)"
       [72] " 2.   \\-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:2"
-      [73] ""                                                                                        
-      [74] "[ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]"                                                   
+      [73] ""
+      [74] "[ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]"
 

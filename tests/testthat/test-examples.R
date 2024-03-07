@@ -1,78 +1,62 @@
-describe("test", {
-  it("should report success with `testthat::test_dir`", {
-    testthat::skip_if(testthat::is_checking())
-    withr::with_dir(system.file("examples/with_testthat_success", package = "cucumber"), {
-      testthat::expect_snapshot(
-        capture.output(
-          testthat::test_dir(
-            "tests/testthat",
-            reporter = ProgressReporter$new(show_praise = FALSE)
-          )
+test_example <- function(path) {
+  withr::with_dir(system.file(path, package = "cucumber"), {
+    testthat::expect_snapshot(
+      capture.output(
+        testthat::test_dir(
+          "tests/testthat",
+          reporter = ProgressReporter$new(show_praise = FALSE),
+          stop_on_failure = FALSE
         )
-      )
-    })
+      ),
+      transform = function(lines) {
+        lines |>
+          stringr::str_remove_all("\\s\\[\\d+.\\d+s\\]") |>
+          stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss") |>
+          stringr::str_trim()
+      }
+    )
+  })
+}
+
+describe("test", {
+  it("should run one feature", {
+    test_example("examples/one_feature")
+  })
+
+  it("should run multiple features", {
+    test_example("examples/multiple_features")
+  })
+
+  it("should run with box", {
+    test_example("examples/box_support")
+  })
+
+  it("should run with shinytest2", {
+    test_example("examples/shinytest2")
+  })
+
+  it("should run a Scenario with Given, When, Then, And, But keywords", {
+    test_example("examples/long_scenario")
+  })
+
+  it("should run a Scenario with a Table", {
+    test_example("examples/table")
+  })
+
+  it("should run a Scenario with a docstring", {
+    test_example("examples/docstring")
+  })
+
+  it("should run a Scenario with custom parameters", {
+    test_example("examples/custom_parameters")
+  })
+
+  it("should report success with `testthat::test_dir`", {
+    test_example("examples/with_testthat_success")
   })
 
   it("should report failure with `testthat::test_dir`", {
     testthat::skip_if(testthat::is_checking())
-    withr::with_dir(system.file("examples/with_testthat_failure", package = "cucumber"), {
-      testthat::expect_snapshot(
-        capture.output(
-          testthat::test_dir(
-            "tests/testthat",
-            reporter = ProgressReporter$new(show_praise = FALSE),
-            stop_on_failure = FALSE
-          )
-        )
-      )
-    })
-  })
-
-  it("should run one feature", {
-    withr::with_dir(system.file("examples/one_feature", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run multiple features", {
-    withr::with_dir(system.file("examples/multiple_features", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run with box", {
-    withr::with_dir(system.file("examples/box_support", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run with shinytest2", {
-    withr::with_dir(system.file("examples/shinytest2", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run a Scenario with Given, When, Then, And, But keywords", {
-    withr::with_dir(system.file("examples/long_scenario", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run a Scenario with a Table", {
-    withr::with_dir(system.file("examples/table", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run a Scenario with a docstring", {
-    withr::with_dir(system.file("examples/docstring", package = "cucumber"), {
-      test()
-    })
-  })
-
-  it("should run a Scenario with custom parameters", {
-    withr::with_dir(system.file("examples/custom_parameters", package = "cucumber"), {
-      testthat::test_dir("tests/testthat")
-    })
+    test_example("examples/with_testthat_failure")
   })
 })
