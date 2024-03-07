@@ -1,1 +1,5 @@
-cucumber::test(".", "./steps")
+box::use(
+  cucumber,
+)
+
+cucumber$test(".", "./steps")

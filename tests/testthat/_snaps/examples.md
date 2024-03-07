@@ -28,9 +28,9 @@
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
-      v |          3 | Feature: Addition
+      v |          4 | Feature: Addition
       == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 4 ]
 
 # test: should run with shinytest2
 
