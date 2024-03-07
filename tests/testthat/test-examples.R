@@ -1,16 +1,20 @@
 test_example <- function(path) {
   withr::with_dir(system.file(path, package = "cucumber"), {
     testthat::expect_snapshot(
-      capture.output(
-        testthat::test_dir(
-          "tests/testthat",
-          reporter = ProgressReporter$new(show_praise = FALSE),
-          stop_on_failure = FALSE
-        )
+      testthat::test_dir(
+        "tests/testthat",
+        reporter = testthat::ProgressReporter$new(show_praise = FALSE),
+        stop_on_failure = FALSE
       ),
       transform = function(lines) {
         lines |>
+          # Remove lines that indicate progress
+          stringr::str_subset("^[\\|/\\-\\\\] \\|", negate = TRUE) |>
+          # Remove empty lines
+          stringr::str_subset("^$", negate = TRUE) |>
+          # Remove test timing information
           stringr::str_remove_all("\\s\\[\\d+.\\d+s\\]") |>
+          # Remove test run duration
           stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss") |>
           stringr::str_trim()
       }
