@@ -33,8 +33,8 @@ make_step <- function(prefix) {
 #'
 #' Named arguments that precede `context` are considered parameters.
 #'
-#' If a step has a description "I have {int} cucumbers in my basket" then the implementation
-#' function should be a `function(n_cucumbers, context)`. The {int} value will be passed to
+#' If a step has a description \code{"I have {int} cucumbers in my basket"} then the implementation
+#' function should be a `function(n_cucumbers, context)`. The \code{{int}} value will be passed to
 #' `n_cucumbers`, this parameter can have any name.
 #'
 #' If a step has a table, then the table will be passed as an argument next after inline parameters
