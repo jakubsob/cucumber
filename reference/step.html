@@ -80,8 +80,8 @@ It holds the environment where state is stored.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Named arguments that precede `context` are considered parameters.</p>
-<p>If a step has a description "I have int cucumbers in my basket" then the implementation
-function should be a `function(n_cucumbers, context)`. The int value will be passed to
+<p>If a step has a description <code>"I have {int} cucumbers in my basket"</code> then the implementation
+function should be a `function(n_cucumbers, context)`. The <code>{int}</code> value will be passed to
 `n_cucumbers`, this parameter can have any name.</p>
 <p>If a step has a table, then the table will be passed as an argument next after inline parameters
 and before `context`. See `inst/examples/table` how write implemntation that uses tables.</p>
