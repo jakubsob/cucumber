@@ -15,11 +15,10 @@ make_step <- function(prefix) {
     args <- formals(implementation)
     assert_subset("context", names(args[length(args)]))
     step <- structure(
-      list(
-        description = step_regex(prefix, description),
-        implementation = implementation
-      ),
-      class = "step"
+      implementation,
+      description = paste(prefix, description),
+      detect = step_regex(prefix, description),
+      class = c("step", class(implementation))
     )
     register_step(step)
     invisible(step)
@@ -61,21 +60,32 @@ when <- make_step("When")
 #' @export
 then <- make_step("Then")
 
+#' @importFrom rlang list2
 .steps <- function(...) {
   structure(list2(...), class = "steps")
 }
 
+#' @importFrom rlang `:=`
 register_step <- function(step) {
-  steps <- getOption("steps", default = .steps())
-  steps <- .steps(!!!steps, step)
-  options(steps = steps)
+  assert_step(step)
+  steps <- getOption(".cucumber_steps", default = .steps())
+  steps <- .steps(!!!steps, !!attr(step, "description") := step)
+  options(.cucumber_steps = steps)
   invisible(step)
 }
 
 clear_steps <- function() {
-  options(steps = .steps())
+  options(.cucumber_steps = .steps())
 }
 
 get_steps <- function() {
-  getOption("steps", default = .steps())
+  getOption(".cucumber_steps", default = .steps())
+}
+
+#' @importFrom checkmate assert_function assert_class assert_string
+assert_step <- function(x) {
+  assert_function(x)
+  assert_class(x, "step")
+  assert_string(attr(x, "description"))
+  assert_string(attr(x, "detect"))
 }

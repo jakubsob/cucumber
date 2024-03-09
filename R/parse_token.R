@@ -43,7 +43,7 @@ parse_token <- function(tokens, steps, parameters = get_parameters()) {
 parse_step <- function(token, steps, parameters = get_parameters()) {
   # Pattern to detect the step
   detect <- steps |>
-    map_chr("description") |>
+    map_chr(attr, "detect") |>
     map_chr(expression_to_pattern, parameters = parameters)
 
   description <- paste(token$type, token$value)
@@ -60,7 +60,7 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
 
   # Extract parameters names
   parameter_names <- parameters |> map_chr("name") |> paste(collapse = "|")
-  parameter_names <- str_match_all(step$description, paste0("\\{(", parameter_names, ")\\}"))[[1]][, 2]
+  parameter_names <- str_match_all(attr(step, "detect"), paste0("\\{(", parameter_names, ")\\}"))[[1]][, 2]
   # Extract parameters values
   values_character <- str_match_all(description, detect[step_mask])[[1]][, -1]
   params <- map2(values_character, parameter_names, \(value, parameter_name) { # nolint: object_usage_linter
@@ -76,7 +76,7 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
     params <- append(params, list(parse_docstring(token$data)))
   }
 
-  impl_formals <- names(formals(step$implementation))
+  impl_formals <- names(formals(step))
   names(params) <- impl_formals[impl_formals != "context"]
-  rlang::call2(step$implementation, !!!params)
+  rlang::call2(step, !!!params)
 }

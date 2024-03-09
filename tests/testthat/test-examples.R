@@ -55,6 +55,17 @@ describe("test", {
     test_example("examples/custom_parameters")
   })
 
+  it("should work with covr", {
+    testthat::skip_if(covr::in_covr())
+    withr::with_dir(system.file("examples/covr_support/tests/testthat", package = "cucumber"), {
+      testthat::expect_snapshot({
+        source_files <- list.files(c("../../R", "./steps"), full.names = TRUE, pattern = ".R$")
+        test_files <- list.files(".", full.names = TRUE, pattern = ".R$")
+        covr::file_coverage(source_files, test_files)
+      })
+    })
+  })
+
   it("should report success with `testthat::test_dir`", {
     test_example("examples/with_testthat_success")
   })

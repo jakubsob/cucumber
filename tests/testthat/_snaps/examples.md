@@ -88,6 +88,16 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
+# Scenario: 1 is bigger than 0
+
+    Code
+      source_files <- list.files(c("../../R", "./steps"), full.names = TRUE, pattern = ".R$")
+      test_files <- list.files(".", full.names = TRUE, pattern = ".R$")
+      covr::file_coverage(source_files, test_files)
+    Message
+      Coverage: 66.67%
+      ../../R/get_bigger.R: 66.67%
+
 # test: should report success with `testthat::test_dir`
 
     Code
@@ -115,7 +125,7 @@
       `expected`: 5
       Backtrace:
       x
-      1. \-global `<fn>`(expected = 5L, context = `<env>`)
+      1. \-global `<step>`(expected = 5L, context = `<env>`)
       2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
@@ -123,7 +133,7 @@
       `expected`: 5
       Backtrace:
       x
-      1. \-global `<fn>`(expected = 5L, context = `<env>`)
+      1. \-global `<step>`(expected = 5L, context = `<env>`)
       2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
       --------------------------------------------------------------------------------
       x | 1        1 | Feature: Guess the word
@@ -134,7 +144,7 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-global `<fn>`(n = 6L, context = `<env>`)
+      1. \-global `<step>`(n = 6L, context = `<env>`)
       2.   \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:2
       --------------------------------------------------------------------------------
       == Results =====================================================================
@@ -145,7 +155,7 @@
       `expected`: 5
       Backtrace:
       x
-      1. \-global `<fn>`(expected = 5L, context = `<env>`)
+      1. \-global `<step>`(expected = 5L, context = `<env>`)
       2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
@@ -153,7 +163,7 @@
       `expected`: 5
       Backtrace:
       x
-      1. \-global `<fn>`(expected = 5L, context = `<env>`)
+      1. \-global `<step>`(expected = 5L, context = `<env>`)
       2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
       Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game
       nchar(context$word) (`actual`) not equal to `n` (`expected`).
@@ -161,7 +171,7 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-global `<fn>`(n = 6L, context = `<env>`)
+      1. \-global `<step>`(n = 6L, context = `<env>`)
       2.   \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:2
       [ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]
 
