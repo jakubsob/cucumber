@@ -56,7 +56,13 @@ from the `features_dir` and runs them using the steps from the `steps_dir`.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">test</span><span class="op">(</span></span>
 <span>  features_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cucumber_features_dir"</span>, <span class="st">"tests/testthat"</span><span class="op">)</span>,</span>
-<span>  steps_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cucumber_steps_dir"</span>, <span class="st">"tests/testthat/steps"</span><span class="op">)</span></span>
+<span>  steps_dir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cucumber_steps_dir"</span>, <span class="st">"tests/testthat/steps"</span><span class="op">)</span>,</span>
+<span>  steps_loader <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">steps_dir</span><span class="op">)</span> <span class="op">{</span></span>
+<span>     <span class="va">steps_files</span> <span class="op">&lt;-</span> <span class="fu">dir_ls</span><span class="op">(</span><span class="va">steps_dir</span>, glob <span class="op">=</span></span>
+<span>    <span class="st">"*.R$"</span>, type <span class="op">=</span> <span class="st">"file"</span><span class="op">)</span></span>
+<span>     <span class="fu">walk</span><span class="op">(</span><span class="va">steps_files</span>, <span class="va">source</span><span class="op">)</span></span>
+<span>     <span class="fu">get_steps</span><span class="op">(</span><span class="op">)</span></span>
+<span> <span class="op">}</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,6 +78,13 @@ use `option(cucumber_features_dir = "path/to/your/features")`.</p></dd>
 <dd><p>A character string of the directory containing the step files.
 By default it checks "tests/testthat/steps" directory. To setup a different, default directory
 use `option(cucumber_steps_dir = "path/to/your/steps")`.</p></dd>
+
+
+<dt>steps_loader</dt>
+<dd><p>A function that loads the steps implementations. By default it sources all files
+from the <code>steps_dir</code> using the built-in mechanism. You can provide your own function to load
+the steps. The function should take one argument, which will be the <code>steps_dir</code>
+and return a list of steps.</p></dd>
 
 </dl></div>
 
