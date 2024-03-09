@@ -9,6 +9,8 @@
 
 An implementation of the [Cucumber](https://cucumber.io/) testing framework in R. Fully native, no external dependencies.
 
+Run with the rest of your `testthat` tests or as a standalone test suite.
+
 ## Introduction
 
 The package parses Gherkin documents and allows you to write tests as shown below:
@@ -50,13 +52,29 @@ then("the result is {float}", function(expected, context) {
 })
 ```
 
-and running them with:
+To run as a part of `testthat` suite, create a `test-cucumber.R` file:
 
 ```r
-cucumber::test()
+#' tests/testthat/test-cucumber.R
+cucumber::test(".", "./steps")
 ```
 
-By default this command will look for Feature files in `tests/testthat` directory and step definitions in `tests/testthat/steps` directory. You can change these defaults by providing `feature_path` and `steps_path` arguments to `cucumber::test()` function.
+It will report the results with the rest of you `testthat` tests:
+
+```r
+v | F W  S  OK | Context
+v |          2 | Feature: Guess the word
+== Results ================================================
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+```
+
+
+
+or run tests separaterly with:
+
+```r
+cucumber::test("tests/testthat/", "tests/testthat/steps")
+```
 
 ## How it works
 
