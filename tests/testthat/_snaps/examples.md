@@ -98,6 +98,18 @@
       Coverage: 66.67%
       ../../R/get_bigger.R: 66.67%
 
+# test: should work with custom steps loader
+
+    Code
+      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          1 | Feature: Add
+      v |          1 | Feature: Multiply
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+
 # test: should report success with `testthat::test_dir`
 
     Code

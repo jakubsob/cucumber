@@ -66,6 +66,10 @@ describe("test", {
     })
   })
 
+  it("should work with custom steps loader", {
+    test_example("examples/custom_steps_loader")
+  })
+
   it("should report success with `testthat::test_dir`", {
     test_example("examples/with_testthat_success")
   })
