@@ -1,7 +1,10 @@
-options(box.path = system.file("examples/box_support", package = "cucumber"))
-
 box::use(
   R/addition[add],
+  cucumber[
+    given,
+    when,
+    then,
+  ]
 )
 
 when("I add {int} and {int}", function(x, y, context) {
