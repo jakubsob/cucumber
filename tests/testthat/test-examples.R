@@ -51,6 +51,10 @@ describe("test", {
     test_example("examples/docstring")
   })
 
+  it("should run a Scenario with comments", {
+    test_example("examples/comments")
+  })
+
   it("should run a Scenario with custom parameters", {
     test_example("examples/custom_parameters")
   })
