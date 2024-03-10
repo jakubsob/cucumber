@@ -9,9 +9,11 @@ step_regex <- function(step_name, description) {
 
 #' @keywords internal
 #' @importFrom rlang exec
-#' @importFrom checkmate assert_subset
+#' @importFrom checkmate assert_subset assert_string assert_function
 make_step <- function(prefix) {
   function(description, implementation) {
+    assert_string(description)
+    assert_function(implementation)
     args <- formals(implementation)
     assert_subset("context", names(args[length(args)]))
     step <- structure(
