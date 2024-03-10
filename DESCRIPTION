@@ -15,7 +15,9 @@ Suggests:
     box,
     shinytest2,
     chromote,
-    covr
+    covr,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
 Imports:
     checkmate,
@@ -29,3 +31,4 @@ Imports:
     tibble,
     withr
 RoxygenNote: 7.3.1
+VignetteBuilder: knitr
