@@ -77,11 +77,11 @@
 <!-- badges: start -->
 
 <p>An implementation of the <a href="https://cucumber.io/" class="external-link">Cucumber</a> testing framework in R. Fully native, no external dependencies.</p>
-<p>Run with the rest of your <code>testthat</code> tests or as a standalone test suite.</p>
+<p>Use it as an extension of your <code>testthat</code> tests or as a standalone testing stage.</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The package parses Gherkin documents and allows you to write tests as shown below:</p>
+<p>The package parses <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin</a> documents</p>
 <pre class="gherkin"><code># tests/testthat/addition.feature
 Feature: Addition
   Scenario: Adding 2 integers
@@ -93,6 +93,7 @@ Feature: Addition
   Scenario: Adding float and float
     When I add 1.1 and 1.1
     Then the result is 2.2</code></pre>
+<p>and uses step definitions to run the tests</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># tests/testthat/steps/steps_definitions.R</span></span>
 <span><span class="fu"><a href="reference/step.html">when</a></span><span class="op">(</span><span class="st">"I add {int} and {int}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
@@ -114,18 +115,85 @@ Feature: Addition
 <span><span class="fu"><a href="reference/step.html">then</a></span><span class="op">(</span><span class="st">"the result is {float}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">expected</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="va">context</span><span class="op">$</span><span class="va">result</span>, <span class="va">expected</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>To run as a part of <code>testthat</code> suite, create a <code>test-cucumber.R</code> file:</p>
+<div class="section level3">
+<h3 id="running-cucumber-tests-with-testthat-tests">Running cucumber tests with <code>testthat</code> tests.<a class="anchor" aria-label="anchor" href="#running-cucumber-tests-with-testthat-tests"></a>
+</h3>
+<p>To run <code>cucumber</code> as a part of <code>testthat</code> suite, create a <code>test-cucumber.R</code> file:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' tests/testthat/test-cucumber.R</span></span>
 <span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"./steps"</span><span class="op">)</span></span></code></pre></div>
-<p>It will report the results with the rest of you <code>testthat</code> tests:</p>
+<p>When you run: - <code>testthat::test_dir("tests/testthat")</code>, - <code>testthat::test_file("tests/testthat/test-cucumber.R")</code>, - or <code>devtools::test()</code>,</p>
+<p>it will use the <a href="https://testthat.r-lib.org/reference/Reporter.html" class="external-link">testthat reporter</a> to show the results.</p>
+<p>The building blocks of the cucumber tests are Features and Scenarios. - Each Feature will be treated as a separate <a href="https://testthat.r-lib.org/reference/context.html?q=context#ref-usage" class="external-link">context</a> – their results will be reported as if they were <code>test-*.R</code> files, e.g. <code>'test-Feature: Addition.R'</code>. - Each Scenario is equivalent to a <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">testthat::test_that</a></code> or <code><a href="https://testthat.r-lib.org/reference/describe.html" class="external-link">testthat::it</a></code> case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.</p>
+<p>That means a succesful run for an <code>Addition</code> feature would produce the following output (with <a href="https://testthat.r-lib.org/reference/ProgressReporter.html" class="external-link">ProgressReporter</a>).</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>v <span class="sc">|</span> F W  S  OK <span class="sc">|</span> Context</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>v <span class="sc">|</span>          <span class="dv">2</span> <span class="sc">|</span> Feature<span class="sc">:</span> Guess the word</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>v <span class="sc">|</span>          <span class="dv">3</span> <span class="sc">|</span> Feature<span class="sc">:</span> Addition</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="sc">==</span> Results <span class="sc">==</span><span class="er">==============================================</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>[ FAIL <span class="dv">0</span> <span class="sc">|</span> WARN <span class="dv">0</span> <span class="sc">|</span> SKIP <span class="dv">0</span> <span class="sc">|</span> PASS <span class="dv">2</span> ]</span></code></pre></div>
-<p>or run tests separaterly with:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/testthat/"</span>, <span class="st">"tests/testthat/steps"</span><span class="op">)</span></span></code></pre></div>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>[ FAIL <span class="dv">0</span> <span class="sc">|</span> WARN <span class="dv">0</span> <span class="sc">|</span> SKIP <span class="dv">0</span> <span class="sc">|</span> PASS <span class="dv">3</span> ]</span></code></pre></div>
+<p>And if it doesn’t succeed, it will report which Scenarios failed in the Feature.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>v <span class="sc">|</span> F W  S  OK <span class="sc">|</span> Context</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>x <span class="sc">|</span> <span class="dv">2</span>        <span class="dv">1</span> <span class="sc">|</span> Feature<span class="sc">:</span> Addition</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">Failure</span> (<span class="st">'test-cucumber.R:1:1'</span>)<span class="sc">:</span> Scenario<span class="sc">:</span> Adding integer and float</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>context<span class="sc">$</span><span class="fu">result</span> (<span class="st">`</span><span class="at">actual</span><span class="st">`</span>) not equal to <span class="st">`</span><span class="at">expected</span><span class="st">`</span> (<span class="st">`</span><span class="at">expected</span><span class="st">`</span>).</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="dv">5</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>Backtrace<span class="sc">:</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>x</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fl">1.</span> \<span class="sc">-</span>global <span class="st">`</span><span class="at">&lt;step&gt;</span><span class="st">`</span>(<span class="at">expected =</span> <span class="dv">5</span><span class="dt">L</span>, <span class="at">context =</span> <span class="st">`</span><span class="at">&lt;env&gt;</span><span class="st">`</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fl">2.</span>   \<span class="sc">-</span>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(context<span class="sc">$</span>result, expected) at .<span class="sc">/</span>steps<span class="sc">/</span>addition.R<span class="sc">:</span><span class="dv">7</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">Failure</span> (<span class="st">'test-cucumber.R:1:1'</span>)<span class="sc">:</span> Scenario<span class="sc">:</span> Adding float and float</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>context<span class="sc">$</span><span class="fu">result</span> (<span class="st">`</span><span class="at">actual</span><span class="st">`</span>) not equal to <span class="st">`</span><span class="at">expected</span><span class="st">`</span> (<span class="st">`</span><span class="at">expected</span><span class="st">`</span>).</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="dv">5</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>Backtrace<span class="sc">:</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>x</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="fl">1.</span> \<span class="sc">-</span>global <span class="st">`</span><span class="at">&lt;step&gt;</span><span class="st">`</span>(<span class="at">expected =</span> <span class="dv">5</span><span class="dt">L</span>, <span class="at">context =</span> <span class="st">`</span><span class="at">&lt;env&gt;</span><span class="st">`</span>)</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="fl">2.</span>   \<span class="sc">-</span>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(context<span class="sc">$</span>result, expected) at .<span class="sc">/</span>steps<span class="sc">/</span>addition.R<span class="sc">:</span><span class="dv">7</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="er">==</span> Results <span class="sc">==</span><span class="er">===================================================================</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="sc">--</span> Failed tests <span class="sc">----------------------------------------------------------------</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="fu">Failure</span> (<span class="st">'test-cucumber.R:1:1'</span>)<span class="sc">:</span> Scenario<span class="sc">:</span> Adding integer and float</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>context<span class="sc">$</span><span class="fu">result</span> (<span class="st">`</span><span class="at">actual</span><span class="st">`</span>) not equal to <span class="st">`</span><span class="at">expected</span><span class="st">`</span> (<span class="st">`</span><span class="at">expected</span><span class="st">`</span>).</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="dv">5</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>Backtrace<span class="sc">:</span></span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>x</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a><span class="fl">1.</span> \<span class="sc">-</span>global <span class="st">`</span><span class="at">&lt;step&gt;</span><span class="st">`</span>(<span class="at">expected =</span> <span class="dv">5</span><span class="dt">L</span>, <span class="at">context =</span> <span class="st">`</span><span class="at">&lt;env&gt;</span><span class="st">`</span>)</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="fl">2.</span>   \<span class="sc">-</span>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(context<span class="sc">$</span>result, expected) at .<span class="sc">/</span>steps<span class="sc">/</span>addition.R<span class="sc">:</span><span class="dv">7</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="fu">Failure</span> (<span class="st">'test-cucumber.R:1:1'</span>)<span class="sc">:</span> Scenario<span class="sc">:</span> Adding float and float</span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a>context<span class="sc">$</span><span class="fu">result</span> (<span class="st">`</span><span class="at">actual</span><span class="st">`</span>) not equal to <span class="st">`</span><span class="at">expected</span><span class="st">`</span> (<span class="st">`</span><span class="at">expected</span><span class="st">`</span>).</span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="dv">2</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="dv">5</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>Backtrace<span class="sc">:</span></span>
+<span id="cb5-36"><a href="#cb5-36" tabindex="-1"></a>x</span>
+<span id="cb5-37"><a href="#cb5-37" tabindex="-1"></a><span class="fl">1.</span> \<span class="sc">-</span>global <span class="st">`</span><span class="at">&lt;step&gt;</span><span class="st">`</span>(<span class="at">expected =</span> <span class="dv">5</span><span class="dt">L</span>, <span class="at">context =</span> <span class="st">`</span><span class="at">&lt;env&gt;</span><span class="st">`</span>)</span>
+<span id="cb5-38"><a href="#cb5-38" tabindex="-1"></a><span class="fl">2.</span>   \<span class="sc">-</span>testthat<span class="sc">::</span><span class="fu">expect_equal</span>(context<span class="sc">$</span>result, expected) at .<span class="sc">/</span>steps<span class="sc">/</span>addition.R<span class="sc">:</span><span class="dv">7</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb5-39"><a href="#cb5-39" tabindex="-1"></a>[ FAIL <span class="dv">1</span> <span class="sc">|</span> WARN <span class="dv">0</span> <span class="sc">|</span> SKIP <span class="dv">0</span> <span class="sc">|</span> PASS <span class="dv">2</span> ]</span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="running-cucumber-tests-separately-to-unit-tests">Running cucumber tests separately to unit tests<a class="anchor" aria-label="anchor" href="#running-cucumber-tests-separately-to-unit-tests"></a>
+</h2>
+<p>If you want to run cucumber tests separately, for example as a different testing step on CI, just put <code>cucumber</code> tests in other directory (or use <a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir filter parameter</a>).</p>
+<p>This may be especially useful, if <code>cucumber</code> tests are significantly slower than unit tests. It may often be the case as <code>cucumber</code> tests should target integration of different parts of the system and provide a high level confirmation if the system works as expected.</p>
+<pre><code>├── tests/
+│   ├── cucumber/
+│   │   ├── steps/
+│   │   │   ├── feature_1_steps.R
+│   │   │   ├── feature_2_steps.R
+│   │   ├── feature_1.feature
+│   │   ├── feature_2.feature
+│   │   ├── test-cucumber.R
+│   ├── testthat/
+│   │   ├── test-unit_test_1.R
+│   │   ├── test-unit_test_2.R</code></pre>
+<p>In that case you would run <code>cucumber</code> tests with <code>testthat::test_dir("tests/cucumber")</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
+<p>See the <a href="https://github.com/jakubsob/cucumber/tree/main/inst/examples" class="external-link">examples directory</a> to help you get started.</p>
 </div>
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
@@ -190,14 +258,13 @@ Feature: Addition
 <li><label><input type="checkbox"><code>@</code> (Tags)</label></li>
 <li><label><input type="checkbox" checked><code>#</code> (Comments)</label></li>
 </ul>
-<p>The goal is to support all listed features.</p>
 <p>See the <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin Reference</a> on how to write Gherkin documents.</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the development version of cucumber from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"jakubsob/cucumber"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
