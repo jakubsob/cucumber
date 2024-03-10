@@ -14,6 +14,9 @@ define_parameter_type(name, regexp, transformer)
 \item{transformer}{A function that will transform the parameter from a string to the desired type.
 Must be a funcion that requires only a single argument.}
 }
+\value{
+An object of class \code{parameter}, invisibly. Function should be called for side effects.
+}
 \description{
 Add a new parameter to the list of parameters that can be used in step definitions.
 }

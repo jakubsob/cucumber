@@ -19,19 +19,23 @@ then(description, implementation)
 \item{implementation}{A function that will be run when the step is executed.}
 }
 \value{
-None, funcion called for side effects.
+A function of class \code{step}, invisibly. Function should be called for side effects.
 }
 \description{
-The implementation function should always have the last parameter named `context`.
-It holds the environment where state is stored.
+The implementation of Cucumber steps.
+Make sure the description is unique for each step.
 }
 \details{
-Named arguments that precede `context` are considered parameters.
+The implementation function should always have the last parameter named \code{context}.
+It holds the environment where state is stored.
+
+Named arguments that precede \code{context} are considered parameters.
 
 If a step has a description \code{"I have {int} cucumbers in my basket"} then the implementation
-function should be a `function(n_cucumbers, context)`. The \code{{int}} value will be passed to
-`n_cucumbers`, this parameter can have any name.
+function should be a \code{function(n_cucumbers, context)}. The \code{{int}} value will be passed to
+\code{n_cucumbers}, this parameter can have any name.
 
-If a step has a table, then the table will be passed as an argument next after inline parameters
-and before `context`. See `inst/examples/table` how write implemntation that uses tables.
+If a table or a docstring is passed to a step, it will be passed as an argument next after inline parameters
+and before \code{context}. See \code{inst/examples/table} how write implemntation that uses tables
+or docstrings.
 }

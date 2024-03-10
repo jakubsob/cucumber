@@ -20,7 +20,7 @@
 
 #' Define Parameter Type
 #'
-#' Add a new parameter to the list of parameters that can be used in step definitions.
+#' Add a new parameter that can be used in step definitions.
 #'
 #' @param name
 #'  The name of the parameter.
@@ -29,6 +29,7 @@
 #' @param transformer
 #'  A function that will transform the parameter from a string to the desired type.
 #'  Must be a funcion that requires only a single argument.
+#' @return An object of class \code{parameter}, invisibly. Function should be called for side effects.
 #'
 #' @examples
 #' define_parameter_type("color", "red|blue|green", as.character)
