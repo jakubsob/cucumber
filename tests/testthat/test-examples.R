@@ -1,8 +1,8 @@
-test_example <- function(path) {
+test_example <- function(path, tests_path = "tests/testthat") {
   withr::with_dir(system.file(path, package = "cucumber"), {
     testthat::expect_snapshot(
       testthat::test_dir(
-        "tests/testthat",
+        tests_path,
         reporter = testthat::ProgressReporter$new(show_praise = FALSE),
         stop_on_failure = FALSE
       ),
@@ -68,6 +68,10 @@ describe("test", {
 
   it("should work with custom steps loader", {
     test_example("examples/custom_steps_loader")
+  })
+
+  it("should work with an arbitrary test directory", {
+    test_example("examples/custom_test_dir", "tests/acceptance")
   })
 
   it("should report success with `testthat::test_dir`", {

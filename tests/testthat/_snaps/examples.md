@@ -1,7 +1,7 @@
 # test: should run one feature
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -12,7 +12,7 @@
 # test: should run multiple features
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -24,7 +24,7 @@
 # test: should run with box
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -35,7 +35,7 @@
 # test: should run with shinytest2
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -47,7 +47,7 @@
 # test: should run a Scenario with Given, When, Then, And, But keywords
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -58,7 +58,7 @@
 # test: should run a Scenario with a Table
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -69,7 +69,7 @@
 # test: should run a Scenario with a docstring
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -80,7 +80,7 @@
 # test: should run a Scenario with custom parameters
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -101,7 +101,7 @@
 # test: should work with custom steps loader
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -110,10 +110,21 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
+# test: should work with an arbitrary test directory
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          2 | Feature: Guess the word
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+
 # test: should report success with `testthat::test_dir`
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
@@ -125,7 +136,7 @@
 # test: should report failure with `testthat::test_dir`
 
     Code
-      testthat::test_dir("tests/testthat", reporter = testthat::ProgressReporter$new(
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
