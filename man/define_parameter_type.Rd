@@ -9,7 +9,8 @@ define_parameter_type(name, regexp, transformer)
 \arguments{
 \item{name}{The name of the parameter.}
 
-\item{regexp}{A regular expression that the parameter will match on.}
+\item{regexp}{A regular expression that the parameter will match on. Note that if you want to escape a special character,
+you need to use four backslashes.}
 
 \item{transformer}{A function that will transform the parameter from a string to the desired type.
 Must be a funcion that requires only a single argument.}
@@ -18,10 +19,13 @@ Must be a funcion that requires only a single argument.}
 An object of class \code{parameter}, invisibly. Function should be called for side effects.
 }
 \description{
-Add a new parameter to the list of parameters that can be used in step definitions.
+Add a new parameter that can be used in step definitions.
 }
 \examples{
 define_parameter_type("color", "red|blue|green", as.character)
-define_parameter_type("sci_number", "[+-]?\\\\d*\\\\.?\\\\d+(e[+-]?\\\\d+)?", as.numeric)
-
+define_parameter_type(
+  name = "sci_number",
+  regexp = "[+-]?\\\\\\\\d*\\\\\\\\.?\\\\\\\\d+(e[+-]?\\\\\\\\d+)?",
+  transform = as.double
+)
 }

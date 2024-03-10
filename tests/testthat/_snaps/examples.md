@@ -95,9 +95,9 @@
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
-      v |          1 | Feature: Addition
+      v |          2 | Feature: Addition
       == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
 # Scenario: 1 is bigger than 0
 

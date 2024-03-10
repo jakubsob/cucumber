@@ -25,7 +25,8 @@
 #' @param name
 #'  The name of the parameter.
 #' @param regexp
-#'   A regular expression that the parameter will match on.
+#'   A regular expression that the parameter will match on. Note that if you want to escape a special character,
+#'   you need to use four backslashes.
 #' @param transformer
 #'  A function that will transform the parameter from a string to the desired type.
 #'  Must be a funcion that requires only a single argument.
@@ -33,8 +34,11 @@
 #'
 #' @examples
 #' define_parameter_type("color", "red|blue|green", as.character)
-#' define_parameter_type("sci_number", "[+-]?\\d*\\.?\\d+(e[+-]?\\d+)?", as.numeric)
-#'
+#' define_parameter_type(
+#'   name = "sci_number",
+#'   regexp = "[+-]?\\\\d*\\\\.?\\\\d+(e[+-]?\\\\d+)?",
+#'   transform = as.double
+#' )
 #' @export
 define_parameter_type <- function(name, regexp, transformer) {
   parameters <- get_parameters()
@@ -44,8 +48,15 @@ define_parameter_type <- function(name, regexp, transformer) {
   invisible(parameter)
 }
 
+#' @importFrom purrr compact
 get_parameters <- function() {
-  getOption("parameters", default = .parameters())
+  parameters <- getOption("parameters", default = .parameters())
+  c(
+    parameters[c("int", "float")],
+    parameters[!names(parameters) %in% c("int", "float", "string")],
+    parameters[c("string")]
+  ) |>
+    compact()
 }
 
 set_parameters <- function(parameters) {

@@ -63,6 +63,8 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
   parameter_names <- str_match_all(attr(step, "detect"), paste0("\\{(", parameter_names, ")\\}"))[[1]][, 2]
   # Extract parameters values
   values_character <- str_match_all(description, detect[step_mask])[[1]][, -1]
+  # If there are nested match groups, take the outermost one
+  values_character <- values_character[seq_len(length(parameter_names))]
   params <- map2(values_character, parameter_names, \(value, parameter_name) { # nolint: object_usage_linter
     transformer <- parameters |>
       keep(~ .x$name == parameter_name) |>
