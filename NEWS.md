@@ -1,1 +1,3 @@
-# cucumber 0.0.0.9000
+# cucumber 1.0.0
+
+First stable version 🚀
