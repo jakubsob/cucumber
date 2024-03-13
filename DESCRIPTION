@@ -1,10 +1,11 @@
 Package: cucumber
 Type: Package
-Title: An Implementation Of Cucumber Framework For R
-Version: 0.0.0.9000
+Title: Behavior-Driven Development For R
+Version: 1.0.0
 Authors@R: person("Jakub", "Sobolewski", email = "jakupsob@gmail.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Write executable specifications in a natural language that describes how your code should behave.
+    Write specifications in feature files using Gherkin language and execute them using functions implemented in R.
+    Use them as an extension to your testthat tests to provide a high level description of how your code works.
 License: MIT + file LICENSE
 URL: https://github.com/jakubsob/cucumber, https://jakubsob.github.io/cucumber/
 BugReports: https://github.com/jakubsob/cucumber
