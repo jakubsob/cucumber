@@ -6,6 +6,7 @@
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Codecov test coverage](https://codecov.io/gh/jakubsob/cucumber/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/cucumber?branch=main)
 [![CRAN status](https://www.r-pkg.org/badges/version/cucumber)](https://CRAN.R-project.org/package=cucumber)
+[![](https://cranlogs.r-pkg.org/badges/cucumber)](https://cran.rstudio.com/web/packages/cucumber/index.html)
 <!-- badges: end -->
 
 An implementation of the [Cucumber](https://cucumber.io/) testing framework in R. Fully native, no external dependencies.
