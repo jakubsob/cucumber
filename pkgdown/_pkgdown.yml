@@ -3,7 +3,12 @@ home:
   title: Behavior-Driven Development in R
 template:
   bootstrap: 5
-  bootswatch: pulse
+  bootswatch: lux
+  bslib:
+    bg: "white"
+    fg: "#1F3545"
+    primary: "#68D678"
+    pkgdown-nav-height: 100px
   includes:
     in_header: |
       <!-- Google tag (gtag.js) -->
