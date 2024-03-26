@@ -82,7 +82,8 @@ make_step <- function(prefix) {
 #'
 #' To define your own parameter types use \code{\link{define_parameter_type}}.
 #'
-#' @seealso [define_parameter_type]
+#' @md
+#' @seealso [define_parameter_type()]
 #' @return A function of class \code{step}, invisibly. Function should be called for side effects.
 NULL
 

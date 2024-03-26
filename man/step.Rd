@@ -72,5 +72,5 @@ then("I should have {int} cucumbers in my basket", function(n_cucumbers, context
 
 }
 \seealso{
-[define_parameter_type]
+\code{\link[=define_parameter_type]{define_parameter_type()}}
 }
