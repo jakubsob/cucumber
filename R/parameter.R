@@ -18,9 +18,20 @@
   )
 }
 
-#' Define Parameter Type
+
+#' Parameter Type
 #'
-#' Add a new parameter that can be used in step definitions.
+#' @description
+#' The following parameter types are available by default:
+#'
+#' | **Type**           | **Description**                                                                                                                                                                                               |
+#' | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+#' | `{int}`            | Matches integers, for example `71` or `-19`. Converts value with `as.integer`.                                                                                                                                      |
+#' | `{float}`          | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`.                                                                                                                                   |
+#' | `{word}`           | Matches words without whitespace, for example `banana` (but not `banana split`).                                                                                                                                  |
+#' | `{string}`         | Matches single-quoted or double-quoted strings, for example `"banana split"` or `'banana split'` (but not `banana split`). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
+#'
+#' To use custom parameter types, call `define_parameter_type` before `cucumber::test` is called.
 #'
 #' @param name
 #'  The name of the parameter.
@@ -39,6 +50,14 @@
 #'   regexp = "[+-]?\\\\d*\\\\.?\\\\d+(e[+-]?\\\\d+)?",
 #'   transform = as.double
 #' )
+#'
+#' \dontrun{
+#' #' tests/testthat/test-cucumber.R
+#' cucumber::define_parameter_type("color", "red|blue|green", as.character)
+#' cucumber::test(".", "./steps")
+#' }
+#'
+#' @md
 #' @export
 define_parameter_type <- function(name, regexp, transformer) {
   parameters <- get_parameters()

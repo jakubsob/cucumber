@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameter.R
 \name{define_parameter_type}
 \alias{define_parameter_type}
-\title{Define Parameter Type}
+\title{Parameter Type}
 \usage{
 define_parameter_type(name, regexp, transformer)
 }
@@ -19,7 +19,16 @@ Must be a function that requires only a single argument.}
 An object of class \code{parameter}, invisibly. Function should be called for side effects.
 }
 \description{
-Add a new parameter that can be used in step definitions.
+The following parameter types are available by default:\tabular{ll}{
+   \strong{Type} \tab \strong{Description} \cr
+   \code{{int}} \tab Matches integers, for example \code{71} or \code{-19}. Converts value with \code{as.integer}. \cr
+   \code{{float}} \tab Matches floats, for example \code{3.6}, \code{.8} or \code{-9.2}. Converts value with \code{as.double}. \cr
+   \code{{word}} \tab Matches words without whitespace, for example \code{banana} (but not \verb{banana split}). \cr
+   \code{{string}} \tab Matches single-quoted or double-quoted strings, for example \code{"banana split"} or \code{'banana split'} (but not \verb{banana split}). Only the text between the quotes will be extracted. The quotes themselves are discarded. \cr
+}
+
+
+To use custom parameter types, call \code{define_parameter_type} before \code{cucumber::test} is called.
 }
 \examples{
 define_parameter_type("color", "red|blue|green", as.character)
@@ -28,4 +37,11 @@ define_parameter_type(
   regexp = "[+-]?\\\\\\\\d*\\\\\\\\.?\\\\\\\\d+(e[+-]?\\\\\\\\d+)?",
   transform = as.double
 )
+
+\dontrun{
+#' tests/testthat/test-cucumber.R
+cucumber::define_parameter_type("color", "red|blue|green", as.character)
+cucumber::test(".", "./steps")
+}
+
 }
