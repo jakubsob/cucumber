@@ -99,6 +99,17 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
+# test: should run a Scenario with snapshot test
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          1 | Feature: Snapshot
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+
 # Scenario: 1 is bigger than 0
 
     Code

@@ -59,6 +59,10 @@ describe("test", {
     test_example("examples/custom_parameters")
   })
 
+  it("should run a Scenario with snapshot test", {
+    test_example("examples/snapshot_test")
+  })
+
   it("should work with covr", {
     testthat::skip_if(covr::in_covr())
     withr::with_dir(system.file("examples/covr_support/tests/testthat", package = "cucumber"), {
