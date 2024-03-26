@@ -140,13 +140,13 @@ Feature: Addition
 <p>it will use the <a href="https://testthat.r-lib.org/reference/Reporter.html" class="external-link">testthat reporter</a> to show the results.</p>
 <p>The building blocks of the cucumber tests are Features and Scenarios. - Each Feature will be treated as a separate <a href="https://testthat.r-lib.org/reference/context.html?q=context#ref-usage" class="external-link">context</a> – their results will be reported as if they were <code>test-*.R</code> files, e.g. <code>'test-Feature: Addition.R'</code>. - Each Scenario is equivalent to a <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">testthat::test_that</a></code> or <code><a href="https://testthat.r-lib.org/reference/describe.html" class="external-link">testthat::it</a></code> case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.</p>
 <p>That means a succesful run for an <code>Addition</code> feature would produce the following output (with <a href="https://testthat.r-lib.org/reference/ProgressReporter.html" class="external-link">ProgressReporter</a>).</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>v <span class="sc">|</span> F W  S  OK <span class="sc">|</span> Context</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>v <span class="sc">|</span>          <span class="dv">3</span> <span class="sc">|</span> Feature<span class="sc">:</span> Addition</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="sc">==</span> Results <span class="sc">==</span><span class="er">==============================================</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="sc">|</span> v <span class="sc">|</span> F W  S  OK <span class="sc">|</span> Context           <span class="sc">|</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="er">|</span> v <span class="sc">|</span> <span class="dv">3</span>          <span class="sc">|</span> Feature<span class="sc">:</span> Addition <span class="sc">|</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="er">==</span> Results <span class="sc">==</span><span class="er">==============================================</span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>[ FAIL <span class="dv">0</span> <span class="sc">|</span> WARN <span class="dv">0</span> <span class="sc">|</span> SKIP <span class="dv">0</span> <span class="sc">|</span> PASS <span class="dv">3</span> ]</span></code></pre></div>
 <p>And if it doesn’t succeed, it will report which Scenarios failed in the Feature.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>v <span class="sc">|</span> F W  S  OK <span class="sc">|</span> Context</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>x <span class="sc">|</span> <span class="dv">2</span>        <span class="dv">1</span> <span class="sc">|</span> Feature<span class="sc">:</span> Addition</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="sc">|</span> v <span class="sc">|</span> F W  S  OK <span class="sc">|</span> Context           <span class="sc">|</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="er">|</span> x <span class="sc">|</span> <span class="dv">2</span>        <span class="dv">1</span> <span class="sc">|</span> Feature<span class="sc">:</span> Addition <span class="sc">|</span></span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">Failure</span> (<span class="st">'test-cucumber.R:1:1'</span>)<span class="sc">:</span> Scenario<span class="sc">:</span> Adding integer and float</span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>context<span class="sc">$</span><span class="fu">result</span> (<span class="st">`</span><span class="at">actual</span><span class="st">`</span>) not equal to <span class="st">`</span><span class="at">expected</span><span class="st">`</span> (<span class="st">`</span><span class="at">expected</span><span class="st">`</span>).</span>
@@ -222,30 +222,35 @@ Feature: Addition
 <p>The following parameter types are available by default:</p>
 <table class="table">
 <colgroup>
-<col width="10%">
-<col width="25%">
-<col width="63%">
+<col width="6%">
+<col width="92%">
+<col width="1%">
 </colgroup>
 <thead><tr class="header">
 <th>Parameter Type</th>
-<th>Underlying regular expression</th>
 <th>Description</th>
+<th></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td><code>{int}</code></td>
-<td><code>[+-]?(?&lt;![.])[:digit:]+(?![.])</code></td>
 <td>Matches integers, for example <code>71</code> or <code>-19</code>. Converts value with <code>as.integer</code>.</td>
+<td></td>
 </tr>
 <tr class="even">
 <td><a href="https://github.com/wrathematics/float" class="external-link">float</a></td>
-<td><code>[+-]?[[:digit:]+]?\\.[:digit:]+</code></td>
 <td>Matches floats, for example <code>3.6</code>, <code>.8</code> or <code>-9.2</code>. Converts value with <code>as.double</code>.</td>
+<td></td>
 </tr>
 <tr class="odd">
+<td><code>{word}</code></td>
+<td>Matches words without whitespace, for example banana (but not banana split).</td>
+<td></td>
+</tr>
+<tr class="even">
 <td><code>{string}</code></td>
-<td><code>[:print:]+</code></td>
-<td>Matches letters, numbers, punctuation and whitespace.</td>
+<td>Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded.</td>
+<td></td>
 </tr>
 </tbody>
 </table>
