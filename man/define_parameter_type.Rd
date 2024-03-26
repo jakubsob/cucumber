@@ -13,7 +13,7 @@ define_parameter_type(name, regexp, transformer)
 you need to use four backslashes.}
 
 \item{transformer}{A function that will transform the parameter from a string to the desired type.
-Must be a funcion that requires only a single argument.}
+Must be a function that requires only a single argument.}
 }
 \value{
 An object of class \code{parameter}, invisibly. Function should be called for side effects.
