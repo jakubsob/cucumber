@@ -8,7 +8,7 @@ given("I have a table", function(table, context) {
     read_table()
 })
 
-when("I multiply {string} column by {int}", function(column, factor, context) {
+when("I multiply {word} column by {int}", function(column, factor, context) {
   context$table <- context$table |>
     dplyr::mutate(dplyr::across({{ column }}, \(x) x * factor))
 })

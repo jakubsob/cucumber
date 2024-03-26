@@ -2,7 +2,7 @@ given("I have a docstring", function(docstring, context) {
   context$docstring <- docstring
 })
 
-when("I remove line that contains '{string}'", function(line, context) {
+when("I remove line that contains {string}", function(line, context) {
   context$docstring <- context$docstring |>
     purrr::discard(\(x) stringr::str_detect(x, line))
 })

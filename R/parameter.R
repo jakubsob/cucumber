@@ -63,6 +63,7 @@ set_parameters <- function(parameters) {
   options(parameters = parameters)
 }
 
+#' @importFrom stringr str_sub str_trim
 set_default_parameters <- function() {
   options(parameters = .parameters())
   define_parameter_type(
@@ -79,7 +80,15 @@ set_default_parameters <- function() {
 
   define_parameter_type(
     name = "string",
-    regexp = "[:print:]+",
+    regexp = "'[:print:]+?'|\"[:print:]+?\"",
+    transformer = function(x) {
+      str_sub(x, 2, nchar(x) - 1)
+    }
+  )
+
+  define_parameter_type(
+    name = "word",
+    regexp = "\\\\w+",
     transformer = as.character
   )
 }

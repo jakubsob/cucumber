@@ -14,15 +14,15 @@ describe("run", {
       mockery::mock()
     )
     steps <- list(
-      given("the Maker has the word '{string}'", function(word, context) {
+      given("the Maker has the word {string}", function(word, context) {
         spies[[1]]()
         testthat::succeed()
       }),
-      when("the Maker says '{string}'", function(word, context) {
+      when("the Maker says {string}", function(word, context) {
         spies[[2]]()
         testthat::succeed()
       }),
-      then("the Maker should say '{string}'", function(word, context) {
+      then("the Maker should say {string}", function(word, context) {
         spies[[3]]()
         testthat::succeed()
       })
@@ -30,7 +30,7 @@ describe("run", {
     parameters <- .parameters(
       .parameter(
         name = "string",
-        regex = "[:print:]+",
+        regex = "'[:print:]+'",
         transformer = as.character
       )
     )

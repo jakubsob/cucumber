@@ -46,32 +46,88 @@ describe("float", {
   it("should detect floats", {
     # Arrange
     x <- c("+1.1", "-1.1", "1.1", ".1", "+1", "-1", "1", "a")
-    float <- get_parameters()$float
+    param <- get_parameters()$float
 
     # Act
-    result <- stringr::str_extract(x, float$regex)
+    result <- x |>
+      stringr::str_subset(param$regex) |>
+      param$transformer()
 
     # Assert
     expect_equal(
       result,
-      c("+1.1", "-1.1", "1.1", ".1", NA, NA, NA, NA)
+      c(1.1, -1.1, 1.1, .1)
     )
   })
 })
 
 describe("string", {
-  it("should detect strings", {
+  it("should detect strings in single quotes", {
     # Arrange
-    x <- c("a", "1", "1.1", "a1", "1a", "1.1a")
-    string <- get_parameters()$string
+    x <- c("'a'", "'1'", "'1.1'", "'a1'", "'1a'", "'1.1a'")
+    param <- get_parameters()$string
 
     # Act
-    result <- stringr::str_extract(x, string$regex)
+    result <- x |>
+      stringr::str_subset(param$regex) |>
+      param$transformer()
 
     # Assert
     expect_equal(
       result,
       c("a", "1", "1.1", "a1", "1a", "1.1a")
+    )
+  })
+
+  it("should detect strings with double quotes", {
+    # Arrange
+    x <- c("\"a\"", "\"1\"", "\"1.1\"", "\"a1\"", "\"1a\"", "\"1.1a\"")
+    param <- get_parameters()$string
+
+    # Act
+    result <- x |>
+      stringr::str_subset(param$regex) |>
+      param$transformer()
+
+    # Assert
+    expect_equal(
+      result,
+      c("a", "1", "1.1", "a1", "1a", "1.1a")
+    )
+  })
+
+  it("shouldn't detect strings without single or double quotes", {
+    # Arrange
+    x <- c("a", "1", "1.1", "a1", "1a", "1.1a")
+    param <- get_parameters()$string
+
+    # Act
+    result <- x |>
+      stringr::str_subset(param$regex) |>
+      param$transformer()
+
+    # Assert
+    expect_equal(result, character(0))
+  })
+})
+
+describe("word", {
+  it("should detect words", {
+    # Arrange
+    x <- c("word", "word_2", "num_1_word", "alnum.word", "1")
+    param <- get_parameters()$word
+
+    # Act
+    result <- x |>
+      stringr::str_subset(
+        stringr::str_replace_all(param$regex, stringr::fixed("\\\\"), "\\")
+      ) |>
+      param$transformer()
+
+    # Assert
+    expect_equal(
+      result,
+      c("word", "word_2", "num_1_word", "alnum.word", "1")
     )
   })
 })

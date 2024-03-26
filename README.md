@@ -80,8 +80,8 @@ The building blocks of the cucumber tests are Features and Scenarios.
 That means a succesful run for an `Addition` feature would produce the following output (with [ProgressReporter](https://testthat.r-lib.org/reference/ProgressReporter.html)).
 
 ```r
-v | F W  S  OK | Context
-v |          3 | Feature: Addition
+| v | F W  S  OK | Context           |
+| v | 3          | Feature: Addition |
 == Results ================================================
 [ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]
 ```
@@ -89,8 +89,8 @@ v |          3 | Feature: Addition
 And if it doesn't succeed, it will report which Scenarios failed in the Feature.
 
 ```r
-v | F W  S  OK | Context
-x | 2        1 | Feature: Addition
+| v | F W  S  OK | Context           |
+| x | 2        1 | Feature: Addition |
 --------------------------------------------------------------------------------
 Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
 context$result (`actual`) not equal to `expected` (`expected`).
@@ -172,11 +172,12 @@ Step implementations receive data from the `.feature` files as parameters. The v
 
 The following parameter types are available by default:
 
-| Parameter Type |   Underlying regular expression   |                                     Description                                     |
-| -------------- | --------------------------------- | ----------------------------------------------------------------------------------- |
-| `{int}`        | `[+-]?(?<![.])[:digit:]+(?![.])`  | Matches integers, for example `71` or `-19`. Converts value with `as.integer`.      |
-| `{float}`      | `[+-]?[[:digit:]+]?\\.[:digit:]+` | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`. |
-| `{string}`     | `[:print:]+`                      | Matches letters, numbers, punctuation and whitespace.                               |
+| Parameter Type | Description                                                                                                                                                                                                   |     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| `{int}`        | Matches integers, for example `71` or `-19`. Converts value with `as.integer`.                                                                                                                                |     |
+| `{float}`      | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`.                                                                                                                           |     |
+| `{word}`       | Matches words without whitespace, for example banana (but not banana split).                                                                                                                                  |     |
+| `{string}`     | Matches single-quoted or double-quoted strings, for example "banana split" or 'banana split' (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |     |
 
 See `cucumber::define_parameter_type()` how to define your own parameter types.
 

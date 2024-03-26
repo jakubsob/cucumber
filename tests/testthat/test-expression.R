@@ -1,7 +1,7 @@
 describe("expression_to_pattern", {
   it("should convert an expression to a pattern that detects parameters", {
     # Arrange
-    expression <- "word '{string}' word"
+    expression <- "word {string} word"
     parameters <- .parameters(
       .parameter(
         name = "string",
@@ -14,6 +14,6 @@ describe("expression_to_pattern", {
     result <- expression_to_pattern(expression, parameters)
 
     # Assert
-    expect_equal(result, "word '([^\"]*)' word")
+    expect_equal(result, "word ([^\"]*) word")
   })
 })

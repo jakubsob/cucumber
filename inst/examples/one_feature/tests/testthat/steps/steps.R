@@ -6,7 +6,7 @@ then("the Maker waits for a Breaker to join", function(context) {
   expect_equal(context$game, "game")
 })
 
-given("the Maker has started a game with the word '{string}'", function(x, context) {
+given("the Maker has started a game with the word {string}", function(x, context) {
   context$word <- x
 })
 

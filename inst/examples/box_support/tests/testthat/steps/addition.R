@@ -23,7 +23,7 @@ when("I add {float} and {float}", function(x, y, context) {
   context$result <- add(x, y)
 })
 
-when("I add {float} and '{string}'", function(x, y, context) {
+when("I add {float} and {string}", function(x, y, context) {
   context$lazy_result <- \() add(x, y)
 })
 

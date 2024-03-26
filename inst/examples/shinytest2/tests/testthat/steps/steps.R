@@ -13,7 +13,7 @@ when("I select {string} variable", function(variable, context) {
   context$driver$set_inputs(variable = value)
 })
 
-then("the formula display should show '{string}'", function(formula, context) {
+then("the formula display should show {string}", function(formula, context) {
   expect_equal(context$driver$get_text("#caption"), formula)
   context$driver$stop()
 })

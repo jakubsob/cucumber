@@ -36,7 +36,7 @@ parse_token <- function(tokens, steps, parameters = get_parameters()) {
     unlist()
 }
 
-#' @importFrom purrr map_chr map map2 keep pluck
+#' @importFrom purrr map_chr map map_int map2 keep pluck
 #' @importFrom stringr str_detect str_match_all
 #' @importFrom rlang exec
 #' @importFrom glue glue
@@ -50,10 +50,11 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
 
   step_mask <- str_detect(description, detect)
   if (sum(step_mask) == 0) {
-    abort(glue("No step found for: {description}"))
+    abort(glue("No step found for: \"{description}\""))
   }
   if (sum(step_mask) > 1) {
-    abort(glue("Multiple steps found for: {description}"))
+    steps <- steps[order(map_int(steps, \(x) length(formals(x))), decreasing = TRUE)]
+    map(steps, \(x) parse_step(token, list(x), parameters))
   }
 
   step <- steps[step_mask][[1]]
