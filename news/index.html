@@ -58,9 +58,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.1" id="cucumber-101">cucumber 1.0.1<a class="anchor" aria-label="anchor" href="#cucumber-101"></a></h2>
-<ul><li>Changed how <code>{string}</code> parameter is matched. It now matches on text in quotes.</li>
-<li>Added a <code>{word}</code> parameter that matches on a single word.</li>
-<li>Fix handling of repeated <code>{string}</code> parameters in the same step.</li>
+<ul><li>✨ Changed how <code>{string}</code> parameter is matched. It now matches on text in quotes. A step <code>Given I have a {string}</code> will match on <code>Given I have a "foo bar"</code>. This change brings the parser closer to how the original <a href="https://github.com/cucumber/cucumber-expressions" class="external-link">cucumber expressions</a> work.</li>
+<li>✨ Added a <code>{word}</code> parameter that matches on a single word. A step like <code>Given I have a {word}</code> will match on <code>Given I have a foo</code>.</li>
+<li>🐛 Fix handling of repeated parameters in the same step. Now if there are steps <code>Given I have a {string} and a {string}</code> and <code>Given I have a {string}</code> it will match on <code>Given I have a "foo" and a "bar"</code> instead of throwing an error that multiple step definitions have been found.</li>
+<li>📝 Improved documentation of parameters in <code>define_parameter_type</code> function docs.</li>
+<li>📝 Added an example with snapshot test.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="cucumber-100">cucumber 1.0.0<a class="anchor" aria-label="anchor" href="#cucumber-100"></a></h2><p class="text-muted">CRAN release: 2024-03-14</p>
