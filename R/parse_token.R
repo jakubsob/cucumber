@@ -52,6 +52,17 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
   if (sum(step_mask) == 0) {
     abort(glue("No step found for: \"{description}\""))
   }
+  unique_steps <- unique(steps[step_mask])
+  are_duplicates <- length(unique_steps) == 1 && length(steps[step_mask]) > 1
+  if (are_duplicates) {
+    step_description <- attr(unique_steps[[1]], "description")
+    abort(
+      glue("Multiple steps found for: \"{description}\""),
+      body = glue(
+        "Check step definitions for duplicates of: \"{step_description}\""
+      )
+    )
+  }
   if (sum(step_mask) > 1) {
     steps <- steps[order(map_int(steps, \(x) length(formals(x))), decreasing = TRUE)]
     map(steps, \(x) parse_step(token, list(x), parameters))

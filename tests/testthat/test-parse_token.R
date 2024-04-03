@@ -25,7 +25,7 @@ describe("parse_token", {
     )
   })
 
-  it("should throw an arror if no step definition has been found", {
+  it("should throw an error if no step definition has been found", {
     # Arrange
     token <- list(
       list(
@@ -49,6 +49,35 @@ describe("parse_token", {
       parse_token(token, steps, parameters),
       fixed = TRUE,
       regexp = "No step found for: \"Given the Maker has {string}\""
+    )
+  })
+
+  it("should throw an error if duplicated step definitions have been found", {
+    # Arrange
+    token <- list(
+      list(
+        type = "Given",
+        value = "the Maker has \"a hat\"",
+        children = NULL,
+        data = NULL
+      )
+    )
+    steps <- list(
+      given("the Maker has {string}", function(string, context) {
+
+      }),
+      given("the Maker has {string}", function(string, context) {
+
+      })
+    )
+    parameters <- .parameters(
+      get_parameters()$string
+    )
+
+    # Act & Assert
+    expect_error(
+      parse_token(token, steps, parameters),
+      regexp = "Multiple steps found for: \"Given the Maker has \"a hat\""
     )
   })
 
