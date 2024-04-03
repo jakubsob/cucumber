@@ -191,11 +191,7 @@ describe("parse_token", {
     )
     parameters <- .parameters(
       get_parameters()$string,
-      define_parameter_type(
-        name = "word",
-        regex = "\\\\s*\\\\w+",
-        transformer = as.character
-      )
+      get_parameters()$word
     )
 
     # Act
