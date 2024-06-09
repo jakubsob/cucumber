@@ -1,3 +1,11 @@
+# cucumber 1.0.3
+
+- Fixed float detection with multiple leading numbers, e.g. `11.1`, `+11.1`, `-11.1`.
+
+# cucumber 1.0.2
+
+- Fixed CRAN debian checks.
+
 # cucumber 1.0.1
 
 - ✨ Changed how `{string}` parameter is matched. It now matches on text in quotes. A step `Given I have a {string}` will match on `Given I have a "foo bar"`. This change brings the parser closer to how the original [cucumber expressions](https://github.com/cucumber/cucumber-expressions) work.
