@@ -45,7 +45,13 @@ describe("int", {
 describe("float", {
   it("should detect floats", {
     # Arrange
-    x <- c("+1.1", "-1.1", "1.1", ".1", "+1", "-1", "1", "a")
+    x <- c(
+      "+1.1", "-1.1", "1.1",
+      "+11.1", "-11.1", "11.1",
+      ".1",
+      "+1", "-1", "1",
+      "a"
+    )
     param <- get_parameters()$float
 
     # Act
@@ -56,7 +62,11 @@ describe("float", {
     # Assert
     expect_equal(
       result,
-      c(1.1, -1.1, 1.1, .1)
+      c(
+        1.1, -1.1, 1.1,
+        11.1, -11.1, 11.1,
+        .1
+      )
     )
   })
 })

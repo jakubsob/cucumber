@@ -93,7 +93,7 @@ set_default_parameters <- function() {
 
   define_parameter_type(
     name = "float",
-    regexp = "[+-]?[[:digit:]+]?\\.[:digit:]+",
+    regexp = "[+-]?[:digit:]*?\\.[:digit:]+",
     transformer = as.double
   )
 
