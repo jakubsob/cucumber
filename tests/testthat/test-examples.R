@@ -60,6 +60,7 @@ describe("test", {
   })
 
   it("should run a Scenario with snapshot test", {
+    testthat::skip_on_cran()
     test_example("examples/snapshot_test")
   })
 

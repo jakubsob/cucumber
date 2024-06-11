@@ -1,5 +1,3 @@
-## R CMD check results
+## Author comment
 
-0 errors | 0 warnings | 1 note
-
-* This is a new release.
+This is a resubmission of version 1.0.3. In this version snapshot tests are skipped to avoid attempting to write to the user library. No other changes have been made.
