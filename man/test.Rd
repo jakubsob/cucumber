@@ -4,7 +4,12 @@
 \alias{test}
 \title{Run all Cucumber tests}
 \usage{
-test(features_dir, steps_dir, steps_loader = .default_steps_loader)
+test(
+  features_dir,
+  steps_dir,
+  steps_loader = .default_steps_loader,
+  test_interactive = getOption("cucumber.interactive", default = FALSE)
+)
 }
 \arguments{
 \item{features_dir}{A character string of the directory containing the feature files.}
@@ -15,6 +20,8 @@ test(features_dir, steps_dir, steps_loader = .default_steps_loader)
 from the \code{steps_dir} using the built-in mechanism. You can provide your own function to load
 the steps. The function should take one argument, which will be the \code{steps_dir}
 and return a list of steps.}
+
+\item{test_interactive}{A logical value indicating whether to ask which feature files to run.}
 }
 \value{
 None, function called for side effects.

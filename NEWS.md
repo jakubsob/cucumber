@@ -1,3 +1,7 @@
+# cucumber 1.0.4
+
+- Added `test_interactive` parameter to `cucumber::test`. It allows you to interactively select which feature files to run. It can be useful to get quicker feedback when developing new features.
+
 # cucumber 1.0.3
 
 - Fixed float detection with multiple leading numbers, e.g. `11.1`, `+11.1`, `-11.1`.
