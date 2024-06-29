@@ -18,7 +18,7 @@ from the features_dir and runs them using the steps from the steps_dir."><meta p
     
     <a class="navbar-brand me-2" href="../index.html">cucumber</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,12 @@ from the <code>features_dir</code> and runs them using the steps from the <code>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">test</span><span class="op">(</span><span class="va">features_dir</span>, <span class="va">steps_dir</span>, steps_loader <span class="op">=</span> <span class="va">.default_steps_loader</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">test</span><span class="op">(</span></span>
+<span>  <span class="va">features_dir</span>,</span>
+<span>  <span class="va">steps_dir</span>,</span>
+<span>  steps_loader <span class="op">=</span> <span class="va">.default_steps_loader</span>,</span>
+<span>  test_interactive <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"cucumber.interactive"</span>, default <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,6 +89,10 @@ from the <code>features_dir</code> and runs them using the steps from the <code>
 from the <code>steps_dir</code> using the built-in mechanism. You can provide your own function to load
 the steps. The function should take one argument, which will be the <code>steps_dir</code>
 and return a list of steps.</p></dd>
+
+
+<dt>test_interactive</dt>
+<dd><p>A logical value indicating whether to ask which feature files to run.</p></dd>
 
 </dl></div>
     <div class="section level2">
