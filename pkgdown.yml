@@ -3,7 +3,7 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   how-it-works: how-it-works.html
-last_built: 2024-06-29T19:18Z
+last_built: 2024-06-30T11:23Z
 urls:
   reference: https://jakubsob.github.io/cucumber/reference
   article: https://jakubsob.github.io/cucumber/articles
