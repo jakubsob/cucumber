@@ -37,6 +37,7 @@ test <- function(
   assert_function(steps_loader, nargs = 1)
   defer({
     clear_steps()
+    clear_hooks()
     set_default_parameters()
   })
   steps <- steps_loader(steps_dir)

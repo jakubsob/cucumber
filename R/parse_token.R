@@ -2,7 +2,13 @@
 #' @importFrom glue glue
 #' @importFrom purrr map walk
 #' @importFrom testthat context_start_file test_that
-parse_token <- function(tokens, steps, parameters = get_parameters()) {
+parse_token <- function(
+  tokens,
+  steps,
+  parameters = get_parameters(),
+  hooks = get_hooks()
+) {
+  force(hooks)
   map(tokens, \(token) {
     switch(
       token$type,
@@ -13,17 +19,19 @@ parse_token <- function(tokens, steps, parameters = get_parameters()) {
             calls <- parse_token(token$children, steps, parameters) |>
               map(\(x) call_modify(x, context = context))
 
+            get_hook(hooks, "before")(context, token$value)
             # Use `for` for better error messages instead of purrr indexed ones
             for (call in calls) {
               eval(call)
             }
+            get_hook(hooks, "after")(context, token$value)
           })
         }
       ),
       "Feature" = call2(
         function(file_name = token$value) {
           context_start_file(glue("Feature: {file_name}"))
-          parse_token(token$children, steps, parameters) |>
+          parse_token(token$children, steps, parameters, hooks) |>
             walk(eval)
         }
       ),

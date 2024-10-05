@@ -55,6 +55,10 @@ describe("test", {
     test_example("examples/comments")
   })
 
+  it("should run before hook", {
+    test_example("examples/hooks")
+  })
+
   it("should run a Scenario with custom parameters", {
     test_example("examples/custom_parameters")
   })
