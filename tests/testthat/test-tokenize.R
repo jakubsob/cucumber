@@ -398,4 +398,60 @@ describe("parse", {
       )
     )
   })
+
+  it("should tokenize table and ignore commented lines", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "  # Scenario: Breaker joins a game",
+      "  #   Given the Maker has started a game with the word 'silky'",
+      "  #   When the Breaker joins the Maker's game",
+      "",
+      "  Scenario: Maker starts a game",
+      "    When the Maker starts a game",
+      "    Then the Maker waits for a Breaker to join",
+      "      | x | y |",
+      "      | 1 | 2 |",
+      "",
+      "# Scenario: Breaker joins a game",
+      "#   Given the Maker has started a game with the word 'silky'",
+      "#   When the Breaker joins the Maker's game"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Feature",
+          value = "Guess the word",
+          children = list(
+            list(
+              type = "Scenario",
+              value = "Maker starts a game",
+              children = list(
+                list(
+                  type = "When",
+                  value = "the Maker starts a game",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Then",
+                  value = "the Maker waits for a Breaker to join",
+                  children = NULL,
+                  data = c("| x | y |", "| 1 | 2 |")
+                )
+              ),
+              data = NULL
+            )
+          ),
+          data = NULL
+        )
+      )
+    )
+  })
 })

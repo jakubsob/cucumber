@@ -84,9 +84,9 @@
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
-      v |          1 | Feature: Guess the word
+      v |          2 | Feature: Guess the word
       == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
 # test: should run a Scenario with custom parameters
 

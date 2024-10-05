@@ -2,6 +2,11 @@ when("the Maker starts a game", function(context) {
   context$game <- "game"
 })
 
+when("the Maker starts a game with", function(table, context) {
+  context$game <- "game"
+  succeed()
+})
+
 then("the Maker waits for a Breaker to join", function(context) {
   expect_equal(context$game, "game")
 })

@@ -22,7 +22,7 @@ remove_empty_lines <- function(x) {
 
 #' @importFrom stringr str_detect
 remove_comments <- function(x) {
-  x[!str_detect(x, "^\\s+#")]
+  x[!str_detect(x, "^\\s*#")]
 }
 
 #' @importFrom stringr str_remove_all
@@ -54,7 +54,7 @@ get_data <- function(x) {
   if (length(x) == 0) {
     return(NULL)
   }
-  x
+  remove_comments(x)
 }
 
 #' @importFrom purrr map
