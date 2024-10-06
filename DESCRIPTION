@@ -18,7 +18,9 @@ Suggests:
     chromote,
     covr,
     knitr,
-    rmarkdown
+    rmarkdown,
+    quarto,
+    R6
 Config/testthat/edition: 3
 Imports:
     checkmate,
@@ -32,4 +34,4 @@ Imports:
     tibble,
     withr
 RoxygenNote: 7.3.2
-VignetteBuilder: knitr
+VignetteBuilder: quarto

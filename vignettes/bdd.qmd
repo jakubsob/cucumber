@@ -1,0 +1,334 @@
+---
+title: "Behavior-Driven Development"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Behavior-Driven Development}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(cucumber)
+library(testthat)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+When developing software, a disconnect between what users want and what the software does can occur. We might've delivered working, tested code, but does it solve the user's problem?
+
+Behavior-driven development aims to mitigate that risk, by capturing and testing requirements from the perspective of the external user of the system.
+
+## How BDD works
+
+Whether we're working with a Product Owner, with users, or by ourselves, BDD can help us explore and define the problem in a structured way.
+
+The process is as follows:
+
+1. We capture a vague wish with a User Story.
+2. We refine the User Story into examples. Those examples describe how we can tell if the wish has been fulfilled. Focus on what you want to achieve, not how to achieve it.
+3. We create specifications. They are direct translations of examples into code.
+
+This helps us move from a vague description to a very precise, testable specification.
+
+## Capturing a wish with a User Story
+
+Let's imagine we want to implement a bookstore. The first User Story could be:
+
+> As a customer, I want to select a book and add it to cart so that I can buy it.
+
+## Refining the User Story into examples
+
+Behavior-Driven Development helps us focus on behavior, by using a language that expresses behavior:
+
+- **Given** some context,
+- **When** an event occurs,
+- **Then** an outcome should be observed.
+
+In this example, we could write:
+
+- Given I am in the bookstore
+- When I select "The Hobbit, J.R.R. Tolkien"
+- When I add selected book to the cart
+- Then I should see "The Hobbit, J.R.R. Tolkien" in the cart
+
+This description is more precise than the User Story. It describes what needs to happen, what the user needs to do, and what result the user should see.
+
+At this level, we don't know anything about the implementation of the bookstore. This description fits any implementation of the bookstore:
+
+- it could be a web application,
+- it could be a CLI application,
+- or it could be a physical store with a robot assistant.
+
+The implementation can be changed at any moment, and executing the specification should tell us if the system allows the user to achieve their goal.
+
+## Implementing executable specifications
+
+Specifications implemented with Behavior-Driven Development are:
+
+- instantly readable,
+- focused on the business goal,
+- hiding the implementation details,
+- encouraging reuse of test code.
+
+Behavior-Driven Development is not about tools. It's a way of building software. We can implement specifications in any way we want, however, there are tools that can help us. {cucumber} is one of them.
+
+# BDD with base R
+
+We can practice BDD using base R. Having a set of examples of how the system should work, we need to establish a way of translating examples to code.
+
+We need to represent the business language with code – a set of actions that user of the system can take. We can do it with functions. Those functions will create the interface of the system. Their names can follow closely the natural language description of the action. They will abstract and hide the implementation details of the system. They will allow reuse of the test code.
+
+The specification of the bookstore could look like this:
+
+```{r, error = TRUE}
+# tests/testthat/test-bookstore.R
+test_that("Bookstore: Adding a book to cart", {
+  # Given
+  bookstore <- Bookstore$new()
+  # When
+  bookstore$select("The Hobbit, J.R.R. Tolkien")
+  bookstore$add_to_cart()
+  # Then
+  bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
+})
+```
+
+This test fails as the code doesn't exist yet. We can pause in this step and try out a few versions of the specifications and go with one that expresses the business goal the best.
+
+Once we have an outline of actions, we can implement them. We can use R6 objects to bind the functions together.
+
+```{r}
+# tests/testthat/setup-bookstore.R
+Bookstore <- R6::R6Class(
+  public = list(
+    select = function(title) {
+
+    },
+    add_to_cart = function() {
+
+    },
+    cart_includes = function(title) {
+
+    }
+  )
+)
+```
+
+When we have a skeleton of the implementation, we can start filling it with the actual code.
+
+For example, our implementation of the bookstore might be a package with:
+
+- `select_book`: function that returns a tibble with book details,
+- `add_to_cart`: function that adds a book with given ID to a storage,
+- `get_cart`: function that returns a list with details of books in the cart.
+
+An implementation that satisfies the specification could be as simple as:
+
+```{r}
+storage <- c()
+books <- list(
+  tibble::tibble(id = 1, title = "The Hobbit, J.R.R. Tolkien"),
+  tibble::tibble(id = 2, title = "The Lord of the Rings, J.R.R. Tolkien")
+)
+
+select_book <- function(title) {
+  books |>
+    purrr::keep(\(x) x$title == title) |>
+    purrr::pluck(1)
+}
+
+add_to_cart <- function(id) {
+  storage <<- c(storage, id)
+}
+
+get_cart <- function() {
+  books |>
+    purrr::keep(\(x) x$id %in% storage)
+}
+```
+
+Having this implementation, we can plug it into the test code:
+
+```{r}
+# tests/testthat/setup-bookstore.R
+Bookstore <- R6::R6Class(
+  private = list(
+    selected_id = NULL
+  ),
+  public = list(
+    select = function(title) {
+      private$selected_id <- select_book(title)$id
+    },
+    add_to_cart = function() {
+      add_to_cart(private$selected_id)
+    },
+    cart_includes = function(title) {
+      testthat::expect_in(title, purrr::map_chr(get_cart(), "title"))
+    }
+  )
+)
+```
+
+Now, the tests pass.
+
+```{r}
+# tests/testthat/test-bookstore.R
+test_that("Bookstore: Adding a book to cart", {
+  # Given
+  bookstore <- Bookstore$new()
+  # When
+  bookstore$select("The Hobbit, J.R.R. Tolkien")
+  bookstore$add_to_cart()
+  # Then
+  bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
+})
+```
+
+With this implementation, we can easily extend tests with checking if we can add multiple books to the cart.
+
+```{r}
+test_that("Bookstore: Adding multiple books to cart", {
+  # Given
+  bookstore <- Bookstore$new()
+  # When
+  bookstore$select("The Hobbit, J.R.R. Tolkien")
+  bookstore$add_to_cart()
+  bookstore$select("The Lord of the Rings, J.R.R. Tolkien")
+  bookstore$add_to_cart()
+  # Then
+  bookstore$cart_includes(c("The Hobbit, J.R.R. Tolkien", "The Lord of the Rings, J.R.R. Tolkien"))
+})
+```
+
+As the system grows, it will be extended with more examples and more actions. Actions already implemented will be reused in different scenarios.
+
+The implementation of the system will evolve, so will specifications, but this approach will ensure that test code is easy to maintain and focused on the business goal.
+
+# BDD with {cucumber}
+
+The steps of BDD with {cucumber} are the same as with base R. The difference in how we express specifications and their implementation.
+
+The readability of specifications is given by them being expressed in [Gherkin](https://cucumber.io/docs/gherkin/reference/) language. Specifications are no longer expressed in code, but as text. It adds another level of separation between the specification and the implementation.
+
+We start by writing a feature file:
+
+```gherkin
+# tests/acceptance/bookstore.feature
+Feature: Bookstore
+  Scenario: Adding a book to cart
+    Given I am in the bookstore
+    When I select "The Hobbit, J.R.R. Tolkien"
+    When I add selected book to the cart
+    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart
+```
+
+We implement actions with `given`, `when`, and `then` functions:
+
+```{r}
+# tests/acceptance/steps/steps.R
+given("I am in the bookstore", function(context) {
+
+})
+
+when("I select {string}", function(title, context) {
+  context$selected_id <- select_book(title)$id
+})
+
+when("I add selected book to the cart", function(context) {
+  add_to_cart(context$selected_id)
+})
+
+then("I should see {string} in the cart", function(title, context) {
+  expect_in(title, purrr::map_chr(get_cart(), "title"))
+})
+```
+
+This test does exactly the same as the test with base R.
+
+We can run those tests with:
+
+```r
+cucumber::test("tests/acceptance", "tests/acceptance/steps")
+#> Test passed
+```
+```{r, include = FALSE}
+cucumber:::run(
+  c(
+    'Feature: Bookstore',
+    '  Scenario: Adding a book to cart',
+    '    Given I am in the bookstore',
+    '    When I select "The Hobbit, J.R.R. Tolkien"',
+    '    When I add selected book to the cart',
+    '    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart'
+  ),
+  steps = cucumber:::get_steps()
+)
+```
+
+What `cucumber::test` function does is it reads the feature files, finds corresponding actions implementations and runs them in order. To learn more how it works, refer to [How it works](https://jakubsob.github.io/cucumber/articles/how-it-works.html) vignette.
+
+Similar to what we did with base R, we can extend the feature file with a scenario that checks if we can add multiple books to the cart:
+
+```gherkin
+# tests/acceptance/bookstore.feature
+Feature: Bookstore
+  Scenario: Adding a book to cart
+    Given I am in the bookstore
+    When I select "The Hobbit, J.R.R. Tolkien"
+    When I add selected book to the cart
+    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart
+
+  Scenario: Adding multiple books to cart
+    Given I am in the bookstore
+    When I select "The Hobbit, J.R.R. Tolkien"
+    When I add selected book to the cart
+    When I select "The Lord of the Rings, J.R.R. Tolkien"
+    When I add selected book to the cart
+    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart
+    Then I should see "The Lord of the Rings, J.R.R. Tolkien" in the cart
+```
+
+Reruning the tests will result in two scenarios passing.
+
+```r
+cucumber::test("tests/acceptance", "tests/acceptance/steps")
+#> Test passed
+#> Test passed
+```
+```{r, include = FALSE}
+cucumber:::run(
+  c(
+    'Feature: Bookstore',
+    '  Scenario: Adding a book to cart',
+    '    Given I am in the bookstore',
+    '    When I select "The Hobbit, J.R.R. Tolkien"',
+    '    When I add selected book to the cart',
+    '    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart',
+    '',
+    '  Scenario: Adding multiple books to cart',
+    '    Given I am in the bookstore',
+    '    When I select "The Hobbit, J.R.R. Tolkien"',
+    '    When I add selected book to the cart',
+    '    When I select "The Lord of the Rings, J.R.R. Tolkien"',
+    '    When I add selected book to the cart',
+    '    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart',
+    '    Then I should see "The Lord of the Rings, J.R.R. Tolkien" in the cart'
+  ),
+  steps = cucumber:::get_steps()
+)
+```
+
+# Why should you choose {cucumber}?
+
+- It allows you to start practicing BDD without having to figure out how to glue actions implementations on your own.
+- It allows you to express high-level tests in a natural language.
+- It helps you keep the separation between the specification and the implementation.
+- It helps you extend and reuse test code.
+
+# Learning BDD
+
+- [ATDD by Example: A Practical Guide to Acceptance Test-Driven Development: A Practical Guide to Acceptance TestDriven Development](https://www.amazon.com/ATDD-Example-Test-Driven-Development-Addison-Wesley/dp/0321784154)
+- [Continuous Delivery Youtube Channel](https://www.youtube.com/watch?v=gXh0iUt4TXA&list=PLwLLcwQlnXByKR1Fo7UnE6gQAbx-JfYJZ)
+- [Cucumber](https://cucumber.io/docs/guides/)
