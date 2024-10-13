@@ -1,3 +1,9 @@
+# cucumber 1.1.0
+
+- ✨ Added scenario `before` and `after` hooks.
+- 📝 Added Behavior-Driven Development vignette.
+- 🐛 Fix parsing error when there is a commented-out scenario after a step with a table.
+
 # cucumber 1.0.4
 
 - Added `test_interactive` parameter to `cucumber::test`. It allows you to interactively select which feature files to run. It can be useful to get quicker feedback when developing new features.
