@@ -329,6 +329,6 @@ cucumber:::run(
 
 # Learning BDD
 
-- [ATDD by Example: A Practical Guide to Acceptance Test-Driven Development: A Practical Guide to Acceptance TestDriven Development](https://www.amazon.com/ATDD-Example-Test-Driven-Development-Addison-Wesley/dp/0321784154)
+- ATDD by Example: A Practical Guide to Acceptance Test-Driven Development: A Practical Guide to Acceptance TestDriven Development.
 - [Continuous Delivery Youtube Channel](https://www.youtube.com/watch?v=gXh0iUt4TXA&list=PLwLLcwQlnXByKR1Fo7UnE6gQAbx-JfYJZ)
 - [Cucumber](https://cucumber.io/docs/guides/)
