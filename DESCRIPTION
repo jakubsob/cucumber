@@ -8,7 +8,7 @@ Description: Write executable specifications in a natural language that describe
     Use them as an extension to your 'testthat' tests to provide a high level description of how your code works.
 License: MIT + file LICENSE
 URL: https://github.com/jakubsob/cucumber, https://jakubsob.github.io/cucumber/
-BugReports: https://github.com/jakubsob/cucumber
+BugReports: https://github.com/jakubsob/cucumber/issues
 Encoding: UTF-8
 LazyData: true
 Suggests:
