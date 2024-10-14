@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   bdd: bdd.html
   how-it-works: how-it-works.html
-last_built: 2024-10-13T12:20Z
+last_built: 2024-10-14T07:44Z
 urls:
   reference: https://jakubsob.github.io/cucumber/reference
   article: https://jakubsob.github.io/cucumber/articles
