@@ -36,6 +36,11 @@ describe("test", {
   })
 
   it("should run with shinytest2", {
+    # nolint start
+    # Produces on r-devel:
+    # Superclass process has cloneable=FALSE, but subclass r_process has cloneable=TRUE. A subclass cannot be cloneable when its superclass is not cloneable, so cloning will be disabled for r_process.
+    # nolint end
+    skip_if(R.version$status == "Under development (unstable)")
     test_example("examples/shinytest2")
   })
 
