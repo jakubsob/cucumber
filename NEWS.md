@@ -1,3 +1,8 @@
+# cucumber 1.1.1
+
+- ✨ Added option to set the indent of feature files. Useful when you use a different indent than the default 2 whitespaces. All user-facing options are documented in `?cucumber::opts`. (#5)
+- ✨ Added validation of feature files to check if they have a consistent indentation. (#5)
+
 # cucumber 1.1.0
 
 - ✨ Added scenario `before` and `after` hooks.
