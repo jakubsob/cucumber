@@ -454,4 +454,53 @@ describe("parse", {
       )
     )
   })
+
+  it("should parse feature files with 4 spaces indent", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "    Scenario: Maker starts a game",
+      "        When the Maker starts a game",
+      "        Then the Maker waits for a Breaker to join"
+    )
+    indent <- "^\\s{4}"
+
+    # Act
+    withr::with_options(list(cucumber.indent = indent), {
+      result <- tokenize(lines)
+    })
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Feature",
+          value = "Guess the word",
+          children = list(
+            list(
+              type = "Scenario",
+              value = "Maker starts a game",
+              children = list(
+                list(
+                  type = "When",
+                  value = "the Maker starts a game",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Then",
+                  value = "the Maker waits for a Breaker to join",
+                  children = NULL,
+                  data = NULL
+                )
+              ),
+              data = NULL
+            )
+          ),
+          data = NULL
+        )
+      )
+    )
+  })
 })

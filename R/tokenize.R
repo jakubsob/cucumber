@@ -1,4 +1,3 @@
-INDENT <- "^\\s{2}"
 NODE_REGEX <- paste0(
   "^(?!\\s+)(",
   paste0(
@@ -32,7 +31,7 @@ remove_trailing_colon <- function(x) {
 
 #' @importFrom stringr str_remove_all
 remove_indent <- function(x) {
-  str_remove_all(x, INDENT)
+  str_remove_all(x, getOption("cucumber.indent", default = "^\\s{2}"))
 }
 
 #' @importFrom stringr str_detect

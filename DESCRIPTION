@@ -24,6 +24,7 @@ Suggests:
 Config/testthat/edition: 3
 Imports:
     checkmate,
+    cli,
     dplyr,
     fs,
     glue,
