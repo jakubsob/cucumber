@@ -107,7 +107,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    eval(callable[[1]])
+    purrr::walk(callable, \(x) x())
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
@@ -148,7 +148,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    purrr::walk(callable, eval)
+    purrr::walk(callable, \(x) x())
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
@@ -196,7 +196,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    purrr::walk(callable, eval)
+    purrr::walk(callable, \(x) x())
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
@@ -243,7 +243,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    purrr::walk(callable, eval)
+    purrr::walk(callable, \(x) x())
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
@@ -291,7 +291,7 @@ describe("parse_token", {
 
     # Act
     callable <- parse_token(token, steps, parameters)
-    purrr::walk(callable, eval)
+    purrr::walk(callable, \(x) x())
 
     # Assert
     mockery::expect_called(spies[[1]], 1)

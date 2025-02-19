@@ -100,4 +100,8 @@ describe("test", {
     testthat::skip_if(testthat::is_checking())
     test_example("examples/with_testthat_failure")
   })
+
+  it("should work with loading steps from setup files", {
+    test_example("examples/testthat_setup_files")
+  })
 })
