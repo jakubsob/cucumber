@@ -56,6 +56,7 @@ test <- function(
   } # nocov end
   feature_files |>
     map(readLines) |>
+    map(validate_feature) |>
     map(normalize_feature) |>
     walk(run, steps = steps, parameters = get_parameters())
 }

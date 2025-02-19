@@ -177,16 +177,16 @@
       --------------------------------------------------------------------------------
       Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.1
+      `expected`: 5.0
       Backtrace:
       x
       1. \-global `<step>`(expected = 5L, context = `<env>`)
       2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.2
+      `expected`: 5.0
       Backtrace:
       x
       1. \-global `<step>`(expected = 5L, context = `<env>`)
@@ -207,16 +207,16 @@
       -- Failed tests ----------------------------------------------------------------
       Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.1
+      `expected`: 5.0
       Backtrace:
       x
       1. \-global `<step>`(expected = 5L, context = `<env>`)
       2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.2
+      `expected`: 5.0
       Backtrace:
       x
       1. \-global `<step>`(expected = 5L, context = `<env>`)
