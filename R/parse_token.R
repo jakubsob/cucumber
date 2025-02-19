@@ -1,10 +1,10 @@
 #' @importFrom rlang abort call_modify call2
 #' @importFrom glue glue
-#' @importFrom purrr map walk
+#' @importFrom purrr map walk partial
 #' @importFrom testthat context_start_file test_that
 parse_token <- function(
   tokens,
-  steps,
+  steps = get_steps(),
   parameters = get_parameters(),
   hooks = get_hooks()
 ) {
@@ -12,29 +12,27 @@ parse_token <- function(
   map(tokens, \(token) {
     switch(
       token$type,
-      "Scenario" = call2(
-        function() {
-          test_that(glue("Scenario: {token$value}"), {
-            context <- new.env()
-            calls <- parse_token(token$children, steps, parameters) |>
-              map(\(x) call_modify(x, context = context))
+      "Scenario" = function() {
+        test_that(glue("Scenario: {token$value}"), {
+          context <- new.env()
+          calls <- parse_token(token$children, steps, parameters) |>
+            map(\(x) partial(x, context = context))
 
-            get_hook(hooks, "before")(context, token$value)
-            # Use `for` for better error messages instead of purrr indexed ones
-            for (call in calls) {
-              eval(call)
-            }
-            get_hook(hooks, "after")(context, token$value)
-          })
+          get_hook(hooks, "before")(context, token$value)
+          # Use `for` for better error messages instead of purrr indexed ones
+          for (call in calls) {
+            call()
+          }
+          get_hook(hooks, "after")(context, token$value)
+        })
+      },
+      "Feature" = function(file_name = token$value) {
+        context_start_file(glue("Feature: {file_name}"))
+        calls <- parse_token(token$children, steps, parameters, hooks)
+        for (call in calls) {
+          call()
         }
-      ),
-      "Feature" = call2(
-        function(file_name = token$value) {
-          context_start_file(glue("Feature: {file_name}"))
-          parse_token(token$children, steps, parameters, hooks) |>
-            walk(eval)
-        }
-      ),
+      },
       "Given" = parse_step(token, steps, parameters),
       "When" = parse_step(token, steps, parameters),
       "Then" = parse_step(token, steps, parameters),
@@ -44,7 +42,7 @@ parse_token <- function(
     unlist()
 }
 
-#' @importFrom purrr map_chr map map_int map2 keep pluck
+#' @importFrom purrr map_chr map map_int map2 keep pluck partial
 #' @importFrom stringr str_detect str_match_all
 #' @importFrom rlang exec
 #' @importFrom glue glue
@@ -100,5 +98,5 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
 
   impl_formals <- names(formals(step))
   names(params) <- impl_formals[impl_formals != "context"]
-  rlang::call2(step, !!!params)
+  partial(step, !!!params)
 }
