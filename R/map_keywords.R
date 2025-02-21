@@ -4,7 +4,8 @@ map_keywords <- function(lines) {
     lines,
     c(
       "Example:" = "Scenario:",
-      "Examples:" = "Scenarios:"
+      "Examples:" = "Scenarios:",
+      "Scenario Template:" = "Scenario Outline:"
     )
   )
 }

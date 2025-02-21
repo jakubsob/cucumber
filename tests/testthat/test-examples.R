@@ -104,4 +104,8 @@ describe("test", {
   it("should work with loading steps from setup files", {
     test_example("examples/testthat_setup_files")
   })
+
+  it("should work with Scenario Outline", {
+    test_example("examples/scenario_outline")
+  })
 })

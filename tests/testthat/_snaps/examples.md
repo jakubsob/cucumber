@@ -32,6 +32,18 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 4 ]
 
+# test: should run with shinytest2
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          2 | Feature: Formula display
+      == Results =====================================================================
+      
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+
 # test: should run a Scenario with Given, When, Then, And, But keywords
 
     Code
@@ -171,7 +183,7 @@
       x
       1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
       2.   \-cucumber (local) x(context = context, ...)
-      3.     \-cucumber (local) step(expected = 5L, ...)
+      3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
@@ -181,7 +193,7 @@
       x
       1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
       2.   \-cucumber (local) x(context = context, ...)
-      3.     \-cucumber (local) step(expected = 5L, ...)
+      3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       --------------------------------------------------------------------------------
       x | 1        1 | Feature: Guess the word
@@ -194,7 +206,7 @@
       x
       1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
       2.   \-cucumber (local) x(context = context, ...)
-      3.     \-cucumber (local) step(n = 6L, ...)
+      3.     \-global step(n = 6L, ...)
       4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
       --------------------------------------------------------------------------------
       == Results =====================================================================
@@ -207,7 +219,7 @@
       x
       1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
       2.   \-cucumber (local) x(context = context, ...)
-      3.     \-cucumber (local) step(expected = 5L, ...)
+      3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
@@ -217,7 +229,7 @@
       x
       1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
       2.   \-cucumber (local) x(context = context, ...)
-      3.     \-cucumber (local) step(expected = 5L, ...)
+      3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game
       nchar(context$word) (`actual`) not equal to `n` (`expected`).
@@ -227,7 +239,7 @@
       x
       1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
       2.   \-cucumber (local) x(context = context, ...)
-      3.     \-cucumber (local) step(n = 6L, ...)
+      3.     \-global step(n = 6L, ...)
       4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
       [ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]
 
@@ -241,4 +253,15 @@
       v |          1 | Feature: Eating cucumbers
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+
+# test: should work with Scenario Outline
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          4 | Feature: Eating
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 4 ]
 
