@@ -29,7 +29,7 @@ describe("parse_token", {
     # Arrange
     token <- list(
       list(
-        type = "Given",
+        type = "Step",
         value = "the Maker has {string}",
         children = NULL,
         data = NULL
@@ -56,7 +56,7 @@ describe("parse_token", {
     # Arrange
     token <- list(
       list(
-        type = "Given",
+        type = "Step",
         value = "the Maker has \"a hat\"",
         children = NULL,
         data = NULL
@@ -85,7 +85,7 @@ describe("parse_token", {
     # Arrange
     token <- list(
       list(
-        type = "Given",
+        type = "Step",
         value = "the Maker has \"a hat\"",
         children = NULL,
         data = NULL
@@ -114,7 +114,7 @@ describe("parse_token", {
     # Arrange
     token <- list(
       list(
-        type = "Given",
+        type = "Step",
         value = "the Maker has the word 'silky' and number 44",
         children = NULL,
         data = NULL
@@ -152,7 +152,7 @@ describe("parse_token", {
         data = NULL,
         children = list(
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word 'silky' and number 44",
             children = NULL,
             data = NULL
@@ -193,13 +193,13 @@ describe("parse_token", {
         data = NULL,
         children = list(
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word foo and bar",
             children = NULL,
             data = NULL
           ),
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word foo",
             children = NULL,
             data = NULL
@@ -241,13 +241,13 @@ describe("parse_token", {
         data = NULL,
         children = list(
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word 'foo' and 'bar'",
             children = NULL,
             data = NULL
           ),
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word 'foo'",
             children = NULL,
             data = NULL
@@ -288,13 +288,13 @@ describe("parse_token", {
         data = NULL,
         children = list(
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word 'foo' and bar",
             children = NULL,
             data = NULL
           ),
           list(
-            type = "Given",
+            type = "Step",
             value = "the Maker has the word 'foo bar'",
             children = NULL,
             data = NULL
@@ -335,19 +335,19 @@ describe("parse_token", {
         value = "eating",
         children = list(
           list(
-            type = "Given",
+            type = "Step",
             value = "there are <start> cucumbers",
             children = NULL,
             data = NULL
           ),
           list(
-            type = "When",
+            type = "Step",
             value = "I eat <eat> cucumbers",
             children = NULL,
             data = NULL
           ),
           list(
-            type = "Then",
+            type = "Step",
             value = "I should have <left> cucumbers",
             children = NULL,
             data = NULL

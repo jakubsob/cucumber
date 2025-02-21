@@ -80,9 +80,7 @@ parse_token <- function(
           call()
         }
       },
-      "Given" = parse_step(token, steps, parameters),
-      "When" = parse_step(token, steps, parameters),
-      "Then" = parse_step(token, steps, parameters),
+      "Step" = parse_step(token, steps, parameters),
       abort(glue("Unknown token type: {token$type}"))
     )
   }) |>

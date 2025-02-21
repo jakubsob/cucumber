@@ -68,6 +68,5 @@ test <- function(
   feature_files |>
     map(readLines) |>
     map(validate_feature) |>
-    map(normalize_feature) |>
     walk(run, parameters = get_parameters())
 }

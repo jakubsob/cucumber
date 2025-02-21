@@ -7,7 +7,7 @@ NODE_REGEX <- paste0(
       "Scenarios:", "Examples:",
       "Scenario Outline:", "Scenario Template:",
       "Background:",
-      "Given", "When", "Then", "And", "But"
+      "Step"
     ),
     collapse = "|"
   ),
@@ -58,6 +58,7 @@ get_data <- function(x) {
 
 #' @importFrom purrr map
 tokenize <- function(x) {
+  x <- normalize_feature(x)
   x <- remove_empty_lines(x)
   x <- remove_comments(x)
   indices <- detect_node(x)

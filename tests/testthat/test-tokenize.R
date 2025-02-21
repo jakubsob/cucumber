@@ -1,4 +1,4 @@
-describe("parse", {
+describe("tokenize", {
   it("should parse feature string into a list of scenarios", {
     # Arrange
     lines <- c(
@@ -28,13 +28,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = NULL
@@ -47,19 +47,19 @@ describe("parse", {
               value = "Breaker joins a game",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "the Maker has started a game with the word 'silky'",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Breaker joins the Maker's game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Breaker must guess a word with 5 characters",
                   children = NULL,
                   data = NULL
@@ -112,13 +112,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = NULL
@@ -172,25 +172,25 @@ describe("parse", {
               value = "",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "a global administrator named \"Greg\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "And",
+                  type = "Step",
                   value = "a blog named \"Greg's anti-tax rants\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "And",
+                  type = "Step",
                   value = "a customer named \"Dr. Bill\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "And",
+                  type = "Step",
                   value = "a blog named \"Expensive Therapy\" owned by \"Dr. Bill\"",
                   children = NULL,
                   data = NULL
@@ -203,19 +203,19 @@ describe("parse", {
               value = "Dr. Bill posts to his own blog",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "I am logged in as Dr. Bill",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "I try to post to \"Expensive Therapy\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "I should see \"Your article was published.\"",
                   children = NULL,
                   data = NULL
@@ -228,19 +228,19 @@ describe("parse", {
               value = "Dr. Bill tries to post to somebody else's blog, and fails",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "I am logged in as Dr. Bill",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "I try to post to \"Greg's anti-tax rants\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "I should see \"Hey! That's not your blog!\"",
                   children = NULL,
                   data = NULL
@@ -280,25 +280,25 @@ describe("parse", {
           value = "eating",
           children = list(
             list(
-              type = "Given",
+              type = "Step",
               value = "there are <start> cucumbers",
               children = NULL,
               data = NULL
             ),
             list(
-              type = "When",
+              type = "Step",
               value = "I eat <eat> cucumbers",
               children = NULL,
               data = NULL
             ),
             list(
-              type = "Then",
+              type = "Step",
               value = "I should have <left> cucumbers",
               children = NULL,
               data = NULL
             ),
             list(
-              type = "Examples",
+              type = "Scenarios",
               value = "",
               children = NULL,
               data = c("| start | eat | left |", "|    12 |   5 |    7 |", "|    20 |   5 |   15 |")
@@ -335,7 +335,7 @@ describe("parse", {
           value = "blog",
           children = list(
             list(
-              type = "Given",
+              type = "Step",
               value = "a blog post named \"Random\" with Markdown body",
               children = NULL,
               data = c(
@@ -379,7 +379,7 @@ describe("parse", {
           value = "blog",
           children = list(
             list(
-              type = "Given",
+              type = "Step",
               value = "a blog post named \"Random\" with Markdown body",
               children = NULL,
               data = c(
@@ -433,13 +433,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = c("| x | y |", "| 1 | 2 |")
@@ -482,13 +482,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = NULL
