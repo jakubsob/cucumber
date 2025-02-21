@@ -10,7 +10,8 @@ map_keywords <- function(lines) {
       "Given" = "Step",
       "Scenario Template:" = "Scenario Outline:",
       "Then" = "Step",
-      "When" = "Step"
+      "When" = "Step",
+      "[*]" = "Step"
     )
   )
 }
