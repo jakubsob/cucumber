@@ -3,8 +3,8 @@
 #' Allows whitespace before and after the description
 #' @keywords internal
 #' @noRd
-step_regex <- function(step_name, description) {
-  paste0("^\\s*", step_name, " ", description, "\\s*$")
+step_regex <- function(description) {
+  paste0("^\\s*", description, "\\s*$")
 }
 
 #' @keywords internal
@@ -18,8 +18,8 @@ make_step <- function(prefix) {
     assert_subset("context", names(args[length(args)]))
     step <- structure(
       implementation,
-      description = paste(prefix, description),
-      detect = step_regex(prefix, description),
+      description = description,
+      detect = step_regex(description),
       class = c("step", class(implementation))
     )
     register_step(step)

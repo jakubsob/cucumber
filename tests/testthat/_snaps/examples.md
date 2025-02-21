@@ -181,7 +181,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:25:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -191,7 +191,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:25:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -204,7 +204,7 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:25:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(n = 6L, ...)
       4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
@@ -217,7 +217,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:25:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -227,7 +227,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:25:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -237,7 +237,7 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:25:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(n = 6L, ...)
       4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3

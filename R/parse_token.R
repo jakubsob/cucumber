@@ -99,7 +99,7 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
     map_chr(attr, "detect") |>
     map_chr(expression_to_pattern, parameters = parameters)
 
-  description <- paste(token$type, token$value)
+  description <- token$value
 
   step_mask <- str_detect(description, detect)
   if (sum(step_mask) == 0) {
