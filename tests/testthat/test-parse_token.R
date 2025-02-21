@@ -297,4 +297,68 @@ describe("parse_token", {
     mockery::expect_called(spies[[1]], 1)
     mockery::expect_called(spies[[2]], 1)
   })
+
+  it("should parse a Scenario Outline to a call list", {
+    # Arrange
+    token <- list(
+      list(
+        type = "Scenario Outline",
+        value = "eating",
+        children = list(
+          list(
+            type = "Given",
+            value = "there are <start> cucumbers",
+            children = NULL,
+            data = NULL
+          ),
+          list(
+            type = "When",
+            value = "I eat <eat> cucumbers",
+            children = NULL,
+            data = NULL
+          ),
+          list(
+            type = "Then",
+            value = "I should have <left> cucumbers",
+            children = NULL,
+            data = NULL
+          ),
+          list(
+            type = "Scenarios",
+            value = "",
+            children = NULL,
+            data = c("| start | eat | left |", "|    12 |   5 |    7 |", "|    20 |   5 |   15 |")
+          )
+        ),
+        data = NULL
+      )
+    )
+    spies <- list(mockery::mock(), mockery::mock(), mockery::mock())
+    steps <- list(
+      given("there are {int} cucumbers", function(start, context) {
+        spies[[1]]()
+        testthat::succeed()
+      }),
+      when("I eat {int} cucumbers", function(eat, context) {
+        spies[[2]]()
+        testthat::succeed()
+      }),
+      then("I should have {int} cucumbers", function(left, context) {
+        spies[[3]]()
+        testthat::succeed()
+      })
+    )
+    parameters <- .parameters(
+      get_parameters()$int
+    )
+
+    # Act
+    callable <- parse_token(token, steps, parameters)
+    purrr::walk(callable, \(x) x())
+
+    # Assert
+    mockery::expect_called(spies[[1]], 2)
+    mockery::expect_called(spies[[2]], 2)
+    mockery::expect_called(spies[[3]], 2)
+  })
 })

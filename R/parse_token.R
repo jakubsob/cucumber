@@ -26,6 +26,53 @@ parse_token <- function(
           get_hook(hooks, "after")(context, token$value)
         })
       },
+      "Scenario Outline" = function() {
+        test_that(glue("Scenario: {token$value}"), {
+          # Find Examples section
+          examples <- token$children |>
+            keep(~ .x$type == "Scenarios") |>
+            pluck(1)
+
+          # Parse examples table
+          table_data <- parse_table(examples$data)
+
+          # Get scenario steps (excluding Examples)
+          steps_tokens <- token$children |>
+            keep(~ .x$type != "Scenarios")
+
+          # For each row in examples
+          for (i in seq_len(nrow(table_data))) {
+            row_data <- table_data[i,]
+
+            # Replace placeholders in steps
+            processed_steps <- steps_tokens |>
+              map(\(step) {
+                new_step <- step
+                for (col in names(row_data)) {
+                  placeholder <- glue("<{col}>")
+                  new_step$value <- gsub(
+                    placeholder,
+                    as.character(row_data[[col]]),
+                    new_step$value,
+                    fixed = TRUE
+                  )
+                }
+                new_step
+              })
+
+            # Execute the steps
+            context <- new.env()
+            calls <- parse_token(processed_steps, steps, parameters) |>
+              map(\(x) partial(x, context = context))
+
+            get_hook(hooks, "before")(context, token$value)
+            for (call in calls) {
+              call()
+            }
+            get_hook(hooks, "after")(context, token$value)
+          }
+        })
+      },
       "Feature" = function(file_name = token$value) {
         context_start_file(glue("Feature: {file_name}"))
         calls <- parse_token(token$children, steps, parameters, hooks)
