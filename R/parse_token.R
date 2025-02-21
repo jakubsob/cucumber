@@ -18,12 +18,12 @@ parse_token <- function(
           calls <- parse_token(token$children, steps, parameters) |>
             map(\(x) partial(x, context = context))
 
+          on.exit(get_hook(hooks, "after")(context, token$value))
           get_hook(hooks, "before")(context, token$value)
           # Use `for` for better error messages instead of purrr indexed ones
           for (call in calls) {
             call()
           }
-          get_hook(hooks, "after")(context, token$value)
         })
       },
       "Scenario Outline" = function() {
@@ -65,11 +65,11 @@ parse_token <- function(
             calls <- parse_token(processed_steps, steps, parameters) |>
               map(\(x) partial(x, context = context))
 
+            on.exit(get_hook(hooks, "after")(context, token$value))
             get_hook(hooks, "before")(context, token$value)
             for (call in calls) {
               call()
             }
-            get_hook(hooks, "after")(context, token$value)
           }
         })
       },
