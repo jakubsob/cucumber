@@ -99,7 +99,7 @@ set_default_parameters <- function() {
 
   define_parameter_type(
     name = "string",
-    regexp = "'[:print:]+?'|\"[:print:]+?\"",
+    regexp = "'[^']*'|\"[^\"]*\"",
     transformer = function(x) {
       str_sub(x, 2, nchar(x) - 1)
     }

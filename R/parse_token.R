@@ -36,6 +36,17 @@ parse_token <- function(
       },
       "Feature" = function(file_name = token$value) {
         context_start_file(glue("Feature: {file_name}"))
+
+        # Append Background steps before each Scenario steps
+        if (token$children[[1]]$type == "Background") {
+          background <- token$children[[1]]
+          token$children <- token$children[2:length(token$children)] |>
+            map(\(x) {
+              x$children <- c(background$children, x$children)
+              x
+            })
+        }
+
         calls <- parse_token(token$children, steps, parameters, hooks)
         for (call in calls) {
           call()
@@ -52,7 +63,7 @@ parse_token <- function(
 #' @importFrom stringr str_detect str_match_all
 #' @importFrom rlang exec
 #' @importFrom glue glue
-parse_step <- function(token, steps, parameters = get_parameters()) {
+parse_step <- function(token, steps = get_steps(), parameters = get_parameters()) {
   # Pattern to detect the step
   detect <- steps |>
     map_chr(attr, "detect") |>
@@ -74,10 +85,6 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
         "Check step definitions for duplicates of: \"{step_description}\""
       )
     )
-  }
-  if (sum(step_mask) > 1) {
-    steps <- steps[order(map_int(steps, \(x) length(formals(x))), decreasing = TRUE)]
-    map(steps, \(x) parse_step(token, list(x), parameters))
   }
 
   step <- steps[step_mask][[1]]

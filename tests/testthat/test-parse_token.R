@@ -390,4 +390,216 @@ describe("parse_token", {
     mockery::expect_called(spies[[2]], 2)
     mockery::expect_called(spies[[3]], 2)
   })
+
+  it("should parse a Feature with a Background", {
+    # Arrange
+    tokens <- list(
+      list(
+        type = "Feature",
+        value = "Multiple site support",
+        children = list(
+          list(
+            type = "Background",
+            value = "",
+            children = list(
+              list(
+                type = "Step",
+                value = "a global administrator named \"Greg\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "a blog named \"Greg's anti-tax rants\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "a customer named \"Dr. Bill\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "a blog named \"Expensive Therapy\" owned by \"Dr. Bill\"",
+                children = NULL,
+                data = NULL
+              )
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario",
+            value = "Dr. Bill posts to his own blog",
+            children = list(
+              list(
+                type = "Step",
+                value = "I am logged in as \"Dr. Bill\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "I try to post to \"Expensive Therapy\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "I should see \"Your article was published.\"",
+                children = NULL,
+                data = NULL
+              )
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario",
+            value = "Dr. Bill tries to post to somebody else's blog, and fails",
+            children = list(
+              list(
+                type = "Step",
+                value = "I am logged in as \"Dr. Bill\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "I try to post to \"Greg's anti-tax rants\"",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "I should see \"Hey! That's not your blog!\"",
+                children = NULL,
+                data = NULL
+              )
+            ),
+            data = NULL
+          )
+        ),
+        data = c("Only blog owners can post to a blog, except administrators,", "who can post to all blogs.")
+      )
+    )
+    spies <- list(mockery::mock(), mockery::mock(), mockery::mock(), mockery::mock(), mockery::mock(), mockery::mock(), mockery::mock())
+    steps <- list(
+      given("a global administrator named {string}", function(name, context) {
+        spies[[1]]()
+        testthat::succeed()
+      }),
+      given("a blog named {string}", function(name, context) {
+        spies[[2]]()
+        testthat::succeed()
+      }),
+      given("a customer named {string}", function(name, context) {
+        spies[[3]]()
+        testthat::succeed()
+      }),
+      given("a blog named {string} owned by {string}", function(blog_name, owner_name, context) {
+        spies[[4]]()
+        testthat::succeed()
+      }),
+      when("I am logged in as {string}", function(name, context) {
+        testthat::succeed()
+      }),
+      when("I try to post to {string}", function(blog_name, context) {
+        testthat::succeed()
+      }),
+      then("I should see {string}", function(message, context) {
+        testthat::succeed()
+      })
+    )
+    parameters <- .parameters(
+      get_parameters()$string
+    )
+
+    # Act
+    callable <- parse_token(tokens, steps, parameters)
+    purrr::walk(callable, \(x) x())
+
+    # Assert
+    mockery::expect_called(spies[[1]], 2)
+    mockery::expect_called(spies[[2]], 2)
+    mockery::expect_called(spies[[3]], 2)
+    mockery::expect_called(spies[[4]], 2)
+  })
+
+  it("should parse a Feature with Background and Scenario Outline", {
+    # Arrange
+    tokens <- list(
+      list(
+        type = "Feature",
+        value = "Multiple site support",
+        children = list(
+          list(
+            type = "Background",
+            value = "",
+            children = list(
+              list(
+                type = "Step",
+                value = "a global administrator named <admin>",
+                children = NULL,
+                data = NULL
+              )
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario Outline",
+            value = "Dr. Bill posts to his own blog",
+            children = list(
+              list(
+                type = "Step",
+                value = "I am logged in as <user>",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Step",
+                value = "I try to post to <blog>",
+                children = NULL,
+                data = NULL
+              ),
+              list(
+                type = "Scenarios",
+                value = "",
+                children = NULL,
+                data = c("| admin | user | blog |", "| 'Greg' | 'Dr. Bill' | 'Expensive Therapy' |", "| 'John' | 'Dr. Bill' | \"Greg's anti-tax rants\" |")
+              )
+            ),
+            data = NULL
+          )
+        )
+      )
+    )
+    spies <- list(mockery::mock(), mockery::mock(), mockery::mock())
+    steps <- list(
+      given("a global administrator named {string}", function(admin, context) {
+        spies[[1]]()
+        testthat::succeed()
+      }),
+      when("I am logged in as {string}", function(user, context) {
+        spies[[2]]()
+        testthat::succeed()
+      }),
+      when("I try to post to {string}", function(blog, context) {
+        spies[[3]]()
+        testthat::succeed()
+      })
+    )
+    parameters <- .parameters(
+      get_parameters()$string
+    )
+
+    # Act
+    callable <- parse_token(tokens, steps, parameters)
+    purrr::walk(callable, \(x) x())
+
+    # Assert
+    mockery::expect_called(spies[[1]], 2)
+    mockery::expect_called(spies[[2]], 2)
+    mockery::expect_called(spies[[3]], 2)
+  })
 })
