@@ -25,7 +25,7 @@ validate_indentation <- function(lines) {
   invisible(lines)
 }
 
-#' @keywords
+#' @keywords internal
 #' @importFrom stringr str_detect
 #' @importFrom cli cli_abort
 validate_one_feature_keyword <- function(lines) {
