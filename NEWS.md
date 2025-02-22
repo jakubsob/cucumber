@@ -1,7 +1,12 @@
-# cucumber 1.1.1
+# cucumber 1.2.0
 
-- ✨ Added option to set the indent of feature files. Useful when you use a different indent than the default 2 whitespaces. All user-facing options are documented in `?cucumber::opts`. (#5)
-- ✨ Added validation of feature files to check if they have a consistent indentation. (#5)
+- ✨ Added support for "Scenario Outline", "Background" and "*" keywords.
+- ⚠️ Keywords are not taken into account when looking for a step definition [Gherkin steps reference](https://cucumber.io/docs/gherkin/reference#steps).
+- 🛡️ Added validation of feature files to fail early if malformed:
+  - Checks for consistent indentation.
+  - Check if a feature file has only one Feature.
+- ✨ `after` hook runs even if a scenario fails. This is useful for cleaning up resources even if a test fails unexpectedly.
+- ✨ Added option to set the indent of feature files. Useful when you use a different indent than the default 2 whitespaces. All user-facing options are documented in `?cucumber::opts`.
 
 # cucumber 1.1.0
 

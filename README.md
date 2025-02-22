@@ -191,9 +191,11 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [x] Then
 - [x] And
 - [x] But
-- [ ] Background
-- [ ] Scenario Outline (or Scenario Template)
-- [ ] Examples (or Scenarios)
+- [x] *
+- [x] Background
+- [x] Scenario Outline (or Scenario Template)
+- [x] Examples (or Scenarios)
+- [ ] Rule
 - [x] `"""` (Doc Strings)
 - [x] `|` (Data Tables)
 - [ ] `@` (Tags)
