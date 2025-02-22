@@ -20,58 +20,19 @@ parse_token <- function(
 
           on.exit(get_hook(hooks, "after")(context, token$value))
           get_hook(hooks, "before")(context, token$value)
-          # Use `for` for better error messages instead of purrr indexed ones
           for (call in calls) {
             call()
           }
         })
       },
       "Scenario Outline" = function() {
-        test_that(glue("Scenario: {token$value}"), {
-          # Find Examples section
-          examples <- token$children |>
-            keep(~ .x$type == "Scenarios") |>
-            pluck(1)
-
-          # Parse examples table
-          table_data <- parse_table(examples$data)
-
-          # Get scenario steps (excluding Examples)
-          steps_tokens <- token$children |>
-            keep(~ .x$type != "Scenarios")
-
-          # For each row in examples
-          for (i in seq_len(nrow(table_data))) {
-            row_data <- table_data[i,]
-
-            # Replace placeholders in steps
-            processed_steps <- steps_tokens |>
-              map(\(step) {
-                new_step <- step
-                for (col in names(row_data)) {
-                  placeholder <- glue("<{col}>")
-                  new_step$value <- gsub(
-                    placeholder,
-                    as.character(row_data[[col]]),
-                    new_step$value,
-                    fixed = TRUE
-                  )
-                }
-                new_step
-              })
-
-            # Execute the steps
-            context <- new.env()
-            calls <- parse_token(processed_steps, steps, parameters) |>
-              map(\(x) partial(x, context = context))
-
-            on.exit(get_hook(hooks, "after")(context, token$value))
-            get_hook(hooks, "before")(context, token$value)
-            for (call in calls) {
-              call()
-            }
-          }
+        scenarios <- expand_scenario_outline(token)
+        calls <- map(scenarios, function(scenario) {
+          parse_token(list(scenario), steps, parameters)[[1]]
         })
+        for (call in calls) {
+          call()
+        }
       },
       "Feature" = function(file_name = token$value) {
         context_start_file(glue("Feature: {file_name}"))
@@ -144,4 +105,37 @@ parse_step <- function(token, steps, parameters = get_parameters()) {
   impl_formals <- names(formals(step))
   names(params) <- impl_formals[impl_formals != "context"]
   partial(step, !!!params)
+}
+
+expand_scenario_outline <- function(outline_token) {
+  examples <- outline_token$children |>
+    keep(~ .x$type == "Scenarios") |>
+    pluck(1)
+  table_data <- parse_table(examples$data)
+  steps_tokens <- outline_token$children |>
+    keep(~ .x$type != "Scenarios")
+  map(seq_len(nrow(table_data)), function(i) {
+    row_data <- table_data[i,]
+    processed_steps <- steps_tokens |>
+      map(\(step) {
+        new_step <- step
+        for (col in names(row_data)) {
+          placeholder <- glue("<{col}>")
+          new_step$value <- gsub(
+            placeholder,
+            as.character(row_data[[col]]),
+            new_step$value,
+            fixed = TRUE
+          )
+        }
+        new_step
+      })
+
+    list(
+      type = "Scenario",
+      value = glue("{outline_token$value} (Example {i})"),
+      children = processed_steps,
+      data = NULL
+    )
+  })
 }
