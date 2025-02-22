@@ -1,5 +1,5 @@
 describe("normalize_feature", {
-  it("should replace all step keywords with 'Step", {
+  it("should replace all step keywords with 'Step'", {
     # Arrange
     lines <- c(
       "Feature: Addition",
