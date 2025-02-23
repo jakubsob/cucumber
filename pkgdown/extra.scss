@@ -1,0 +1,20 @@
+nav {
+  .nav-text {
+    color: var(--bs-navbar-brand-color) !important;
+  }
+  // Search input
+  .form-control {
+    border-color: var(--bs-nav-link-color);
+    background-color: transparent;
+    color: var(--bs-navbar-brand-color);
+
+    &::placeholder {
+      color: var(--bs-nav-link-color);
+    }
+
+    &:focus {
+      background-color: transparent;
+      outline: solid 2px var(--bs-body-bg);
+    }
+  }
+}

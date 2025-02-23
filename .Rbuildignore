@@ -14,3 +14,4 @@
 ^Meta$
 ^cran-comments\.md$
 ^vignettes/*_files$
+^vignettes/articles$

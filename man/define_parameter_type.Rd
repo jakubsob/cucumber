@@ -2,7 +2,7 @@
 % Please edit documentation in R/parameter.R
 \name{define_parameter_type}
 \alias{define_parameter_type}
-\title{Parameter Type}
+\title{Define extra parameters to use in Cucumber steps.}
 \usage{
 define_parameter_type(name, regexp, transformer)
 }

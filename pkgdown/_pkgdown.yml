@@ -3,11 +3,14 @@ home:
   title: Behavior-Driven Development in R
 template:
   bootstrap: 5
-  bootswatch: minty
+  bootswatch: flatly
   bslib:
     bg: "#FFFFFF"
     fg: "#0f2a13"
-    primary: "#104618"
+    primary: "#59cf64"
+    secondary: "#1C2541"
+    green: "#1C2541"
+    success: "#1C2541"
   includes:
     in_header: |
       <!-- Google tag (gtag.js) -->
@@ -19,3 +22,33 @@ template:
 
         gtag('config', 'G-N7MW34VJS3');
       </script>
+
+navbar:
+  type: light
+  structure:
+    left: [reference, gherkin-reference, articles, news]
+    right: [search, github]
+  components:
+    gherkin-reference:
+      text: Gherkin Reference
+      href: articles/reference-gherkin.html
+    articles:
+      text: Articles
+      menu:
+        - text: Behavior-Driven Development
+          href: articles/bdd.html
+        - text: How it works
+          href: articles/how-it-works.html
+
+reference:
+  - title: Add implementation
+    contents:
+      - hook
+      - step
+  - title: Run tests
+    contents:
+      - test
+  - title: Optional
+    contents:
+      - define_parameter_type
+      - opts

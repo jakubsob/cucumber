@@ -19,7 +19,7 @@
 }
 
 
-#' Parameter Type
+#' Define extra parameters to use in Cucumber steps.
 #'
 #' @description
 #' The following parameter types are available by default:
