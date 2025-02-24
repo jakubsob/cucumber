@@ -53,7 +53,7 @@ get_data <- function(x) {
   if (length(x) == 0) {
     return(NULL)
   }
-  remove_comments(x)
+  str_remove_all(x, "^\\s*")
 }
 
 #' @importFrom purrr map
@@ -62,6 +62,9 @@ tokenize <- function(x) {
   x <- remove_empty_lines(x)
   x <- remove_comments(x)
   indices <- detect_node(x)
+  if (sum(indices) == 0) {
+    abort("Error tokenizing Gherkin, no keywords found")
+  }
   groups <- seq_len(max(cumsum(indices)))
   groups |>
     map(\(ind) {
@@ -74,22 +77,27 @@ tokenize <- function(x) {
       children <- text[!indices]
       children <- remove_indent(children)
 
-      if (sum(detect_node(children)) == 0) {
-        node <- list(
-          type = type,
-          value = value,
-          children = NULL,
-          data = get_data(children)
+    if (type %in% c("Feature", "Scenario", "Background", "Scenario Outline")) {
+        return(
+          list(
+            type = type,
+            value = value,
+            children = tokenize(children),
+            # Store free-form text in data
+            data = get_data(children[!cumsum(detect_node(children))])
+          )
+        )
+      } else if (type %in% c("Step", "Scenarios")) {
+        return(
+          list(
+            type = type,
+            value = value,
+            children = NULL,
+            data = get_data(children)
+          )
         )
       } else {
-        node <- list(
-          type = type,
-          value = value,
-          children = tokenize(children),
-          # Get data from lines directly after the node
-          data = get_data(children[!cumsum(detect_node(children))])
-        )
+        abort(glue("Error tokenizing Gherkin, unknown node type '{type}'"))
       }
-      node
     })
 }

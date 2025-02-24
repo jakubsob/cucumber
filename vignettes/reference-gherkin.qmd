@@ -22,7 +22,7 @@ Block comments are currently not supported by Gherkin.
 
 The recommended indentation level is two spaces. If you need other indentation see `?opts`.
 
-Here is an example of a feature file:
+Here is an example:
 
 ```gherkin
 Feature: Guess the word
@@ -40,9 +40,9 @@ Feature: Guess the word
 
 Please note that some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, your test(s) will be ignored.
 
-Each line that isn't a blank line has to start with a Gherkin _keyword_, followed by any text you like.
-
 # Keywords
+
+Each line that isn't a blank line has to start with a Gherkin _keyword_, followed by any text you like. The only exceptions are the free-form descriptions placed underneath `Example/Scenario`, `Background` and `Scenario Outline` lines.
 
 The primary keywords are:
 
@@ -75,20 +75,27 @@ The purpose of the `Feature` keyword is to provide a high-level description of a
 
 The first primary keyword in a Gherkin document must always be `Feature`, followed by a `:` and a short text that describes the feature.
 
-These description lines are ignored by Cucumber at runtime.
+You can add free-form text underneath Feature to add more description. These description lines are ignored by Cucumber at runtime.
 
 ```gherkin
 Feature: Guess the word
   The word guess game is a turn-based game for two players.
-  The Maker makes a word for the Breaker to guess.
-  The game  is over when the Breaker guesses the Maker's word.
+  The Maker makes a word for the Breaker to guess. The game  is over when the Breaker guesses the Maker's word.
 
   Example: Maker starts a game
 ```
 
 The name and the optional description have no special meaning to Cucumber. Their purpose is to provide a place for you to document important aspects of the feature, such as a brief explanation and a list of business rules (general acceptance criteria).
 
+The free format description for Feature ends when you start a line with the keyword `Background`, `Example` or `Scenario Outline` (or their alias keywords).
+
 You can only have a single `Feature` in a `.feature` file.
+
+# Descriptions
+
+Free-form descriptions (as described above for `Feature`) can also be placed underneath `Example/Scenario`, `Background` and `Scenario Outline`.
+
+You can write anything you like, as long as no line starts with a keyword.
 
 # Example
 
@@ -385,7 +392,7 @@ It will automatically be passed as the last argument in the step definition. See
 
 Indentation of the opening `"""` is unimportant, although common practice is two spaces in from the enclosing step. The indentation inside the triple quotes, however, is significant. Each line of the Doc String will be dedented according to the opening `"""`. Indentation beyond the column of the opening `"""` will therefore be preserved.
 
-Doc strings also support using three backticks as the delimiter.
+Doc strings also support using three backticks or three single quotes as the delimiter.
 
 # Data Tables
 
