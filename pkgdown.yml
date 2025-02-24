@@ -5,7 +5,7 @@ articles:
   bdd: bdd.html
   how-it-works: how-it-works.html
   reference-gherkin: reference-gherkin.html
-last_built: 2025-02-24T18:40Z
+last_built: 2025-02-24T18:44Z
 urls:
   reference: https://jakubsob.github.io/cucumber/reference
   article: https://jakubsob.github.io/cucumber/articles
