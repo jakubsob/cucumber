@@ -202,12 +202,10 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [x] `#` (Comments)
 - [ ] Free-format text
 
-See the [Gherkin Reference](https://cucumber.io/docs/gherkin/reference/) on how to write Gherkin documents.
+# Installation
 
-## Installation
+To install the stable version from CRAN:
 
-You can install the development version of cucumber from [GitHub](https://github.com/) with:
-
-``` r
-devtools::install_github("jakubsob/cucumber")
+```r
+install.packages("cucumber")
 ```
