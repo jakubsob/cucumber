@@ -11,6 +11,8 @@ URL: https://github.com/jakubsob/cucumber, https://jakubsob.github.io/cucumber/
 BugReports: https://github.com/jakubsob/cucumber/issues
 Encoding: UTF-8
 LazyData: true
+Depends:
+  R (>= 4.1.0)
 Imports:
     checkmate,
     cli,
