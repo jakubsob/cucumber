@@ -1,5 +1,5 @@
 describe("parse_table", {
-  it("should parse Gherkin table with 1 row", {
+  it("should parse Data Table with 1 row", {
     # Arrange
     x <- c(
       "| start | eat | left |",
@@ -20,7 +20,7 @@ describe("parse_table", {
     )
   })
 
-  it("should parse Gherkin table with header only", {
+  it("should parse Data Table with header only", {
     # Arrange
     x <- c(
       "| start | eat | left |"
@@ -40,7 +40,7 @@ describe("parse_table", {
     )
   })
 
-  it("should parse Gherkin table with many rows", {
+  it("should parse Data Table with many rows", {
     # Arrange
     x <- c(
       "| start | eat | left |",
@@ -58,6 +58,27 @@ describe("parse_table", {
         start = c("12", "13"),
         eat = c("5", "6"),
         left = c("7", "7")
+      )
+    )
+  })
+
+  it("should parse Data Table with escaped characters", {
+    # Arrange
+    x <- c(
+      "| start | eat  | left  |",
+      "| '\\'  | '\n' | '\\|' |"
+    )
+
+    # Act
+    result <- parse_table(x)
+
+    # Assert
+    expect_equal(
+      result,
+      tibble::tibble(
+        start = c("'\\'"),
+        eat = c("'\n'"),
+        left = c("'|'")
       )
     )
   })
