@@ -18,8 +18,11 @@ test(
 
 \item{steps_loader}{A function that loads the steps implementations. By default it sources all files
 from the \code{steps_dir} using the built-in mechanism. You can provide your own function to load
-the steps. The function should take one argument, which will be the \code{steps_dir}
-and return a list of steps.}
+the steps. The function should take one argument, which will be the \code{steps_dir}.
+
+\strong{For packages}: set to NULL to use default support-code load mechanism and place your steps
+definitions in \code{setup} or \code{helper} files. Read more about those files in
+\href{https://testthat.r-lib.org/articles/special-files.html}{testthat documentation}.}
 
 \item{test_interactive}{A logical value indicating whether to ask which feature files to run.}
 }
@@ -29,4 +32,12 @@ None, function called for side effects.
 \description{
 This command runs all Cucumber tests. It takes all .feature files
 from the \code{features_dir} and runs them using the steps from the \code{steps_dir}.
+}
+\examples{
+\dontrun{
+#' testthat/acceptance/test-cucumber.R
+cucumber::test(".", ".", steps_loader = NULL)
+# Steps are stored in `testthat/acceptance/setup-steps.R` file.
+}
+
 }

@@ -177,20 +177,24 @@
       --------------------------------------------------------------------------------
       Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.1
+      `expected`: 5.0
       Backtrace:
       x
-      1. \-global `<step>`(expected = 5L, context = `<env>`)
-      2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-global step(expected = 5L, ...)
+      4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.2
+      `expected`: 5.0
       Backtrace:
       x
-      1. \-global `<step>`(expected = 5L, context = `<env>`)
-      2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-global step(expected = 5L, ...)
+      4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       --------------------------------------------------------------------------------
       x | 1        1 | Feature: Guess the word
       --------------------------------------------------------------------------------
@@ -200,34 +204,64 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-global `<step>`(n = 6L, context = `<env>`)
-      2.   \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-global step(n = 6L, ...)
+      4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
       Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.1
+      `expected`: 5.0
       Backtrace:
       x
-      1. \-global `<step>`(expected = 5L, context = `<env>`)
-      2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-global step(expected = 5L, ...)
+      4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
-      `actual`: 2
-      `expected`: 5
+      `actual`: 2.2
+      `expected`: 5.0
       Backtrace:
       x
-      1. \-global `<step>`(expected = 5L, context = `<env>`)
-      2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-global step(expected = 5L, ...)
+      4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
       Failure ('test-cucumber.R:1:1'): Scenario: Breaker joins a game
       nchar(context$word) (`actual`) not equal to `n` (`expected`).
       `actual`: 5
       `expected`: 6
       Backtrace:
       x
-      1. \-global `<step>`(n = 6L, context = `<env>`)
-      2.   \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-global step(n = 6L, ...)
+      4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
       [ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]
+
+# test: should work with loading steps from setup files
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          1 | Feature: Eating cucumbers
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+
+# test: should work with Scenario Outline
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      v |          6 | Feature: Eating
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 6 ]
 

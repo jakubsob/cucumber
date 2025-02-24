@@ -36,6 +36,11 @@ describe("test", {
   })
 
   it("should run with shinytest2", {
+    # nolint start
+    # Produces on r-devel:
+    # Superclass process has cloneable=FALSE, but subclass r_process has cloneable=TRUE. A subclass cannot be cloneable when its superclass is not cloneable, so cloning will be disabled for r_process.
+    # nolint end
+    skip_if(R.version$status == "Under development (unstable)")
     test_example("examples/shinytest2")
   })
 
@@ -94,5 +99,13 @@ describe("test", {
   it("should report failure with `testthat::test_dir`", {
     testthat::skip_if(testthat::is_checking())
     test_example("examples/with_testthat_failure")
+  })
+
+  it("should work with loading steps from setup files", {
+    test_example("examples/testthat_setup_files")
+  })
+
+  it("should work with Scenario Outline", {
+    test_example("examples/scenario_outline")
   })
 })

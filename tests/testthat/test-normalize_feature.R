@@ -1,14 +1,14 @@
 describe("normalize_feature", {
-  it("should replace 'And' keywords with the preceeding keyword", {
+  it("should replace all step keywords with 'Step'", {
     # Arrange
     lines <- c(
       "Feature: Addition",
       "  Scenario: Addition should work for 2 numbers",
       "    Given I have 1",
-      "    And I have 2",
-      "    And I have 3",
+      "    * I have 2",
+      "    * I have 3",
       "    When I add them",
-      "    And I do nothing more",
+      "    But I do nothing more",
       "    Then I get 6",
       "    And it's over"
     )
@@ -22,47 +22,13 @@ describe("normalize_feature", {
       c(
         "Feature: Addition",
         "  Scenario: Addition should work for 2 numbers",
-        "    Given I have 1",
-        "    Given I have 2",
-        "    Given I have 3",
-        "    When I add them",
-        "    When I do nothing more",
-        "    Then I get 6",
-        "    Then it's over"
-      )
-    )
-  })
-
-  it("should replace 'But' keywords with the preceeding keyword", {
-    # Arrange
-    lines <- c(
-      "Feature: Addition",
-      "  Scenario: Addition should work for 2 numbers",
-      "    Given I have 1",
-      "    But I have 2",
-      "    But I have 3",
-      "    When I add them",
-      "    But I do nothing more",
-      "    Then I get 6",
-      "    But it's over"
-    )
-
-    # Act
-    result <- normalize_feature(lines)
-
-    # Assert
-    expect_equal(
-      result,
-      c(
-        "Feature: Addition",
-        "  Scenario: Addition should work for 2 numbers",
-        "    Given I have 1",
-        "    Given I have 2",
-        "    Given I have 3",
-        "    When I add them",
-        "    When I do nothing more",
-        "    Then I get 6",
-        "    Then it's over"
+        "    Step I have 1",
+        "    Step I have 2",
+        "    Step I have 3",
+        "    Step I add them",
+        "    Step I do nothing more",
+        "    Step I get 6",
+        "    Step it's over"
       )
     )
   })
@@ -84,7 +50,7 @@ describe("normalize_feature", {
       c(
         "Feature: Addition",
         "  Scenario: Addition should work for 2 numbers",
-        "    Given I have 1"
+        "    Step I have 1"
       )
     )
   })

@@ -16,23 +16,53 @@ then(description, implementation)
 \arguments{
 \item{description}{A description of the step.
 
-A simple version of a \href{https://github.com/cucumber/cucumber-expressions}{Cucumber expression}.
-The description is used by the \code{cucumber::test} function to find an implementation of a step
-from a feature file.
-The description can contain placeholders in curly braces, e.g. \code{"I have {int} cucumbers in my basket"}.
-If no step definition is found an error will be thrown. If multiple steps definitions for a single step
-are found an error will be thrown. Make sure the description is unique for each step.}
+Cucumber executes each step in a scenario one at a time, in the sequence you’ve written them in.
+When Cucumber tries to execute a step, it looks for a matching step definition to execute.
 
-\item{implementation}{A function that will be run when the step is executed.
-The implementation function should always have the last parameter named \code{context}.
-It holds the environment where state should be stored to be passed to the next step.
+\strong{Keywords are not taken into account when looking for a step definition.}
+This means you cannot have a \code{Given}, \code{When}, \code{Then}, \code{And} or \code{But} step with the same text as another step.
+
+Cucumber considers the following steps duplicates:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Given there is money in my account
+Then there is money in my account
+}\if{html}{\out{</div>}}
+
+This might seem like a limitation, but it forces you to come up with a less ambiguous, more clear domain language:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Given my account has a balance of £430
+Then my account should have a balance of £430
+}\if{html}{\out{</div>}}
+
+To pass arguments, description can contain placeholders in curly braces.
+
+To match:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Given my account has a balance of £430
+}\if{html}{\out{</div>}}
+
+use:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{given("my account has a balance of £\{float\}", function(balance, context) \{
+
+\})
+}\if{html}{\out{</div>}}
+
+If no step definition is found an error will be thrown.
+
+If multiple steps definitions for a single step are found an error will be thrown.}
+
+\item{implementation}{A function that will be run during test execution.
+
+The implementation function must always have the last parameter named \code{context}.
+It holds the environment where test state can be stored to be passed to the next step.
 
 If a step has a description \code{"I have {int} cucumbers in my basket"} then the implementation
-function should be a \code{function(n_cucumbers, context)}. The \code{{int}} value will be passed to
-\code{n_cucumbers}, this parameter can have any name.
+function should be \verb{function(n, context)}. The \code{{int}} value will be passed to
+\code{n}, this parameter can have any name.
 
 If a table or a docstring is defined for a step, it will be passed as an argument after plceholder parameters
-and before \code{context}. The function should be a \code{function(n_cucumbers, table, context)}.
+and before \code{context}. The function should be a \verb{function(n, table, context)}.
 See
 \href{https://github.com/jakubsob/cucumber/blob/main/inst/examples/table/tests/testthat/steps/steps.R}{an example}
 on how to write implementation that uses tables or docstrings.}
@@ -45,7 +75,8 @@ Provide a description that matches steps in feature files and the implementation
 }
 \details{
 Placeholders in expressions are replaced with regular expressions that match values in the feature file.
-The regular expressions are generated during runtime based on defined parameter types.
+Regular expressions are generated during runtime based on defined parameter types.
+
 The expression \code{"I have {int} cucumbers in my basket"} will be converted to
 \code{"I have [+-]?(?<![.])[:digit:]+(?![.]) cucumbers in my basket"}. The extracted value of \code{{int}}
 will be passed to the implementation function after being transformed with \code{as.integer}.

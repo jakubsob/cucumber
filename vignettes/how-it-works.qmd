@@ -1,0 +1,107 @@
+---
+title: "How it works"
+vignette: >
+  %\VignetteIndexEntry{How it works}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+When `cucumber::test` is called, it scans for the `.feature` files in the `features_dir` directory.
+
+It parses the feature files and runs the step implementations one by one, according to their order in feature files.
+
+# Step execution order
+
+Given such a feature file:
+
+```gherkin
+# tests/testthat/sum.feature
+Feature: Sum
+  Scenario: Sum should work for 2 numbers
+    Given I have 1
+    And I have 2
+    When I add them
+    Then I get 3
+
+  Scenario: Sum should work for 3 numbers
+    Given I have 1
+    And I have 2
+    But I have 3
+    When I add them
+    Then I get 6
+```
+
+And such step definitions:
+
+```r
+# tests/testthat/steps/steps_definitions.R
+given("I have {int}", function(int, context) {
+  print("given")
+  context$numbers <- c(context$numbers, int)
+})
+
+when("I add them", function(context) {
+  print("when")
+  context$result <- sum(context$numbers)
+})
+
+then("I get {int}", function(int, context) {
+  print("then")
+  expect_equal(context$result, int)
+})
+```
+
+The order of calling the steps would be:
+
+```r
+> [1] "given"
+> [1] "given"
+> [1] "when"
+> [1] "then"
+> [1] "given"
+> [1] "given"
+> [1] "given"
+> [1] "when"
+> [1] "then"
+```
+
+# Translation to `testthat` code
+
+Cucumber translates `.feature` files to `testthat::test_that` calls.
+
+When a `Scenario` is run, the `context` environment is reset so that the state doesn't leak to the next scenario.
+
+The previous feature file is basically translated to the following test code, so that we can leverate [testthat reporters](https://testthat.r-lib.org/reference/index.html#reporters) and not reinvent the wheel.
+
+```r
+test_that("Scenario: Sum should work for 2 numbers", {
+  context <- new.env()
+  context$numbers <- c(context$numbers, 1)
+  context$numbers <- c(context$numbers, 2)
+  context$result <- sum(context$numbers)
+  expect_equal(context$result, 3)
+})
+
+test_that("Scenario: Sum should work for 3 numbers", {
+  context <- new.env()
+  context$numbers <- c(context$numbers, 1)
+  context$numbers <- c(context$numbers, 2)
+  context$numbers <- c(context$numbers, 3)
+  context$result <- sum(context$numbers)
+  expect_equal(context$result, 6)
+})
+```
+
+Test successes or failures are reported at the level of Scenarios.
+
+A scenario is a test case.
+
+# How step definitions are loaded
+
+You don't have to load step implementations manually. Cucumber loads them automatically when `cucumber::test` is called.
+
+If you don't want them to be loaded automatically from the default location, you can use `steps_loader` argument to provide your own step loader function. See [inst/examples/custom_step_loader](https://github.com/jakubsob/cucumber/blob/main/inst/examples/custom_steps_loader/tests/testthat/test-cucumber.R)
+
+Steps from feature files are matched against step definitions defined with `given()`, `when()`, and `then()` functions using regular expressions.
+
+When you define a step by calling any of the step functions, you register that step, making it available for the tests.

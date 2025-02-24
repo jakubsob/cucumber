@@ -1,6 +1,5 @@
 ---
 title: "Behavior-Driven Development"
-output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Behavior-Driven Development}
   %\VignetteEngine{quarto::html}

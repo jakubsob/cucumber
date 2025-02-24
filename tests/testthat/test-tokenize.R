@@ -1,8 +1,9 @@
-describe("parse", {
-  it("should parse feature string into a list of scenarios", {
+describe("tokenize", {
+  it("should tokenize feature string into a list of scenarios", {
     # Arrange
     lines <- c(
       "Feature: Guess the word",
+      "",
       "  Scenario: Maker starts a game",
       "    When the Maker starts a game",
       "    Then the Maker waits for a Breaker to join",
@@ -28,13 +29,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = NULL
@@ -47,19 +48,19 @@ describe("parse", {
               value = "Breaker joins a game",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "the Maker has started a game with the word 'silky'",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Breaker joins the Maker's game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Breaker must guess a word with 5 characters",
                   children = NULL,
                   data = NULL
@@ -112,13 +113,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = NULL
@@ -133,14 +134,13 @@ describe("parse", {
     )
   })
 
-  it("should parse a feature with Background", {
+  it("should tokenize a feature with Background", {
     # Arrange
     lines <- c(
       "Feature: Multiple site support",
-      "  Only blog owners can post to a blog, except administrators,",
-      "  who can post to all blogs.",
       "",
       "  Background:",
+      "",
       "    Given a global administrator named \"Greg\"",
       "    And a blog named \"Greg's anti-tax rants\"",
       "    And a customer named \"Dr. Bill\"",
@@ -172,25 +172,25 @@ describe("parse", {
               value = "",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "a global administrator named \"Greg\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "And",
+                  type = "Step",
                   value = "a blog named \"Greg's anti-tax rants\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "And",
+                  type = "Step",
                   value = "a customer named \"Dr. Bill\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "And",
+                  type = "Step",
                   value = "a blog named \"Expensive Therapy\" owned by \"Dr. Bill\"",
                   children = NULL,
                   data = NULL
@@ -203,19 +203,19 @@ describe("parse", {
               value = "Dr. Bill posts to his own blog",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "I am logged in as Dr. Bill",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "I try to post to \"Expensive Therapy\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "I should see \"Your article was published.\"",
                   children = NULL,
                   data = NULL
@@ -228,19 +228,19 @@ describe("parse", {
               value = "Dr. Bill tries to post to somebody else's blog, and fails",
               children = list(
                 list(
-                  type = "Given",
+                  type = "Step",
                   value = "I am logged in as Dr. Bill",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "I try to post to \"Greg's anti-tax rants\"",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "I should see \"Hey! That's not your blog!\"",
                   children = NULL,
                   data = NULL
@@ -249,24 +249,23 @@ describe("parse", {
               data = NULL
             )
           ),
-          data = c("Only blog owners can post to a blog, except administrators,", "who can post to all blogs.")
+          data = NULL
         )
       )
     )
   })
 
-  it("should parse Scenario Outline", {
+  it("should tokenize Scenario Outline", {
     # Arrange
     lines <- c(
       "Scenario Outline: eating",
       "  Given there are <start> cucumbers",
       "  When I eat <eat> cucumbers",
       "  Then I should have <left> cucumbers",
-      "",
       "  Examples:",
-      "  | start | eat | left |",
-      "  |    12 |   5 |    7 |",
-      "  |    20 |   5 |   15 |"
+      "    | start | eat | left |",
+      "    |    12 |   5 |    7 |",
+      "    |    20 |   5 |   15 |"
     )
 
     # Act
@@ -281,25 +280,25 @@ describe("parse", {
           value = "eating",
           children = list(
             list(
-              type = "Given",
+              type = "Step",
               value = "there are <start> cucumbers",
               children = NULL,
               data = NULL
             ),
             list(
-              type = "When",
+              type = "Step",
               value = "I eat <eat> cucumbers",
               children = NULL,
               data = NULL
             ),
             list(
-              type = "Then",
+              type = "Step",
               value = "I should have <left> cucumbers",
               children = NULL,
               data = NULL
             ),
             list(
-              type = "Examples",
+              type = "Scenarios",
               value = "",
               children = NULL,
               data = c("| start | eat | left |", "|    12 |   5 |    7 |", "|    20 |   5 |   15 |")
@@ -311,7 +310,7 @@ describe("parse", {
     )
   })
 
-  it("should parse docstring with triple quote marks", {
+  it("should tokenize docstring with triple quote marks", {
     # Arrange
     lines <- c(
       "Scenario: blog",
@@ -336,7 +335,7 @@ describe("parse", {
           value = "blog",
           children = list(
             list(
-              type = "Given",
+              type = "Step",
               value = "a blog post named \"Random\" with Markdown body",
               children = NULL,
               data = c(
@@ -355,7 +354,51 @@ describe("parse", {
     )
   })
 
-  it("should parse docstring with backticks", {
+  it("should tokenize docstring with triple single-quotes", {
+    # Arrange
+    lines <- c(
+      "Scenario: blog",
+      "  Given a blog post named \"Random\" with Markdown body",
+      "    '''",
+      "    Some Title, Eh?",
+      "    ===============",
+      "    Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,",
+      "    consectetur adipiscing elit.",
+      "    '''"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Scenario",
+          value = "blog",
+          children = list(
+            list(
+              type = "Step",
+              value = "a blog post named \"Random\" with Markdown body",
+              children = NULL,
+              data = c(
+                "'''",
+                "Some Title, Eh?",
+                "===============",
+                "Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,",
+                "consectetur adipiscing elit.",
+                "'''"
+              )
+            )
+          ),
+          data = NULL
+        )
+      )
+    )
+  })
+
+  it("should tokenize docstring with backticks", {
     # Arrange
     lines <- c(
       "Scenario: blog",
@@ -380,7 +423,7 @@ describe("parse", {
           value = "blog",
           children = list(
             list(
-              type = "Given",
+              type = "Step",
               value = "a blog post named \"Random\" with Markdown body",
               children = NULL,
               data = c(
@@ -399,7 +442,101 @@ describe("parse", {
     )
   })
 
-  it("should tokenize table and ignore commented lines", {
+  it("should tokenize docstring no matter the delimiter indentation", {
+    # Arrange
+    lines <- c(
+      "Scenario: blog",
+      "  Given a blog post named \"Random\" with Markdown body",
+      "```",
+      "Some Title, Eh?",
+      "===============",
+      "Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,",
+      "consectetur adipiscing elit.",
+      "```"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Scenario",
+          value = "blog",
+          children = list(
+            list(
+              type = "Step",
+              value = "a blog post named \"Random\" with Markdown body",
+              children = NULL,
+              data = c(
+                "```",
+                "Some Title, Eh?",
+                "===============",
+                "Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,",
+                "consectetur adipiscing elit.",
+                "```"
+              )
+            )
+          ),
+          data = NULL
+        )
+      )
+    )
+  })
+
+  it("should tokenize a Data Table", {
+    # Arrange
+    lines <- c(
+      "Given the following users exist:",
+      "  | name  | email            |",
+      "  | Jane  | janedoe@jane.com |"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Step",
+          value = "the following users exist:",
+          children = NULL,
+          data = c("| name  | email            |", "| Jane  | janedoe@jane.com |")
+        )
+      )
+    )
+  })
+
+  it("should tokenize a Data Table no matter the indentation", {
+    # Arrange
+    lines <- c(
+      "Given the following users exist:",
+      "         | name  | email            |",
+      "         | Jane  | janedoe@jane.com |"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Step",
+          value = "the following users exist:",
+          children = NULL,
+          data = c("| name  | email            |", "| Jane  | janedoe@jane.com |")
+        )
+      )
+    )
+  })
+
+  it("should tokenize Data Table and ignore commented lines", {
     # Arrange
     lines <- c(
       "Feature: Guess the word",
@@ -434,13 +571,13 @@ describe("parse", {
               value = "Maker starts a game",
               children = list(
                 list(
-                  type = "When",
+                  type = "Step",
                   value = "the Maker starts a game",
                   children = NULL,
                   data = NULL
                 ),
                 list(
-                  type = "Then",
+                  type = "Step",
                   value = "the Maker waits for a Breaker to join",
                   children = NULL,
                   data = c("| x | y |", "| 1 | 2 |")
@@ -453,5 +590,182 @@ describe("parse", {
         )
       )
     )
+  })
+
+  it("should tokenize feature files with 4 spaces indent", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "    Scenario: Maker starts a game",
+      "        When the Maker starts a game",
+      "        Then the Maker waits for a Breaker to join"
+    )
+    indent <- "^\\s{4}"
+
+    # Act
+    withr::with_options(list(cucumber.indent = indent), {
+      result <- tokenize(lines)
+    })
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Feature",
+          value = "Guess the word",
+          children = list(
+            list(
+              type = "Scenario",
+              value = "Maker starts a game",
+              children = list(
+                list(
+                  type = "Step",
+                  value = "the Maker starts a game",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Step",
+                  value = "the Maker waits for a Breaker to join",
+                  children = NULL,
+                  data = NULL
+                )
+              ),
+              data = NULL
+            )
+          ),
+          data = NULL
+        )
+      )
+    )
+  })
+
+  it("should read free-form text after Feature, Background, Scenario, Scenario Outline keywords", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "",
+      "  This is a freeform text after Feature",
+      "",
+      "  Background:",
+      "",
+      "    This is a freeform text after Background",
+      "",
+      "    Given a global administrator named \"Greg\"",
+      "",
+      "  Scenario: Maker starts a game",
+      "",
+      "    This is a freeform text after Scenario",
+      "",
+      "    When the Maker starts a game",
+      "    Then the Maker waits for a Breaker to join",
+      "",
+      "  Scenario Outline: eating",
+      "",
+      "    This is a freeform text after Scenario Outline",
+      "",
+      "    Given there are <start> cucumbers",
+      "    When I eat <eat> cucumbers",
+      "    Then I should have <left> cucumbers",
+      "    Examples:",
+      "      | start | eat | left |",
+      "      |    12 |   5 |    7 |",
+      "      |    20 |   5 |   15 |"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      list(
+        list(
+          type = "Feature",
+          value = "Guess the word",
+          children = list(
+            list(
+              type = "Background",
+              value = "",
+              children = list(
+                list(
+                  type = "Step",
+                  value = "a global administrator named \"Greg\"",
+                  children = NULL,
+                  data = NULL
+                )
+              ),
+              data = "This is a freeform text after Background"
+            ),
+            list(
+              type = "Scenario",
+              value = "Maker starts a game",
+              children = list(
+                list(
+                  type = "Step",
+                  value = "the Maker starts a game",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Step",
+                  value = "the Maker waits for a Breaker to join",
+                  children = NULL,
+                  data = NULL
+                )
+              ),
+              data = "This is a freeform text after Scenario"
+            ),
+            list(
+              type = "Scenario Outline",
+              value = "eating",
+              children = list(
+                list(
+                  type = "Step",
+                  value = "there are <start> cucumbers",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Step",
+                  value = "I eat <eat> cucumbers",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Step",
+                  value = "I should have <left> cucumbers",
+                  children = NULL,
+                  data = NULL
+                ),
+                list(
+                  type = "Scenarios",
+                  value = "",
+                  children = NULL,
+                  data = c("| start | eat | left |", "|    12 |   5 |    7 |", "|    20 |   5 |   15 |")
+                )
+              ),
+              data = "This is a freeform text after Scenario Outline"
+            )
+          ),
+          data = "This is a freeform text after Feature"
+        )
+      )
+    )
+  })
+
+  it("should throw an error on unknown keyword", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "",
+      "  Unknown: Maker starts a game",
+      "    When the Maker starts a game",
+      "    Then the Maker waits for a Breaker to join"
+    )
+
+    # Act & Assert
+    expect_error(tokenize(lines))
   })
 })
