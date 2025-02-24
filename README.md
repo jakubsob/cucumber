@@ -200,7 +200,8 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [x] `|` (Data Tables)
 - [ ] `@` (Tags)
 - [x] `#` (Comments)
-- [ ] Free-format text
+- [x] Free-format text
+- [ ] Localization
 
 # Installation
 
