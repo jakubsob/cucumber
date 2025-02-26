@@ -58,6 +58,7 @@ after <- make_hook("after")
 #' @importFrom rlang `:=` arg_match abort
 #' @importFrom checkmate test_subset
 #' @importFrom glue glue
+#' @importFrom purrr `pluck<-`
 register_hook <- function(
   hook,
   name = c("before", "after")
@@ -70,7 +71,7 @@ register_hook <- function(
       body = "A hook can only be registered once."
     )
   }
-  hooks <- .hooks(!!name := hook)
+  pluck(hooks, name) <- hook
   options(.cucumber_hooks = hooks)
   invisible(hooks)
 }

@@ -8,7 +8,6 @@ parse_token <- function(
   parameters = get_parameters(),
   hooks = get_hooks()
 ) {
-  force(hooks)
   map(tokens, \(token) {
     switch(
       token$type,

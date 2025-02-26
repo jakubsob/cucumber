@@ -1,1 +1,1 @@
-cucumber::test(".", "./steps")
+cucumber::test(".", ".", steps_loader = NULL)
