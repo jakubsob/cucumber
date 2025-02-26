@@ -24,10 +24,11 @@ describe("hooks", {
     })
   })
 
-  it("should register a hook", {
+  it("should register one hook", {
     withr::with_options(list(.cucumber_hooks = .hooks()), {
       # Arrange
-      hook <- function(context, scenario) {}
+      hook <- function(context, scenario) {
+      }
       before(hook)
 
       # Act
@@ -35,6 +36,24 @@ describe("hooks", {
 
       # Assert
       expect_equal(h, hook)
+    })
+  })
+
+  it("should register both hooks", {
+    withr::with_options(list(.cucumber_hooks = .hooks()), {
+      # Arrange
+      hook1 <- function(context, scenario) {
+      }
+      hook2 <- function(context, scenario) {
+      }
+
+      # Act
+      before(hook1)
+      after(hook2)
+
+      # Assert
+      expect_equal(get_hook(name = "before"), hook1)
+      expect_equal(get_hook(name = "after"), hook2)
     })
   })
 })

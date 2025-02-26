@@ -88,16 +88,66 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should run before hook
+# test: should run before and after hooks
 
     Code
       testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
         show_praise = FALSE), stop_on_failure = FALSE)
     Output
       v | F W  S  OK | Context
-      v |          1 | Feature: Hooks
+      v |   2      1 | Feature: Hooks
+      --------------------------------------------------------------------------------
+      Warning ('test-cucumber.R:1:1'): Scenario: Before hook is executed
+      Warning in before hook.
+      Backtrace:
+      x
+      1. \-get_hook(hooks, "before")(context, token$value) at cucumber/R/parse_token.R:21:11
+      Warning ('test-cucumber.R:1:1'): Scenario: Before hook is executed
+      Warning in after hook.
+      Backtrace:
+      x
+      1. \-get_hook(hooks, "after")(context, token$value)
+      --------------------------------------------------------------------------------
       == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      [ FAIL 0 | WARN 2 | SKIP 0 | PASS 1 ]
+
+# test: should run after hook, even after error in step
+
+    Code
+      testthat::test_dir(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE)
+    Output
+      v | F W  S  OK | Context
+      x | 1 2      0 | Feature: Hooks
+      --------------------------------------------------------------------------------
+      Warning ('test-cucumber.R:1:1'): Scenario: After hook is executed even when a step throws an error
+      Warning in before hook.
+      Backtrace:
+      x
+      1. \-get_hook(hooks, "before")(context, token$value) at cucumber/R/parse_token.R:21:11
+      Error ('test-cucumber.R:1:1'): Scenario: After hook is executed even when a step throws an error
+      Error in `step(...)`: Unexpected error!
+      Backtrace:
+      x
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-step(...)
+      Warning ('test-cucumber.R:1:1'): Scenario: After hook is executed even when a step throws an error
+      Warning in after hook, even after error in a step.
+      Backtrace:
+      x
+      1. \-get_hook(hooks, "after")(context, token$value)
+      --------------------------------------------------------------------------------
+      == Results =====================================================================
+      -- Failed tests ----------------------------------------------------------------
+      Error ('test-cucumber.R:1:1'): Scenario: After hook is executed even when a step throws an error
+      Error in `step(...)`: Unexpected error!
+      Backtrace:
+      x
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
+      2.   \-cucumber (local) x(context = context, ...)
+      3.     \-step(...)
+      [ FAIL 1 | WARN 2 | SKIP 0 | PASS 0 ]
 
 # test: should run a Scenario with custom parameters
 
@@ -181,7 +231,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -191,7 +241,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -204,7 +254,7 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(n = 6L, ...)
       4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
@@ -217,7 +267,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -227,7 +277,7 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(expected = 5L, ...)
       4.       \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:3
@@ -237,7 +287,7 @@
       `expected`: 6
       Backtrace:
       x
-      1. \-cucumber (local) call() at cucumber/R/parse_token.R:24:13
+      1. \-cucumber (local) call() at cucumber/R/parse_token.R:23:13
       2.   \-cucumber (local) x(context = context, ...)
       3.     \-global step(n = 6L, ...)
       4.       \-testthat::expect_equal(nchar(context$word), n) at ./steps/guess_the_word.R:18:3
