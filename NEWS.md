@@ -1,3 +1,7 @@
+# cucumber 1.2.1
+
+- 🐛 Fix hook registering that previously could only register one hook.
+
 # cucumber 1.2.0
 
 - ✨ Added support for "Scenario Outline", "Background" and "*" keywords.
