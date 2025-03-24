@@ -1,72 +1,118 @@
 #' @importFrom fs dir_ls
 #' @importFrom purrr map walk
-.default_steps_loader <- function(steps_dir) {
-  steps_files <- dir_ls(steps_dir, glob = "*.R$", type = "file")
-  walk(steps_files, source)
+run_features <- function(features) {
+  features |>
+    map(readLines) |>
+    map(validate_feature) |>
+    walk(run)
 }
 
-#' Run all Cucumber tests
+#' @importFrom fs dir_ls
+find_features <- function(path) {
+  fs::dir_ls(path, glob = "*.feature$", type = "file")
+}
+
+#' @importFrom fs path_ext_remove path_file
+context_name <- function(feature) {
+  feature |>
+    fs::path_file() |>
+    fs::path_ext_remove()
+}
+
+filter_features <- function(features, filter = NULL, ...) {
+  if (is.null(filter)) {
+    return(features)
+  }
+  features[grepl(filter, context_name(features), ...)]
+}
+
+cleanup <- function() {
+  clear_steps()
+  clear_hooks()
+  set_default_parameters()
+}
+
+#' @importFrom withr defer
+test_cucumber_code <- function(features) {
+  c(
+    'withr::defer(cucumber:::cleanup(), testthat::teardown_env())',
+    sprintf(
+      'cucumber:::run_features(c("%s"))',
+      paste(fs::path_file(features), collapse = '", "')
+    )
+  )
+}
+
+#' Run Cucumber tests
 #'
-#' This command runs all Cucumber tests. It takes all .feature files
-#' from the \code{features_dir} and runs them using the steps from the \code{steps_dir}.
+#' It runs tests from specifications in `.feature` files found in the `path`.
 #'
-#' @param features_dir A character string of the directory containing the feature files.
-#' @param steps_dir A character string of the directory containing the step files.
-#' @param steps_loader A function that loads the steps implementations. By default it sources all files
-#'   from the \code{steps_dir} using the built-in mechanism. You can provide your own function to load
-#'   the steps. The function should take one argument, which will be the \code{steps_dir}.
+#' @section Good Practices:
 #'
-#'   **For packages**: set to NULL to use default support-code load mechanism and place your steps
-#'   definitions in `setup` or `helper` files. Read more about those files in
-#'   [testthat documentation](https://testthat.r-lib.org/articles/special-files.html).
-#' @param test_interactive A logical value indicating whether to ask which feature files to run.
-#' @return None, function called for side effects.
+#' - Use a separate directory for your acceptance tests, e.g. `tests/acceptance`.
+#'
+#'   It's not prohibited to use `tests/testthat` directory, but it's not recommended as those tests
+#'   serve a different purpose and are usually run separately.
+#'
+#' - Use [`setup-*.R`](https://testthat.r-lib.org/articles/special-files.html#setup-files)
+#'   files to define [steps](step.html), [parameters](define_parameter_type.html) and [hooks](hook.html)
+#'   to leverage testthat loading mechanism to load them.
+#'
+#'   If your [steps](step.html), [parameters](define_parameter_type.html) or [hooks](hook.html)
+#'   are stored somewhere else, you are responsible for loading them.
+#'
+#'   Read more about testthat special files in the [testthat documentation](https://testthat.r-lib.org/articles/special-files.html).
+#'
+#' - Use `test-*.R` files to test the support code you might have implemented that is used to run Cucumber tests.
+#'
+#'   Those tests won't be run when calling [cucumber::test()]. To run those tests use
+#'   `testthat::test_dir("tests/acceptance")`.
+#'
+#' @inheritParams testthat::test_dir
+#' @param filter If not NULL, only fetures with file names matching this regular expression
+#'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
 #'
 #' @examples
 #' \dontrun{
-#' #' testthat/acceptance/test-cucumber.R
-#' cucumber::test(".", ".", steps_loader = NULL)
-#' # Steps are stored in `testthat/acceptance/setup-steps.R` file.
+#' cucumber::test("tests/acceptance")
+#' cucumber::test("tests/acceptance", filter = "addition|multiplication")
 #' }
 #'
-#' @md
+#' @importFrom testthat test_dir
+#' @importFrom withr defer with_file
+#' @importFrom fs path
+#' @importFrom checkmate test_character
+#' @importFrom rlang abort
 #' @export
-#' @importFrom fs dir_ls
-#' @importFrom purrr map walk
-#' @importFrom checkmate assert_directory_exists assert_function assert_list test_function
-#' @importFrom withr defer
-#' @importFrom utils menu
+#' @md
 test <- function(
-  features_dir,
-  steps_dir,
-  steps_loader = .default_steps_loader,
-  test_interactive = getOption("cucumber.interactive", default = FALSE)
+  path = "tests/acceptance",
+  filter = NULL,
+  reporter = NULL,
+  load_helpers = TRUE,
+  stop_on_failure = TRUE,
+  stop_on_warning = FALSE,
+  ...
 ) {
-  assert_directory_exists(features_dir)
-  assert_directory_exists(steps_dir)
-  assert_function(steps_loader, nargs = 1, null.ok = TRUE)
-  defer({
-    clear_steps()
-    clear_hooks()
-    set_default_parameters()
-  })
-  if (test_function(steps_loader)) {
-    steps_loader(steps_dir)
+  features <- path |>
+    find_features() |>
+    filter_features(filter, ...)
+  file <- fs::path(path, "test-__cucumber__.R")
+  if (length(features) == 0) {
+    abort("No feature files found")
   }
-  feature_files <- dir_ls(features_dir, glob = "*.feature$", type = "file")
-  if (test_interactive) { # nocov start
-    selection <- menu(
-      choices = c("All", feature_files),
-      title = "Select feature files to run"
+  with_file(file, {
+    writeLines(
+      test_cucumber_code(features),
+      con = file
     )
-    if (selection == 1) {
-      feature_files <- feature_files
-    } else {
-      feature_files <- feature_files[selection - 1]
-    }
-  } # nocov end
-  feature_files |>
-    map(readLines) |>
-    map(validate_feature) |>
-    walk(run, parameters = get_parameters())
+    test_dir(
+      path = path,
+      filter = "^__cucumber__$",
+      reporter = reporter,
+      load_helpers = load_helpers,
+      stop_on_failure = stop_on_failure,
+      stop_on_warning = stop_on_warning
+    )
+  })
 }

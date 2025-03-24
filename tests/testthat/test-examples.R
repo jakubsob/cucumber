@@ -1,10 +1,11 @@
-test_example <- function(path, tests_path = "tests/testthat") {
+test_example <- function(path, tests_path = "tests/acceptance", ...) {
   withr::with_dir(system.file(path, package = "cucumber"), {
     testthat::expect_snapshot(
-      testthat::test_dir(
+      cucumber::test(
         tests_path,
         reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-        stop_on_failure = FALSE
+        stop_on_failure = FALSE,
+        ...
       ),
       transform = function(lines) {
         lines |>
@@ -23,6 +24,7 @@ test_example <- function(path, tests_path = "tests/testthat") {
 }
 
 describe("test", {
+  testthat::skip_if(testthat::is_checking())
   it("should run one feature", {
     test_example("examples/one_feature")
   })
@@ -84,7 +86,10 @@ describe("test", {
   it("should work with covr", {
     testthat::skip_if(covr::in_covr())
     withr::with_dir(
-      system.file("examples/covr_support/tests/testthat", package = "cucumber"),
+      system.file(
+        "examples/covr_support/tests/acceptance",
+        package = "cucumber"
+      ),
       {
         testthat::expect_snapshot({
           source_files <- list.files(
@@ -99,12 +104,8 @@ describe("test", {
     )
   })
 
-  it("should work with custom steps loader", {
-    test_example("examples/custom_steps_loader")
-  })
-
   it("should work with an arbitrary test directory", {
-    test_example("examples/custom_test_dir", "tests/acceptance")
+    test_example("examples/custom_test_dir", "tests/e2e")
   })
 
   it("should report success with `testthat::test_dir`", {
@@ -112,7 +113,6 @@ describe("test", {
   })
 
   it("should report failure with `testthat::test_dir`", {
-    testthat::skip_if(testthat::is_checking())
     test_example("examples/with_testthat_failure")
   })
 
@@ -122,5 +122,26 @@ describe("test", {
 
   it("should work with Scenario Outline", {
     test_example("examples/scenario_outline")
+  })
+
+  it("shouldn't run testthat test files", {
+    test_example("examples/with_test_files")
+  })
+
+  it("should work with testthat filtering", {
+    test_example(
+      "examples/with_testthat_filtering",
+      filter = "guess_the_word$"
+    )
+  })
+
+  it("should throw an error if no test files are found", {
+    expect_error(
+      test_example(
+        "examples/with_testthat_filtering",
+        filter = "this_feature_doesnt_exist"
+      ),
+      "No feature files found"
+    )
   })
 })
