@@ -41,7 +41,7 @@
       v | F W  S  OK | Context
       v |          2 | Feature: Formula display
       == Results =====================================================================
-      
+
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
 # test: should run a Scenario with Given, When, Then, And, But keywords
@@ -171,15 +171,6 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
-# test: should work with covr
-
-    Code
-      source_files <- list.files(c("../../R", "./steps"), full.names = TRUE, pattern = ".R$")
-      test_files <- list.files(".", full.names = TRUE, pattern = ".R$")
-      covr::file_coverage(source_files, test_files)
-    Message
-      Coverage: 0.00%
-      ../../R/get_bigger.R: 0.00%
 
 # test: should work with an arbitrary test directory
 
@@ -324,4 +315,3 @@
       v |          2 | Feature: Guess the word
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
-
