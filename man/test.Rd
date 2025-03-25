@@ -8,6 +8,7 @@ test(
   path = "tests/acceptance",
   filter = NULL,
   reporter = NULL,
+  env = NULL,
   load_helpers = TRUE,
   stop_on_failure = TRUE,
   stop_on_warning = FALSE,
@@ -25,6 +26,8 @@ as a string (e.g. "summary") or as an R6 object
 (e.g. \code{SummaryReporter$new()}).
 
 See \link[testthat]{Reporter} for more details and a list of built-in reporters.}
+
+\item{env}{Environment in which to execute the tests. Expert use only.}
 
 \item{load_helpers}{Source helper files before running the tests?}
 

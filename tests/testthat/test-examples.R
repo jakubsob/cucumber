@@ -18,13 +18,13 @@ test_example <- function(path, tests_path = "tests/acceptance", ...) {
           # Remove test run duration
           stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss") |>
           stringr::str_trim()
-      }
+      },
+      variant = ifelse(testthat::is_checking(), "check", "local")
     )
   })
 }
 
 describe("test", {
-
   it("should run one feature", {
     test_example("examples/one_feature")
   })

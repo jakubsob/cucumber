@@ -1,10 +1,15 @@
 #' @importFrom fs dir_ls
 #' @importFrom purrr map walk
-run_features <- function(features) {
+run_features <- function(
+  features,
+  steps = get_steps(),
+  parameters = get_parameters(),
+  hooks = get_hooks()
+) {
   features |>
     map(readLines) |>
     map(validate_feature) |>
-    walk(run)
+    walk(run, steps = steps, parameters = parameters, hooks = hooks)
 }
 
 #' @importFrom fs dir_ls
@@ -89,6 +94,7 @@ test <- function(
   path = "tests/acceptance",
   filter = NULL,
   reporter = NULL,
+  env = NULL,
   load_helpers = TRUE,
   stop_on_failure = TRUE,
   stop_on_warning = FALSE,
@@ -110,6 +116,7 @@ test <- function(
       path = path,
       filter = "^__cucumber__$",
       reporter = reporter,
+      env = env,
       load_helpers = load_helpers,
       stop_on_failure = stop_on_failure,
       stop_on_warning = stop_on_warning
