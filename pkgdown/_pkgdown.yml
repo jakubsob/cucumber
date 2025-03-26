@@ -39,6 +39,10 @@ navbar:
           href: articles/bdd.html
         - text: How it works
           href: articles/how-it-works.html
+        - text: -------
+        - text: Migration guides
+        - text: 2.0.0
+          href: articles/migration-to-2-0-0.html
 
 reference:
   - title: Add implementation
