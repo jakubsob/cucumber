@@ -18,8 +18,8 @@ parse_token <- function(
           after <- get_hook(hooks, "after")
           before <- get_hook(hooks, "before")
 
-          on.exit(after(context, token$value))
-          before(context, token$value)
+          on.exit(after(.context, token$value))
+          before(.context, token$value)
           for (call in calls) {
             step <- unclass(call)
             description <- attr(step, "description")

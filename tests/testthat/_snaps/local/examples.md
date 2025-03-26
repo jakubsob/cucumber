@@ -101,12 +101,12 @@
       Warning in before hook.
       Backtrace:
       x
-      1. \-before(context, token$value) at cucumber/R/parse_token.R:22:11
+      1. \-before(.context, token$value) at cucumber/R/parse_token.R:22:11
       Warning ('test-__cucumber__.R:2:1'): Scenario: Before hook is executed
       Warning in after hook.
       Backtrace:
       x
-      1. \-after(context, token$value)
+      1. \-after(.context, token$value)
       --------------------------------------------------------------------------------
       == Results =====================================================================
       [ FAIL 0 | WARN 2 | SKIP 0 | PASS 1 ]
@@ -124,7 +124,7 @@
       Warning in before hook.
       Backtrace:
       x
-      1. \-before(context, token$value) at cucumber/R/parse_token.R:22:11
+      1. \-before(.context, token$value) at cucumber/R/parse_token.R:22:11
       Error ('test-__cucumber__.R:2:1'): Scenario: After hook is executed even when a step throws an error
       Error in `(function (context)
       {
@@ -138,7 +138,7 @@
       Warning in after hook, even after error in a step.
       Backtrace:
       x
-      1. \-after(context, token$value)
+      1. \-after(.context, token$value)
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
