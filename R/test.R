@@ -74,7 +74,7 @@ test_cucumber_code <- function(features) {
 #'   `testthat::test_dir("tests/acceptance")`.
 #'
 #' @inheritParams testthat::test_dir
-#' @param filter If not NULL, only fetures with file names matching this regular expression
+#' @param filter If not NULL, only features with file names matching this regular expression
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
 #'
 #' @examples

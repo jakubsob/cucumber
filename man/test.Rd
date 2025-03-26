@@ -18,7 +18,7 @@ test(
 \arguments{
 \item{path}{Path to directory containing tests.}
 
-\item{filter}{If not NULL, only fetures with file names matching this regular expression
+\item{filter}{If not NULL, only features with file names matching this regular expression
 will be executed. Matching is performed on the file name after it's stripped of ".feature".}
 
 \item{reporter}{Reporter to use to summarise output. Can be supplied
