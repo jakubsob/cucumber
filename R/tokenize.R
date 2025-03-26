@@ -96,8 +96,6 @@ tokenize <- function(x) {
             data = get_data(children)
           )
         )
-      } else {
-        abort(glue("Error tokenizing Gherkin, unknown node type '{type}'"))
       }
     })
 }
