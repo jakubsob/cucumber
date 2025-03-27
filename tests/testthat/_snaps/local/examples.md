@@ -313,3 +313,13 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
+# test: should run tests with custom loading of steps and support code
+
+    Code
+      .test()
+    Output
+      v | F W  S  OK | Context
+      v |          2 | Feature: Guess the word
+      == Results =====================================================================
+      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+
