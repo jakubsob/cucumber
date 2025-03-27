@@ -111,9 +111,9 @@ Backtrace:
 [ FAIL 1 | WARN 0 | SKIP 0 | PASS 4 ]
 ```
 
-Put you acceptance tests in a directory separate to your unit tests:
+Put your acceptance tests in a directory separate to your unit tests:
 
-```
+```text
 tests/
 ├── acceptance/
 │   ├── setup-steps_1.R

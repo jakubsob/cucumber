@@ -18,7 +18,7 @@ Now, you can run the tests directly from the console or from the R script using 
 
 # 2. Move steps definitions to [`setup-*.R` files](https://testthat.r-lib.org/articles/special-files.html#setup-files).
 
-`cucumber::test()` no longer is responsible for loading step defninitions.
+`cucumber::test()` no longer is responsible for loading step definitions.
 
 Instead it is recommended to store step definitions in [`setup-*.R`](https://testthat.r-lib.org/articles/special-files.html#setup-files) files in tests directory, alongside `.feature` files.
 

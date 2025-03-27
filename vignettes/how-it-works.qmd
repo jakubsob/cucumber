@@ -100,7 +100,7 @@ A scenario is a test case.
 
 If you define your steps in [setup or helper](https://testthat.r-lib.org/articles/special-files.html) files you don't have to load step implementations manually. Cucumber will load them automatically when `cucumber::test` is called.
 
-If you don't want them to be loaded automatically from the default location, you can create you own command that calls `cucumber::test()` and loads the step definitions from the desired location.
+If you don't want them to be loaded automatically from the default location, you can create your own command that calls `cucumber::test()` and loads the step definitions from the desired location.
 
 Steps from feature files are matched against step definitions defined with `given()`, `when()`, and `then()` functions using regular expressions.
 
