@@ -14,14 +14,14 @@ run_features <- function(
 
 #' @importFrom fs dir_ls
 find_features <- function(path) {
-  fs::dir_ls(path, glob = "*.feature$", type = "file")
+  dir_ls(path, glob = "*.feature$", type = "file")
 }
 
 #' @importFrom fs path_ext_remove path_file
 context_name <- function(feature) {
   feature |>
-    fs::path_file() |>
-    fs::path_ext_remove()
+    path_file() |>
+    path_ext_remove()
 }
 
 filter_features <- function(features, filter = NULL, ...) {
