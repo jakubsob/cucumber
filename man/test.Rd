@@ -2,42 +2,71 @@
 % Please edit documentation in R/test.R
 \name{test}
 \alias{test}
-\title{Run all Cucumber tests}
+\title{Run Cucumber tests}
 \usage{
 test(
-  features_dir,
-  steps_dir,
-  steps_loader = .default_steps_loader,
-  test_interactive = getOption("cucumber.interactive", default = FALSE)
+  path = "tests/acceptance",
+  filter = NULL,
+  reporter = NULL,
+  env = NULL,
+  load_helpers = TRUE,
+  stop_on_failure = TRUE,
+  stop_on_warning = FALSE,
+  ...
 )
 }
 \arguments{
-\item{features_dir}{A character string of the directory containing the feature files.}
+\item{path}{Path to directory containing tests.}
 
-\item{steps_dir}{A character string of the directory containing the step files.}
+\item{filter}{If not NULL, only features with file names matching this regular expression
+will be executed. Matching is performed on the file name after it's stripped of ".feature".}
 
-\item{steps_loader}{A function that loads the steps implementations. By default it sources all files
-from the \code{steps_dir} using the built-in mechanism. You can provide your own function to load
-the steps. The function should take one argument, which will be the \code{steps_dir}.
+\item{reporter}{Reporter to use to summarise output. Can be supplied
+as a string (e.g. "summary") or as an R6 object
+(e.g. \code{SummaryReporter$new()}).
 
-\strong{For packages}: set to NULL to use default support-code load mechanism and place your steps
-definitions in \code{setup} or \code{helper} files. Read more about those files in
-\href{https://testthat.r-lib.org/articles/special-files.html}{testthat documentation}.}
+See \link[testthat]{Reporter} for more details and a list of built-in reporters.}
 
-\item{test_interactive}{A logical value indicating whether to ask which feature files to run.}
-}
-\value{
-None, function called for side effects.
+\item{env}{Environment in which to execute the tests. Expert use only.}
+
+\item{load_helpers}{Source helper files before running the tests?}
+
+\item{stop_on_failure}{If \code{TRUE}, throw an error if any tests fail.}
+
+\item{stop_on_warning}{If \code{TRUE}, throw an error if any tests generate
+warnings.}
+
+\item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
 \description{
-This command runs all Cucumber tests. It takes all .feature files
-from the \code{features_dir} and runs them using the steps from the \code{steps_dir}.
+It runs tests from specifications in \code{.feature} files found in the \code{path}.
 }
+\section{Good Practices}{
+
+\itemize{
+\item Use a separate directory for your acceptance tests, e.g. \code{tests/acceptance}.
+
+It's not prohibited to use \code{tests/testthat} directory, but it's not recommended as those tests
+serve a different purpose and are usually run separately.
+\item Use \href{https://testthat.r-lib.org/articles/special-files.html#setup-files}{\verb{setup-*.R}}
+files to define \href{step.html}{steps}, \href{define_parameter_type.html}{parameters} and \href{hook.html}{hooks}
+to leverage testthat loading mechanism to load them.
+
+If your \href{step.html}{steps}, \href{define_parameter_type.html}{parameters} or \href{hook.html}{hooks}
+are stored somewhere else, you are responsible for loading them.
+
+Read more about testthat special files in the \href{https://testthat.r-lib.org/articles/special-files.html}{testthat documentation}.
+\item Use \verb{test-*.R} files to test the support code you might have implemented that is used to run Cucumber tests.
+
+Those tests won't be run when calling \code{\link[=test]{test()}}. To run those tests use
+\code{testthat::test_dir("tests/acceptance")}.
+}
+}
+
 \examples{
 \dontrun{
-#' testthat/acceptance/test-cucumber.R
-cucumber::test(".", ".", steps_loader = NULL)
-# Steps are stored in `testthat/acceptance/setup-steps.R` file.
+cucumber::test("tests/acceptance")
+cucumber::test("tests/acceptance", filter = "addition|multiplication")
 }
 
 }

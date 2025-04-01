@@ -1,1 +1,0 @@
-cucumber::test(".", "steps/")

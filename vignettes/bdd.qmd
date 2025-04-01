@@ -82,7 +82,7 @@ We need to represent the business language with code – a set of actions that u
 The specification of the bookstore could look like this:
 
 ```{r, error = TRUE}
-# tests/testthat/test-bookstore.R
+# tests/acceptance/test-bookstore.R
 test_that("Bookstore: Adding a book to cart", {
   # Given
   bookstore <- Bookstore$new()
@@ -99,7 +99,7 @@ This test fails as the code doesn't exist yet. We can pause in this step and try
 Once we have an outline of actions, we can implement them. We can use R6 objects to bind the functions together.
 
 ```{r}
-# tests/testthat/setup-bookstore.R
+# tests/acceptance/setup-bookstore.R
 Bookstore <- R6::R6Class(
   public = list(
     select = function(title) {
@@ -151,7 +151,7 @@ get_cart <- function() {
 Having this implementation, we can plug it into the test code:
 
 ```{r}
-# tests/testthat/setup-bookstore.R
+# tests/acceptance/setup-bookstore.R
 Bookstore <- R6::R6Class(
   private = list(
     selected_id = NULL
@@ -173,7 +173,7 @@ Bookstore <- R6::R6Class(
 Now, the tests pass.
 
 ```{r}
-# tests/testthat/test-bookstore.R
+# tests/acceptance/test-bookstore.R
 test_that("Bookstore: Adding a book to cart", {
   # Given
   bookstore <- Bookstore$new()
@@ -226,9 +226,8 @@ Feature: Bookstore
 We implement actions with `given`, `when`, and `then` functions:
 
 ```{r}
-# tests/acceptance/steps/steps.R
+# tests/acceptance/setup-steps.R
 given("I am in the bookstore", function(context) {
-
 })
 
 when("I select {string}", function(title, context) {
@@ -249,7 +248,7 @@ This test does exactly the same as the test with base R.
 We can run those tests with:
 
 ```r
-cucumber::test("tests/acceptance", "tests/acceptance/steps")
+cucumber::test()
 #> Test passed
 ```
 ```{r, include = FALSE}
@@ -292,7 +291,7 @@ Feature: Bookstore
 Reruning the tests will result in two scenarios passing.
 
 ```r
-cucumber::test("tests/acceptance", "tests/acceptance/steps")
+cucumber::test()
 #> Test passed
 #> Test passed
 ```

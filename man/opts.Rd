@@ -15,11 +15,6 @@ The following options are available:
 Regular expression for the indent of the feature files.
 
 default: \verb{^\\\\s\{2\}}
-\item \code{cucumber.interactive}
-
-Logical value indicating whether to ask which feature files to run.
-
-default: \code{FALSE}
 }
 
 See \code{\link[base:options]{base::options()}} and \code{\link[base:options]{base::getOption()}} on how to work with options.

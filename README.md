@@ -11,14 +11,12 @@
 
 An implementation of the [Cucumber](https://cucumber.io/) testing framework in R. Fully native, no external dependencies.
 
-Use it as an extension of your `testthat` tests or as a standalone testing stage.
-
 ## Introduction
 
 The package parses [Gherkin](https://cucumber.io/docs/gherkin/reference/) documents
 
 ```gherkin
-# tests/testthat/addition.feature
+# tests/acceptance/addition.feature
 Feature: Addition
   Scenario: Adding 2 integers
     When I add 1 and 1
@@ -29,12 +27,18 @@ Feature: Addition
   Scenario: Adding float and float
     When I add 1.1 and 1.1
     Then the result is 2.2
+  Scenario: Adding float and float with signs
+    When I add +11.1 and +11.1
+    Then the result is +22.2
+  Scenario: Adding float and float of opposite signs
+    When I add +11.11 and -11.1
+    Then the result is +0.01
 ```
 
 and uses step definitions to run the tests
 
 ```r
-# tests/testthat/steps/steps_definitions.R
+# tests/acceptance/setups-steps.R
 when("I add {int} and {int}", function(x, y, context) {
   context$result <- x + y
 })
@@ -56,101 +60,70 @@ then("the result is {float}", function(expected, context) {
 })
 ```
 
-### Running cucumber tests with `testthat` tests.
-
-To run `cucumber` as a part of `testthat` suite, create a `test-cucumber.R` file:
-
-```r
-#' tests/testthat/test-cucumber.R
-cucumber::test(".", "./steps")
-```
-
-When you run:
-- `testthat::test_dir("tests/testthat")`,
-- `testthat::test_file("tests/testthat/test-cucumber.R")`,
-- or `devtools::test()`,
-
-it will use the [testthat reporter](https://testthat.r-lib.org/reference/Reporter.html) to show the results.
-
-
 The building blocks of the cucumber tests are Features and Scenarios.
+
 - Each Feature will be treated as a separate [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage) – their results will be reported as if they were `test-*.R` files, e.g. `'test-Feature: Addition.R'`.
 - Each Scenario is equivalent to a `testthat::test_that` or `testthat::it` case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.
 
 That means a succesful run for an `Addition` feature would produce the following output (with [ProgressReporter](https://testthat.r-lib.org/reference/ProgressReporter.html)).
 
 ```r
-| v | F W  S  OK | Context           |
-| v | 3          | Feature: Addition |
-== Results ================================================
-[ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]
+✔ | F W  S  OK | Context
+✔ |          5 | Feature: Addition
+
+══ Results ═══════════════════════════════════════════
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 5 ]
 ```
 
-And if it doesn't succeed, it will report which Scenarios failed in the Feature.
+and a failing one would produce:
 
 ```r
-| v | F W  S  OK | Context           |
-| x | 2        1 | Feature: Addition |
---------------------------------------------------------------------------------
-Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
+✔ | F W  S  OK | Context
+✖ | 1        4 | Feature: Addition
+────────────────────────────────────────────────────────────────────────────
+Failure (test-__cucumber__.R:2:1): Scenario: Adding float and float of opposite signs
 context$result (`actual`) not equal to `expected` (`expected`).
-`actual`: 2
-`expected`: 5
+
+  `actual`: 0.0100
+`expected`: 0.0010
 Backtrace:
-x
-1. \-global `<step>`(expected = 5L, context = `<env>`)
-2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
-Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
+    ▆
+ 1. └─cucumber (local) call() at cucumber/R/parse_token.R:23:13
+ 2.   └─cucumber (local) x(context = context, ...)
+ 3.     └─step(expected = 0.001, ...)
+ 4.       └─testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:19:3
+────────────────────────────────────────────────────────────────────────────
+
+══ Results ═════════════════════════════════════════════════════════════════
+── Failed tests ────────────────────────────────────────────────────────────
+Failure (test-__cucumber__.R:2:1): Scenario: Adding float and float of opposite signs
 context$result (`actual`) not equal to `expected` (`expected`).
-`actual`: 2
-`expected`: 5
+
+  `actual`: 0.0100
+`expected`: 0.0010
 Backtrace:
-x
-1. \-global `<step>`(expected = 5L, context = `<env>`)
-2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
---------------------------------------------------------------------------------
-== Results =====================================================================
--- Failed tests ----------------------------------------------------------------
-Failure ('test-cucumber.R:1:1'): Scenario: Adding integer and float
-context$result (`actual`) not equal to `expected` (`expected`).
-`actual`: 2
-`expected`: 5
-Backtrace:
-x
-1. \-global `<step>`(expected = 5L, context = `<env>`)
-2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
-Failure ('test-cucumber.R:1:1'): Scenario: Adding float and float
-context$result (`actual`) not equal to `expected` (`expected`).
-`actual`: 2
-`expected`: 5
-Backtrace:
-x
-1. \-global `<step>`(expected = 5L, context = `<env>`)
-2.   \-testthat::expect_equal(context$result, expected) at ./steps/addition.R:7:2
-[ FAIL 1 | WARN 0 | SKIP 0 | PASS 2 ]
+    ▆
+ 1. └─cucumber (local) call() at cucumber/R/parse_token.R:23:13
+ 2.   └─cucumber (local) x(context = context, ...)
+ 3.     └─step(expected = 0.001, ...)
+ 4.       └─testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:19:3
+
+[ FAIL 1 | WARN 0 | SKIP 0 | PASS 4 ]
 ```
 
-## Running cucumber tests separately to unit tests
+Put your acceptance tests in a directory separate to your unit tests:
 
-If you want to run cucumber tests separately, for example as a different testing step on CI, just put `cucumber` tests in other directory (or use [testthat::test_dir filter parameter](https://testthat.r-lib.org/reference/test_dir.html)).
-
-This may be especially useful, if `cucumber` tests are significantly slower than unit tests. It may often be the case as `cucumber` tests should target integration of different parts of the system and provide a high level confirmation if the system works as expected.
-
+```text
+tests/
+├── acceptance/
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   ├── feature_2.feature
+├── testthat/
+│   ├── test-unit_test_1.R
+│   ├── test-unit_test_2.R
 ```
-├── tests/
-│   ├── cucumber/
-│   │   ├── steps/
-│   │   │   ├── feature_1_steps.R
-│   │   │   ├── feature_2_steps.R
-│   │   ├── feature_1.feature
-│   │   ├── feature_2.feature
-│   │   ├── test-cucumber.R
-│   ├── testthat/
-│   │   ├── test-unit_test_1.R
-│   │   ├── test-unit_test_2.R
-```
-
-In that case you would run `cucumber` tests with `testthat::test_dir("tests/cucumber")`.
 
 ## Examples
 
@@ -161,6 +134,7 @@ See the [examples directory](https://github.com/jakubsob/cucumber/tree/main/inst
 The `.feature` files are parsed and matched against step definitions.
 
 Step functions are defined using:
+
 - `description`: a [cucumber expression](https://github.com/cucumber/cucumber-expressions).
 - and an implementation function. It must have the parameters that will be matched in the description and a `context` parameter - an environment for managing state between steps.
 

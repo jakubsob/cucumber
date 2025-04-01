@@ -1,4 +1,4 @@
-#' @importFrom rlang abort call_modify call2
+#' @importFrom rlang abort exec
 #' @importFrom glue glue
 #' @importFrom purrr map walk partial
 #' @importFrom testthat context_start_file test_that
@@ -13,24 +13,29 @@ parse_token <- function(
       token$type,
       "Scenario" = function() {
         test_that(glue("Scenario: {token$value}"), {
-          context <- new.env()
-          calls <- parse_token(token$children, steps, parameters) |>
-            map(\(x) partial(x, context = context))
+          .context <- new.env()
+          calls <- parse_token(token$children, steps, parameters)
+          after <- get_hook(hooks, "after")
+          before <- get_hook(hooks, "before")
 
-          on.exit(get_hook(hooks, "after")(context, token$value))
-          get_hook(hooks, "before")(context, token$value)
+          on.exit(after(.context, token$value))
+          before(.context, token$value)
           for (call in calls) {
-            call()
+            step <- unclass(call)
+            description <- attr(step, "description")
+            args <- attr(step, "args")
+            attributes(step) <- NULL
+            exec(step, !!!args, context = .context)
           }
         })
       },
       "Scenario Outline" = function() {
         scenarios <- expand_scenario_outline(token)
         calls <- map(scenarios, function(scenario) {
-          parse_token(list(scenario), steps, parameters)[[1]]
+          parse_token(list(scenario), steps, parameters, hooks)[[1]]
         })
         for (call in calls) {
-          call()
+          exec(call)
         }
       },
       "Feature" = function(file_name = token$value) {
@@ -48,14 +53,13 @@ parse_token <- function(
 
         calls <- parse_token(token$children, steps, parameters, hooks)
         for (call in calls) {
-          call()
+          exec(call)
         }
       },
       "Step" = parse_step(token, steps, parameters),
       abort(glue("Unknown token type: {token$type}"))
     )
-  }) |>
-    unlist()
+  })
 }
 
 #' @importFrom purrr map_chr map map_int map2 keep pluck partial
@@ -110,7 +114,8 @@ parse_step <- function(token, steps = get_steps(), parameters = get_parameters()
 
   impl_formals <- names(formals(step))
   names(params) <- impl_formals[impl_formals != "context"]
-  partial(step, !!!params)
+  attr(step, "args") <- params
+  step
 }
 
 expand_scenario_outline <- function(outline_token) {

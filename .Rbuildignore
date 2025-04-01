@@ -15,3 +15,5 @@
 ^cran-comments\.md$
 ^vignettes/*_files$
 ^vignettes/articles$
+^vignettes/.quarto$
+^CRAN-SUBMISSION$

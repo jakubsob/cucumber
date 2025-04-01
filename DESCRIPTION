@@ -1,7 +1,7 @@
 Package: cucumber
 Type: Package
 Title: Behavior-Driven Development for R
-Version: 1.2.1
+Version: 2.0.0
 Authors@R: person("Jakub", "Sobolewski", email = "jakupsob@gmail.com", role = c("aut", "cre"))
 Description: Write executable specifications in a natural language that describes how your code should behave.
     Write specifications in feature files using 'Gherkin' language and execute them using functions implemented in R.
@@ -11,6 +11,8 @@ URL: https://github.com/jakubsob/cucumber, https://jakubsob.github.io/cucumber/
 BugReports: https://github.com/jakubsob/cucumber/issues
 Encoding: UTF-8
 LazyData: true
+Depends:
+  R (>= 4.1.0)
 Imports:
     checkmate,
     cli,

@@ -13,12 +13,6 @@
 #'
 #'   default: `^\\s{2}`
 #'
-#' - `cucumber.interactive`
-#'
-#'   Logical value indicating whether to ask which feature files to run.
-#'
-#'   default: `FALSE`
-#'
 #' See [base::options()] and [base::getOption()] on how to work with options.
 #'
 #' @md

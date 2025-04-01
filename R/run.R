@@ -1,3 +1,4 @@
+#' @importFrom rlang exec
 #' @importFrom purrr walk
 run <- function(
   feature,
@@ -7,5 +8,5 @@ run <- function(
 ) {
   tokens <- tokenize(feature)
   call_queue <- parse_token(tokens, steps, parameters, hooks)
-  walk(call_queue, \(x) x())
+  walk(call_queue, exec)
 }
