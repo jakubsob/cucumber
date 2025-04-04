@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cucumber</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,9 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
     <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -40,7 +43,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Define a step</h1>
-      <small class="dont-index">Source: <a href="https://github.com/jakubsob/cucumber/blob/v1.2.1/R/step.R" class="external-link"><code>R/step.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jakubsob/cucumber/blob/main/R/step.R" class="external-link"><code>R/step.R</code></a></small>
       <div class="d-none name"><code>step.Rd</code></div>
     </div>
 
@@ -91,7 +94,7 @@ It holds the environment where test state can be stored to be passed to the next
 <p>If a step has a description <code>"I have {int} cucumbers in my basket"</code> then the implementation
 function should be <code>function(n, context)</code>. The <code>{int}</code> value will be passed to
 <code>n</code>, this parameter can have any name.</p>
-<p>If a table or a docstring is defined for a step, it will be passed as an argument after plceholder parameters
+<p>If a table or a docstring is defined for a step, it will be passed as an argument after placeholder parameters
 and before <code>context</code>. The function should be a <code>function(n, table, context)</code>.
 See
 <a href="https://github.com/jakubsob/cucumber/blob/main/inst/examples/table/tests/testthat/steps/steps.R" class="external-link">an example</a>

@@ -36,7 +36,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cucumber</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,6 +52,9 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
     <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -74,7 +77,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/jakubsob/cucumber/blob/v1.2.1/vignettes/reference-gherkin.qmd" class="external-link"><code>vignettes/reference-gherkin.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jakubsob/cucumber/blob/main/vignettes/reference-gherkin.qmd" class="external-link"><code>vignettes/reference-gherkin.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -219,7 +222,7 @@ Then my account should have a balance of £430</code></pre>
 </h3>
 <p><code>Then</code> steps are used to describe an <em>expected</em> outcome, or result.</p>
 <p>The <code><a href="../reference/step.html">step()</a></code> definition of a <code>Then</code> step should use an <em>assertion</em> to compare the <em>actual</em> outcome (what the system actually does) to the <em>expected</em> outcome (what the step says the system is supposed to do).</p>
-<p>An outcome <em>should</em> be on an <strong>observable</strong> output. That is, something that comes <em>out</em> of the system (report, user interface, message), and not a behaviour deeply buried inside the system (like a record in a database).</p>
+<p>An outcome <em>should</em> be on an <strong>observable</strong> output. That is, something that comes <em>out</em> of the system (report, user interface, message), and not a behavior deeply buried inside the system (like a record in a database).</p>
 <p>Examples:</p>
 <ul>
 <li>See that the guessed word was wrong</li>
