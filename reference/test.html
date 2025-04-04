@@ -114,10 +114,8 @@ warnings.</p></dd>
 <p>It's not prohibited to use <code>tests/testthat</code> directory, but it's not recommended as those tests
 serve a different purpose and are usually run separately.</p></li>
 <li><p>Use <a href="https://testthat.r-lib.org/articles/special-files.html#setup-files" class="external-link"><code>setup-*.R</code></a>
-files to define <a href="step.html">steps</a>, <a href="define_parameter_type.html">parameters</a> and <a href="hook.html">hooks</a>
-to leverage testthat loading mechanism to load them.</p>
-<p>If your <a href="step.html">steps</a>, <a href="define_parameter_type.html">parameters</a> or <a href="hook.html">hooks</a>
-are stored somewhere else, you are responsible for loading them.</p>
+files for calling <code><a href="step.html">step()</a></code>, <code><a href="define_parameter_type.html">define_parameter_type()</a></code> and <code><a href="hook.html">hook()</a></code> to leverage testthat loading mechanism.</p>
+<p>If your <code><a href="step.html">step()</a></code>, <code><a href="define_parameter_type.html">define_parameter_type()</a></code> and <code><a href="hook.html">hook()</a></code> are called from somewhere else, you are responsible for loading them.</p>
 <p>Read more about testthat special files in the <a href="https://testthat.r-lib.org/articles/special-files.html" class="external-link">testthat documentation</a>.</p></li>
 <li><p>Use <code>test-*.R</code> files to test the support code you might have implemented that is used to run Cucumber tests.</p>
 <p>Those tests won't be run when calling <code>test()</code>. To run those tests use
