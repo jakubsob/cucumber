@@ -1,6 +1,6 @@
 # cucumber 2.0.0
 
-See the [migration guide](../articles/migration-to-2-0-0.html)
+See the [migration guide](https://jakubsob.github.io/cucumber/articles/migration-to-2-0-0.html).
 
 - ✨ You can now run specifications directly with `cucumber:test()` function.
 

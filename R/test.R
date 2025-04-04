@@ -60,11 +60,9 @@ test_cucumber_code <- function(features) {
 #'   serve a different purpose and are usually run separately.
 #'
 #' - Use [`setup-*.R`](https://testthat.r-lib.org/articles/special-files.html#setup-files)
-#'   files to define [steps](step.html), [parameters](define_parameter_type.html) and [hooks](hook.html)
-#'   to leverage testthat loading mechanism to load them.
+#'   files for calling [step()], [define_parameter_type()] and [hook()] to leverage testthat loading mechanism.
 #'
-#'   If your [steps](step.html), [parameters](define_parameter_type.html) or [hooks](hook.html)
-#'   are stored somewhere else, you are responsible for loading them.
+#'   If your [step()], [define_parameter_type()] and [hook()] are called from somewhere else, you are responsible for loading them.
 #'
 #'   Read more about testthat special files in the [testthat documentation](https://testthat.r-lib.org/articles/special-files.html).
 #'

@@ -49,11 +49,9 @@ It runs tests from specifications in \code{.feature} files found in the \code{pa
 It's not prohibited to use \code{tests/testthat} directory, but it's not recommended as those tests
 serve a different purpose and are usually run separately.
 \item Use \href{https://testthat.r-lib.org/articles/special-files.html#setup-files}{\verb{setup-*.R}}
-files to define \href{step.html}{steps}, \href{define_parameter_type.html}{parameters} and \href{hook.html}{hooks}
-to leverage testthat loading mechanism to load them.
+files for calling \code{\link[=step]{step()}}, \code{\link[=define_parameter_type]{define_parameter_type()}} and \code{\link[=hook]{hook()}} to leverage testthat loading mechanism.
 
-If your \href{step.html}{steps}, \href{define_parameter_type.html}{parameters} or \href{hook.html}{hooks}
-are stored somewhere else, you are responsible for loading them.
+If your \code{\link[=step]{step()}}, \code{\link[=define_parameter_type]{define_parameter_type()}} and \code{\link[=hook]{hook()}} are called from somewhere else, you are responsible for loading them.
 
 Read more about testthat special files in the \href{https://testthat.r-lib.org/articles/special-files.html}{testthat documentation}.
 \item Use \verb{test-*.R} files to test the support code you might have implemented that is used to run Cucumber tests.
