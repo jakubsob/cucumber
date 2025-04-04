@@ -65,7 +65,7 @@ The building blocks of the cucumber tests are Features and Scenarios.
 - Each Feature will be treated as a separate [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage) – their results will be reported as if they were `test-*.R` files, e.g. `'test-Feature: Addition.R'`.
 - Each Scenario is equivalent to a `testthat::test_that` or `testthat::it` case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.
 
-That means a succesful run for an `Addition` feature would produce the following output (with [ProgressReporter](https://testthat.r-lib.org/reference/ProgressReporter.html)).
+That means a successful run for an `Addition` feature would produce the following output (with [ProgressReporter](https://testthat.r-lib.org/reference/ProgressReporter.html)).
 
 ```r
 ✔ | F W  S  OK | Context
@@ -142,7 +142,7 @@ If a step parsed from one of `.feature` files is not found, an error will be thr
 
 ### Parameter types
 
-Step implementations receive data from the `.feature` files as parameters. The values are detected via regular expressions and casted with a transformer function.
+Step implementations receive data from the `.feature` files as parameters. The values are detected via regular expressions and cast with a transformer function.
 
 The following parameter types are available by default:
 

@@ -61,7 +61,7 @@ If a step has a description \code{"I have {int} cucumbers in my basket"} then th
 function should be \verb{function(n, context)}. The \code{{int}} value will be passed to
 \code{n}, this parameter can have any name.
 
-If a table or a docstring is defined for a step, it will be passed as an argument after plceholder parameters
+If a table or a docstring is defined for a step, it will be passed as an argument after placeholder parameters
 and before \code{context}. The function should be a \verb{function(n, table, context)}.
 See
 \href{https://github.com/jakubsob/cucumber/blob/main/inst/examples/table/tests/testthat/steps/steps.R}{an example}

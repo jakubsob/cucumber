@@ -288,7 +288,7 @@ Feature: Bookstore
     Then I should see "The Lord of the Rings, J.R.R. Tolkien" in the cart
 ```
 
-Reruning the tests will result in two scenarios passing.
+Re-running the tests will result in two scenarios passing.
 
 ```r
 cucumber::test()
@@ -327,6 +327,6 @@ cucumber:::run(
 
 # Learning BDD
 
-- ATDD by Example: A Practical Guide to Acceptance Test-Driven Development: A Practical Guide to Acceptance TestDriven Development.
+- ATDD by Example: A Practical Guide to Acceptance Test-Driven Development: A Practical Guide to Acceptance Test-Driven Development.
 - [Continuous Delivery Youtube Channel](https://www.youtube.com/watch?v=gXh0iUt4TXA&list=PLwLLcwQlnXByKR1Fo7UnE6gQAbx-JfYJZ)
 - [Cucumber](https://cucumber.io/docs/guides/)

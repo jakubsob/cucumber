@@ -71,7 +71,7 @@ Cucumber translates `.feature` files to `testthat::test_that` calls.
 
 When a `Scenario` is run, the `context` environment is reset so that the state doesn't leak to the next scenario.
 
-The previous feature file is basically translated to the following test code, so that we can leverate [testthat reporters](https://testthat.r-lib.org/reference/index.html#reporters) and not reinvent the wheel.
+The previous feature file is basically translated to the following test code, so that we can leverage [testthat reporters](https://testthat.r-lib.org/reference/index.html#reporters) and not reinvent the wheel.
 
 ```r
 test_that("Scenario: Sum should work for 2 numbers", {
