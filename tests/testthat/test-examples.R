@@ -36,6 +36,7 @@ test_example <- function(path, tests_path = "tests/acceptance", ...) {
 }
 
 describe("test", {
+  skip_on_cran()
   it("should run one feature", {
     test_example("one_feature")
   })
