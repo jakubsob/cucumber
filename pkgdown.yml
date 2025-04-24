@@ -6,7 +6,7 @@ articles:
   how-it-works: how-it-works.html
   migration-to-2-0-0: migration-to-2-0-0.html
   reference-gherkin: reference-gherkin.html
-last_built: 2025-04-24T20:36Z
+last_built: 2025-04-24T20:38Z
 urls:
   reference: https://jakubsob.github.io/cucumber/reference
   article: https://jakubsob.github.io/cucumber/articles
