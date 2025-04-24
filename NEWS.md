@@ -1,8 +1,12 @@
+# cucumber 2.0.1
+
+- 🐛 Fix CRAN Debian checks.
+
 # cucumber 2.0.0
 
 See the [migration guide](https://jakubsob.github.io/cucumber/articles/migration-to-2-0-0.html).
 
-- ✨ You can now run specifications directly with `cucumber:test()` function.
+- ✨ You can now run specifications directly with `cucumber::test()` function.
 
 # cucumber 1.2.1
 
