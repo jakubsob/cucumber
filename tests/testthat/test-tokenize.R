@@ -530,7 +530,10 @@ describe("tokenize", {
           type = "Step",
           value = "the following users exist:",
           children = NULL,
-          data = c("| name  | email            |", "| Jane  | janedoe@jane.com |")
+          data = c(
+            "       | name  | email            |",
+            "       | Jane  | janedoe@jane.com |"
+          )
         )
       )
     )

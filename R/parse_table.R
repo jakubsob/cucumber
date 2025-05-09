@@ -5,6 +5,7 @@
 #' @importFrom checkmate assert_character
 parse_table <- function(lines) {
   assert_character(lines, min.len = 1)
+  lines <- str_remove_all(lines, "^\\s*")
   # Split on unescaped pipes and process each cell
   rows <- lines |>
     map(\(x) str_split(x, "(?<!\\\\)\\|")[[1]]) |>
