@@ -74,4 +74,72 @@ describe("normalize_feature", {
       )
     )
   })
+
+  it("should omit docstrings", {
+    # Arrange
+    lines <- c(
+      "Feature: Addition",
+      "  Scenario: Addition should work for 2 numbers",
+      "    Given I have",
+      "    ```",
+      "    *",
+      "    And",
+      "    But",
+      "    ```",
+      "    When I add them",
+      "    Then I get 6"
+    )
+
+    # Act
+    result <- normalize_feature(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      c(
+        "Feature: Addition",
+        "  Scenario: Addition should work for 2 numbers",
+        "    Step I have",
+        "    ```",
+        "    *",
+        "    And",
+        "    But",
+        "    ```",
+        "    Step I add them",
+        "    Step I get 6"
+      )
+    )
+  })
+
+  it("should omit tables", {
+    # Arrange
+    lines <- c(
+      "Feature: Addition",
+      "  Scenario: Addition should work for 2 numbers",
+      "    Given I have",
+      "    | Given | When | Then |",
+      "    | *     | *    | *    |",
+      "    | *     | *    | *    |",
+      "    When I add them",
+      "    Then I get 6"
+    )
+
+    # Act
+    result <- normalize_feature(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      c(
+        "Feature: Addition",
+        "  Scenario: Addition should work for 2 numbers",
+        "    Step I have",
+        "    | Given | When | Then |",
+        "    | *     | *    | *    |",
+        "    | *     | *    | *    |",
+        "    Step I add them",
+        "    Step I get 6"
+      )
+    )
+  })
 })

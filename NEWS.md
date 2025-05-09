@@ -1,3 +1,7 @@
+# cucumber 2.0.2
+
+- 🐛 Don't normalize feature files text within docstrings or tables.
+
 # cucumber 2.0.1
 
 - 🐛 Fix CRAN Debian checks.
