@@ -35,7 +35,8 @@ Suggests:
     rmarkdown,
     quarto,
     R6,
-    pkgdown
+    pkgdown,
+    pkgload
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 VignetteBuilder:

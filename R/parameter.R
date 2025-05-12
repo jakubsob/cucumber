@@ -69,7 +69,10 @@ define_parameter_type <- function(name, regexp, transformer) {
 
 #' @importFrom purrr compact
 get_parameters <- function() {
-  parameters <- getOption("parameters", default = .parameters())
+  parameters <- getOption(
+    getOption(".cucumber_parameters_option"),
+    default = .parameters()
+  )
   c(
     parameters[c("int", "float")],
     parameters[!names(parameters) %in% c("int", "float", "string")],
@@ -78,13 +81,14 @@ get_parameters <- function() {
     compact()
 }
 
+#' @importFrom rlang list2 `:=`
 set_parameters <- function(parameters) {
-  options(parameters = parameters)
+  options(list2(!!getOption(".cucumber_parameters_option") := parameters))
 }
 
 #' @importFrom stringr str_sub str_trim
 set_default_parameters <- function() {
-  options(parameters = .parameters())
+  set_parameters(.parameters())
   define_parameter_type(
     name = "int",
     regexp = "[+-]?(?<![.])[:digit:]+(?![.])",
