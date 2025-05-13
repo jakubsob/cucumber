@@ -1,10 +1,9 @@
 Feature: Background
 
-  Background allows you to add some context to the scenarios in a
-  single feature. A Background is much like a scenario containing a
-  number of steps. The difference is when it is run. The background is
-  run before each of your scenarios but after any of your Before
-  Hooks.
+  Background allows you to add some context to the scenarios in a single feature.
+  A Background is much like a scenario containing a number of steps.
+  The difference is when it is run.
+  The background is run before each of your scenarios but after any of your `before` hooks.
 
   Scenario: One scenario and a background
     Given a file named "tests/acceptance/background.feature" with
