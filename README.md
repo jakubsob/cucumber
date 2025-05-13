@@ -10,7 +10,7 @@
 [![Last month](http://cranlogs.r-pkg.org/badges/last-month/cucumber)](https://cran.r-project.org/package=cucumber)
 <!-- badges: end -->
 
-An implementation of the [Cucumber](https://cucumber.io/) testing framework in R. Fully native, no external dependencies.
+An implementation of the [Cucumber](https://cucumber.io/) testing framework in R.
 
 ## Introduction
 
