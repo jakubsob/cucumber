@@ -31,28 +31,23 @@ detect_docstring <- function(x) {
   )
 }
 
+#' Check if line is inside a docstring or table
 special_mask <- function(lines) {
   state <- new.env()
   state$inside_docstring <- FALSE
   purrr::map_lgl(lines, function(x) {
-    # Check if this is a docstring boundary line
     is_docstring_boundary <- detect_docstring_start(x)
-
-    # Check if this is a table line
     is_table_line <- detect_table_start(x)
 
     if (is_docstring_boundary) {
-      # Toggle the docstring state when we hit a boundary
       state$inside_docstring <- !state$inside_docstring
-      return(TRUE) # Mark docstring boundary as special
+      return(TRUE)
     }
 
-    # Mark table lines as special
     if (is_table_line) {
       return(TRUE)
     }
 
-    # Return docstring state for non-boundary, non-table lines
     return(state$inside_docstring)
   })
 
