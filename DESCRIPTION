@@ -36,7 +36,10 @@ Suggests:
     quarto,
     R6,
     pkgdown,
-    pkgload
+    pkgload,
+    muttest
+Remotes:
+    jakubsob/muttest
 Config/testthat/edition: 3
 RoxygenNote: 7.3.2
 VignetteBuilder:
