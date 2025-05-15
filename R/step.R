@@ -142,18 +142,18 @@ then <- make_step("Then")
 #' @importFrom rlang `:=`
 register_step <- function(step) {
   assert_step(step)
-  steps <- getOption(".cucumber_steps", default = .steps())
+  steps <- getOption(getOption(".cucumber_steps_option"), default = .steps())
   steps <- .steps(!!!steps, !!attr(step, "description") := step)
-  options(.cucumber_steps = steps)
+  options(list2(!!getOption(".cucumber_steps_option") := steps))
   invisible(step)
 }
 
 clear_steps <- function() {
-  options(.cucumber_steps = .steps())
+  options(list2(!!getOption(".cucumber_steps_option") := .steps()))
 }
 
 get_steps <- function() {
-  getOption(".cucumber_steps", default = .steps())
+  getOption(getOption(".cucumber_steps_option"), default = .steps())
 }
 
 #' @importFrom checkmate assert_function assert_class assert_string

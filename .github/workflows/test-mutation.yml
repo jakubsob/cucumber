@@ -1,0 +1,109 @@
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+name: test-mutation.yml
+permissions: write-all
+
+jobs:
+  generate-badge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::jsonlite
+
+      - name: Set up Git user
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Mutation testing
+        shell: Rscript {0}
+        run: |
+          color_scale <- function(score) {
+            rgb <- round(colorRamp(c("#D61F1F", "#FFD301", "#006B3D"))(score))
+            sprintf("#%02X%02X%02X", rgb[1], rgb[2], rgb[3])
+          }
+
+          create_badge <- function(score) {
+            dir.create(".badges", showWarnings = FALSE)
+            jsonlite::write_json(
+              list(
+                schemaVersion = 1,
+                label = "muttest",
+                labelColor = "#0f2a13",
+                message = paste0(round(score, digits = 2) * 100, "%"),
+                color = color_scale(score),
+                logoSvg = "<svg viewBox='0 0 24 24' id='Layer_1' data-name='Layer 1' xmlns='http://www.w3.org/2000/svg'><defs><style>.cls-1{fill:none;stroke:#ffffff;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs><path class='cls-1' d='M15.82,1.5l-1,1A9.55,9.55,0,0,0,12,9.27v5.46a9.55,9.55,0,0,1-2.8,6.75l-1,1'/><path class='cls-1' d='M9.27,12a9.55,9.55,0,0,0-6.75,2.8l-1,1'/><path class='cls-1' d='M22.5,8.18l-1,1A9.55,9.55,0,0,1,14.73,12'/><line class='cls-1' x1='13.91' y1='2.45' x2='21.07' y2='9.61'/><line class='cls-1' x1='12.95' y1='6.27' x2='15.82' y2='9.14'/><line class='cls-1' x1='2.45' y1='13.91' x2='9.14' y2='20.59'/><line class='cls-1' x1='8.18' y1='14.86' x2='11.52' y2='18.2'/></svg>"
+              ),
+              path = ".badges/muttest.json",
+              auto_unbox = TRUE
+            )
+          }
+
+          pkgload::load_all()
+
+          plan <- muttest::test_plan(
+            mutators = list(
+              muttest::operator("+", "-"),
+              muttest::operator("-", "+"),
+              muttest::operator("*", "/"),
+              muttest::operator("/", "*"),
+              muttest::operator("==", "!="),
+              muttest::operator("!=", "=="),
+              muttest::operator("<", ">"),
+              muttest::operator(">", "<"),
+              muttest::operator("<=", ">="),
+              muttest::operator(">=", "<=")
+            )
+          )
+          score <- muttest::test(plan)
+
+          create_badge(score)
+
+      - name: Switch to or create 'badges' branch
+        run: |
+          # Try to fetch the badges branch without failing if it doesn't exist
+          git fetch origin badges || echo "No badges branch yet, will create it"
+
+          # If badges branch exists remotely, check it out
+          if git show-ref --verify --quiet refs/remotes/origin/badges; then
+            echo "Remote badges branch exists, checking it out"
+            git checkout -b badges origin/badges
+          # If badges branch exists only locally, check it out
+          elif git show-ref --verify --quiet refs/heads/badges; then
+            echo "Local badges branch exists, checking it out"
+            git checkout badges
+          else
+            # Create a new orphan branch (no history)
+            echo "Creating new badges branch"
+            git checkout --orphan badges
+            # Remove all files from staging
+            git rm -rf --cached .
+            # Create empty commit to start the branch
+            git commit --allow-empty -m "Initial empty commit for badges branch"
+          fi
+
+      - name: Copy badge file to badges branch
+        run: |
+          # Create badges directory if it doesn't exist
+          mkdir -p badges
+          # Copy the badge file
+          cp -f .badges/muttest.json badges/
+          # Add and commit the changes
+          git add badges/muttest.json
+          git commit -m "chore: :robot-face: Update muttest badge" || echo "No changes to commit"
+          # Force push to the badges branch (use with caution as it overwrites remote history)
+          git push --force-with-lease origin badges

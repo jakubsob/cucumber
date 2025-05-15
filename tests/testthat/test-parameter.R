@@ -1,25 +1,23 @@
 describe("define_parameter_type", {
   it("should add parameter to options", {
     withr::with_options(
-      list(
-        parameters = .parameters()
-      ), {
+      list2(!!getOption(".cucumber_parameters_option") := .parameters()),
+      {
         define_parameter_type("string", "[:print:]+", as.character)
 
-        expect_length(getOption("parameters"), 1)
+        expect_length(get_parameters(), 1)
       }
     )
   })
 
   it("should allow adding multiple parameters to options", {
     withr::with_options(
-      list(
-        parameters = .parameters()
-      ), {
+      list2(!!getOption(".cucumber_parameters_option") := .parameters()),
+      {
         define_parameter_type("string", "[:print:]+", as.character)
         define_parameter_type("int", "[:digit:]+", as.integer)
 
-        expect_length(getOption("parameters"), 2)
+        expect_length(get_parameters(), 2)
       }
     )
   })

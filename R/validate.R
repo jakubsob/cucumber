@@ -3,6 +3,7 @@
 validate_feature <- function(lines) {
   # Remove comments and empty lines for validation
   clean_lines <- remove_comments(remove_empty_lines(lines))
+  clean_lines <- clean_lines[!special_mask(clean_lines)]
   clean_lines |>
     validate_indentation() |>
     validate_one_feature_keyword()
@@ -16,6 +17,7 @@ validate_indentation <- function(lines) {
   indent <- getOption("cucumber.indent", default = "^\\s{2}")
   test_lines <- lines[!str_detect(lines, "^Feature")] |>
     remove_empty_lines()
+  test_lines <- test_lines[!special_mask(test_lines)]
   if (any(!str_detect(test_lines, indent))) {
     cli_abort(c(
       "All lines must be indented with {indent}",
@@ -31,6 +33,7 @@ validate_indentation <- function(lines) {
 validate_one_feature_keyword <- function(lines) {
   test_lines <- lines |>
     remove_empty_lines()
+  test_lines <- test_lines[!special_mask(test_lines)]
   if (sum(str_detect(test_lines, "Feature:")) != 1) {
     cli_abort("Feature file must have exactly one {.field Feature:} keyword.")
   }

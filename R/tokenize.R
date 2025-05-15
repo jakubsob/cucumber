@@ -53,7 +53,7 @@ get_data <- function(x) {
   if (length(x) == 0) {
     return(NULL)
   }
-  str_remove_all(x, "^\\s*")
+  x
 }
 
 #' @importFrom purrr map

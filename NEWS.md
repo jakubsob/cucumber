@@ -1,3 +1,9 @@
+# cucumber 2.0.2
+
+- 🐛 Don't normalize feature files text within docstrings or tables.
+- 🐛 Don't include docstrings and tables when validating feature files.
+- 🧪 Added cucumber tests in `tests/acceptance`.
+
 # cucumber 2.0.1
 
 - 🐛 Fix CRAN Debian checks.

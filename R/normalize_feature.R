@@ -1,7 +1,9 @@
 #' @importFrom stringr str_replace_all
 map_keywords <- function(lines) {
-  str_replace_all(
-    lines,
+  special <- special_mask(lines)
+  # Only normalize lines that aren't special
+  lines[!special] <- str_replace_all(
+    lines[!special],
     c(
       "And" = "Step",
       "But" = "Step",
@@ -14,6 +16,8 @@ map_keywords <- function(lines) {
       "[*]" = "Step"
     )
   )
+
+  lines
 }
 
 normalize_feature <- function(lines) {

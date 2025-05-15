@@ -110,7 +110,7 @@ test <- function(
       test_cucumber_code(features),
       con = file
     )
-    test_dir(
+    result <- test_dir(
       path = path,
       filter = "^__cucumber__$",
       reporter = reporter,
@@ -120,4 +120,5 @@ test <- function(
       stop_on_warning = stop_on_warning
     )
   })
+  invisible(result)
 }

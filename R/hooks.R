@@ -76,7 +76,7 @@ register_hook <- function(
   name = c("before", "after")
 ) {
   arg_match(name)
-  hooks <- getOption(".cucumber_hooks", default = .hooks())
+  hooks <- getOption(getOption(".cucumber_hooks_option"), default = .hooks())
   if (test_subset(name, names(hooks))) {
     abort(
       message = glue("Hook '{name}' already registered."),
@@ -84,7 +84,7 @@ register_hook <- function(
     )
   }
   pluck(hooks, name) <- hook
-  options(.cucumber_hooks = hooks)
+  options(list2(!!getOption(".cucumber_hooks_option") := hooks))
   invisible(hooks)
 }
 
@@ -93,10 +93,11 @@ get_hook <- function(hooks = get_hooks(), name) {
   pluck(hooks, name, .default = function(...) { })
 }
 
+#' @importFrom rlang list2
 clear_hooks <- function() {
-  options(.cucumber_hooks = .hooks())
+  options(list2(!!getOption(".cucumber_hooks_option") := .hooks()))
 }
 
 get_hooks <- function() {
-  getOption(".cucumber_hooks", default = .hooks())
+  getOption(getOption(".cucumber_hooks_option"), default = .hooks())
 }
