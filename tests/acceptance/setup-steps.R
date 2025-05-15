@@ -12,7 +12,6 @@ when("I run cucumber", function(context) {
     .cucumber_parameters_option = ".cucumber_parameters_"
   ), {
     cucumber:::set_default_parameters()
-    Sys.sleep(3)
     withr::with_dir(context$tempdir, {
       withr::with_output_sink(nullfile(), {
         context$result <- test(stop_on_failure = FALSE)
