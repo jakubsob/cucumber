@@ -164,7 +164,9 @@ Feature: Testing a package with cucumber tests in features/ directory
       """
     When I run
       """
+      pkgload::load_all(quiet = TRUE)
       test("features")
+      pkgload::unload()
       """
     Then it passes
 

@@ -1,5 +1,8 @@
+before(function(context, scenario_name) {
+  context$tempdir <- fs::path(tempdir(), paste0("test_", as.character(runif(1))))
+})
+
 given("a file named {string} with", function(filename, code, context) {
-  context$tempdir <- fs::path(tempdir(), "__cucumber__")
   file <- fs::path(context$tempdir, filename)
   fs::dir_create(fs::path_dir(file))
   writeLines(code, file)
@@ -17,7 +20,7 @@ when("I run", function(code, context) {
       .cucumber_parameters_option = .cucumber_parameters_option
     ),
     {
-      set_default_parameters()
+      cucumber:::set_default_parameters()
       withr::with_dir(context$tempdir, {
         withr::with_output_sink(nullfile(), {
           context$result <- eval(parse(text = code))
@@ -25,9 +28,9 @@ when("I run", function(code, context) {
       })
     }
   )
-  options(list2(!!.cucumber_hooks_option := NULL))
-  options(list2(!!.cucumber_steps_option := NULL))
-  options(list2(!!.cucumber_parameters_option := NULL))
+  options(rlang::list2(!!.cucumber_hooks_option := NULL))
+  options(rlang::list2(!!.cucumber_steps_option := NULL))
+  options(rlang::list2(!!.cucumber_parameters_option := NULL))
 })
 
 then("it passes", function(context) {
