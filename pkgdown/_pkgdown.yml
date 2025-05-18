@@ -52,6 +52,7 @@ reference:
   - title: Run tests
     contents:
       - test
+      - run
   - title: Optional
     contents:
       - define_parameter_type

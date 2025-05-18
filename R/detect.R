@@ -32,6 +32,7 @@ detect_docstring <- function(x) {
 }
 
 #' Check if line is inside a docstring or table
+#' @noRd
 special_mask <- function(lines) {
   state <- new.env()
   state$inside_docstring <- FALSE
@@ -50,5 +51,4 @@ special_mask <- function(lines) {
 
     return(state$inside_docstring)
   })
-
 }

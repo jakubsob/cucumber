@@ -39,7 +39,9 @@ warnings.}
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
 \description{
-It runs tests from specifications in \code{.feature} files found in the \code{path}.
+It runs  tests from specifications in \code{.feature} files found in the \code{path}.
+
+To run Cucumber tests alongside \code{testthat} tests, see \code{cucumber::run()}.
 }
 \section{Good Practices}{
 
@@ -47,7 +49,10 @@ It runs tests from specifications in \code{.feature} files found in the \code{pa
 \item Use a separate directory for your acceptance tests, e.g. \code{tests/acceptance}.
 
 It's not prohibited to use \code{tests/testthat} directory, but it's not recommended as those tests
-serve a different purpose and are usually run separately.
+serve a different purpose and are better run separately, especially if acceptance tests take
+longer to run than unit tests.
+
+If you want to run Cucumber tests alongside \code{testthat} tests, you can use \code{cucumber::run()} in one of the \verb{test-*.R} files in your \code{tests/testthat} directory.
 \item Use \href{https://testthat.r-lib.org/articles/special-files.html#setup-files}{\verb{setup-*.R}}
 files for calling \code{\link[=step]{step()}}, \code{\link[=define_parameter_type]{define_parameter_type()}} and \code{\link[=hook]{hook()}} to leverage testthat loading mechanism.
 

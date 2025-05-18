@@ -251,19 +251,6 @@ We can run those tests with:
 cucumber::test()
 #> Test passed
 ```
-```{r, include = FALSE}
-cucumber:::run(
-  c(
-    'Feature: Bookstore',
-    '  Scenario: Adding a book to cart',
-    '    Given I am in the bookstore',
-    '    When I select "The Hobbit, J.R.R. Tolkien"',
-    '    When I add selected book to the cart',
-    '    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart'
-  ),
-  steps = cucumber:::get_steps()
-)
-```
 
 What `cucumber::test` function does is it reads the feature files, finds corresponding actions implementations and runs them in order. To learn more how it works, refer to [How it works](https://jakubsob.github.io/cucumber/articles/how-it-works.html) vignette.
 
@@ -294,28 +281,6 @@ Re-running the tests will result in two scenarios passing.
 cucumber::test()
 #> Test passed
 #> Test passed
-```
-```{r, include = FALSE}
-cucumber:::run(
-  c(
-    'Feature: Bookstore',
-    '  Scenario: Adding a book to cart',
-    '    Given I am in the bookstore',
-    '    When I select "The Hobbit, J.R.R. Tolkien"',
-    '    When I add selected book to the cart',
-    '    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart',
-    '',
-    '  Scenario: Adding multiple books to cart',
-    '    Given I am in the bookstore',
-    '    When I select "The Hobbit, J.R.R. Tolkien"',
-    '    When I add selected book to the cart',
-    '    When I select "The Lord of the Rings, J.R.R. Tolkien"',
-    '    When I add selected book to the cart',
-    '    Then I should see "The Hobbit, J.R.R. Tolkien" in the cart',
-    '    Then I should see "The Lord of the Rings, J.R.R. Tolkien" in the cart'
-  ),
-  steps = cucumber:::get_steps()
-)
 ```
 
 # Why should you choose {cucumber}?

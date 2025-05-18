@@ -36,7 +36,7 @@ describe("run", {
     )
 
     # Act
-    run(feature, steps, parameters)
+    execute(feature, steps, parameters)
 
     # Assert
     mockery::expect_called(spies[[1]], 1)
@@ -90,7 +90,7 @@ describe("run", {
     )
 
     # Act
-    run(feature, steps, parameters, hooks)
+    execute(feature, steps, parameters, hooks)
 
     # Assert
     mockery::expect_called(spies$before, 2)

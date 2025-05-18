@@ -5,19 +5,29 @@ given("a file named {string} with", function(filename, code, context) {
   writeLines(code, file)
 })
 
-when("I run cucumber", function(context) {
-  withr::with_options(list(
-    .cucumber_steps_option = ".cucumber_steps_",
-    .cucumber_hooks_option = ".cucumber_hooks_",
-    .cucumber_parameters_option = ".cucumber_parameters_"
-  ), {
-    cucumber:::set_default_parameters()
-    withr::with_dir(context$tempdir, {
-      withr::with_output_sink(nullfile(), {
-        context$result <- test(stop_on_failure = FALSE)
+when("I run", function(code, context) {
+  x <- as.character(runif(1))
+  .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)
+  .cucumber_steps_option <- paste0(".cucumber_steps_", x)
+  .cucumber_parameters_option <- paste0(".cucumber_parameters_", x)
+  withr::with_options(
+    list(
+      .cucumber_steps_option = .cucumber_steps_option,
+      .cucumber_hooks_option = .cucumber_hooks_option,
+      .cucumber_parameters_option = .cucumber_parameters_option
+    ),
+    {
+      set_default_parameters()
+      withr::with_dir(context$tempdir, {
+        withr::with_output_sink(nullfile(), {
+          context$result <- eval(parse(text = code))
+        })
       })
-    })
-  })
+    }
+  )
+  options(list2(!!.cucumber_hooks_option := NULL))
+  options(list2(!!.cucumber_steps_option := NULL))
+  options(list2(!!.cucumber_parameters_option := NULL))
 })
 
 then("it passes", function(context) {
@@ -26,9 +36,19 @@ then("it passes", function(context) {
   expect_true(sum(results$passed > 0) == nrow(results))
 })
 
-then("it fails", function(context) {
+then("it has {int} passed", function(n, context) {
   results <- as.data.frame(context$result)
-  expect_true(sum(results$failed) > 0)
+  expect_equal(sum(results$passed), n)
+})
+
+then("only {string} was run", function(feature_name, context) {
+  results <- as.data.frame(context$result)
+  expect_setequal(results$context, sprintf("Feature: %s", feature_name))
+})
+
+then("it has {int} errors", function(n, context) {
+  results <- as.data.frame(context$result)
+  expect_equal(sum(results$error), n)
 })
 
 after(function(context, scenario_name) {

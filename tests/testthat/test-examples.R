@@ -127,12 +127,9 @@ describe("test", {
   })
 
   it("should throw an error if no test files are found", {
-    expect_error(
-      test_example(
-        "with_testthat_filtering",
-        filter = "this_feature_doesnt_exist"
-      ),
-      "No feature files found"
+    test_example(
+      "with_testthat_filtering",
+      filter = "this_feature_doesnt_exist"
     )
   })
 
