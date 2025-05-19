@@ -352,3 +352,106 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
       testthat::test_local()
       """
     Then it has 2 passed
+
+  Scenario: Registering hooks
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "tests/testthat/test.feature" with
+      """
+      Feature: a feature
+        Scenario: a scenario
+          Given I calculate
+          Then the result is 2
+      """
+    And a file named "tests/testthat/setup-hooks.R" with
+      """
+      before(function(context, scenario_name) {
+        context$before <- TRUE
+      })
+
+      after(function(context, scenario_name) {
+        context$after <- TRUE
+      })
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run()
+      """
+    And a file named "R/calculate.R" with
+      """
+      calculate <- function(x) {
+        x + 1
+      }
+      """
+    When I run
+      """
+      testthat::test_local()
+      """
+    Then it passes
+
+  Scenario: Rerunning tests
+    This scenario checks if users can run tests again after they have been run once.
+    Each time hooks, parameters and steps are loaded from setup files, and cleaned up after each run.
+    It's observed by tests not throwing errors.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "tests/testthat/test.feature" with
+      """
+      Feature: a feature
+        Scenario: a scenario
+          Given I calculate
+          Then the result is 2
+      """
+    And a file named "tests/testthat/setup-hooks.R" with
+      """
+      before(function(context, scenario_name) {
+        context$before <- TRUE
+      })
+
+      after(function(context, scenario_name) {
+        context$after <- TRUE
+      })
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run()
+      """
+    And a file named "R/calculate.R" with
+      """
+      calculate <- function(x) {
+        x + 1
+      }
+      """
+    When I run
+      """
+      testthat::test_local()
+      testthat::test_local()
+      """
+    Then it passes

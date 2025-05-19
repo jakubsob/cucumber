@@ -55,5 +55,14 @@ then("it has {int} errors", function(n, context) {
 })
 
 after(function(context, scenario_name) {
+  # Cleanup environment if package was loaded
+  withr::with_dir(context$tempdir, {
+    if (fs::file_exists("DESCRIPTION")) {
+      package_name <- desc::desc_get_field("Package")
+      if (paste0("package:", package_name) %in% search()) {
+        pkgload::unload(package_name, quiet = TRUE)
+      }
+    }
+  })
   fs::dir_delete(context$tempdir)
 })

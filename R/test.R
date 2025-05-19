@@ -29,6 +29,7 @@ run <- function(
   filter = NULL,
   ...
 ) {
+  withr::defer(cleanup(), testthat::teardown_env())
   features <- path |>
     find_features() |>
     filter_features(filter, ...)
@@ -72,17 +73,14 @@ cleanup <- function() {
 
 #' @importFrom withr defer
 test_cucumber_code <- function(path, filter, ...) {
-  c(
-    'withr::defer(cucumber:::cleanup(), testthat::teardown_env())',
-    sprintf(
-      'cucumber::run(%s, %s)',
-      shQuote(path),
-      if (is.null(filter)) {
-        "NULL"
-      } else {
-        shQuote(filter)
-      }
-    )
+  sprintf(
+    'cucumber::run(%s, %s)',
+    shQuote(path),
+    if (is.null(filter)) {
+      "NULL"
+    } else {
+      shQuote(filter)
+    }
   )
 }
 
