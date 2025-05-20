@@ -127,6 +127,20 @@ tests/
 │   ├── test-unit_test_2.R
 ```
 
+or alongside your unit tests:
+
+```text
+tests/
+├── testthat/
+│   ├── test-cucumber.R
+│   ├── test-unit_test_1.R
+│   ├── test-unit_test_2.R
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   ├── feature_2.feature
+```
+
 ## Examples
 
 See the [examples directory](https://github.com/jakubsob/cucumber/tree/main/inst/examples) to help you get started.
