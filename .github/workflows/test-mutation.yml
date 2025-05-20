@@ -10,6 +10,8 @@ permissions: write-all
 jobs:
   generate-badge:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v3
@@ -32,6 +34,9 @@ jobs:
       - name: Mutation testing
         shell: Rscript {0}
         run: |
+          install.packages("remotes")
+          remotes::install_github("jakubsob/muttest")
+
           color_scale <- function(score) {
             rgb <- round(colorRamp(c("#D61F1F", "#FFD301", "#006B3D"))(score))
             sprintf("#%02X%02X%02X", rgb[1], rgb[2], rgb[3])
