@@ -327,7 +327,7 @@
       Backtrace:
       x
       1. \-cucumber::run(".", "this_feature_doesnt_exist") at test-__cucumber__.R:2:1
-      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:17:5
+      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:37:5
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
@@ -336,7 +336,7 @@
       Backtrace:
       x
       1. \-cucumber::run(".", "this_feature_doesnt_exist") at test-__cucumber__.R:2:1
-      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:17:5
+      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:37:5
       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
 
 # test: should run tests with custom loading of steps and support code
