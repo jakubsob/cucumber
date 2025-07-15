@@ -75,6 +75,34 @@ describe("normalize_feature", {
     )
   })
 
+  it("shouldn replace only keywords, not words in step descriptions", {
+    # Arrange
+    lines <- c(
+      "Feature: Feature",
+      "  Scenario: Scenario",
+      "    Given I have Given",
+      "    When I add When",
+      "    Then I get Then",
+      "    And I have And"
+    )
+
+    # Act
+    result <- normalize_feature(lines)
+
+    # Assert
+    expect_equal(
+      result,
+      c(
+        "Feature: Feature",
+        "  Scenario: Scenario",
+        "    Step I have Given",
+        "    Step I add When",
+        "    Step I get Then",
+        "    Step I have And"
+      )
+    )
+  })
+
   it("should omit docstrings", {
     # Arrange
     lines <- c(
