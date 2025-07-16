@@ -1,12 +1,12 @@
 pandoc: 3.1.11
-pkgdown: 2.1.2
+pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   bdd: bdd.html
   how-it-works: how-it-works.html
   migration-to-2-0-0: migration-to-2-0-0.html
   reference-gherkin: reference-gherkin.html
-last_built: 2025-05-22T11:55Z
+last_built: 2025-07-16T11:33Z
 urls:
   reference: https://jakubsob.github.io/cucumber/reference
   article: https://jakubsob.github.io/cucumber/articles
