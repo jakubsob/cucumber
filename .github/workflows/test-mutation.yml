@@ -60,7 +60,7 @@ jobs:
 
           pkgload::load_all()
 
-          plan <- muttest::test_plan(
+          plan <- muttest::plan(
             mutators = list(
               muttest::operator("+", "-"),
               muttest::operator("-", "+"),
@@ -74,7 +74,7 @@ jobs:
               muttest::operator(">=", "<=")
             )
           )
-          score <- muttest::test(plan)
+          score <- muttest::muttest(plan)
 
           create_badge(score)
 

@@ -5,15 +5,15 @@ map_keywords <- function(lines) {
   lines[!special] <- str_replace_all(
     lines[!special],
     c(
-      "And" = "Step",
-      "But" = "Step",
-      "Example:" = "Scenario:",
-      "Examples:" = "Scenarios:",
-      "Given" = "Step",
-      "Scenario Template:" = "Scenario Outline:",
-      "Then" = "Step",
-      "When" = "Step",
-      "[*]" = "Step"
+      "^(\\s*)And" = "\\1Step",
+      "^(\\s*)But" = "\\1Step",
+      "^(\\s*)Example:" = "\\1Scenario:",
+      "^(\\s*)Examples:" = "\\1Scenarios:",
+      "^(\\s*)Given" = "\\1Step",
+      "^(\\s*)Scenario Template:" = "\\1Scenario Outline:",
+      "^(\\s*)Then" = "\\1Step",
+      "^(\\s*)When" = "\\1Step",
+      "^(\\s*)\\*" = "\\1Step"
     )
   )
 
