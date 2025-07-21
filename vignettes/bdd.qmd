@@ -252,7 +252,7 @@ cucumber::test()
 #> Test passed
 ```
 
-What `cucumber::test` function does is it reads the feature files, finds corresponding actions implementations and runs them in order. To learn more how it works, refer to [How it works](https://jakubsob.github.io/cucumber/articles/how-it-works.html) vignette.
+What `cucumber::test` function does is it reads the feature files, finds corresponding actions implementations and runs them in order. To learn more how it works, refer to [How it works](https://jakubsobolewski.com/cucumber/articles/how-it-works.html) vignette.
 
 Similar to what we did with base R, we can extend the feature file with a scenario that checks if we can add multiple books to the cart:
 
