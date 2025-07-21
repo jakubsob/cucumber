@@ -17,3 +17,4 @@
 ^vignettes/articles$
 ^vignettes/.quarto$
 ^CRAN-SUBMISSION$
+^revdep$
