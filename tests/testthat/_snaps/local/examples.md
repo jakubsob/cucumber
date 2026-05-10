@@ -101,7 +101,7 @@
       Warning in before hook.
       Backtrace:
       x
-      1. \-before(.context, token$value) at cucumber/R/parse_token.R:27:11
+      1. \-before(.context, token$value) at cucumber/R/parse_token.R:28:13
       Warning ('test-__cucumber__.R:1:1'): Scenario: Before hook is executed
       Warning in after hook.
       Backtrace:
@@ -120,20 +120,22 @@
       v | F W  S  OK | Context
       x | 1 2      0 | Feature: Hooks
       --------------------------------------------------------------------------------
+    Condition
+      Warning in `max()`:
+      no non-missing arguments to max; returning -Inf
+    Output
       Warning ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
       Warning in before hook.
       Backtrace:
       x
-      1. \-before(.context, token$value) at cucumber/R/parse_token.R:27:11
+      1. \-before(.context, token$value) at cucumber/R/parse_token.R:28:13
       Error ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
-      Error in `(function (context)
-      {
-      stop("Unexpected error!")
-      })(context = <environment>)`: Unexpected error!
+      Error: Step "I start the scenario with error" failed
+      i Defined at: setup-steps.R:9
+      Caused by error:
+      ! Unexpected error!
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(context = `<env>`)
       Warning ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
       Warning in after hook, even after error in a step.
       Backtrace:
@@ -142,15 +144,17 @@
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
+    Condition
+      Warning in `max()`:
+      no non-missing arguments to max; returning -Inf
+    Output
       Error ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
-      Error in `(function (context)
-      {
-      stop("Unexpected error!")
-      })(context = <environment>)`: Unexpected error!
+      Error: Step "I start the scenario with error" failed
+      i Defined at: setup-steps.R:9
+      Caused by error:
+      ! Unexpected error!
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(context = `<env>`)
       [ FAIL 1 | WARN 2 | SKIP 0 | PASS 0 ]
 
 # test: should run a Scenario with custom parameters
@@ -213,18 +217,20 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(expected = 5L, context = `<env>`)
-      3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
+      2. +-rlang::exec(step, !!!args, context = .context)
+      3. \-`<fn>`(expected = 5L, context = `<env>`)
+      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
       Failure ('test-__cucumber__.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
       `actual`: 2.2
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(expected = 5L, context = `<env>`)
-      3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
+      2. +-rlang::exec(step, !!!args, context = .context)
+      3. \-`<fn>`(expected = 5L, context = `<env>`)
+      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
       --------------------------------------------------------------------------------
       x | 1        1 | Feature: Guess the word
       --------------------------------------------------------------------------------
@@ -234,9 +240,10 @@
       `expected`: 6
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(n = 6L, context = `<env>`)
-      3.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
+      1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
+      2. +-rlang::exec(step, !!!args, context = .context)
+      3. \-`<fn>`(n = 6L, context = `<env>`)
+      4.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
@@ -246,28 +253,99 @@
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(expected = 5L, context = `<env>`)
-      3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
+      2. +-rlang::exec(step, !!!args, context = .context)
+      3. \-`<fn>`(expected = 5L, context = `<env>`)
+      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
       Failure ('test-__cucumber__.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
       `actual`: 2.2
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(expected = 5L, context = `<env>`)
-      3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
+      2. +-rlang::exec(step, !!!args, context = .context)
+      3. \-`<fn>`(expected = 5L, context = `<env>`)
+      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
       Failure ('test-__cucumber__.R:1:1'): Scenario: Breaker joins a game
       nchar(context$word) (`actual`) not equal to `n` (`expected`).
       `actual`: 5
       `expected`: 6
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
-      2. \-`<fn>`(n = 6L, context = `<env>`)
-      3.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
+      1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
+      2. +-rlang::exec(step, !!!args, context = .context)
+      3. \-`<fn>`(n = 6L, context = `<env>`)
+      4.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
       [ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]
+
+# test: should show clean error when a step throws
+
+    Code
+      cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE, ...)
+    Output
+      v | F W  S  OK | Context
+      x | 1        0 | Feature: Addition
+      --------------------------------------------------------------------------------
+    Condition
+      Warning in `max()`:
+      no non-missing arguments to max; returning -Inf
+    Output
+      Error ('test-__cucumber__.R:1:1'): Scenario: Adding two numbers
+      Error: Step "I add them" failed
+      i Defined at: setup-steps.R:6
+      Caused by error:
+      ! Addition service is unavailable
+      Backtrace:
+      x
+      --------------------------------------------------------------------------------
+      == Results =====================================================================
+      -- Failed tests ----------------------------------------------------------------
+    Condition
+      Warning in `max()`:
+      no non-missing arguments to max; returning -Inf
+    Output
+      Error ('test-__cucumber__.R:1:1'): Scenario: Adding two numbers
+      Error: Step "I add them" failed
+      i Defined at: setup-steps.R:6
+      Caused by error:
+      ! Addition service is unavailable
+      Backtrace:
+      x
+      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
+
+# test: should show full trace when a step throws in debug mode
+
+    Code
+      cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
+        show_praise = FALSE), stop_on_failure = FALSE, ...)
+    Output
+      v | F W  S  OK | Context
+      x | 1        0 | Feature: Addition
+      --------------------------------------------------------------------------------
+      Error ('test-__cucumber__.R:1:1'): Scenario: Adding two numbers
+      Error in `(function (context)
+      {
+      stop("Addition service is unavailable")
+      })(context = <environment>)`: Addition service is unavailable
+      Backtrace:
+      x
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:36:17
+      2. \-`<fn>`(context = `<env>`)
+      --------------------------------------------------------------------------------
+      == Results =====================================================================
+      -- Failed tests ----------------------------------------------------------------
+      Error ('test-__cucumber__.R:1:1'): Scenario: Adding two numbers
+      Error in `(function (context)
+      {
+      stop("Addition service is unavailable")
+      })(context = <environment>)`: Addition service is unavailable
+      Backtrace:
+      x
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:36:17
+      2. \-`<fn>`(context = `<env>`)
+      [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
 
 # test: should work with loading steps from setup files
 

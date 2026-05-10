@@ -1,4 +1,4 @@
-#' @importFrom rlang exec
+#' @importFrom rlang exec try_fetch cnd_signal
 #' @importFrom purrr walk
 execute <- function(
   feature,
@@ -12,5 +12,8 @@ execute <- function(
   checkmate::assert_list(hooks)
   tokens <- tokenize(feature)
   call_queue <- parse_token(tokens, steps, parameters, hooks, tags)
-  walk(call_queue, exec)
+  try_fetch(
+    walk(call_queue, exec),
+    purrr_error_indexed = function(err) cnd_signal(err$parent)
+  )
 }

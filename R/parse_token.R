@@ -1,4 +1,4 @@
-#' @importFrom rlang abort exec `%||%`
+#' @importFrom rlang abort exec try_fetch cnd_signal error_cnd format_error_bullets trace_back `%||%`
 #' @importFrom glue glue
 #' @importFrom purrr map walk partial
 #' @importFrom testthat context_start_file test_that
@@ -9,78 +9,115 @@ parse_token <- function(
   hooks = get_hooks(),
   tags = NULL
 ) {
-  map(tokens, \(token) {
-    switch(
-      token$type,
-      "Scenario" = function() {
-        scenario_tags <- c(token$tags %||% character(0))
-        if (!is.null(tags) && !any(tags %in% scenario_tags)) {
-          return(invisible(NULL))
-        }
-        test_that(glue("Scenario: {token$value}"), {
-          .context <- new.env()
-          calls <- parse_token(token$children, steps, parameters)
-          after <- get_hook(hooks, "after")
-          before <- get_hook(hooks, "before")
-
-          on.exit(after(.context, token$value))
-          before(.context, token$value)
-          for (call in calls) {
-            step <- unclass(call)
-            description <- attr(step, "description")
-            args <- attr(step, "args")
-            attributes(step) <- NULL
-            exec(step, !!!args, context = .context)
+  try_fetch(
+    map(tokens, \(token) {
+      switch(
+        token$type,
+        "Scenario" = function() {
+          scenario_tags <- c(token$tags %||% character(0))
+          if (!is.null(tags) && !any(tags %in% scenario_tags)) {
+            return(invisible(NULL))
           }
-        })
-      },
-      "Scenario Outline" = function() {
-        outline_tags <- token$tags %||% character(0)
-        if (!is.null(tags) && !any(tags %in% outline_tags)) {
-          return(invisible(NULL))
-        }
-        scenarios <- expand_scenario_outline(token)
-        calls <- map(scenarios, function(scenario) {
-          parse_token(list(scenario), steps, parameters, hooks)[[1]]
-        })
-        for (call in calls) {
-          exec(call)
-        }
-      },
-      "Feature" = function(file_name = token$value) {
-        context_start_file(glue("Feature: {file_name}"))
+          test_that(glue("Scenario: {token$value}"), {
+            .context <- new.env()
+            calls <- parse_token(token$children, steps, parameters)
+            after <- get_hook(hooks, "after")
+            before <- get_hook(hooks, "before")
 
-        feature_tags <- token$tags %||% character(0)
-        # Propagate feature tags to child scenarios
-        children <- token$children |>
-          map(\(child) {
-            if (child$type %in% c("Scenario", "Scenario Outline")) {
-              child$tags <- unique(c(
-                feature_tags,
-                child$tags %||% character(0)
-              ))
+            on.exit(after(.context, token$value))
+            before(.context, token$value)
+            for (call in calls) {
+              step <- unclass(call)
+              description <- attr(step, "description")
+              args <- attr(step, "args")
+              src <- attr(step, "srcref")
+              attributes(step) <- NULL
+              if (isTRUE(getOption("cucumber.debug"))) {
+                exec(step, !!!args, context = .context)
+              } else {
+                withCallingHandlers(
+                  exec(step, !!!args, context = .context),
+                  error = function(e) {
+                    if (inherits(e, "expectation")) return()
+                    trace <- rlang::trace_back()
+                    internal_pkgs <- c("cucumber", "rlang", "base", "methods")
+                    is_internal <- vapply(
+                      trace$envs,
+                      function(env) environmentName(topenv(env)) %in% internal_pkgs,
+                      logical(1)
+                    )
+                    user_trace <- trace[!is_internal]
+                    location <- if (!is.null(src)) {
+                      glue(
+                        "{getSrcFilename(src)}:",
+                        "{getSrcLocation(src, 'line', first = TRUE)}"
+                      )
+                    }
+                    cnd <- rlang::error_cnd(
+                      message = rlang::format_error_bullets(c(
+                        glue("Step \"{description}\" failed"),
+                        if (!is.null(location)) c(i = glue("Defined at: {location}"))
+                      )),
+                      parent = e,
+                      call = NULL,
+                      trace = user_trace
+                    )
+                    stop(cnd)
+                  }
+                )
+              }
             }
-            child
           })
-        # Append Background steps before each Scenario steps
-        if (children[[1]]$type == "Background") {
-          background <- children[[1]]
-          children <- children[2:length(children)] |>
-            map(\(x) {
-              x$children <- c(background$children, x$children)
-              x
-            })
-        }
+        },
+        "Scenario Outline" = function() {
+          outline_tags <- token$tags %||% character(0)
+          if (!is.null(tags) && !any(tags %in% outline_tags)) {
+            return(invisible(NULL))
+          }
+          scenarios <- expand_scenario_outline(token)
+          calls <- map(scenarios, function(scenario) {
+            parse_token(list(scenario), steps, parameters, hooks)[[1]]
+          })
+          for (call in calls) {
+            exec(call)
+          }
+        },
+        "Feature" = function(file_name = token$value) {
+          context_start_file(glue("Feature: {file_name}"))
 
-        calls <- parse_token(children, steps, parameters, hooks, tags)
-        for (call in calls) {
-          exec(call)
-        }
-      },
-      "Step" = parse_step(token, steps, parameters),
-      abort(glue("Unknown token type: {token$type}"))
-    )
-  })
+          feature_tags <- token$tags %||% character(0)
+          # Propagate feature tags to child scenarios
+          children <- token$children |>
+            map(\(child) {
+              if (child$type %in% c("Scenario", "Scenario Outline")) {
+                child$tags <- unique(c(
+                  feature_tags,
+                  child$tags %||% character(0)
+                ))
+              }
+              child
+            })
+          # Append Background steps before each Scenario steps
+          if (children[[1]]$type == "Background") {
+            background <- children[[1]]
+            children <- children[2:length(children)] |>
+              map(\(x) {
+                x$children <- c(background$children, x$children)
+                x
+              })
+          }
+
+          calls <- parse_token(children, steps, parameters, hooks, tags)
+          for (call in calls) {
+            exec(call)
+          }
+        },
+        "Step" = parse_step(token, steps, parameters),
+        abort(glue("Unknown token type: {token$type}"))
+      )
+    }),
+    purrr_error_indexed = function(err) cnd_signal(err$parent)
+  )
 }
 
 #' @importFrom purrr map_chr map map_int map2 keep pluck partial

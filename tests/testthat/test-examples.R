@@ -107,6 +107,17 @@ describe("test", {
     test_example("with_testthat_failure")
   })
 
+  it("should show clean error when a step throws", {
+    test_example("step_error")
+  })
+
+  it("should show full trace when a step throws in debug mode", {
+    withr::with_options(
+      list(cucumber.debug = TRUE),
+      test_example("step_error")
+    )
+  })
+
   it("should work with loading steps from setup files", {
     test_example("testthat_setup_files")
   })
