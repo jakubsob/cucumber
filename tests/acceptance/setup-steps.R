@@ -54,6 +54,11 @@ then("it has {int} errors", function(n, context) {
   expect_equal(sum(results$error), n)
 })
 
+then("it has {int} skipped", function(n, context) {
+  results <- as.data.frame(context$result)
+  expect_equal(sum(results$skipped), n)
+})
+
 after(function(context, scenario_name) {
   # Cleanup environment if package was loaded
   withr::with_dir(context$tempdir, {

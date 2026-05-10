@@ -49,6 +49,7 @@ reference:
     contents:
       - hook
       - step
+      - pending
   - title: Run tests
     contents:
       - test
