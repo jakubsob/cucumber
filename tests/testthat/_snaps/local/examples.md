@@ -97,12 +97,12 @@
       v | F W  S  OK | Context
       v |   2      1 | Feature: Hooks
       --------------------------------------------------------------------------------
-      Warning ('test-__cucumber__.R:2:1'): Scenario: Before hook is executed
+      Warning ('test-__cucumber__.R:1:1'): Scenario: Before hook is executed
       Warning in before hook.
       Backtrace:
       x
-      1. \-before(.context, token$value) at cucumber/R/parse_token.R:22:11
-      Warning ('test-__cucumber__.R:2:1'): Scenario: Before hook is executed
+      1. \-before(.context, token$value) at cucumber/R/parse_token.R:27:11
+      Warning ('test-__cucumber__.R:1:1'): Scenario: Before hook is executed
       Warning in after hook.
       Backtrace:
       x
@@ -120,21 +120,21 @@
       v | F W  S  OK | Context
       x | 1 2      0 | Feature: Hooks
       --------------------------------------------------------------------------------
-      Warning ('test-__cucumber__.R:2:1'): Scenario: After hook is executed even when a step throws an error
+      Warning ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
       Warning in before hook.
       Backtrace:
       x
-      1. \-before(.context, token$value) at cucumber/R/parse_token.R:22:11
-      Error ('test-__cucumber__.R:2:1'): Scenario: After hook is executed even when a step throws an error
+      1. \-before(.context, token$value) at cucumber/R/parse_token.R:27:11
+      Error ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
       Error in `(function (context)
       {
       stop("Unexpected error!")
       })(context = <environment>)`: Unexpected error!
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(context = `<env>`)
-      Warning ('test-__cucumber__.R:2:1'): Scenario: After hook is executed even when a step throws an error
+      Warning ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
       Warning in after hook, even after error in a step.
       Backtrace:
       x
@@ -142,14 +142,14 @@
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
-      Error ('test-__cucumber__.R:2:1'): Scenario: After hook is executed even when a step throws an error
+      Error ('test-__cucumber__.R:1:1'): Scenario: After hook is executed even when a step throws an error
       Error in `(function (context)
       {
       stop("Unexpected error!")
       })(context = <environment>)`: Unexpected error!
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(context = `<env>`)
       [ FAIL 1 | WARN 2 | SKIP 0 | PASS 0 ]
 
@@ -207,64 +207,64 @@
       v | F W  S  OK | Context
       x | 2        1 | Feature: Addition
       --------------------------------------------------------------------------------
-      Failure ('test-__cucumber__.R:2:1'): Scenario: Adding integer and float
+      Failure ('test-__cucumber__.R:1:1'): Scenario: Adding integer and float
       context$result (`actual`) not equal to `expected` (`expected`).
       `actual`: 2.1
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(expected = 5L, context = `<env>`)
       3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
-      Failure ('test-__cucumber__.R:2:1'): Scenario: Adding float and float
+      Failure ('test-__cucumber__.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
       `actual`: 2.2
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(expected = 5L, context = `<env>`)
       3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
       --------------------------------------------------------------------------------
       x | 1        1 | Feature: Guess the word
       --------------------------------------------------------------------------------
-      Failure ('test-__cucumber__.R:2:1'): Scenario: Breaker joins a game
+      Failure ('test-__cucumber__.R:1:1'): Scenario: Breaker joins a game
       nchar(context$word) (`actual`) not equal to `n` (`expected`).
       `actual`: 5
       `expected`: 6
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(n = 6L, context = `<env>`)
       3.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
-      Failure ('test-__cucumber__.R:2:1'): Scenario: Adding integer and float
+      Failure ('test-__cucumber__.R:1:1'): Scenario: Adding integer and float
       context$result (`actual`) not equal to `expected` (`expected`).
       `actual`: 2.1
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(expected = 5L, context = `<env>`)
       3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
-      Failure ('test-__cucumber__.R:2:1'): Scenario: Adding float and float
+      Failure ('test-__cucumber__.R:1:1'): Scenario: Adding float and float
       context$result (`actual`) not equal to `expected` (`expected`).
       `actual`: 2.2
       `expected`: 5.0
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(expected = 5L, context = `<env>`)
       3.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
-      Failure ('test-__cucumber__.R:2:1'): Scenario: Breaker joins a game
+      Failure ('test-__cucumber__.R:1:1'): Scenario: Breaker joins a game
       nchar(context$word) (`actual`) not equal to `n` (`expected`).
       `actual`: 5
       `expected`: 6
       Backtrace:
       x
-      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:28:13
+      1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:33:13
       2. \-`<fn>`(n = 6L, context = `<env>`)
       3.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
       [ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]
@@ -322,21 +322,21 @@
       v | F W  S  OK | Context
       x | 1        0 | __cucumber__
       --------------------------------------------------------------------------------
-      Error ('test-__cucumber__.R:2:1'): (code run outside of `test_that()`)
-      Error in `cucumber::run(".", "this_feature_doesnt_exist")`: No feature files found
+      Error ('test-__cucumber__.R:1:1'): (code run outside of `test_that()`)
+      Error in `cucumber::run(".", filter = "this_feature_doesnt_exist")`: No feature files found
       Backtrace:
       x
-      1. \-cucumber::run(".", "this_feature_doesnt_exist") at test-__cucumber__.R:2:1
-      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:37:5
+      1. \-cucumber::run(".", filter = "this_feature_doesnt_exist") at test-__cucumber__.R:1:1
+      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:41:5
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
-      Error ('test-__cucumber__.R:2:1'): (code run outside of `test_that()`)
-      Error in `cucumber::run(".", "this_feature_doesnt_exist")`: No feature files found
+      Error ('test-__cucumber__.R:1:1'): (code run outside of `test_that()`)
+      Error in `cucumber::run(".", filter = "this_feature_doesnt_exist")`: No feature files found
       Backtrace:
       x
-      1. \-cucumber::run(".", "this_feature_doesnt_exist") at test-__cucumber__.R:2:1
-      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:37:5
+      1. \-cucumber::run(".", filter = "this_feature_doesnt_exist") at test-__cucumber__.R:1:1
+      2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:41:5
       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
 
 # test: should run tests with custom loading of steps and support code

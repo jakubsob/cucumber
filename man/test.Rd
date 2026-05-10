@@ -7,6 +7,7 @@
 test(
   path = "tests/acceptance",
   filter = NULL,
+  tags = NULL,
   reporter = NULL,
   env = NULL,
   load_helpers = TRUE,
@@ -20,6 +21,9 @@ test(
 
 \item{filter}{If not NULL, only features with file names matching this regular expression
 will be executed. Matching is performed on the file name after it's stripped of ".feature".}
+
+\item{tags}{If not NULL, only scenarios with at least one of the given tags will be executed.
+Tags should be provided as a character vector without the \code{@} prefix, e.g. \code{c("smoke", "fast")}.}
 
 \item{reporter}{Reporter to use to summarise output. Can be supplied
 as a string (e.g. "summary") or as an R6 object
@@ -70,6 +74,7 @@ Those tests won't be run when calling \code{\link[=test]{test()}}. To run those 
 \dontrun{
 cucumber::test("tests/acceptance")
 cucumber::test("tests/acceptance", filter = "addition|multiplication")
+cucumber::test("tests/acceptance", tags = c("smoke", "fast"))
 }
 
 }

@@ -18,6 +18,7 @@ validate_indentation <- function(lines) {
   test_lines <- lines[!str_detect(lines, "^Feature")] |>
     remove_empty_lines()
   test_lines <- test_lines[!special_mask(test_lines)]
+  test_lines <- test_lines[!str_detect(test_lines, TAG_LINE_REGEX)]
   if (any(!str_detect(test_lines, indent))) {
     cli_abort(c(
       "All lines must be indented with {indent}",

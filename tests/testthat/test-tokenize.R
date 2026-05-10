@@ -23,10 +23,12 @@ describe("tokenize", {
         list(
           type = "Feature",
           value = "Guess the word",
+          tags = character(0),
           children = list(
             list(
               type = "Scenario",
               value = "Maker starts a game",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -46,6 +48,7 @@ describe("tokenize", {
             list(
               type = "Scenario",
               value = "Breaker joins a game",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -107,10 +110,12 @@ describe("tokenize", {
         list(
           type = "Feature",
           value = "Guess the word",
+          tags = character(0),
           children = list(
             list(
               type = "Scenario",
               value = "Maker starts a game",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -166,10 +171,12 @@ describe("tokenize", {
         list(
           type = "Feature",
           value = "Multiple site support",
+          tags = character(0),
           children = list(
             list(
               type = "Background",
               value = "",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -201,6 +208,7 @@ describe("tokenize", {
             list(
               type = "Scenario",
               value = "Dr. Bill posts to his own blog",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -226,6 +234,7 @@ describe("tokenize", {
             list(
               type = "Scenario",
               value = "Dr. Bill tries to post to somebody else's blog, and fails",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -278,6 +287,7 @@ describe("tokenize", {
         list(
           type = "Scenario Outline",
           value = "eating",
+          tags = character(0),
           children = list(
             list(
               type = "Step",
@@ -333,6 +343,7 @@ describe("tokenize", {
         list(
           type = "Scenario",
           value = "blog",
+          tags = character(0),
           children = list(
             list(
               type = "Step",
@@ -377,6 +388,7 @@ describe("tokenize", {
         list(
           type = "Scenario",
           value = "blog",
+          tags = character(0),
           children = list(
             list(
               type = "Step",
@@ -421,6 +433,7 @@ describe("tokenize", {
         list(
           type = "Scenario",
           value = "blog",
+          tags = character(0),
           children = list(
             list(
               type = "Step",
@@ -465,6 +478,7 @@ describe("tokenize", {
         list(
           type = "Scenario",
           value = "blog",
+          tags = character(0),
           children = list(
             list(
               type = "Step",
@@ -568,10 +582,12 @@ describe("tokenize", {
         list(
           type = "Feature",
           value = "Guess the word",
+          tags = character(0),
           children = list(
             list(
               type = "Scenario",
               value = "Maker starts a game",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -617,10 +633,12 @@ describe("tokenize", {
         list(
           type = "Feature",
           value = "Guess the word",
+          tags = character(0),
           children = list(
             list(
               type = "Scenario",
               value = "Maker starts a game",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -687,10 +705,12 @@ describe("tokenize", {
         list(
           type = "Feature",
           value = "Guess the word",
+          tags = character(0),
           children = list(
             list(
               type = "Background",
               value = "",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -704,6 +724,7 @@ describe("tokenize", {
             list(
               type = "Scenario",
               value = "Maker starts a game",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -723,6 +744,7 @@ describe("tokenize", {
             list(
               type = "Scenario Outline",
               value = "eating",
+              tags = character(0),
               children = list(
                 list(
                   type = "Step",
@@ -770,5 +792,89 @@ describe("tokenize", {
 
     # Act & Assert
     expect_error(tokenize(lines))
+  })
+
+  it("should attach a single tag to a Scenario", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "  @smoke",
+      "  Scenario: Maker starts a game",
+      "    When the Maker starts a game"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(result[[1]]$children[[1]]$tags, c("smoke"))
+  })
+
+  it("should attach multiple tags from one line to a Scenario", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "  @smoke @fast",
+      "  Scenario: Maker starts a game",
+      "    When the Maker starts a game"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(result[[1]]$children[[1]]$tags, c("smoke", "fast"))
+  })
+
+  it("should attach tags from multiple lines to a Scenario", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "  @smoke",
+      "  @fast",
+      "  Scenario: Maker starts a game",
+      "    When the Maker starts a game"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(result[[1]]$children[[1]]$tags, c("smoke", "fast"))
+  })
+
+  it("should attach tags to Feature", {
+    # Arrange
+    lines <- c(
+      "@suite",
+      "Feature: Guess the word",
+      "  Scenario: Maker starts a game",
+      "    When the Maker starts a game"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(result[[1]]$tags, c("suite"))
+  })
+
+  it("should not include tag lines in freeform data", {
+    # Arrange
+    lines <- c(
+      "Feature: Guess the word",
+      "",
+      "  This is a description",
+      "",
+      "  @smoke",
+      "  Scenario: Maker starts a game",
+      "    When the Maker starts a game"
+    )
+
+    # Act
+    result <- tokenize(lines)
+
+    # Assert
+    expect_equal(result[[1]]$data, "This is a description")
   })
 })

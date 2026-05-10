@@ -133,6 +133,32 @@ describe("test", {
     )
   })
 
+  it("should run only scenarios matching the tags filter", {
+    result <- .with_example_dir("tags", {
+      cucumber::test(
+        "tests/acceptance",
+        stop_on_failure = FALSE,
+        reporter = testthat::SilentReporter$new(),
+        tags = c("fast")
+      )
+    })
+    df <- as.data.frame(result)
+    expect_equal(nrow(df), 1)
+    expect_equal(df$test, "Scenario: Adding two numbers")
+  })
+
+  it("should run all scenarios when no tags filter is given", {
+    result <- .with_example_dir("tags", {
+      cucumber::test(
+        "tests/acceptance",
+        stop_on_failure = FALSE,
+        reporter = testthat::SilentReporter$new()
+      )
+    })
+    df <- as.data.frame(result)
+    expect_equal(nrow(df), 2)
+  })
+
   it("should run tests with custom loading of steps and support code", {
     .with_example_dir("custom_loading", {
       .test <- function() {

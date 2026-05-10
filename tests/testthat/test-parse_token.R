@@ -487,26 +487,21 @@ describe("parse_token", {
     steps <- list(
       given("a global administrator named {string}", function(name, context) {
         spies[[1]]()
-        testthat::succeed()
       }),
       given("a blog named {string}", function(name, context) {
         spies[[2]]()
-        testthat::succeed()
       }),
       given("a customer named {string}", function(name, context) {
         spies[[3]]()
-        testthat::succeed()
       }),
-      given("a blog named {string} owned by {string}", function(blog_name, owner_name, context) {
-        spies[[4]]()
-        testthat::succeed()
-      }),
-      when("I am logged in as {string}", function(name, context) {
-        testthat::succeed()
-      }),
-      when("I try to post to {string}", function(blog_name, context) {
-        testthat::succeed()
-      }),
+      given(
+        "a blog named {string} owned by {string}",
+        function(blog_name, owner_name, context) {
+          spies[[4]]()
+        }
+      ),
+      when("I am logged in as {string}", function(name, context) {}),
+      when("I try to post to {string}", function(blog_name, context) {}),
       then("I should see {string}", function(message, context) {
         testthat::succeed()
       })
@@ -601,5 +596,204 @@ describe("parse_token", {
     mockery::expect_called(spies[[1]], 2)
     mockery::expect_called(spies[[2]], 2)
     mockery::expect_called(spies[[3]], 2)
+  })
+
+  it("should run only scenarios matching the tags filter", {
+    # Arrange
+    spies <- list(mockery::mock(), mockery::mock())
+    steps <- list(
+      given("a step", function(context) {
+        spies[[1]]()
+        testthat::succeed()
+      }),
+      given("another step", function(context) {
+        spies[[2]]()
+        testthat::succeed()
+      })
+    )
+    parameters <- .parameters(get_parameters()$string)
+    tokens <- list(
+      list(
+        type = "Feature",
+        value = "My Feature",
+        tags = character(0),
+        children = list(
+          list(
+            type = "Scenario",
+            value = "smoke scenario",
+            tags = c("smoke"),
+            children = list(
+              list(type = "Step", value = "a step", children = NULL, data = NULL)
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario",
+            value = "wip scenario",
+            tags = c("wip"),
+            children = list(
+              list(type = "Step", value = "another step", children = NULL, data = NULL)
+            ),
+            data = NULL
+          )
+        ),
+        data = NULL
+      )
+    )
+
+    # Act — filter to @smoke only
+    callable <- parse_token(tokens, steps, parameters, tags = c("smoke"))
+    purrr::walk(callable, \(x) x())
+
+    # Assert
+    mockery::expect_called(spies[[1]], 1)
+    mockery::expect_called(spies[[2]], 0)
+  })
+
+  it("should run all scenarios when tags filter is NULL", {
+    # Arrange
+    spies <- list(mockery::mock(), mockery::mock())
+    steps <- list(
+      given("a step", function(context) {
+        spies[[1]]()
+        testthat::succeed()
+      }),
+      given("another step", function(context) {
+        spies[[2]]()
+        testthat::succeed()
+      })
+    )
+    parameters <- .parameters(get_parameters()$string)
+    tokens <- list(
+      list(
+        type = "Feature",
+        value = "My Feature",
+        tags = character(0),
+        children = list(
+          list(
+            type = "Scenario",
+            value = "smoke scenario",
+            tags = c("smoke"),
+            children = list(
+              list(type = "Step", value = "a step", children = NULL, data = NULL)
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario",
+            value = "untagged scenario",
+            tags = character(0),
+            children = list(
+              list(type = "Step", value = "another step", children = NULL, data = NULL)
+            ),
+            data = NULL
+          )
+        ),
+        data = NULL
+      )
+    )
+
+    # Act — no tag filter
+    callable <- parse_token(tokens, steps, parameters, tags = NULL)
+    purrr::walk(callable, \(x) x())
+
+    # Assert — both scenarios run
+    mockery::expect_called(spies[[1]], 1)
+    mockery::expect_called(spies[[2]], 1)
+  })
+
+  it("should propagate Feature tags to child Scenarios", {
+    # Arrange
+    spy <- mockery::mock()
+    steps <- list(
+      given("a step", function(context) {
+        spy()
+        testthat::succeed()
+      })
+    )
+    parameters <- .parameters(get_parameters()$string)
+    tokens <- list(
+      list(
+        type = "Feature",
+        value = "Smoke Suite",
+        tags = c("smoke"),
+        children = list(
+          list(
+            type = "Scenario",
+            value = "scenario inherits feature tag",
+            tags = character(0),
+            children = list(
+              list(type = "Step", value = "a step", children = NULL, data = NULL)
+            ),
+            data = NULL
+          )
+        ),
+        data = NULL
+      )
+    )
+
+    # Act — filter by @smoke; scenario has no own tags but Feature does
+    callable <- parse_token(tokens, steps, parameters, tags = c("smoke"))
+    purrr::walk(callable, \(x) x())
+
+    # Assert — scenario ran because Feature tag propagated
+    mockery::expect_called(spy, 1)
+  })
+
+  it("should run scenarios matching any of multiple tags (OR logic)", {
+    # Arrange
+    spies <- list(mockery::mock(), mockery::mock(), mockery::mock())
+    steps <- list(
+      given("step one", function(context) { spies[[1]](); testthat::succeed() }),
+      given("step two", function(context) { spies[[2]](); testthat::succeed() }),
+      given("step three", function(context) { spies[[3]](); testthat::succeed() })
+    )
+    parameters <- .parameters(get_parameters()$string)
+    tokens <- list(
+      list(
+        type = "Feature",
+        value = "My Feature",
+        tags = character(0),
+        children = list(
+          list(
+            type = "Scenario",
+            value = "smoke scenario",
+            tags = c("smoke"),
+            children = list(
+              list(type = "Step", value = "step one", children = NULL, data = NULL)
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario",
+            value = "fast scenario",
+            tags = c("fast"),
+            children = list(
+              list(type = "Step", value = "step two", children = NULL, data = NULL)
+            ),
+            data = NULL
+          ),
+          list(
+            type = "Scenario",
+            value = "slow scenario",
+            tags = c("slow"),
+            children = list(
+              list(type = "Step", value = "step three", children = NULL, data = NULL)
+            ),
+            data = NULL
+          )
+        ),
+        data = NULL
+      )
+    )
+
+    # Act — filter to @smoke OR @fast
+    callable <- parse_token(tokens, steps, parameters, tags = c("smoke", "fast"))
+    purrr::walk(callable, \(x) x())
+
+    # Assert — smoke and fast ran, slow did not
+    mockery::expect_called(spies[[1]], 1)
+    mockery::expect_called(spies[[2]], 1)
+    mockery::expect_called(spies[[3]], 0)
   })
 })

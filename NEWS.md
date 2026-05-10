@@ -1,3 +1,7 @@
+# cucumber 2.2.0
+
+- ✨ Added support for tags. Scenarios can now be tagged with `@tag` in feature files and filtered by passing `tags` to `cucumber::test()` or `cucumber::run()`. Feature-level tags are inherited by all scenarios in the feature.
+
 # cucumber 2.1.1
 
 - 🐛 Fix normalisation of feature files. [#14](https://github.com/jakubsob/cucumber/pull/14)

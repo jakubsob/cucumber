@@ -17,6 +17,8 @@
 #'
 #' @param filter If not NULL, only features with file names matching this regular expression
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
+#' @param tags If not NULL, only scenarios with at least one of the given tags will be executed.
+#'   Tags should be provided as a character vector without the `@` prefix, e.g. `c("smoke", "fast")`.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
@@ -27,6 +29,7 @@
 run <- function(
   path = ".",
   filter = NULL,
+  tags = NULL,
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
@@ -41,7 +44,7 @@ run <- function(
   features |>
     map(readLines) |>
     map(validate_feature) |>
-    walk(execute)
+    walk(\(f) execute(f, tags = tags))
 
   invisible(NULL)
 }
@@ -72,16 +75,13 @@ cleanup <- function() {
 }
 
 #' @importFrom withr defer
-test_cucumber_code <- function(path, filter, ...) {
-  sprintf(
-    'cucumber::run(%s, %s)',
+test_cucumber_code <- function(path, filter, tags = NULL, ...) {
+  args <- c(
     shQuote(path),
-    if (is.null(filter)) {
-      "NULL"
-    } else {
-      shQuote(filter)
-    }
+    sprintf("filter = %s", if (is.null(filter)) "NULL" else shQuote(filter)),
+    if (!is.null(tags)) sprintf("tags = %s", deparse(tags))
   )
+  sprintf("cucumber::run(%s)", paste(args, collapse = ", "))
 }
 
 #' Run Cucumber tests
@@ -116,11 +116,14 @@ test_cucumber_code <- function(path, filter, ...) {
 #' @inheritParams testthat::test_dir
 #' @param filter If not NULL, only features with file names matching this regular expression
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
+#' @param tags If not NULL, only scenarios with at least one of the given tags will be executed.
+#'   Tags should be provided as a character vector without the `@` prefix, e.g. `c("smoke", "fast")`.
 #'
 #' @examples
 #' \dontrun{
 #' cucumber::test("tests/acceptance")
 #' cucumber::test("tests/acceptance", filter = "addition|multiplication")
+#' cucumber::test("tests/acceptance", tags = c("smoke", "fast"))
 #' }
 #'
 #' @importFrom testthat test_dir
@@ -133,6 +136,7 @@ test_cucumber_code <- function(path, filter, ...) {
 test <- function(
   path = "tests/acceptance",
   filter = NULL,
+  tags = NULL,
   reporter = NULL,
   env = NULL,
   load_helpers = TRUE,
@@ -143,7 +147,7 @@ test <- function(
   file <- fs::path(path, "test-__cucumber__.R")
   with_file(file, {
     writeLines(
-      test_cucumber_code(".", filter = filter, ...),
+      test_cucumber_code(".", filter = filter, tags = tags, ...),
       con = file
     )
     result <- test_dir(

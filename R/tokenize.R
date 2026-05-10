@@ -14,6 +14,13 @@ NODE_REGEX <- paste0(
   ")(\\s+)?([:print:]*)?"
 )
 
+TAG_LINE_REGEX <- "^\\s*@"
+
+parse_tag_line <- function(line) {
+  tags <- regmatches(line, gregexpr("@[[:alnum:]_]+", line))[[1]]
+  sub("^@", "", tags)
+}
+
 #' @importFrom stringr str_detect
 remove_empty_lines <- function(x) {
   x[!str_detect(x, "^$")]
@@ -61,30 +68,44 @@ tokenize <- function(x) {
   x <- normalize_feature(x)
   x <- remove_empty_lines(x)
   x <- remove_comments(x)
+  is_tag_line <- grepl(TAG_LINE_REGEX, x)
   indices <- detect_node(x)
   if (sum(indices) == 0) {
     abort("Error tokenizing Gherkin, no keywords found")
   }
-  groups <- seq_len(max(cumsum(indices)))
+  cumulative <- cumsum(indices)
+  groups <- seq_len(max(cumulative))
   groups |>
     map(\(ind) {
-      text <- x[which(cumsum(indices) == ind)]
+      group_positions <- which(cumulative == ind)
+      text <- x[group_positions]
 
-      indices <- detect_node(text)
+      # Collect tag lines immediately preceding this group
+      first_pos <- group_positions[1]
+      tags <- character(0)
+      j <- first_pos - 1
+      while (j >= 1 && is_tag_line[j]) {
+        tags <- c(parse_tag_line(x[j]), tags)
+        j <- j - 1
+      }
+
+      local_indices <- detect_node(text)
       type <- get_node_type(text[1]) |>
         remove_trailing_colon()
       value <- get_node_value(text[1])
-      children <- text[!indices]
+      children <- text[!local_indices]
       children <- remove_indent(children)
 
-    if (type %in% c("Feature", "Scenario", "Background", "Scenario Outline")) {
+      if (type %in% c("Feature", "Scenario", "Background", "Scenario Outline")) {
+        pre_node <- children[!cumsum(detect_node(children))]
         return(
           list(
             type = type,
             value = value,
+            tags = tags,
             children = tokenize(children),
-            # Store free-form text in data
-            data = get_data(children[!cumsum(detect_node(children))])
+            # Store free-form text in data, excluding tag lines
+            data = get_data(pre_node[!grepl(TAG_LINE_REGEX, pre_node)])
           )
         )
       } else if (type %in% c("Step", "Scenarios")) {

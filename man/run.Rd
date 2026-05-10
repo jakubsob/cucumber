@@ -4,7 +4,7 @@
 \alias{run}
 \title{Run Cucumber tests in a \code{testthat} context}
 \usage{
-run(path = ".", filter = NULL, ...)
+run(path = ".", filter = NULL, tags = NULL, ...)
 }
 \arguments{
 \item{path}{Path to the directory containing the \code{.feature} files.
@@ -14,6 +14,9 @@ files in the \code{tests/testthat} directory.}
 
 \item{filter}{If not NULL, only features with file names matching this regular expression
 will be executed. Matching is performed on the file name after it's stripped of ".feature".}
+
+\item{tags}{If not NULL, only scenarios with at least one of the given tags will be executed.
+Tags should be provided as a character vector without the \code{@} prefix, e.g. \code{c("smoke", "fast")}.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

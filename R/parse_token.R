@@ -1,4 +1,4 @@
-#' @importFrom rlang abort exec
+#' @importFrom rlang abort exec `%||%`
 #' @importFrom glue glue
 #' @importFrom purrr map walk partial
 #' @importFrom testthat context_start_file test_that
@@ -6,12 +6,17 @@ parse_token <- function(
   tokens,
   steps = get_steps(),
   parameters = get_parameters(),
-  hooks = get_hooks()
+  hooks = get_hooks(),
+  tags = NULL
 ) {
   map(tokens, \(token) {
     switch(
       token$type,
       "Scenario" = function() {
+        scenario_tags <- c(token$tags %||% character(0))
+        if (!is.null(tags) && !any(tags %in% scenario_tags)) {
+          return(invisible(NULL))
+        }
         test_that(glue("Scenario: {token$value}"), {
           .context <- new.env()
           calls <- parse_token(token$children, steps, parameters)
@@ -30,6 +35,10 @@ parse_token <- function(
         })
       },
       "Scenario Outline" = function() {
+        outline_tags <- token$tags %||% character(0)
+        if (!is.null(tags) && !any(tags %in% outline_tags)) {
+          return(invisible(NULL))
+        }
         scenarios <- expand_scenario_outline(token)
         calls <- map(scenarios, function(scenario) {
           parse_token(list(scenario), steps, parameters, hooks)[[1]]
@@ -41,17 +50,29 @@ parse_token <- function(
       "Feature" = function(file_name = token$value) {
         context_start_file(glue("Feature: {file_name}"))
 
+        feature_tags <- token$tags %||% character(0)
+        # Propagate feature tags to child scenarios
+        children <- token$children |>
+          map(\(child) {
+            if (child$type %in% c("Scenario", "Scenario Outline")) {
+              child$tags <- unique(c(
+                feature_tags,
+                child$tags %||% character(0)
+              ))
+            }
+            child
+          })
         # Append Background steps before each Scenario steps
-        if (token$children[[1]]$type == "Background") {
-          background <- token$children[[1]]
-          token$children <- token$children[2:length(token$children)] |>
+        if (children[[1]]$type == "Background") {
+          background <- children[[1]]
+          children <- children[2:length(children)] |>
             map(\(x) {
               x$children <- c(background$children, x$children)
               x
             })
         }
 
-        calls <- parse_token(token$children, steps, parameters, hooks)
+        calls <- parse_token(children, steps, parameters, hooks, tags)
         for (call in calls) {
           exec(call)
         }
