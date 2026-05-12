@@ -46,7 +46,7 @@ parse_token <- function(
                       function(env) environmentName(topenv(env)) %in% internal_pkgs,
                       logical(1)
                     )
-                    user_trace <- trace[!is_internal]
+                    user_trace <- if (any(!is_internal)) trace[!is_internal] else NULL
                     location <- if (!is.null(src)) {
                       glue(
                         "{getSrcFilename(src)}:",
