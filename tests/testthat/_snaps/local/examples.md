@@ -1,4 +1,4 @@
-# test: should run one feature
+# test / should run one feature
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -9,7 +9,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should run multiple features
+# test / should run multiple features
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -21,7 +21,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 7 ]
 
-# test: should run with box
+# test / should run with box
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -32,7 +32,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 4 ]
 
-# test: should run with shinytest2
+# test / should run with shinytest2
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -44,7 +44,7 @@
       
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should run a Scenario with Given, When, Then, And, But keywords
+# test / should run a Scenario with Given, When, Then, And, But keywords
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -55,7 +55,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]
 
-# test: should run a Scenario with a Table
+# test / should run a Scenario with a Table
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -66,7 +66,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
-# test: should run a Scenario with a docstring
+# test / should run a Scenario with a docstring
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -77,7 +77,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
-# test: should run a Scenario with comments
+# test / should run a Scenario with comments
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -88,7 +88,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should run before and after hooks
+# test / should run before and after hooks
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -111,7 +111,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 2 | SKIP 0 | PASS 1 ]
 
-# test: should run after hook, even after error in step
+# test / should run after hook, even after error in step
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -157,7 +157,7 @@
       x
       [ FAIL 1 | WARN 2 | SKIP 0 | PASS 0 ]
 
-# test: should run a Scenario with custom parameters
+# test / should run a Scenario with custom parameters
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -168,7 +168,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should run a Scenario with snapshot test
+# test / should run a Scenario with snapshot test
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -179,7 +179,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
-# test: should work with an arbitrary test directory
+# test / should work with an arbitrary test directory
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -190,7 +190,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should report success with `testthat::test_dir`
+# test / should report success with `testthat::test_dir`
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -202,7 +202,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 5 ]
 
-# test: should report failure with `testthat::test_dir`
+# test / should report failure with `testthat::test_dir`
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -212,7 +212,8 @@
       x | 2        1 | Feature: Addition
       --------------------------------------------------------------------------------
       Failure ('test-__cucumber__.R:1:1'): Scenario: Adding integer and float
-      context$result (`actual`) not equal to `expected` (`expected`).
+      Expected `context$result` to equal `expected`.
+      Differences:
       `actual`: 2.1
       `expected`: 5.0
       Backtrace:
@@ -220,9 +221,10 @@
       1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
       2. +-rlang::exec(step, !!!args, context = .context)
       3. \-`<fn>`(expected = 5L, context = `<env>`)
-      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      4.   \-testthat::expect_equal(context$result, expected) at ./setup-steps-addition.R:7:3
       Failure ('test-__cucumber__.R:1:1'): Scenario: Adding float and float
-      context$result (`actual`) not equal to `expected` (`expected`).
+      Expected `context$result` to equal `expected`.
+      Differences:
       `actual`: 2.2
       `expected`: 5.0
       Backtrace:
@@ -230,12 +232,13 @@
       1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
       2. +-rlang::exec(step, !!!args, context = .context)
       3. \-`<fn>`(expected = 5L, context = `<env>`)
-      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      4.   \-testthat::expect_equal(context$result, expected) at ./setup-steps-addition.R:7:3
       --------------------------------------------------------------------------------
       x | 1        1 | Feature: Guess the word
       --------------------------------------------------------------------------------
       Failure ('test-__cucumber__.R:1:1'): Scenario: Breaker joins a game
-      nchar(context$word) (`actual`) not equal to `n` (`expected`).
+      Expected `nchar(context$word)` to equal `n`.
+      Differences:
       `actual`: 5
       `expected`: 6
       Backtrace:
@@ -243,12 +246,13 @@
       1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
       2. +-rlang::exec(step, !!!args, context = .context)
       3. \-`<fn>`(n = 6L, context = `<env>`)
-      4.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
+      4.   \-testthat::expect_equal(nchar(context$word), n) at ./setup-steps-guess_the_word.R:18:3
       --------------------------------------------------------------------------------
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
       Failure ('test-__cucumber__.R:1:1'): Scenario: Adding integer and float
-      context$result (`actual`) not equal to `expected` (`expected`).
+      Expected `context$result` to equal `expected`.
+      Differences:
       `actual`: 2.1
       `expected`: 5.0
       Backtrace:
@@ -256,9 +260,10 @@
       1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
       2. +-rlang::exec(step, !!!args, context = .context)
       3. \-`<fn>`(expected = 5L, context = `<env>`)
-      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      4.   \-testthat::expect_equal(context$result, expected) at ./setup-steps-addition.R:7:3
       Failure ('test-__cucumber__.R:1:1'): Scenario: Adding float and float
-      context$result (`actual`) not equal to `expected` (`expected`).
+      Expected `context$result` to equal `expected`.
+      Differences:
       `actual`: 2.2
       `expected`: 5.0
       Backtrace:
@@ -266,9 +271,10 @@
       1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
       2. +-rlang::exec(step, !!!args, context = .context)
       3. \-`<fn>`(expected = 5L, context = `<env>`)
-      4.   \-testthat::expect_equal(context$result, expected) at tests/acceptance/setup-steps-addition.R:7:3
+      4.   \-testthat::expect_equal(context$result, expected) at ./setup-steps-addition.R:7:3
       Failure ('test-__cucumber__.R:1:1'): Scenario: Breaker joins a game
-      nchar(context$word) (`actual`) not equal to `n` (`expected`).
+      Expected `nchar(context$word)` to equal `n`.
+      Differences:
       `actual`: 5
       `expected`: 6
       Backtrace:
@@ -276,10 +282,10 @@
       1. +-base::withCallingHandlers(...) at cucumber/R/parse_token.R:38:17
       2. +-rlang::exec(step, !!!args, context = .context)
       3. \-`<fn>`(n = 6L, context = `<env>`)
-      4.   \-testthat::expect_equal(nchar(context$word), n) at tests/acceptance/setup-steps-guess_the_word.R:18:3
+      4.   \-testthat::expect_equal(nchar(context$word), n) at ./setup-steps-guess_the_word.R:18:3
       [ FAIL 3 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should show clean error when a step throws
+# test / should show clean error when a step throws
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -315,7 +321,7 @@
       x
       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
 
-# test: should show full trace when a step throws in debug mode
+# test / should show full trace when a step throws in debug mode
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -325,10 +331,7 @@
       x | 1        0 | Feature: Addition
       --------------------------------------------------------------------------------
       Error ('test-__cucumber__.R:1:1'): Scenario: Adding two numbers
-      Error in `(function (context)
-      {
-      stop("Addition service is unavailable")
-      })(context = <environment>)`: Addition service is unavailable
+      Error in `(function (context)  {     stop("Addition service is unavailable") })(context = <environment>)`: Addition service is unavailable
       Backtrace:
       x
       1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:36:17
@@ -337,17 +340,14 @@
       == Results =====================================================================
       -- Failed tests ----------------------------------------------------------------
       Error ('test-__cucumber__.R:1:1'): Scenario: Adding two numbers
-      Error in `(function (context)
-      {
-      stop("Addition service is unavailable")
-      })(context = <environment>)`: Addition service is unavailable
+      Error in `(function (context)  {     stop("Addition service is unavailable") })(context = <environment>)`: Addition service is unavailable
       Backtrace:
       x
       1. +-rlang::exec(step, !!!args, context = .context) at cucumber/R/parse_token.R:36:17
       2. \-`<fn>`(context = `<env>`)
       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
 
-# test: should work with loading steps from setup files
+# test / should work with loading steps from setup files
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -358,7 +358,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
 
-# test: should work with Scenario Outline
+# test / should work with Scenario Outline
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -369,7 +369,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 6 ]
 
-# test: shouldn't run testthat test files
+# test / shouldn't run testthat test files
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -380,7 +380,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should work with testthat filtering
+# test / should work with testthat filtering
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -391,7 +391,7 @@
       == Results =====================================================================
       [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
 
-# test: should throw an error if no test files are found
+# test / should throw an error if no test files are found
 
     Code
       cucumber::test(tests_path, reporter = testthat::ProgressReporter$new(
@@ -417,7 +417,7 @@
       2.   \-rlang::abort("No feature files found") at cucumber/R/test.R:41:5
       [ FAIL 1 | WARN 0 | SKIP 0 | PASS 0 ]
 
-# test: should run tests with custom loading of steps and support code
+# test / should run tests with custom loading of steps and support code
 
     Code
       .test()

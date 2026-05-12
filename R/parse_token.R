@@ -120,6 +120,31 @@ parse_token <- function(
   )
 }
 
+#' @importFrom stringr str_count str_replace_all
+format_step_snippet <- function(description, parameters) {
+  ordered_names <- intersect(c("string", "float", "int"), names(parameters))
+  result <- description
+  params_found <- character(0)
+  for (type_name in ordered_names) {
+    param <- parameters[[type_name]]
+    n <- str_count(result, param$regexp)
+    if (n > 0) {
+      params_found <- c(params_found, rep(type_name, n))
+      result <- str_replace_all(result, param$regexp, paste0("{", type_name, "}"))
+    }
+  }
+  type_totals <- table(params_found)
+  type_seen <- list()
+  args <- character(length(params_found))
+  for (i in seq_along(params_found)) {
+    t <- params_found[[i]]
+    type_seen[[t]] <- (type_seen[[t]] %||% 0L) + 1L
+    args[[i]] <- if (as.integer(type_totals[[t]]) > 1L) paste0(t, "_", type_seen[[t]]) else t
+  }
+  arg_str <- paste(c(args, "context"), collapse = ", ")
+  glue('given("{result}", function({arg_str}) {{\n  pending()\n}})')
+}
+
 #' @importFrom purrr map_chr map map_int map2 keep pluck partial
 #' @importFrom stringr str_detect str_match_all
 #' @importFrom rlang exec
@@ -134,7 +159,11 @@ parse_step <- function(token, steps = get_steps(), parameters = get_parameters()
 
   step_mask <- str_detect(description, detect)
   if (sum(step_mask) == 0) {
-    abort(glue("No step found for: \"{description}\""))
+    snippet <- format_step_snippet(description, parameters)
+    abort(
+      glue("No step found for: \"{description}\""),
+      body = c(i = "Add a step definition:", " " = snippet)
+    )
   }
   unique_steps <- unique(steps[step_mask])
   are_duplicates <- length(unique_steps) == 1 && length(steps[step_mask]) > 1

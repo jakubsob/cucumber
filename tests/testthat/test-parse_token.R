@@ -52,6 +52,20 @@ describe("parse_token", {
     )
   })
 
+  it("should include a snippet in the error message when no step is found", {
+    # Arrange
+    token <- list(
+      list(type = "Step", value = "I have 5 cucumbers", children = NULL, data = NULL)
+    )
+
+    # Act — rlang merges body into conditionMessage
+    err <- tryCatch(parse_token(token, .steps(), get_parameters()), error = function(e) e)
+
+    # Assert
+    expect_true(grepl('given("I have {int} cucumbers"', err$message, fixed = TRUE))
+    expect_true(grepl("function(int, context)", err$message, fixed = TRUE))
+  })
+
   it("should throw an error if duplicated step definitions have been found", {
     # Arrange
     token <- list(
@@ -795,5 +809,42 @@ describe("parse_token", {
     mockery::expect_called(spies[[1]], 1)
     mockery::expect_called(spies[[2]], 1)
     mockery::expect_called(spies[[3]], 0)
+  })
+})
+
+describe("format_step_snippet", {
+  it("should generate a snippet with no args for a plain step", {
+    result <- format_step_snippet("I log in", get_parameters())
+    expect_true(grepl('given("I log in", function(context)', result, fixed = TRUE))
+  })
+
+  it("should detect an int and replace it with a placeholder", {
+    result <- format_step_snippet("I have 5 cucumbers", get_parameters())
+    expect_true(grepl('given("I have {int} cucumbers", function(int, context)', result, fixed = TRUE))
+  })
+
+  it("should detect a float and replace it with a placeholder", {
+    result <- format_step_snippet("the price is 3.99", get_parameters())
+    expect_true(grepl('given("the price is {float}", function(float, context)', result, fixed = TRUE))
+  })
+
+  it("should detect a quoted string and replace it with a placeholder", {
+    result <- format_step_snippet('I see "hello world"', get_parameters())
+    expect_true(grepl('given("I see {string}", function(string, context)', result, fixed = TRUE))
+  })
+
+  it("should number duplicate parameter types", {
+    result <- format_step_snippet("I have 5 and 10 items", get_parameters())
+    expect_true(grepl("function(int_1, int_2, context)", result, fixed = TRUE))
+  })
+
+  it("should prefer string over int for quoted numbers", {
+    result <- format_step_snippet('I have "5" items', get_parameters())
+    expect_true(grepl('given("I have {string} items", function(string, context)', result, fixed = TRUE))
+  })
+
+  it("should include pending() in the snippet body", {
+    result <- format_step_snippet("I log in", get_parameters())
+    expect_true(grepl("pending()", result, fixed = TRUE))
   })
 })

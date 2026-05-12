@@ -59,6 +59,38 @@ then("it has {int} skipped", function(n, context) {
   expect_equal(sum(results$skipped), n)
 })
 
+extract_error_messages <- function(result) {
+  messages <- lapply(result, function(r) {
+    lapply(r$results, function(exp) {
+      if (!inherits(exp, "expectation_success") && !inherits(exp, "expectation_skip")) {
+        exp$message
+      }
+    })
+  })
+  unlist(Filter(Negate(is.null), unlist(messages, recursive = FALSE)))
+}
+
+then("the error message includes {string}", function(text, context) {
+  messages <- extract_error_messages(context$result)
+  expect_true(
+    any(vapply(messages, function(m) grepl(text, m, fixed = TRUE), logical(1))),
+    info = paste("Messages found:\n", paste(messages, collapse = "\n---\n"))
+  )
+})
+
+then("the error message includes", function(text, context) {
+  messages <- extract_error_messages(context$result)
+  # text is a character vector of lines from a docstring; normalize whitespace
+  # so indentation differences between the feature file and the error message don't matter
+  needle <- paste(trimws(text), collapse = " ")
+  normalize <- function(s) paste(trimws(strsplit(s, "\n")[[1]]), collapse = " ")
+  found <- any(vapply(messages, function(m) grepl(needle, normalize(m), fixed = TRUE), logical(1)))
+  expect_true(
+    found,
+    info = paste0("Expected:\n", paste(text, collapse = "\n"), "\n\nIn messages:\n", paste(messages, collapse = "\n---\n"))
+  )
+})
+
 after(function(context, scenario_name) {
   # Cleanup environment if package was loaded
   withr::with_dir(context$tempdir, {
