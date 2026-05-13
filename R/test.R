@@ -17,8 +17,9 @@
 #'
 #' @param filter If not NULL, only features with file names matching this regular expression
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
-#' @param tags If not NULL, only scenarios with at least one of the given tags will be executed.
-#'   Tags should be provided as a character vector without the `@` prefix, e.g. `c("smoke", "fast")`.
+#' @param tags If not NULL, filter scenarios by tag expression string
+#'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
+#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
@@ -116,14 +117,20 @@ test_cucumber_code <- function(path, filter, tags = NULL, ...) {
 #' @inheritParams testthat::test_dir
 #' @param filter If not NULL, only features with file names matching this regular expression
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
-#' @param tags If not NULL, only scenarios with at least one of the given tags will be executed.
-#'   Tags should be provided as a character vector without the `@` prefix, e.g. `c("smoke", "fast")`.
+#' @param tags If not NULL, filter scenarios by tag expression string
+#'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
+#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
 #'
 #' @examples
 #' \dontrun{
 #' cucumber::test("tests/acceptance")
 #' cucumber::test("tests/acceptance", filter = "addition|multiplication")
-#' cucumber::test("tests/acceptance", tags = c("smoke", "fast"))
+#'
+#' # Tag expressions
+#' cucumber::test("tests/acceptance", tags = "@smoke")
+#' cucumber::test("tests/acceptance", tags = "@smoke and @fast")
+#' cucumber::test("tests/acceptance", tags = "@wip and not @slow")
+#' cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
 #' }
 #'
 #' @importFrom testthat test_dir

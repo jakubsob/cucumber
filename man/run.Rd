@@ -15,8 +15,9 @@ files in the \code{tests/testthat} directory.}
 \item{filter}{If not NULL, only features with file names matching this regular expression
 will be executed. Matching is performed on the file name after it's stripped of ".feature".}
 
-\item{tags}{If not NULL, only scenarios with at least one of the given tags will be executed.
-Tags should be provided as a character vector without the \code{@} prefix, e.g. \code{c("smoke", "fast")}.}
+\item{tags}{If not NULL, filter scenarios by tag expression string
+(e.g., \code{"@smoke and not @slow"}, \code{"@gui or @database"}).
+Tag expressions support \code{and}, \code{or}, \code{not} operators and parentheses for grouping.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

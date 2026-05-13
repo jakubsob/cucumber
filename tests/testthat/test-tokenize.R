@@ -310,6 +310,7 @@ describe("tokenize", {
             list(
               type = "Scenarios",
               value = "",
+              tags = character(0),
               children = NULL,
               data = c("| start | eat | left |", "|    12 |   5 |    7 |", "|    20 |   5 |   15 |")
             )
@@ -767,6 +768,7 @@ describe("tokenize", {
                 list(
                   type = "Scenarios",
                   value = "",
+                  tags = character(0),
                   children = NULL,
                   data = c("| start | eat | left |", "|    12 |   5 |    7 |", "|    20 |   5 |   15 |")
                 )

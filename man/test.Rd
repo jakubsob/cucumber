@@ -22,8 +22,9 @@ test(
 \item{filter}{If not NULL, only features with file names matching this regular expression
 will be executed. Matching is performed on the file name after it's stripped of ".feature".}
 
-\item{tags}{If not NULL, only scenarios with at least one of the given tags will be executed.
-Tags should be provided as a character vector without the \code{@} prefix, e.g. \code{c("smoke", "fast")}.}
+\item{tags}{If not NULL, filter scenarios by tag expression string
+(e.g., \code{"@smoke and not @slow"}, \code{"@gui or @database"}).
+Tag expressions support \code{and}, \code{or}, \code{not} operators and parentheses for grouping.}
 
 \item{reporter}{Reporter to use to summarise output. Can be supplied
 as a string (e.g. "summary") or as an R6 object
@@ -74,7 +75,12 @@ Those tests won't be run when calling \code{\link[=test]{test()}}. To run those 
 \dontrun{
 cucumber::test("tests/acceptance")
 cucumber::test("tests/acceptance", filter = "addition|multiplication")
-cucumber::test("tests/acceptance", tags = c("smoke", "fast"))
+
+# Tag expressions
+cucumber::test("tests/acceptance", tags = "@smoke")
+cucumber::test("tests/acceptance", tags = "@smoke and @fast")
+cucumber::test("tests/acceptance", tags = "@wip and not @slow")
+cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
 }
 
 }

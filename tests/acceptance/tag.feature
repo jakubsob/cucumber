@@ -1,5 +1,5 @@
-Feature: Tag filtering
-
+@tags
+Feature: Tags
   Scenario: Single tag runs only matching scenarios
     Given a file named "DESCRIPTION" with
       """
@@ -30,48 +30,9 @@ Feature: Tag filtering
       """
     When I run
       """
-      test("features", tags = c("smoke"))
+      test("features", tags = "smoke")
       """
     Then it has 1 passed
-
-  Scenario: Multiple tags run scenarios matching any tag
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
-    And a file named "features/tagged.feature" with
-      """
-      Feature: Addition
-        @smoke
-        Scenario: Smoke scenario
-          Given I have 1
-          Then I get 1
-
-        @fast
-        Scenario: Fast scenario
-          Given I have 2
-          Then I get 2
-
-        @slow
-        Scenario: Slow scenario
-          Given I have 3
-          Then I get 3
-      """
-    And a file named "features/setup-steps.R" with
-      """
-      given("I have {int}", function(n, context) {
-        context$value <- n
-      })
-      then("I get {int}", function(n, context) {
-        expect_equal(context$value, n)
-      })
-      """
-    When I run
-      """
-      test("features", tags = c("smoke", "fast"))
-      """
-    Then it has 2 passed
 
   Scenario: A scenario with multiple tags matches any of them
     Given a file named "DESCRIPTION" with
@@ -103,7 +64,7 @@ Feature: Tag filtering
       """
     When I run
       """
-      test("features", tags = c("fast"))
+      test("features", tags = "fast")
       """
     Then it has 2 passed
 
@@ -136,6 +97,6 @@ Feature: Tag filtering
       """
     When I run
       """
-      test("features", tags = c("smoke"))
+      test("features", tags = "smoke")
       """
     Then it has 2 passed

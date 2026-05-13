@@ -59,6 +59,16 @@ then("it has {int} skipped", function(n, context) {
   expect_equal(sum(results$skipped), n)
 })
 
+then("it fails with {string}", function(error_message, context) {
+  expect_false(is.null(context$error))
+  # Get the full error message including cli formatting
+  full_message <- paste(conditionMessage(context$error), collapse = "\n")
+  expect_true(
+    grepl(error_message, full_message, fixed = TRUE),
+    info = sprintf("Expected error to contain '%s', but got: %s", error_message, full_message)
+  )
+})
+
 extract_error_messages <- function(result) {
   messages <- lapply(result, function(r) {
     lapply(r$results, function(exp) {

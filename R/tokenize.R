@@ -17,7 +17,8 @@ NODE_REGEX <- paste0(
 TAG_LINE_REGEX <- "^\\s*@"
 
 parse_tag_line <- function(line) {
-  tags <- regmatches(line, gregexpr("@[[:alnum:]_]+", line))[[1]]
+  # Tags can contain alphanumeric, underscore, hyphen, and dot
+  tags <- regmatches(line, gregexpr("@[[:alnum:]_.-]+", line))[[1]]
   sub("^@", "", tags)
 }
 
@@ -108,13 +109,23 @@ tokenize <- function(x) {
             data = get_data(pre_node[!grepl(TAG_LINE_REGEX, pre_node)])
           )
         )
-      } else if (type %in% c("Step", "Scenarios")) {
+      } else if (type == "Step") {
         return(
           list(
             type = type,
             value = value,
             children = NULL,
             data = get_data(children)
+          )
+        )
+      } else if (type == "Scenarios") {
+        return(
+          list(
+            type = type,
+            value = value,
+            tags = tags,
+            children = NULL,
+            data = get_data(children[!grepl(TAG_LINE_REGEX, children)])
           )
         )
       }

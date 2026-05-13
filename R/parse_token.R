@@ -1,6 +1,6 @@
 #' @importFrom rlang abort exec try_fetch cnd_signal error_cnd format_error_bullets trace_back `%||%`
 #' @importFrom glue glue
-#' @importFrom purrr map walk partial
+#' @importFrom purrr map walk partial keep flatten
 #' @importFrom testthat context_start_file test_that
 parse_token <- function(
   tokens,
@@ -15,8 +15,11 @@ parse_token <- function(
         token$type,
         "Scenario" = function() {
           scenario_tags <- c(token$tags %||% character(0))
-          if (!is.null(tags) && !any(tags %in% scenario_tags)) {
-            return(invisible(NULL))
+          if (!is.null(tags)) {
+            result <- evaluate_tag_expression(tags, scenario_tags)
+            if (!result) {
+              return(invisible(NULL))
+            }
           }
           test_that(glue("Scenario: {token$value}"), {
             .context <- new.env()
@@ -70,16 +73,17 @@ parse_token <- function(
           })
         },
         "Scenario Outline" = function() {
-          outline_tags <- token$tags %||% character(0)
-          if (!is.null(tags) && !any(tags %in% outline_tags)) {
-            return(invisible(NULL))
-          }
+          # Expand scenario outline first, then filter by tags
           scenarios <- expand_scenario_outline(token)
-          calls <- map(scenarios, function(scenario) {
-            parse_token(list(scenario), steps, parameters, hooks)[[1]]
-          })
-          for (call in calls) {
-            exec(call)
+          for (i in seq_along(scenarios)) {
+            scenario <- scenarios[[i]]
+            # Check tags for each expanded scenario
+            scenario_tags <- scenario$tags %||% character(0)
+            if (is.null(tags) || evaluate_tag_expression(tags, scenario_tags)) {
+              # Parse and execute the scenario
+              call <- parse_token(list(scenario), steps, parameters, hooks)[[1]]
+              exec(call)
+            }
           }
         },
         "Feature" = function(file_name = token$value) {
@@ -205,35 +209,46 @@ parse_step <- function(token, steps = get_steps(), parameters = get_parameters()
   step
 }
 
+#' @importFrom purrr keep map
 expand_scenario_outline <- function(outline_token) {
-  examples <- outline_token$children |>
-    keep(~ .x$type == "Scenarios") |>
-    pluck(1)
-  table_data <- parse_table(examples$data)
+  # Get all Examples sections
+  examples_sections <- outline_token$children |>
+    keep(~ .x$type == "Scenarios")
+  # Get step templates
   steps_tokens <- outline_token$children |>
     keep(~ .x$type != "Scenarios")
-  map(seq_len(nrow(table_data)), function(i) {
-    row_data <- table_data[i,]
-    processed_steps <- steps_tokens |>
-      map(\(step) {
-        new_step <- step
-        for (col in names(row_data)) {
-          placeholder <- glue("<{col}>")
-          new_step$value <- gsub(
-            placeholder,
-            as.character(row_data[[col]]),
-            new_step$value,
-            fixed = TRUE
-          )
-        }
-        new_step
-      })
 
-    list(
-      type = "Scenario",
-      value = glue("{outline_token$value} (Example {i})"),
-      children = processed_steps,
-      data = NULL
-    )
+  # Process each Examples section separately
+  all_scenarios <- map(examples_sections, function(examples) {
+    table_data <- parse_table(examples$data)
+    examples_tags <- examples$tags %||% character(0)
+    map(seq_len(nrow(table_data)), function(i) {
+      row_data <- table_data[i, ]
+      processed_steps <- steps_tokens |>
+        map(\(step) {
+          new_step <- step
+          for (col in names(row_data)) {
+            placeholder <- glue("<{col}>")
+            new_step$value <- gsub(
+              placeholder,
+              as.character(row_data[[col]]),
+              new_step$value,
+              fixed = TRUE
+            )
+          }
+          new_step
+        })
+
+      list(
+        type = "Scenario",
+        value = glue("{outline_token$value} (Example {i})"),
+        children = processed_steps,
+        tags = unique(c(outline_token$tags %||% character(0), examples_tags)),
+        data = NULL
+      )
+    })
   })
+
+  # Flatten the list of lists
+  unlist(all_scenarios, recursive = FALSE)
 }

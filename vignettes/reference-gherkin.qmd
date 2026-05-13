@@ -62,6 +62,11 @@ The primary keywords are:
   - [Step Arguments](#step-arguments)
     - [Doc Strings](#doc-strings)
     - [Data Tables](#data-tables)
+  - [Tags](#tags)
+    - [Tag inheritance](#tag-inheritance)
+    - [Running a subset of scenarios](#running-a-subset-of-scenarios)
+    - [Tag expressions](#tag-expressions)
+    - [Using tags for documentation](#using-tags-for-documentation)
 
 There are a few secondary keywords as well:
 
@@ -411,3 +416,173 @@ Just like `Doc Strings`, `Data Tables` will be passed to the step definition as 
 #### Table Cell Escaping
 
 If you want to use a newline character in a table cell, you can write this as `\n`. If you need a `|` as part of the cell, you can escape it as `\|`.
+
+# Tags
+
+Tags are a great way to organise your features and scenarios.
+
+They can be used for two purposes:
+
+* Running a subset of scenarios
+* Restricting hooks to a subset of scenarios
+
+Consider the following example:
+
+```gherkin
+@billing
+Feature: Verify billing
+
+  @important
+  Scenario: Missing product description
+    Given hello
+
+  Scenario: Several products
+    Given hello
+```
+
+A feature or scenario can have as many tags as you like. Separate them with spaces:
+
+```gherkin
+@billing @bicker @annoy
+Feature: Verify billing
+```
+
+Tags can be placed above the following Gherkin elements:
+
+* `Feature`
+* `Scenario`
+* `Scenario Outline`
+* `Examples`
+
+**Note:** Tags placed above `Background` or steps (`Given`, `When`, `Then`, `And`, `But`, `*`) will cause a validation error. Place tags only on the elements listed above.
+
+In `Scenario Outline`, you can use tags on different sets of examples:
+
+```gherkin
+Scenario Outline: Steps will run conditionally if tagged
+  Given user is logged in
+  When user clicks <link>
+  Then user will be logged out
+
+  @mobile
+  Examples:
+    | link                  |
+    | logout link on mobile |
+
+  @desktop
+  Examples:
+    | link                   |
+    | logout link on desktop |
+```
+
+Tags placed in invalid locations will result in an error. For example, this is **invalid** and will throw an error:
+
+```gherkin
+Feature: Invalid tag usage
+  @invalid-here
+  Background:
+    Given setup step
+
+  Scenario: Test
+    @also-invalid
+    Given a step
+```
+
+**Note:** It is not possible to place tags above `Background` or steps (`Given`, `When`, `Then`, `And` and `But`).
+
+## Tag inheritance
+
+Tags are inherited by child elements. Tags placed above a `Feature` will be inherited by `Scenario`, `Scenario Outline`, or `Examples`. Similarly, tags placed above a `Scenario Outline` will be inherited by `Examples`.
+
+## Running a subset of scenarios
+
+You can use the `tags` parameter in `cucumber::test()` or `cucumber::run()` to only run scenarios with particular tags.
+
+Using tag expressions:
+
+```r
+# Run only scenarios tagged with @smoke
+cucumber::test("tests/acceptance", tags = "@smoke")
+
+# Run scenarios tagged with both @smoke and @fast
+cucumber::test("tests/acceptance", tags = "@smoke and @fast")
+
+# Run scenarios tagged with @wip but not @slow
+cucumber::test("tests/acceptance", tags = "@wip and not @slow")
+
+# Run scenarios tagged with either @gui or @database
+cucumber::test("tests/acceptance", tags = "@gui or @database")
+```
+
+## Tag expressions
+
+A tag expression is an infix boolean expression. Below are some examples:
+
+| Expression | Description |
+|------------|-------------|
+| `@fast` | Scenarios tagged with @fast |
+| `@wip and not @slow` | Scenarios tagged with @wip that aren't also tagged with @slow |
+| `@smoke and @fast` | Scenarios tagged with both @smoke and @fast |
+| `@gui or @database` | Scenarios tagged with either @gui or @database |
+
+For more advanced tag expressions you can use parentheses for clarity, or to change operator precedence:
+
+```r
+cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
+```
+
+### Tag expression operators
+
+Tag expressions support the following operators:
+
+* `and` - logical AND (both conditions must be true)
+* `or` - logical OR (at least one condition must be true)
+* `not` - logical NOT (negates the condition)
+* `( )` - parentheses for grouping and controlling precedence
+
+**Operator precedence:** `not` has the highest precedence, followed by `and`, then `or`. Use parentheses to change the order of evaluation.
+
+The operators are case-insensitive (`and`, `AND`, and `And` all work the same way).
+
+### Tag names
+
+Tag names can contain:
+* Alphanumeric characters (a-z, A-Z, 0-9)
+* Underscores (`_`)
+* Hyphens (`-`)
+* Dots (`.`)
+
+Tag names are case-sensitive: `@Smoke` and `@smoke` are different tags.
+
+## Using tags for documentation
+
+Your imagination is the only limitation when it comes to using tags for documentation.
+
+### Link to other documents
+
+Tags can refer to IDs in external systems such as requirement management tools, issue trackers or test management tools:
+
+```gherkin
+@BJ-x98.77 @BJ-z12.33
+Feature: Convert transaction
+```
+
+You can use custom reporting to turn these tags into links pointing to documents in your external tool.
+
+### Development process
+
+Another creative way to use tags is to keep track of where in the development process a certain feature is:
+
+```gherkin
+@qa_ready
+Feature: Index projects
+```
+
+### Other common uses
+
+* `@smoke` - Quick smoke tests that run on every commit
+* `@wip` - Work in progress, scenarios that are being developed
+* `@slow` - Long-running tests that might be skipped in development
+* `@manual` - Tests that require manual verification
+* `@bug` - Tests that reproduce a reported bug
+* `@regression` - Regression tests for fixed bugs

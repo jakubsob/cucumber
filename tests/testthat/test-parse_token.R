@@ -656,7 +656,7 @@ describe("parse_token", {
     )
 
     # Act — filter to @smoke only
-    callable <- parse_token(tokens, steps, parameters, tags = c("smoke"))
+    callable <- parse_token(tokens, steps, parameters, tags = "@smoke")
     purrr::walk(callable, \(x) x())
 
     # Assert
@@ -747,7 +747,7 @@ describe("parse_token", {
     )
 
     # Act — filter by @smoke; scenario has no own tags but Feature does
-    callable <- parse_token(tokens, steps, parameters, tags = c("smoke"))
+    callable <- parse_token(tokens, steps, parameters, tags = "@smoke")
     purrr::walk(callable, \(x) x())
 
     # Assert — scenario ran because Feature tag propagated
@@ -802,7 +802,7 @@ describe("parse_token", {
     )
 
     # Act — filter to @smoke OR @fast
-    callable <- parse_token(tokens, steps, parameters, tags = c("smoke", "fast"))
+    callable <- parse_token(tokens, steps, parameters, tags = "@smoke or @fast")
     purrr::walk(callable, \(x) x())
 
     # Assert — smoke and fast ran, slow did not

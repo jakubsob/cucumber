@@ -150,7 +150,7 @@ describe("test", {
         "tests/acceptance",
         stop_on_failure = FALSE,
         reporter = testthat::SilentReporter$new(),
-        tags = c("fast")
+        tags = "fast"
       )
     })
     df <- as.data.frame(result)

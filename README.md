@@ -188,7 +188,7 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [ ] Rule
 - [x] `"""` (Doc Strings)
 - [x] `|` (Data Tables)
-- [ ] `@` (Tags)
+- [x] `@` (Tags)
 - [x] `#` (Comments)
 - [x] Free-format text
 - [ ] Localization
