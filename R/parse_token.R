@@ -35,40 +35,46 @@ parse_token <- function(
               args <- attr(step, "args")
               src <- attr(step, "srcref")
               attributes(step) <- NULL
-              if (isTRUE(getOption("cucumber.debug"))) {
-                exec(step, !!!args, context = .context)
-              } else {
-                withCallingHandlers(
-                  exec(step, !!!args, context = .context),
-                  error = function(e) {
-                    if (inherits(e, "expectation")) return()
-                    trace <- rlang::trace_back()
-                    internal_pkgs <- c("cucumber", "rlang", "base", "methods")
-                    is_internal <- vapply(
-                      trace$envs,
-                      function(env) environmentName(topenv(env)) %in% internal_pkgs,
-                      logical(1)
-                    )
-                    user_trace <- if (any(!is_internal)) trace[!is_internal] else NULL
-                    location <- if (!is.null(src)) {
-                      glue(
-                        "{getSrcFilename(src)}:",
-                        "{getSrcLocation(src, 'line', first = TRUE)}"
-                      )
-                    }
-                    cnd <- rlang::error_cnd(
-                      message = rlang::format_error_bullets(c(
-                        glue("Step \"{description}\" failed"),
-                        if (!is.null(location)) c(i = glue("Defined at: {location}"))
-                      )),
-                      parent = e,
-                      call = NULL,
-                      trace = user_trace
-                    )
-                    stop(cnd)
+              withCallingHandlers(
+                exec(step, !!!args, context = .context),
+                error = function(e) {
+                  if (inherits(e, "expectation")) {
+                    return()
                   }
-                )
-              }
+                  trace <- rlang::trace_back()
+                  internal_pkgs <- c("cucumber", "rlang", "base", "methods")
+                  is_internal <- vapply(
+                    trace$envs,
+                    function(env) {
+                      environmentName(topenv(env)) %in% internal_pkgs
+                    },
+                    logical(1)
+                  )
+                  user_trace <- if (any(!is_internal)) {
+                    trace[!is_internal]
+                  } else {
+                    NULL
+                  }
+                  location <- if (!is.null(src)) {
+                    glue(
+                      "{getSrcFilename(src)}:",
+                      "{getSrcLocation(src, 'line', first = TRUE)}"
+                    )
+                  }
+                  cnd <- rlang::error_cnd(
+                    message = rlang::format_error_bullets(c(
+                      glue("Step \"{description}\" failed"),
+                      if (!is.null(location)) {
+                        c(i = glue("Defined at: {location}"))
+                      }
+                    )),
+                    parent = e,
+                    call = NULL,
+                    trace = user_trace
+                  )
+                  stop(cnd)
+                }
+              )
             }
           })
         },

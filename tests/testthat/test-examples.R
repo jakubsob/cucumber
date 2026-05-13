@@ -25,7 +25,7 @@
 test_example <- function(path, tests_path = "tests/acceptance", ...) {
   .with_example_dir(path, {
     .expect_snapshot(
-      cucumber::test(
+      test(
         tests_path,
         reporter = testthat::ProgressReporter$new(show_praise = FALSE),
         stop_on_failure = FALSE,
@@ -34,6 +34,7 @@ test_example <- function(path, tests_path = "tests/acceptance", ...) {
     )
   })
 }
+
 
 describe("test", {
   skip_on_cran()
@@ -111,13 +112,6 @@ describe("test", {
     test_example("step_error")
   })
 
-  it("should show full trace when a step throws in debug mode", {
-    withr::with_options(
-      list(cucumber.debug = TRUE),
-      test_example("step_error")
-    )
-  })
-
   it("should work with loading steps from setup files", {
     test_example("testthat_setup_files")
   })
@@ -142,6 +136,10 @@ describe("test", {
       "with_testthat_filtering",
       filter = "this_feature_doesnt_exist"
     )
+  })
+
+  it("should throw an error if no steps are defined", {
+    test_example("no_steps")
   })
 
   it("should run only scenarios matching the tags filter", {

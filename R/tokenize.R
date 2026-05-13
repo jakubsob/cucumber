@@ -100,7 +100,7 @@ tokenize <- function(x) {
       if (type %in% c("Feature", "Scenario", "Background", "Scenario Outline")) {
         pre_node <- children[!cumsum(detect_node(children))]
         return(
-          list(
+          new_token(
             type = type,
             value = value,
             tags = tags,
@@ -111,20 +111,18 @@ tokenize <- function(x) {
         )
       } else if (type == "Step") {
         return(
-          list(
+          new_token(
             type = type,
             value = value,
-            children = NULL,
             data = get_data(children)
           )
         )
       } else if (type == "Scenarios") {
         return(
-          list(
+          new_token(
             type = type,
             value = value,
             tags = tags,
-            children = NULL,
             data = get_data(children[!grepl(TAG_LINE_REGEX, children)])
           )
         )
