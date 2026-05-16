@@ -24,7 +24,7 @@
 #' @return NULL, invisibly.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
 #'
-#' @importFrom purrr map walk
+#' @importFrom rlang abort
 #' @export
 #' @md
 run <- function(
@@ -34,18 +34,29 @@ run <- function(
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
+
   features <- path |>
     find_features() |>
     filter_features(filter, ...)
 
   if (length(features) == 0) {
-    abort("No feature files found")
+    abort(
+      "No feature files found.",
+      body = c(
+        i = "Add `.feature` files describing your scenarios."
+      ),
+      trace = empty_trace()
+    )
   }
 
-  features |>
-    map(readLines) |>
-    map(validate_feature) |>
-    walk(\(f) execute(f, tags = tags))
+  for (feature_path in features) {
+    feature <- validate_feature(readLines(feature_path))
+    execute(
+      feature,
+      feature_file = feature_path,
+      tags = tags
+    )
+  }
 
   invisible(NULL)
 }

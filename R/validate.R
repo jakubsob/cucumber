@@ -21,10 +21,13 @@ validate_indentation <- function(lines) {
   test_lines <- test_lines[!special_mask(test_lines)]
   test_lines <- test_lines[!str_detect(test_lines, TAG_LINE_REGEX)]
   if (any(!str_detect(test_lines, indent))) {
-    cli_abort(c(
-      "All lines must be indented with {indent}",
-      "i" = "Check the {.code getOption('cucumber.indent')} option if it is set to your feature file indent."
-    ))
+    cli_abort(
+      c(
+        "All lines must be indented with {indent}",
+        "i" = "Check the {.code getOption('cucumber.indent')} option if it is set to your feature file indent."
+      ),
+      trace = empty_trace()
+    )
   }
   invisible(lines)
 }
@@ -37,7 +40,7 @@ validate_one_feature_keyword <- function(lines) {
     remove_empty_lines()
   test_lines <- test_lines[!special_mask(test_lines)]
   if (sum(str_detect(test_lines, "Feature:")) != 1) {
-    cli_abort("Feature file must have exactly one {.field Feature:} keyword.")
+    cli_abort("Feature file must have exactly one {.field Feature:} keyword.", trace = empty_trace())
   }
   invisible(lines)
 }
@@ -93,11 +96,14 @@ validate_tag_placement <- function(lines) {
               "\\1",
               next_line
             )
-            cli_abort(c(
-              "Tags cannot be placed above {.field {invalid_keyword}} (line {j})",
-              "i" = "Tags can only be placed above: Feature, Scenario, Scenario Outline, or Examples",
-              "x" = "Tag found at line {i}: {.val {lines[i]}}"
-            ))
+            cli_abort(
+              c(
+                "Tags cannot be placed above {.field {invalid_keyword}} (line {j})",
+                "i" = "Tags can only be placed above: Feature, Scenario, Scenario Outline, or Examples",
+                "x" = "Tag found at line {i}: {.val {lines[i]}}"
+              ),
+              trace = empty_trace()
+            )
           }
         }
       }

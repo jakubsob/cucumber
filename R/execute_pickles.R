@@ -11,7 +11,7 @@
 #' @noRd
 #' @importFrom purrr walk
 #' @importFrom testthat test_that
-#' @importFrom rlang exec error_cnd format_error_bullets trace_back
+#' @importFrom rlang exec format_error_bullets
 #' @importFrom glue glue
 execute_pickles <- function(
   pickles,
@@ -38,8 +38,11 @@ execute_single_pickle <- function(pickle, hooks) {
     on.exit(after(.context, pickle$name))
     before(.context, pickle$name)
 
-    for (step in pickle$steps) {
-      execute_single_step(step, .context)
+    for (i in seq_along(pickle$steps)) {
+      step <- pickle$steps[[i]]
+      cont <- execute_single_step(step, .context, pickle = pickle)
+      pickle$steps[[i]] <- step
+      if (!cont) break
     }
   })
 
@@ -50,67 +53,67 @@ execute_single_pickle <- function(pickle, hooks) {
 #'
 #' @keywords internal
 #' @noRd
-execute_single_step <- function(step, context) {
+execute_single_step <- function(step, context, pickle = NULL) {
+  step_done <- FALSE
+  step_error <- NULL
+
   start_time <- Sys.time()
 
   tryCatch(
-    {
-      withCallingHandlers(
-        exec(step$matched_fn, !!!step$arguments, context = context),
-        error = function(e) {
-          if (inherits(e, "expectation")) {
-            return()
-          }
+    withCallingHandlers(
+      exec(step$matched_fn, !!!step$arguments, context = context),
+      error = function(e) {
+        if (
+          inherits(e, "expectation") ||
+            inherits(e, "cucumber_step_error")
+        ) {
+          return()
+        }
 
-          trace <- rlang::trace_back()
-          internal_pkgs <- c("cucumber", "rlang", "base", "methods")
-          is_internal <- vapply(
-            trace$envs,
-            function(env) environmentName(topenv(env)) %in% internal_pkgs,
-            logical(1)
-          )
-          user_trace <- if (any(!is_internal)) trace[!is_internal] else NULL
-
-          location <- if (!is.null(step$definition_location)) {
-            glue(
-              "{getSrcFilename(step$definition_location)}:",
-              "{getSrcLocation(step$definition_location, 'line', first = TRUE)}"
-              )
-            }
-
-            cnd <- rlang::error_cnd(
-              message = rlang::format_error_bullets(c(
-                glue("Step \"{step$text}\" failed"),
-                if (!is.null(location)) c(i = glue("Defined at: {location}"))
-              )),
-              parent = e,
-              call = NULL,
-              trace = user_trace
-            )
-            stop(cnd)
-          }
+        rlang::abort(
+          rlang::format_error_bullets(step_error_bullets(step, pickle)),
+          class = "cucumber_step_error",
+          parent = e,
+          call = NULL,
+          trace = empty_trace()
         )
-
-      # Update step metadata on success
-      step$status <- "passed"
-      step$duration <- as.numeric(difftime(
-        Sys.time(),
-        start_time,
-        units = "secs"
-      ))
+      }
+    ),
+    expectation_failure = function(e) {
+      location <- step_location(step)
+      if (!is.null(location)) {
+        e$message <- paste0(e$message, "\n", glue("Step at: {location}"))
+      }
+      e$trace <- NULL
+      withRestarts(
+        base::signalCondition(e),
+        muffle_expectation = function() invisible(NULL)
+      )
+      step_done <<- TRUE
+      step_error <<- e
     },
     error = function(e) {
-      # Update step metadata on error
-      step$status <- "failed"
-      step$error <- e
-      step$duration <- as.numeric(difftime(
-        Sys.time(),
-        start_time,
-        units = "secs"
-      ))
-      stop(e)
+      if (!inherits(e, "cucumber_step_error")) {
+        step_error <<- e
+      }
+      step_done <<- TRUE
     }
   )
 
-  invisible(step)
+  end_time <- Sys.time()
+  duration <- as.numeric(difftime(end_time, start_time, units = "secs"))
+
+  step$duration <- duration
+  if (step_done) {
+    step$status <- if (inherits(step_error, "expectation_failure")) {
+      "failed"
+    } else {
+      "error"
+    }
+    step$error <- step_error
+  } else {
+    step$status <- "passed"
+  }
+
+  invisible(!step_done)
 }

@@ -130,7 +130,7 @@ print.pickle <- function(x, ...) {
 #' @noRd
 #' @importFrom purrr map keep flatten
 #' @importFrom glue glue
-create_pickles <- function(tokens) {
+create_pickles <- function(tokens, feature_file = NULL) {
   # Should have exactly one Feature token at top level
   if (length(tokens) != 1 || tokens[[1]]$type != "Feature") {
     abort("Expected exactly one Feature token")
@@ -179,6 +179,10 @@ create_pickles <- function(tokens) {
     }) |>
     keep(\(x) !is.null(x)) |>
     flatten()
+
+  if (!is.null(feature_file)) {
+    pickles <- purrr::map(pickles, \(p) { p$feature_file <- feature_file; p })
+  }
 
   pickles
 }

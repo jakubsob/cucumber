@@ -16,14 +16,17 @@ match_steps <- function(
   steps = get_steps(),
   parameters = get_parameters()
 ) {
-  pickles |>
-    map(\(pickle) {
-      pickle$steps <- pickle$steps |>
-        map(\(step) {
-          match_single_step(step, steps, parameters)
-        })
-      pickle
-    })
+  withCallingHandlers(
+    pickles |>
+      map(\(pickle) {
+        pickle$steps <- pickle$steps |>
+          map(\(step) {
+            match_single_step(step, steps, parameters)
+          })
+        pickle
+      }),
+    purrr_error_indexed = unwrap_purrr_error
+  )
 }
 
 #' Match a single step to its definition
@@ -52,7 +55,8 @@ match_single_step <- function(
     snippet <- format_step_snippet(description, parameters)
     abort(
       glue("No step found for: \"{description}\""),
-      body = c(i = "Add a step definition:", " " = snippet)
+      body = c(i = "Add a step definition:", " " = snippet),
+      trace = empty_trace()
     )
   }
 
@@ -65,7 +69,8 @@ match_single_step <- function(
       glue("Multiple steps found for: \"{description}\""),
       body = glue(
         "Check step definitions for duplicates of: \"{step_description}\""
-      )
+      ),
+      trace = empty_trace()
     )
   }
 
