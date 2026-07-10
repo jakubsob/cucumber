@@ -1,5 +1,5 @@
 describe("normalize_feature", {
-  it("should replace all step keywords with 'Step'", {
+  it("should preserve Given/When/Then and resolve And/But/* to previous keyword", {
     # Arrange
     lines <- c(
       "Feature: Addition",
@@ -22,13 +22,13 @@ describe("normalize_feature", {
       c(
         "Feature: Addition",
         "  Scenario: Addition should work for 2 numbers",
-        "    Step I have 1",
-        "    Step I have 2",
-        "    Step I have 3",
-        "    Step I add them",
-        "    Step I do nothing more",
-        "    Step I get 6",
-        "    Step it's over"
+        "    Given I have 1",
+        "    Given I have 2",
+        "    Given I have 3",
+        "    When I add them",
+        "    When I do nothing more",
+        "    Then I get 6",
+        "    Then it's over"
       )
     )
   })
@@ -50,7 +50,7 @@ describe("normalize_feature", {
       c(
         "Feature: Addition",
         "  Scenario: Addition should work for 2 numbers",
-        "    Step I have 1"
+        "    Given I have 1"
       )
     )
   })
@@ -95,10 +95,10 @@ describe("normalize_feature", {
       c(
         "Feature: Feature",
         "  Scenario: Scenario",
-        "    Step I have Given",
-        "    Step I add When",
-        "    Step I get Then",
-        "    Step I have And"
+        "    Given I have Given",
+        "    When I add When",
+        "    Then I get Then",
+        "    Then I have And"
       )
     )
   })
@@ -127,14 +127,14 @@ describe("normalize_feature", {
       c(
         "Feature: Addition",
         "  Scenario: Addition should work for 2 numbers",
-        "    Step I have",
+        "    Given I have",
         "    ```",
         "    *",
         "    And",
         "    But",
         "    ```",
-        "    Step I add them",
-        "    Step I get 6"
+        "    When I add them",
+        "    Then I get 6"
       )
     )
   })
@@ -161,12 +161,12 @@ describe("normalize_feature", {
       c(
         "Feature: Addition",
         "  Scenario: Addition should work for 2 numbers",
-        "    Step I have",
+        "    Given I have",
         "    | Given | When | Then |",
         "    | *     | *    | *    |",
         "    | *     | *    | *    |",
-        "    Step I add them",
-        "    Step I get 6"
+        "    When I add them",
+        "    Then I get 6"
       )
     )
   })

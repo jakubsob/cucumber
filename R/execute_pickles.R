@@ -6,6 +6,8 @@
 #'
 #' @param pickles List of pickle objects (must have matched steps)
 #' @param hooks List of before/after hooks
+#' @param reporter Optional reporter instance (testthat::Reporter or CucumberReporter)
+#' @param feature_name Optional feature name for reporter context
 #' @return List of pickles with populated metadata
 #' @keywords internal
 #' @noRd
@@ -15,11 +17,25 @@
 #' @importFrom glue glue
 execute_pickles <- function(
   pickles,
-  hooks = get_hooks()
+  hooks = get_hooks(),
+  reporter = NULL,
+  feature_name = NULL
 ) {
+  # Call feature start hook if reporter supports it
+  if (inherits(reporter, "CucumberReporter")) {
+    if (!is.null(feature_name)) {
+      reporter$start_feature(feature_name)
+    }
+  }
+
   walk(pickles, \(pickle) {
-    execute_single_pickle(pickle, hooks)
+    execute_single_pickle(pickle, hooks, reporter)
   })
+
+  # Call feature end hook if reporter supports it
+  if (inherits(reporter, "CucumberReporter")) {
+    reporter$end_feature()
+  }
 
   invisible(pickles)
 }
@@ -28,7 +44,7 @@ execute_pickles <- function(
 #'
 #' @keywords internal
 #' @noRd
-execute_single_pickle <- function(pickle, hooks) {
+execute_single_pickle <- function(pickle, hooks, reporter = NULL) {
   test_that(glue("Scenario: {pickle$name}"), {
     .context <- new.env()
 
@@ -40,7 +56,13 @@ execute_single_pickle <- function(pickle, hooks) {
 
     for (i in seq_along(pickle$steps)) {
       step <- pickle$steps[[i]]
-      cont <- execute_single_step(step, .context, pickle = pickle)
+      cont <- execute_single_step(
+        step,
+        .context,
+        pickle = pickle,
+        reporter = reporter
+      )
+      # Update the step in the pickle with execution results
       pickle$steps[[i]] <- step
       if (!cont) break
     }
@@ -53,10 +75,16 @@ execute_single_pickle <- function(pickle, hooks) {
 #'
 #' @keywords internal
 #' @noRd
-execute_single_step <- function(step, context, pickle = NULL) {
+execute_single_step <- function(step, context, pickle = NULL, reporter = NULL) {
   step_done <- FALSE
   step_error <- NULL
 
+  # Call step start hook if reporter supports it
+  if (inherits(reporter, "CucumberReporter")) {
+    reporter$start_step(step)
+  }
+
+  # Capture timing
   start_time <- Sys.time()
 
   tryCatch(
@@ -93,9 +121,8 @@ execute_single_step <- function(step, context, pickle = NULL) {
       step_error <<- e
     },
     error = function(e) {
-      if (!inherits(e, "cucumber_step_error")) {
-        step_error <<- e
-      }
+      # Keep the full cucumber_step_error for proper error reporting
+      step_error <<- e
       step_done <<- TRUE
     }
   )
@@ -113,6 +140,11 @@ execute_single_step <- function(step, context, pickle = NULL) {
     step$error <- step_error
   } else {
     step$status <- "passed"
+  }
+
+  # Call step end hook if reporter supports it
+  if (inherits(reporter, "CucumberReporter")) {
+    reporter$end_step(step)
   }
 
   invisible(!step_done)

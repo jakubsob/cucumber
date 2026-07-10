@@ -1,6 +1,6 @@
 #' @importFrom rlang exec try_fetch cnd_signal abort
 #' @importFrom checkmate test_list
-#' @importFrom purrr walk
+#' @importFrom purrr walk map
 #' @importFrom testthat context_start_file
 #' @importFrom glue glue
 execute <- function(
@@ -9,7 +9,8 @@ execute <- function(
   parameters = get_parameters(),
   hooks = get_hooks(),
   tags = NULL,
-  feature_file = NULL
+  feature_file = NULL,
+  reporter = NULL
 ) {
   if (!checkmate::test_list(steps, min.len = 1)) {
     abort(
@@ -30,9 +31,12 @@ execute <- function(
   # Phase 2 & 3: Normalize and Tokenize (normalization happens inside tokenize)
   tokens <- tokenize(validated)
 
-  # Set feature context for testthat
+  # Extract feature name for reporter
+  feature_name <- NULL
   if (length(tokens) > 0 && tokens[[1]]$type == "Feature") {
-    context_start_file(glue("Feature: {tokens[[1]]$value}"))
+    feature_name <- glue("Feature: {tokens[[1]]$value}")
+    # Set feature context for testthat
+    context_start_file(feature_name)
   }
 
   # Phase 4: Create pickles
@@ -45,5 +49,5 @@ execute <- function(
   pickles <- match_steps(pickles, steps, parameters)
 
   # Phase 6: Execute
-  execute_pickles(pickles, hooks)
+  execute_pickles(pickles, hooks, reporter = reporter, feature_name = feature_name)
 }

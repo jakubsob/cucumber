@@ -20,6 +20,8 @@
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
 #'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#' @param reporter Optional reporter instance (testthat::Reporter or cucumber::CucumberReporter).
+#'   If NULL, will use reporter from package options if available.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
@@ -31,6 +33,7 @@ run <- function(
   path = ".",
   filter = NULL,
   tags = NULL,
+  reporter = get_reporter(),
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
@@ -54,7 +57,8 @@ run <- function(
     execute(
       feature,
       feature_file = feature_path,
-      tags = tags
+      tags = tags,
+      reporter = reporter
     )
   }
 
@@ -93,7 +97,10 @@ test_cucumber_code <- function(path, filter, tags = NULL, ...) {
     sprintf("filter = %s", if (is.null(filter)) "NULL" else shQuote(filter)),
     if (!is.null(tags)) sprintf("tags = %s", deparse(tags))
   )
-  sprintf("cucumber::run(%s)", paste(args, collapse = ", "))
+  sprintf(
+    "cucumber::run(%s, reporter = getOption('.cucumber_reporter'))",
+    paste(args, collapse = ", ")
+  )
 }
 
 #' Run Cucumber tests
@@ -155,17 +162,26 @@ test <- function(
   path = "tests/acceptance",
   filter = NULL,
   tags = NULL,
-  reporter = NULL,
+  reporter = get_reporter(),
   env = NULL,
   load_helpers = TRUE,
   stop_on_failure = TRUE,
   stop_on_warning = FALSE,
   ...
 ) {
+  if (!is.null(reporter)) {
+    withr::local_options(.cucumber_reporter = reporter)
+  }
+
   file <- fs::path(path, "test-__cucumber__.R")
   with_file(file, {
     writeLines(
-      test_cucumber_code(".", filter = filter, tags = tags, ...),
+      test_cucumber_code(
+        ".",
+        filter = filter,
+        tags = tags,
+        ...
+      ),
       con = file
     )
     result <- test_dir(

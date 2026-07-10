@@ -1,6 +1,6 @@
 #' Create a pickle step object
 #'
-#' @param keyword Step keyword (normalized to "Step")
+#' @param keyword Step keyword ("Given", "When", or "Then")
 #' @param text Step text
 #' @param data_table Data table (tibble or NULL)
 #' @param docstring Docstring (character or NULL)

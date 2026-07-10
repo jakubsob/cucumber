@@ -7,7 +7,7 @@ NODE_REGEX <- paste0(
       "Scenarios:", "Examples:",
       "Scenario Outline:", "Scenario Template:",
       "Background:",
-      "Step"
+      "Given", "When", "Then", "Step"
     ),
     collapse = "|"
   ),
@@ -109,7 +109,7 @@ tokenize <- function(x) {
             data = get_data(pre_node[!grepl(TAG_LINE_REGEX, pre_node)])
           )
         )
-      } else if (type == "Step") {
+      } else if (type %in% c("Step", "Given", "When", "Then")) {
         return(
           new_token(
             type = type,

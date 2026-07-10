@@ -1,252 +1,421 @@
 # test / should run one feature
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Guess the word
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 5 | Passed: 5 | Failed: 0
 
 # test / should run multiple features
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          5 | Feature: Addition
+      Feature: Addition
+        Scenario: Adding 2 integers
+          v When I add 1 and 1
+          v Then the result is 2
+        Scenario: Adding integer and float
+          v When I add 1 and 1.1
+          v Then the result is 2.1
+        Scenario: Adding float and float
+          v When I add 1.1 and 1.1
+          v Then the result is 2.2
+        Scenario: Adding float and float with signs
+          v When I add +11.1 and +11.1
+          v Then the result is +22.2
+        Scenario: Adding float and float of opposite signs
+          v When I add +11.11 and -11.1
+          v Then the result is +0.01
       
-      v |          2 | Feature: Guess the word
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 7 ]
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
+      
+      
+      Summary
+        Total: 15 | Passed: 15 | Failed: 0
 
 # test / should run with box
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          4 | Feature: Addition
+      Feature: Addition
+        Scenario: Adding 2 integers
+          v When I add 1 and 1
+          v Then the result is 2
+        Scenario: Adding integer and float
+          v When I add 1 and 1.1
+          v Then the result is 2.1
+        Scenario: Adding float and float
+          v When I add 1.1 and 1.1
+          v Then the result is 2.2
+        Scenario: Adding float and string
+          v When I add 1.1 and 'one'
+          v Then the result is an error
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 4 ]
+      
+      Summary
+        Total: 8 | Passed: 8 | Failed: 0
 
 # test / should run with shinytest2
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Formula display
+      Feature: Formula display
+        Scenario: Selecting Transmission as the grouping variable
+          v Given I am on the main page
+          v When I select 'Transmission' variable
+          v Then the formula display should show 'mpg ~ am'
+        Scenario: Selecting Gears as the grouping variable
+          v Given I am on the main page
+          v When I select 'Gears' variable
+          v Then the formula display should show 'mpg ~ gear'
       
-      == Results =====================================================================
       
-      
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      Summary
+        Total: 6 | Passed: 6 | Failed: 0
 
 # test / should run a Scenario with Given, When, Then, And, But keywords
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          3 | Feature: Addition
+      Feature: Addition
+        Scenario: Addition should work for 3 numbers
+          v Given I have 1
+          v Given I have 2
+          v Given I have 3
+          v When I add them
+          v When I do nothing more
+          v Then I get 6
+          v Then it's over
+        Scenario: Addition should work for 5 numbers
+          v Given I have 1
+          v Given I have 2
+          v Given I have 3
+          v Given I have 4
+          v Given I have 5
+          v When I add them
+          v Then I get 15
+        Scenario: Addition should work for 10 numbers
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v Given I have 1
+          v When I add them
+          v Then I get 10
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 3 ]
+      
+      Summary
+        Total: 26 | Passed: 26 | Failed: 0
 
 # test / should run a Scenario with a Table
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          1 | Feature: Column multiplication
+      Feature: Column multiplication
+        Scenario: Multiplying selected column
+          v Given I have a table
+          v When I multiply x column by 2
+          v Then I should see the following table
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      
+      Summary
+        Total: 3 | Passed: 3 | Failed: 0
 
 # test / should run a Scenario with a docstring
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          1 | Feature: Docstrings
+      Feature: Docstrings
+        Scenario: It is possible to pass docstring to a step
+          v Given I have a docstring
+          v When I remove line that contains 'I will remove this one'
+          v When I remove trailing empty lines
+          v Then the docstring looks like this
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      
+      Summary
+        Total: 4 | Passed: 4 | Failed: 0
 
 # test / should run a Scenario with comments
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Guess the word
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Scenario with a commented scenario after a table
+          v When the Maker starts a game with
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 3 | Passed: 3 | Failed: 0
 
 # test / should run before and after hooks
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |   2      1 | Feature: Hooks
-      --------------------------------------------------------------------------------
-      Warning ('test-__cucumber__.R:1:1'): Scenario: Before hook is executed
-      Warning in before hook.
-      Backtrace:
-          x
-       1. \-before(.context, pickle$name) at cucumber/R/execute_pickles.R:39:5
+      Feature: Hooks
+        Scenario: Before hook is executed
+          Warning: 
+            Warning in before hook.
+          v When I start the scenario
+          v Then the before hook was run
+          Warning: 
+            Warning in after hook.
       
-      Warning ('test-__cucumber__.R:1:1'): Scenario: Before hook is executed
-      Warning in after hook.
-      Backtrace:
-          x
-       1. \-after(.context, pickle$name)
-      --------------------------------------------------------------------------------
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 2 | SKIP 0 | PASS 1 ]
+      Summary
+        Total: 2 | Passed: 2 | Failed: 0
 
 # test / should run a Scenario with custom parameters
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Addition
+      Feature: Addition
+        Scenario: I can't add a color to a number
+          v Given I have a color red
+          v Given I have a person named 'John Doe'
+          v When I add them
+          v Then 🤯
+        Scenario: I can add two numbers in scientific notation
+          v Given I have a number 1e3
+          v Given I have a number 1e3
+          v When I add them
+          v Then I get 2e3
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 8 | Passed: 8 | Failed: 0
 
 # test / should run a Scenario with snapshot test
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          1 | Feature: Snapshot
+      Feature: Snapshot
+        Scenario: Snapshotting code output
+          v Given I have a text
+          v Then the output should be saved in a snapshot
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      
+      Summary
+        Total: 2 | Passed: 2 | Failed: 0
 
 # test / should work with an arbitrary test directory
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Guess the word
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 5 | Passed: 5 | Failed: 0
 
 # test / should report success with `testthat::test_dir`
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          3 | Feature: Addition
+      Feature: Addition
+        Scenario: Adding 2 integers
+          v When I add 1 and 1
+          v Then the result is 2
+        Scenario: Adding integer and float
+          v When I add 1 and 1.1
+          v Then the result is 2.1
+        Scenario: Adding float and float
+          v When I add 1.1 and 1.1
+          v Then the result is 2.2
       
-      v |          2 | Feature: Guess the word
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 5 ]
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
+      
+      
+      Summary
+        Total: 11 | Passed: 11 | Failed: 0
 
 # test / should work with loading steps from setup files
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          1 | Feature: Eating cucumbers
+      Feature: Eating cucumbers
+        Scenario: eat 5 out of 12
+          v Given there are 12 cucumbers
+          v When I eat 5 cucumbers
+          v Then I should have 7 cucumbers
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 1 ]
+      
+      Summary
+        Total: 3 | Passed: 3 | Failed: 0
 
 # test / should work with Scenario Outline
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          6 | Feature: Eating
+      Feature: Eating
+        Scenario: eating (Example 1)
+          v Given there are 12 cucumbers
+          v When I eat 5 cucumbers
+          v Then I should have 7 cucumbers
+        Scenario: eating (Example 2)
+          v Given there are 20 cucumbers
+          v When I eat 5 cucumbers
+          v Then I should have 15 cucumbers
+        Scenario: eating (Example 1)
+          v Given there are 12 cucumbers
+          v When I eat 5 cucumbers
+          v Then I should have 7 cucumbers
+        Scenario: eating (Example 2)
+          v Given there are 20 cucumbers
+          v When I eat 5 cucumbers
+          v Then I should have 15 cucumbers
+        Scenario: eating (Example 1)
+          v Given there are '5.6' cucumbers
+          v Then I should have 5.6 cucumbers
+        Scenario: eating (Example 2)
+          v Given there are "12" cucumbers
+          v Then I should have 12 cucumbers
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 6 ]
+      
+      Summary
+        Total: 16 | Passed: 16 | Failed: 0
 
 # test / shouldn't run testthat test files
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Guess the word
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 5 | Passed: 5 | Failed: 0
 
 # test / should work with testthat filtering
 
     Code
-      test(tests_path, reporter = testthat::ProgressReporter$new(show_praise = FALSE),
-      stop_on_failure = FALSE, ...)
+      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      ...)
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Guess the word
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 5 | Passed: 5 | Failed: 0
 
 # test / should run tests with custom loading of steps and support code
 
     Code
       .test()
     Output
-      v | F W  S  OK | Context
       
-      v |          2 | Feature: Guess the word
+      Feature: Guess the word
+        Scenario: Maker starts a game
+          v When the Maker starts a game
+          v Then the Maker waits for a Breaker to join
+        Scenario: Breaker joins a game
+          v Given the Maker has started a game with the word 'silky'
+          v When the Breaker joins the Maker's game
+          v Then the Breaker must guess a word with 5 characters
       
-      == Results =====================================================================
-      [ FAIL 0 | WARN 0 | SKIP 0 | PASS 2 ]
+      
+      Summary
+        Total: 5 | Passed: 5 | Failed: 0
 

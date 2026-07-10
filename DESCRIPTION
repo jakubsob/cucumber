@@ -20,6 +20,7 @@ Imports:
     fs,
     glue,
     purrr,
+    R6,
     rlang,
     stringr,
     testthat (>= 3.0.0),
@@ -34,7 +35,6 @@ Suggests:
     knitr,
     rmarkdown,
     quarto,
-    R6,
     pkgdown,
     pkgload,
     muttest

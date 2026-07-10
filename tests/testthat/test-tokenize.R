@@ -31,12 +31,12 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "the Maker starts a game",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "the Maker waits for a Breaker to join",
                   data = NULL
                 )
@@ -49,17 +49,17 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "the Maker has started a game with the word 'silky'",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "the Breaker joins the Maker's game",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "the Breaker must guess a word with 5 characters",
                   data = NULL
                 )
@@ -113,12 +113,12 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "the Maker starts a game",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "the Maker waits for a Breaker to join",
                   data = NULL
                 )
@@ -172,22 +172,22 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "a global administrator named \"Greg\"",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "a blog named \"Greg's anti-tax rants\"",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "a customer named \"Dr. Bill\"",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "a blog named \"Expensive Therapy\" owned by \"Dr. Bill\"",
                   data = NULL
                 )
@@ -200,17 +200,17 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "I am logged in as Dr. Bill",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "I try to post to \"Expensive Therapy\"",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "I should see \"Your article was published.\"",
                   data = NULL
                 )
@@ -223,17 +223,17 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "I am logged in as Dr. Bill",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "I try to post to \"Greg's anti-tax rants\"",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "I should see \"Hey! That's not your blog!\"",
                   data = NULL
                 )
@@ -273,17 +273,17 @@ describe("tokenize", {
           tags = character(0),
           children = list(
             new_token(
-              type = "Step",
+              type = "Given",
               value = "there are <start> cucumbers",
               data = NULL
             ),
             new_token(
-              type = "Step",
+              type = "When",
               value = "I eat <eat> cucumbers",
               data = NULL
             ),
             new_token(
-              type = "Step",
+              type = "Then",
               value = "I should have <left> cucumbers",
               data = NULL
             ),
@@ -330,7 +330,7 @@ describe("tokenize", {
           tags = character(0),
           children = list(
             new_token(
-              type = "Step",
+              type = "Given",
               value = "a blog post named \"Random\" with Markdown body",
               data = c(
                 "\"\"\"",
@@ -374,7 +374,7 @@ describe("tokenize", {
           tags = character(0),
           children = list(
             new_token(
-              type = "Step",
+              type = "Given",
               value = "a blog post named \"Random\" with Markdown body",
               data = c(
                 "'''",
@@ -418,7 +418,7 @@ describe("tokenize", {
           tags = character(0),
           children = list(
             new_token(
-              type = "Step",
+              type = "Given",
               value = "a blog post named \"Random\" with Markdown body",
               data = c(
                 "```",
@@ -462,7 +462,7 @@ describe("tokenize", {
           tags = character(0),
           children = list(
             new_token(
-              type = "Step",
+              type = "Given",
               value = "a blog post named \"Random\" with Markdown body",
               data = c(
                 "```",
@@ -496,7 +496,7 @@ describe("tokenize", {
       result,
       list(
         new_token(
-          type = "Step",
+          type = "Given",
           value = "the following users exist:",
           data = c(
             "| name  | email            |",
@@ -523,7 +523,7 @@ describe("tokenize", {
       result,
       list(
         new_token(
-          type = "Step",
+          type = "Given",
           value = "the following users exist:",
           data = c(
             "       | name  | email            |",
@@ -571,12 +571,12 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "the Maker starts a game",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "the Maker waits for a Breaker to join",
                   data = c("| x | y |", "| 1 | 2 |")
                 )
@@ -620,12 +620,12 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "the Maker starts a game",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "the Maker waits for a Breaker to join",
                   data = NULL
                 )
@@ -690,7 +690,7 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "a global administrator named \"Greg\"",
                   data = NULL
                 )
@@ -703,12 +703,12 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "the Maker starts a game",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "the Maker waits for a Breaker to join",
                   data = NULL
                 )
@@ -721,17 +721,17 @@ describe("tokenize", {
               tags = character(0),
               children = list(
                 new_token(
-                  type = "Step",
+                  type = "Given",
                   value = "there are <start> cucumbers",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "When",
                   value = "I eat <eat> cucumbers",
                   data = NULL
                 ),
                 new_token(
-                  type = "Step",
+                  type = "Then",
                   value = "I should have <left> cucumbers",
                   data = NULL
                 ),

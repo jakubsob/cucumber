@@ -8,7 +8,7 @@ test(
   path = "tests/acceptance",
   filter = NULL,
   tags = NULL,
-  reporter = NULL,
+  reporter = get_reporter(),
   env = NULL,
   load_helpers = TRUE,
   stop_on_failure = TRUE,
