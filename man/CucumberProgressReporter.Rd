@@ -43,6 +43,16 @@ cucumber::test(
 \item{\code{step_passed}}{Number of steps that passed}
 
 \item{\code{step_failed}}{Number of steps that failed}
+
+\item{\code{current_scenario}}{Name of the scenario currently executing}
+
+\item{\code{current_steps}}{Steps executed so far in the current scenario}
+
+\item{\code{failures}}{Recorded failures for the end-of-run summary}
+
+\item{\code{step_errored}}{Whether end_step already rendered an error this scenario}
+
+\item{\code{num_colors}}{Terminal color support captured at construction}
 }
 \if{html}{\out{</div>}}
 }

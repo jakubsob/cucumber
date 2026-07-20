@@ -147,5 +147,12 @@ execute_single_step <- function(step, context, pickle = NULL, reporter = NULL) {
     reporter$end_step(step)
   }
 
+  # Surface non-expectation errors to testthat so the scenario is recorded as an
+  # error (expectation failures are already signalled above). end_step has run,
+  # so the reporter has already shown the step before we re-raise.
+  if (identical(step$status, "error")) {
+    stop(step_error)
+  }
+
   invisible(!step_done)
 }

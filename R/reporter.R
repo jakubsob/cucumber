@@ -67,6 +67,20 @@ CucumberReporter <- R6::R6Class(
   )
 )
 
+#' Bold the label (text up to and including the first colon), name left plain
+#'
+#' e.g. "Feature: Addition" -> bold "Feature:" + " Addition"
+#'
+#' @keywords internal
+#' @noRd
+bold_label <- function(x) {
+  colon <- regexpr(":", x, fixed = TRUE)
+  if (colon == -1) {
+    return(x)
+  }
+  paste0(cli::style_bold(substr(x, 1, colon)), substr(x, colon + 1, nchar(x)))
+}
+
 #' Progress Reporter for Cucumber
 #'
 #' @description
@@ -112,6 +126,21 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field step_failed Number of steps that failed
     step_failed = 0,
 
+    #' @field current_scenario Name of the scenario currently executing
+    current_scenario = NULL,
+
+    #' @field current_steps Steps executed so far in the current scenario
+    current_steps = NULL,
+
+    #' @field failures Recorded failures for the end-of-run summary
+    failures = NULL,
+
+    #' @field step_errored Whether end_step already rendered an error this scenario
+    step_errored = FALSE,
+
+    #' @field num_colors Terminal color support captured at construction
+    num_colors = 1L,
+
     #' @description
     #' Initialize the reporter
     #' @param show_praise Whether to show praise (default TRUE)
@@ -122,6 +151,13 @@ CucumberProgressReporter <- R6::R6Class(
       self$step_count <- 0
       self$step_passed <- 0
       self$step_failed <- 0
+      self$current_steps <- list()
+      self$failures <- list()
+      # ponytail: capture real color support now, before testthat runs. During a
+      # test, output is sunk and cli auto-detects 0 colors; forcing this captured
+      # value at each print site re-enables color live while snapshots (built
+      # non-interactively -> num_colors = 1) stay plain.
+      self$num_colors <- cli::num_ansi_colors()
       invisible(self)
     },
 
@@ -130,7 +166,8 @@ CucumberProgressReporter <- R6::R6Class(
     #' @param feature_name Name of the feature
     start_feature = function(feature_name) {
       super$start_feature(feature_name)
-      cat("\n", cli::col_blue(cli::style_bold(feature_name)), "\n", sep = "")
+      withr::local_options(cli.num_colors = self$num_colors)
+      cat("\n", bold_label(feature_name), "\n", sep = "")
       invisible(self)
     },
 
@@ -150,7 +187,11 @@ CucumberProgressReporter <- R6::R6Class(
       if (!is.null(super$start_test)) {
         super$start_test(context, test)
       }
-      cat("  ", cli::style_bold(test), "\n", sep = "")
+      self$current_scenario <- test
+      self$current_steps <- list()
+      self$step_errored <- FALSE
+      withr::local_options(cli.num_colors = self$num_colors)
+      cat("  ", bold_label(test), "\n", sep = "")
       invisible(self)
     },
 
@@ -164,18 +205,30 @@ CucumberProgressReporter <- R6::R6Class(
         super$add_result(context, test, result)
       }
 
+      withr::local_options(cli.num_colors = self$num_colors)
+
       # Display warnings
       if (inherits(result, "expectation_warning")) {
         warning_msg <- conditionMessage(result)
         warning_lines <- strsplit(warning_msg, "\n")[[1]]
-        cat("    ", cli::col_yellow(cli::style_italic("Warning: ")), "\n", sep = "")
+        cat(
+          "    ",
+          cli::col_yellow(cli::style_italic("Warning: ")),
+          "\n",
+          sep = ""
+        )
         for (line in warning_lines) {
           cat("      ", cli::col_yellow(line), "\n", sep = "")
         }
       }
 
-      # Display errors that occur outside of test_that (e.g., during setup)
-      if (inherits(result, "expectation_error") || inherits(result, "expectation_failure")) {
+      # Display errors that occur outside of test_that (e.g., during setup).
+      # Skip step errors already rendered by end_step to avoid double reporting.
+      if (
+        !self$step_errored &&
+          (inherits(result, "expectation_error") ||
+            inherits(result, "expectation_failure"))
+      ) {
         cat("  ", cli::col_red(cli::style_bold("Error: ")), "\n", sep = "")
         error_msg <- conditionMessage(result)
         error_lines <- strsplit(error_msg, "\n")[[1]]
@@ -201,7 +254,10 @@ CucumberProgressReporter <- R6::R6Class(
     end_step = function(step) {
       super$end_step(step)
 
+      withr::local_options(cli.num_colors = self$num_colors)
+
       self$step_count <- self$step_count + 1
+      self$current_steps <- c(self$current_steps, list(step))
 
       status <- step$status %||% "passed"
 
@@ -211,12 +267,22 @@ CucumberProgressReporter <- R6::R6Class(
       } else {
         self$step_failed <- self$step_failed + 1
         status_symbol <- cli::col_red(cli::symbol$cross)
+        if (identical(status, "error")) {
+          self$step_errored <- TRUE
+        }
+        self$failures <- c(
+          self$failures,
+          list(list(
+            feature = self$current_feature,
+            scenario = self$current_scenario,
+            steps = self$current_steps
+          ))
+        )
       }
 
       # Format: "    ✓ Given I have 5 cucumbers"
-      # ponytail: stdout so expect_snapshot can capture step output. Forgoes
-      # forced ANSI color in a live terminal; add a colored-live path if anyone
-      # actually needs it interactively.
+      # ponytail: cat to stdout so expect_snapshot can capture step output; color
+      # is re-enabled via the num_colors option forced above.
       cat(
         "    ",
         status_symbol,
@@ -254,15 +320,54 @@ CucumberProgressReporter <- R6::R6Class(
         super$end_reporter()
       }
 
+      withr::local_options(cli.num_colors = self$num_colors)
+
       cat("\n")
+      cat(cli::rule(), "\n", sep = "")
       cat(cli::style_bold("Summary"), "\n", sep = "")
       cat(
-        "  Total: ", self$step_count,
-        " | Passed: ", cli::col_green(self$step_passed),
-        " | Failed: ", cli::col_red(self$step_failed),
+        "  Total: ",
+        self$step_count,
+        " | Passed: ",
+        cli::col_green(self$step_passed),
+        " | Failed: ",
+        cli::col_red(self$step_failed),
         "\n",
         sep = ""
       )
+      cat(cli::rule(), "\n", sep = "")
+
+      if (length(self$failures) > 0) {
+        cat("\n", cli::style_bold("Failures"), "\n", sep = "")
+        for (failure in self$failures) {
+          cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
+          cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
+          for (step in failure$steps) {
+            failed <- !is.null(step$error)
+            symbol <- if (failed) {
+              cli::col_red(cli::symbol$cross)
+            } else {
+              cli::col_green(cli::symbol$tick)
+            }
+            cat(
+              "    ",
+              symbol,
+              " ",
+              cli::style_bold(step$keyword),
+              " ",
+              step$text,
+              "\n",
+              sep = ""
+            )
+            if (failed) {
+              error_lines <- strsplit(conditionMessage(step$error), "\n")[[1]]
+              for (line in error_lines) {
+                cat("      ", cli::col_red(line), "\n", sep = "")
+              }
+            }
+          }
+        }
+      }
 
       invisible(self)
     }

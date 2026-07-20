@@ -17,7 +17,10 @@ when("I run", function(code, context) {
     list(
       .cucumber_steps_option = .cucumber_steps_option,
       .cucumber_hooks_option = .cucumber_hooks_option,
-      .cucumber_parameters_option = .cucumber_parameters_option
+      .cucumber_parameters_option = .cucumber_parameters_option,
+      # Isolate the reporter: nested runs demonstrate failures on purpose, so
+      # their step results must not accumulate into the outer run's summary.
+      .cucumber_reporter = cucumber::CucumberProgressReporter$new()
     ),
     {
       cucumber:::set_default_parameters()

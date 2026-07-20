@@ -15,8 +15,10 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 5 | Passed: 5 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run multiple features
 
@@ -53,8 +55,10 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 15 | Passed: 15 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run with box
 
@@ -78,8 +82,10 @@
           v Then the result is an error
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 8 | Passed: 8 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run with shinytest2
 
@@ -99,8 +105,10 @@
           v Then the formula display should show 'mpg ~ gear'
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 6 | Passed: 6 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run a Scenario with Given, When, Then, And, But keywords
 
@@ -141,8 +149,10 @@
           v Then I get 10
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 26 | Passed: 26 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run a Scenario with a Table
 
@@ -158,8 +168,10 @@
           v Then I should see the following table
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 3 | Passed: 3 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run a Scenario with a docstring
 
@@ -176,8 +188,10 @@
           v Then the docstring looks like this
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 4 | Passed: 4 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run a Scenario with comments
 
@@ -194,8 +208,10 @@
           v When the Maker starts a game with
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 3 | Passed: 3 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run before and after hooks
 
@@ -214,8 +230,10 @@
             Warning in after hook.
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 2 | Passed: 2 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run a Scenario with custom parameters
 
@@ -237,8 +255,10 @@
           v Then I get 2e3
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 8 | Passed: 8 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run a Scenario with snapshot test
 
@@ -253,8 +273,10 @@
           v Then the output should be saved in a snapshot
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 2 | Passed: 2 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should work with an arbitrary test directory
 
@@ -273,8 +295,10 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 5 | Passed: 5 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should report success with `testthat::test_dir`
 
@@ -305,8 +329,10 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 11 | Passed: 11 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should work with loading steps from setup files
 
@@ -322,8 +348,10 @@
           v Then I should have 7 cucumbers
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 3 | Passed: 3 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should work with Scenario Outline
 
@@ -357,8 +385,10 @@
           v Then I should have 12 cucumbers
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 16 | Passed: 16 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / shouldn't run testthat test files
 
@@ -377,8 +407,10 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 5 | Passed: 5 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should work with testthat filtering
 
@@ -397,8 +429,10 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 5 | Passed: 5 | Failed: 0
+      --------------------------------------------------------------------------------
 
 # test / should run tests with custom loading of steps and support code
 
@@ -416,6 +450,8 @@
           v Then the Breaker must guess a word with 5 characters
       
       
+      --------------------------------------------------------------------------------
       Summary
         Total: 5 | Passed: 5 | Failed: 0
+      --------------------------------------------------------------------------------
 
