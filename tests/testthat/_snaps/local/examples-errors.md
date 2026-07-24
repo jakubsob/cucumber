@@ -202,9 +202,9 @@
         Error: 
           Error in `match_single_step(step, steps, parameters)`: No step found for: "I add them"
           i Add a step definition:
-            given("I add them", function(context) {
-            pending()
-          })
+            when("I add them", function(context) {
+              pending()
+            })
       
       --------------------------------------------------------------------------------
       Summary

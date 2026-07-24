@@ -25,8 +25,8 @@ Feature: Step definition snippets
     And the error message includes
       """
       given("I have {int} cucumbers in my basket", function(int, context) {
-        pending()
-      })
+          pending()
+        })
       """
 
   Scenario: Missing step with a quoted string shows a string placeholder
@@ -53,6 +53,34 @@ Feature: Step definition snippets
     And the error message includes
       """
       given("I see the message {string}", function(string, context) {
-        pending()
-      })
+          pending()
+        })
+      """
+
+  Scenario: Snippet uses the step keyword
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/pass.feature" with
+      """
+      Feature: Pass
+        Scenario: It passes
+          Then it passes
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("some other step", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 errors
+    And the error message includes
+      """
+      then("it passes", function(context) {
+          pending()
+        })
       """

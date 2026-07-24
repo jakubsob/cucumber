@@ -52,10 +52,14 @@ match_single_step <- function(
 
   # No matching step found
   if (sum(step_mask) == 0) {
-    snippet <- format_step_snippet(description, parameters)
+    snippet <- format_step_snippet(step$keyword, description, parameters)
+    snippet_lines <- strsplit(snippet, "\n")[[1]]
     abort(
       glue("No step found for: \"{description}\""),
-      body = c(i = "Add a step definition:", " " = snippet),
+      body = c(
+        i = "Add a step definition:",
+        set_names(snippet_lines, rep(" ", length(snippet_lines)))
+      ),
       trace = empty_trace()
     )
   }
@@ -131,7 +135,8 @@ match_single_step <- function(
 #' @noRd
 #' @importFrom stringr str_count str_replace_all
 #' @importFrom glue glue
-format_step_snippet <- function(description, parameters) {
+format_step_snippet <- function(keyword, description, parameters) {
+  fn <- tolower(keyword)
   ordered_names <- intersect(c("string", "float", "int"), names(parameters))
   result <- description
   params_found <- character(0)
@@ -164,5 +169,5 @@ format_step_snippet <- function(description, parameters) {
   }
 
   arg_str <- paste(c(args, "context"), collapse = ", ")
-  glue('given("{result}", function({arg_str}) {{\n  pending()\n}})')
+  glue('{fn}("{result}", function({arg_str}) {{\n  pending()\n}})')
 }
