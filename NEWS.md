@@ -3,6 +3,7 @@
 - ✨ Added support for tags and tag expressions. Scenarios can now be tagged with `@tag` in feature files and filtered by passing `tags` to `cucumber::test()` or `cucumber::run()`. Feature-level tags are inherited by all scenarios in the feature.
 - ✨ Added `pending()` function to mark steps as pending. A pending step will cause the scenario to be reported as skipped rather than failed. This is useful when writing the feature files before implementing the steps.
 - ✨ Added step-level reporters. `CucumberReporter` is a base class (extending `testthat::Reporter`) with `start_feature()`/`end_feature()`/`start_step()`/`end_step()` hooks, and `CucumberProgressReporter` prints each step as it runs with its real `Given`/`When`/`Then` keyword. Pass one via the `reporter` argument to `cucumber::test()` or `cucumber::run()`.
+- ✨ Missing step definitions now report a ready-to-paste snippet (with `{int}`/`{string}` placeholders inferred from the step text) instead of just an error.
 - 🐛 Feature file normalisation now preserves the original `Given`/`When`/`Then` keyword (resolving `And`/`But`/`*` to the preceding one) instead of collapsing every step to a generic keyword.
 
 # cucumber 2.1.1
