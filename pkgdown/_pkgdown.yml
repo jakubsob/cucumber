@@ -54,6 +54,10 @@ reference:
     contents:
       - test
       - run
+  - title: Reporters
+    contents:
+      - CucumberReporter
+      - CucumberProgressReporter
   - title: Optional
     contents:
       - define_parameter_type

@@ -5,14 +5,84 @@
 \title{Progress Reporter for Cucumber}
 \description{
 A reporter that prints step-by-step progress to the console, mimicking
-testthat::ProgressReporter but with visibility into individual steps.
+testthat::ProgressReporter but with visibility into individual Gherkin steps.
 }
 \details{
-Prints each step as it executes with a status indicator:
-- ✓ for passed steps (green)
-- ✗ for failed/errored steps (red)
+Prints each step as it executes with a status indicator, grouped under
+scenario and feature headers similar to testthat's output:
+\itemize{
+\item ✓ for passed steps (green)
+\item ✗ for failed/errored steps (red)
+}
 
-Groups steps under scenario and feature headers, similar to testthat's output.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Addition
+  Scenario: Add two numbers
+    ✓ Given I have entered 50 into the calculator
+    ✓ Given I have entered 70 into the calculator
+    ✓ When I press add
+    ✓ Then the result should be 120 on the screen
+}\if{html}{\out{</div>}}
+\subsection{Usage}{
+
+Pass a reporter instance to \code{\link[=test]{test()}} or \code{\link[=run]{run()}}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Step-level detail
+cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
+
+# testthat reporters still work, reporting at the scenario level only
+cucumber::test("tests/acceptance", reporter = testthat::ProgressReporter$new())
+
+# Silent mode
+cucumber::test("tests/acceptance", reporter = testthat::SilentReporter$new())
+
+# From within a test file
+cucumber::run(reporter = cucumber::CucumberProgressReporter$new())
+}\if{html}{\out{</div>}}
+}
+
+\subsection{Creating custom reporters}{
+
+Extend \link{CucumberReporter} to build your own:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{HTMLReporter <- R6::R6Class(
+  "HTMLReporter",
+  inherit = cucumber::CucumberReporter,
+  public = list(
+    html_output = character(),
+    start_feature = function(feature_name) \{
+      super$start_feature(feature_name)
+      self$html_output <- c(self$html_output, sprintf("<h2>\%s</h2>", feature_name))
+    \},
+    end_step = function(step) \{
+      super$end_step(step)
+      status_class <- step$status \%||\% "passed"
+      self$html_output <- c(
+        self$html_output,
+        sprintf('<div class="step \%s">\%s \%s</div>', status_class, step$keyword, step$text)
+      )
+    \},
+    end_reporter = function() \{
+      if (!is.null(super$end_reporter)) super$end_reporter()
+      writeLines(self$html_output, "test-report.html")
+    \}
+  )
+)
+}\if{html}{\out{</div>}}
+}
+
+\subsection{Step metadata}{
+
+When \code{end_step()} is called, the step object contains:
+\itemize{
+\item \code{keyword} - The step keyword (Given, When, Then, etc.)
+\item \code{text} - The step text
+\item \code{status} - One of "passed", "failed", or "error"
+\item \code{error} - The error object if the step failed or errored (NULL otherwise)
+\item \code{duration} - Execution time in seconds
+\item \code{data_table} - Data table if present (NULL otherwise)
+\item \code{docstring} - Docstring if present (NULL otherwise)
+}
+}
 }
 \examples{
 \dontrun{
@@ -22,13 +92,16 @@ cucumber::test(
   reporter = cucumber::CucumberProgressReporter$new()
 )
 
-# Or with verbose output
+# Or without praise messages
 cucumber::test(
   "tests/acceptance",
   reporter = cucumber::CucumberProgressReporter$new(show_praise = FALSE)
 )
 }
 
+}
+\seealso{
+\link{CucumberReporter}
 }
 \section{Super classes}{
 \code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberProgressReporter}
@@ -150,7 +223,7 @@ Start a test (called by testthat for each scenario)
 \describe{
 \item{\code{context}}{Test context}
 
-\item{\code{test}}{Test name (will be "Scenario: <name>")}
+\item{\code{test}}{Test name (will be "Scenario: \if{html}{\out{<name>}}")}
 }
 \if{html}{\out{</div>}}
 }
