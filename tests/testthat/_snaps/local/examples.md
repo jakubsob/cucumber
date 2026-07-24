@@ -164,8 +164,14 @@
       Feature: Column multiplication
         Scenario: Multiplying selected column
           v Given I have a table
+            | x | y | z |
+            | 1 | 3 | 5 |
+            | 2 | 4 | 6 |
           v When I multiply x column by 2
           v Then I should see the following table
+            | x | y | z |
+            | 2 | 3 | 5 |
+            | 4 | 4 | 6 |
       
       
       --------------------------------------------------------------------------------
@@ -183,9 +189,18 @@
       Feature: Docstrings
         Scenario: It is possible to pass docstring to a step
           v Given I have a docstring
+            """
+            My docstring
+            It has multiple lines
+            I will remove this one
+            """
           v When I remove line that contains 'I will remove this one'
           v When I remove trailing empty lines
           v Then the docstring looks like this
+            """
+            My docstring
+            It has multiple lines
+            """
       
       
       --------------------------------------------------------------------------------
@@ -206,6 +221,8 @@
           v Then the Maker waits for a Breaker to join
         Scenario: Scenario with a commented scenario after a table
           v When the Maker starts a game with
+            | x | y | z |
+            | 1 | 3 | 5 |
       
       
       --------------------------------------------------------------------------------
@@ -270,6 +287,9 @@
       Feature: Snapshot
         Scenario: Snapshotting code output
           v Given I have a text
+            """
+            Hello, world!
+            """
           v Then the output should be saved in a snapshot
       
       

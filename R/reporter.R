@@ -81,6 +81,33 @@ bold_label <- function(x) {
   paste0(cli::style_bold(substr(x, 1, colon)), substr(x, colon + 1, nchar(x)))
 }
 
+#' Render a data table (tibble) as aligned Gherkin pipe rows
+#'
+#' @keywords internal
+#' @noRd
+format_data_table <- function(tbl) {
+  cells <- rbind(names(tbl), as.matrix(tbl))
+  widths <- apply(cells, 2, \(col) max(nchar(col)))
+  apply(cells, 1, \(row) {
+    padded <- mapply(\(cell, w) formatC(cell, width = w, flag = "-"), row, widths)
+    paste0("| ", paste(padded, collapse = " | "), " |")
+  })
+}
+
+#' Truncate lines to max_lines, appending a "... N more lines" marker
+#'
+#' @keywords internal
+#' @noRd
+truncate_lines <- function(lines, max_lines) {
+  if (length(lines) <= max_lines) {
+    return(lines)
+  }
+  c(
+    lines[seq_len(max_lines)],
+    sprintf("... and %d more line(s)", length(lines) - max_lines)
+  )
+}
+
 #' Progress Reporter for Cucumber
 #'
 #' @description
@@ -212,13 +239,35 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field num_colors Terminal color support captured at construction
     num_colors = 1L,
 
+    #' @field reporter_max_docstring_lines Max docstring lines to print per step
+    reporter_max_docstring_lines = Inf,
+
+    #' @field reporter_max_table_lines Max data table rows to print per step
+    reporter_max_table_lines = Inf,
+
     #' @description
     #' Initialize the reporter
     #' @param show_praise Whether to show praise (default TRUE)
+    #' @param reporter_max_docstring_lines Max docstring lines to print for a step before
+    #'   truncating. Defaults to the `cucumber.reporter_max_docstring_lines` option, or
+    #'   `Inf` (print in full) if unset.
+    #' @param reporter_max_table_lines Max data table rows to print for a step before
+    #'   truncating. Defaults to the `cucumber.reporter_max_table_lines` option, or `Inf`
+    #'   (print in full) if unset.
     #' @param ... Additional arguments passed to parent
-    initialize = function(show_praise = TRUE, ...) {
+    initialize = function(
+      show_praise = TRUE,
+      reporter_max_docstring_lines = getOption(
+        "cucumber.reporter_max_docstring_lines",
+        Inf
+      ),
+      reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
+      ...
+    ) {
       super$initialize(...)
       self$show_praise <- show_praise
+      self$reporter_max_docstring_lines <- reporter_max_docstring_lines
+      self$reporter_max_table_lines <- reporter_max_table_lines
       self$step_count <- 0
       self$step_passed <- 0
       self$step_failed <- 0
@@ -365,6 +414,8 @@ CucumberProgressReporter <- R6::R6Class(
         sep = ""
       )
 
+      self$print_step_args(step)
+
       # If step failed or errored, show error details
       if (!is.null(step$error)) {
         # Get error message - for rlang errors this includes full formatting
@@ -381,6 +432,28 @@ CucumberProgressReporter <- R6::R6Class(
         }
       }
 
+      invisible(self)
+    },
+
+    #' @description
+    #' Print a step's docstring and/or data table arguments, indented and
+    #' truncated to `reporter_max_docstring_lines` / `reporter_max_table_lines`
+    #' @param step Pickle step object
+    print_step_args = function(step) {
+      if (!is.null(step$docstring)) {
+        body <- truncate_lines(step$docstring, self$reporter_max_docstring_lines)
+        for (line in c('"""', body, '"""')) {
+          cat("      ", cli::style_dim(line), "\n", sep = "")
+        }
+      }
+      if (!is.null(step$data_table)) {
+        rows <- format_data_table(step$data_table)
+        # Keep the header, truncate only the body rows
+        rows <- c(rows[1], truncate_lines(rows[-1], self$reporter_max_table_lines))
+        for (line in rows) {
+          cat("      ", cli::style_dim(line), "\n", sep = "")
+        }
+      }
       invisible(self)
     },
 

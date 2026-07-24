@@ -126,6 +126,10 @@ cucumber::test(
 \item{\code{step_errored}}{Whether end_step already rendered an error this scenario}
 
 \item{\code{num_colors}}{Terminal color support captured at construction}
+
+\item{\code{reporter_max_docstring_lines}}{Max docstring lines to print per step}
+
+\item{\code{reporter_max_table_lines}}{Max data table rows to print per step}
 }
 \if{html}{\out{</div>}}
 }
@@ -139,6 +143,7 @@ cucumber::test(
 \item \href{#method-CucumberProgressReporter-add_result}{\code{CucumberProgressReporter$add_result()}}
 \item \href{#method-CucumberProgressReporter-start_step}{\code{CucumberProgressReporter$start_step()}}
 \item \href{#method-CucumberProgressReporter-end_step}{\code{CucumberProgressReporter$end_step()}}
+\item \href{#method-CucumberProgressReporter-print_step_args}{\code{CucumberProgressReporter$print_step_args()}}
 \item \href{#method-CucumberProgressReporter-end_reporter}{\code{CucumberProgressReporter$end_reporter()}}
 \item \href{#method-CucumberProgressReporter-clone}{\code{CucumberProgressReporter$clone()}}
 }
@@ -169,13 +174,26 @@ cucumber::test(
 \subsection{Method \code{new()}}{
 Initialize the reporter
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new(show_praise = TRUE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new(
+  show_praise = TRUE,
+  reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines", Inf),
+  reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
+  ...
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{show_praise}}{Whether to show praise (default TRUE)}
+
+\item{\code{reporter_max_docstring_lines}}{Max docstring lines to print for a step before
+truncating. Defaults to the \code{cucumber.reporter_max_docstring_lines} option, or
+\code{Inf} (print in full) if unset.}
+
+\item{\code{reporter_max_table_lines}}{Max data table rows to print for a step before
+truncating. Defaults to the \code{cucumber.reporter_max_table_lines} option, or \code{Inf}
+(print in full) if unset.}
 
 \item{\code{...}}{Additional arguments passed to parent}
 }
@@ -279,6 +297,24 @@ End a step and print its result
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{step}}{Pickle step object with execution results}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberProgressReporter-print_step_args"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-print_step_args}{}}}
+\subsection{Method \code{print_step_args()}}{
+Print a step's docstring and/or data table arguments, indented and
+truncated to \code{reporter_max_docstring_lines} / \code{reporter_max_table_lines}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$print_step_args(step)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{step}}{Pickle step object}
 }
 \if{html}{\out{</div>}}
 }

@@ -119,4 +119,58 @@ describe("CucumberProgressReporter", {
       })
     })
   })
+
+  it("prints docstring and data table step arguments", {
+    feature <- c(
+      "Feature: Step arguments",
+      "  Scenario: Steps with a docstring and a table",
+      "    Given a message",
+      "      ```",
+      "      line one",
+      "      line two",
+      "      ```",
+      "    And these people",
+      "      | name  | age |",
+      "      | Alice | 30  |",
+      "      | Bob   | 7   |"
+    )
+
+    given("a message", function(message, context) {})
+    given("these people", function(people, context) {})
+
+    reporter <- CucumberProgressReporter$new(show_praise = FALSE)
+
+    .expect_snapshot({
+      suppressMessages({
+        cucumber:::execute(feature, reporter = reporter)
+      })
+    })
+  })
+
+  it("truncates long step arguments to max_lines", {
+    feature <- c(
+      "Feature: Step arguments",
+      "  Scenario: Long docstring",
+      "    Given a long message",
+      "      ```",
+      "      line one",
+      "      line two",
+      "      line three",
+      "      line four",
+      "      ```"
+    )
+
+    given("a long message", function(message, context) {})
+
+    reporter <- CucumberProgressReporter$new(
+      show_praise = FALSE,
+      reporter_max_docstring_lines = 2
+    )
+
+    .expect_snapshot({
+      suppressMessages({
+        cucumber:::execute(feature, reporter = reporter)
+      })
+    })
+  })
 })

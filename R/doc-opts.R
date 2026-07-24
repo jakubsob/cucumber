@@ -13,6 +13,20 @@
 #'
 #'   default: `^\\s{2}`
 #'
+#' - `cucumber.reporter_max_docstring_lines`
+#'
+#'   Max docstring lines [CucumberProgressReporter] prints per step before
+#'   truncating.
+#'
+#'   default: `Inf`
+#'
+#' - `cucumber.reporter_max_table_lines`
+#'
+#'   Max data table rows [CucumberProgressReporter] prints per step before
+#'   truncating.
+#'
+#'   default: `Inf`
+#'
 #' See [base::options()] and [base::getOption()] on how to work with options.
 #'
 #' @md

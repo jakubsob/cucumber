@@ -15,6 +15,18 @@ The following options are available:
 Regular expression for the indent of the feature files.
 
 default: \verb{^\\\\s\{2\}}
+\item \code{cucumber.reporter_max_docstring_lines}
+
+Max docstring lines \link{CucumberProgressReporter} prints per step before
+truncating.
+
+default: \code{Inf}
+\item \code{cucumber.reporter_max_table_lines}
+
+Max data table rows \link{CucumberProgressReporter} prints per step before
+truncating.
+
+default: \code{Inf}
 }
 
 See \code{\link[base:options]{base::options()}} and \code{\link[base:options]{base::getOption()}} on how to work with options.
