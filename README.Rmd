@@ -1,0 +1,171 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = FALSE,
+  comment = ""
+)
+library(cucumber)
+
+# testthat forces ASCII "v"/"x" step symbols while it captures reporter output,
+# so pin cli to ASCII everywhere for a consistent look (this also matches the
+# package's own test snapshots). Colour is dropped automatically because cli
+# detects no ANSI support in a non-interactive knit.
+options(cli.unicode = FALSE)
+
+# Reporter output below is produced by running shipped examples, so it can
+# never drift from the implementation.
+pass_dir <- "inst/examples/with_testthat_success"
+fail_dir <- "inst/examples/with_testthat_failure"
+feature_file <- "tests/acceptance/addition.feature"
+steps_file <- "tests/acceptance/setup-steps-addition.R"
+
+# Helper: fence a file's contents so the displayed example is the exact same
+# source that is executed further down.
+embed <- function(path, lang) {
+  cat(sprintf("```%s\n", lang))
+  cat(readLines(path), sep = "\n")
+  cat("\n```\n")
+}
+```
+
+# cucumber <img src="man/figures/logo.png" align="right" alt="" width="120" />
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/jakubsob/cucumber/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jakubsob/cucumber/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/jakubsob/cucumber/branch/main/graph/badge.svg)](https://app.codecov.io/gh/jakubsob/cucumber?branch=main)
+[![cucumber](https://img.shields.io/github/actions/workflow/status/jakubsob/cucumber/test-acceptance.yaml?branch=main&label=cucumber&logo=cucumber&color=23D96C&labelColor=0f2a13)](https://github.com/jakubsob/cucumber/actions/workflows/test-acceptance.yaml)
+[![muttest](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jakubsob/cucumber/badges/badges/muttest.json)](https://github.com/jakubsob/cucumber/actions/workflows/test-mutation.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/cucumber)](https://CRAN.R-project.org/package=cucumber)
+[![Grand total](http://cranlogs.r-pkg.org/badges/grand-total/cucumber)](https://cran.r-project.org/package=cucumber)
+[![Last month](http://cranlogs.r-pkg.org/badges/last-month/cucumber)](https://cran.r-project.org/package=cucumber)
+<!-- badges: end -->
+
+An implementation of the [Cucumber](https://cucumber.io/) testing framework in R.
+
+## Introduction
+
+The package parses [Gherkin](https://cucumber.io/docs/gherkin/reference/) documents
+
+```{r feature, echo = FALSE, results = "asis"}
+embed(file.path(pass_dir, feature_file), "gherkin")
+```
+
+and uses step definitions to run the tests
+
+```{r steps, echo = FALSE, results = "asis"}
+embed(file.path(pass_dir, steps_file), "r")
+```
+
+The building blocks of the cucumber tests are Features and Scenarios.
+
+- Each Feature will be treated as a separate [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage) – their results will be reported as if they were `test-*.R` files, e.g. `'test-Feature: Addition.R'`.
+- Each Scenario is equivalent to a `testthat::test_that` or `testthat::it` case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.
+
+Run the tests with `cucumber::test()`. By default it uses the `CucumberProgressReporter`, which reports every Gherkin step as it runs:
+
+```{r run-pass}
+withr::with_dir(pass_dir, {
+  cucumber::test(filter = "addition")
+})
+```
+
+When a step fails, the reporter shows which step broke and why, and repeats the failing scenarios in a summary at the end:
+
+```{r run-fail, error = TRUE}
+withr::with_dir(fail_dir, {
+  cucumber::test(filter = "addition")
+})
+```
+
+Put your acceptance tests in a directory separate to your unit tests:
+
+```text
+tests/
+├── acceptance/
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   ├── feature_2.feature
+├── testthat/
+│   ├── test-unit_test_1.R
+│   ├── test-unit_test_2.R
+```
+
+or alongside your unit tests:
+
+```text
+tests/
+├── testthat/
+│   ├── test-cucumber.R
+│   ├── test-unit_test_1.R
+│   ├── test-unit_test_2.R
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   ├── feature_2.feature
+```
+
+## Examples
+
+See the [examples directory](https://github.com/jakubsob/cucumber/tree/main/inst/examples) to help you get started.
+
+## How it works
+
+The `.feature` files are parsed and matched against step definitions.
+
+Step functions are defined using:
+
+- `description`: a [cucumber expression](https://github.com/cucumber/cucumber-expressions).
+- and an implementation function. It must have the parameters that will be matched in the description and a `context` parameter - an environment for managing state between steps.
+
+If a step parsed from one of `.feature` files is not found, an error will be thrown.
+
+### Parameter types
+
+Step implementations receive data from the `.feature` files as parameters. The values are detected via regular expressions and cast with a transformer function.
+
+The following parameter types are available by default:
+
+| Parameter Type | Description                                                                                                                                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `{int}`        | Matches integers, for example `71` or `-19`. Converts value with `as.integer`.                                                                                                                                |
+| `{float}`      | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`.                                                                                                                           |
+| `{word}`       | Matches words without whitespace, for example banana (but not banana split).                                                                                                                                  |
+| `{string}`     | Matches single-quoted or double-quoted strings, for example "banana split" or 'banana split' (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
+
+See `cucumber::define_parameter_type()` how to define your own parameter types.
+
+## Supported Gherkin syntax:
+
+- [x] Feature
+- [x] Scenario
+- [x] Example
+- [x] Given
+- [x] When
+- [x] Then
+- [x] And
+- [x] But
+- [x] *
+- [x] Background
+- [x] Scenario Outline (or Scenario Template)
+- [x] Examples (or Scenarios)
+- [ ] Rule
+- [x] `"""` (Doc Strings)
+- [x] `|` (Data Tables)
+- [x] `@` (Tags)
+- [x] `#` (Comments)
+- [x] Free-format text
+- [ ] Localization
+
+# Installation
+
+To install the stable version from CRAN:
+
+```r
+install.packages("cucumber")
+```

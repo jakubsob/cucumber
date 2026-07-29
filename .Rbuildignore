@@ -18,3 +18,4 @@
 ^vignettes/.quarto$
 ^CRAN-SUBMISSION$
 ^revdep$
+^README\.Rmd$
