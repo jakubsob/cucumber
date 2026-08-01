@@ -8,8 +8,7 @@
       stringr::str_remove_all("\\s\\[\\d+.\\d+s\\]") |>
       # Remove test run duration
       stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss")
-  },
-  variant = ifelse(testthat::is_checking(), "check", "local")
+  }
 )
 
 .with_example_dir <- function(path, code) {
