@@ -60,7 +60,7 @@ jobs:
 
           pkgload::load_all()
 
-          plan <- muttest::plan(
+          plan <- muttest::muttest_plan(
             mutators = list(
               muttest::operator("+", "-"),
               muttest::operator("-", "+"),
