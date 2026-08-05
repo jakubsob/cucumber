@@ -1,0 +1,274 @@
+# cucumber
+
+An implementation of the [Cucumber](https://cucumber.io/) testing
+framework in R.
+
+## Introduction
+
+The package parses
+[Gherkin](https://cucumber.io/docs/gherkin/reference/) documents
+
+``` gherkin
+Feature: Addition
+  Scenario: Adding 2 integers
+    When I add 1 and 1
+    Then the result is 2
+  Scenario: Adding integer and float
+    When I add 1 and 1.1
+    Then the result is 2.1
+  Scenario: Adding float and float
+    When I add 1.1 and 1.1
+    Then the result is 2.2
+```
+
+and uses step definitions to run the tests
+
+``` r
+
+when("I add {int} and {int}", function(x, y, context) {
+  context$result <- x + y
+  context
+})
+
+then("the result is {int}", function(expected, context) {
+  expect_equal(context$result, expected)
+})
+
+when("I add {int} and {float}", function(x, y, context) {
+  context$result <- x + y
+})
+
+when("I add {float} and {float}", function(x, y, context) {
+  context$result <- x + y
+})
+
+then("the result is {float}", function(expected, context) {
+  expect_equal(context$result, expected)
+})
+```
+
+The building blocks of the cucumber tests are Features and Scenarios.
+
+- Each Feature will be treated as a separate
+  [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage)
+  – their results will be reported as if they were `test-*.R` files,
+  e.g. `'test-Feature: Addition.R'`.
+- Each Scenario is equivalent to a
+  [`testthat::test_that`](https://testthat.r-lib.org/reference/test_that.html)
+  or
+  [`testthat::it`](https://testthat.r-lib.org/reference/describe.html)
+  case. You get feedback on each Scenario separately. Only if all steps
+  in a scenario are successful, the scenario is considered successful.
+
+Run the tests with
+[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md).
+By default it uses the `CucumberProgressReporter`, which reports every
+Gherkin step as it runs:
+
+``` r
+
+withr::with_dir(pass_dir, {
+  cucumber::test(filter = "addition")
+})
+```
+
+``` R
+Feature: Addition
+  Scenario: Adding 2 integers
+    v When I add 1 and 1
+    v Then the result is 2
+  Scenario: Adding integer and float
+    v When I add 1 and 1.1
+    v Then the result is 2.1
+  Scenario: Adding float and float
+    v When I add 1.1 and 1.1
+    v Then the result is 2.2
+
+
+--------------------------------------------------------------------------------
+Summary
+  Total: 6 | Passed: 6 | Failed: 0
+--------------------------------------------------------------------------------
+```
+
+When a step fails, the reporter shows which step broke and why, and
+repeats the failing scenarios in a summary at the end:
+
+``` r
+
+withr::with_dir(fail_dir, {
+  cucumber::test(filter = "addition")
+})
+```
+
+``` R
+Feature: Addition
+  Scenario: Adding 2 integers
+    v When I add 1 and 1
+    v Then the result is 2
+  Scenario: Adding integer and float
+    v When I add 1 and 1.1
+    x Then the result is 5
+      Expected `context$result` to equal `expected`.
+      Differences:
+        `actual`: 2.1
+      `expected`: 5.0
+      
+      Step at: setup-steps-addition.R:6
+  Scenario: Adding float and float
+    v When I add 1.1 and 1.1
+    x Then the result is 5
+      Expected `context$result` to equal `expected`.
+      Differences:
+        `actual`: 2.2
+      `expected`: 5.0
+      
+      Step at: setup-steps-addition.R:6
+
+
+--------------------------------------------------------------------------------
+Summary
+  Total: 6 | Passed: 4 | Failed: 2
+--------------------------------------------------------------------------------
+
+Failures
+
+Feature: Addition
+  Scenario: Adding integer and float
+    v When I add 1 and 1.1
+    x Then the result is 5
+      Expected `context$result` to equal `expected`.
+      Differences:
+        `actual`: 2.1
+      `expected`: 5.0
+      
+      Step at: setup-steps-addition.R:6
+
+Feature: Addition
+  Scenario: Adding float and float
+    v When I add 1.1 and 1.1
+    x Then the result is 5
+      Expected `context$result` to equal `expected`.
+      Differences:
+        `actual`: 2.2
+      `expected`: 5.0
+      
+      Step at: setup-steps-addition.R:6
+```
+
+Put your acceptance tests in a directory separate to your unit tests:
+
+``` text
+tests/
+├── acceptance/
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   ├── feature_2.feature
+├── testthat/
+│   ├── test-unit_test_1.R
+│   ├── test-unit_test_2.R
+```
+
+or alongside your unit tests:
+
+``` text
+tests/
+├── testthat/
+│   ├── test-cucumber.R
+│   ├── test-unit_test_1.R
+│   ├── test-unit_test_2.R
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   ├── feature_2.feature
+```
+
+## Examples
+
+See the [examples
+directory](https://github.com/jakubsob/cucumber/tree/main/inst/examples)
+to help you get started.
+
+## How it works
+
+The `.feature` files are parsed and matched against step definitions.
+
+Step functions are defined using:
+
+- `description`: a [cucumber
+  expression](https://github.com/cucumber/cucumber-expressions).
+- and an implementation function. It must have the parameters that will
+  be matched in the description and a `context` parameter - an
+  environment for managing state between steps.
+
+If a step parsed from one of `.feature` files is not found, an error
+will be thrown.
+
+### Parameter types
+
+Step implementations receive data from the `.feature` files as
+parameters. The values are detected via regular expressions and cast
+with a transformer function.
+
+The following parameter types are available by default:
+
+| Parameter Type | Description |
+|----|----|
+| `{int}` | Matches integers, for example `71` or `-19`. Converts value with `as.integer`. |
+| [float](https://github.com/wrathematics/float) | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`. |
+| `{word}` | Matches words without whitespace, for example banana (but not banana split). |
+| `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
+
+See
+[`cucumber::define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
+how to define your own parameter types.
+
+## Supported Gherkin syntax:
+
+Feature
+
+Scenario
+
+Example
+
+Given
+
+When
+
+Then
+
+And
+
+But
+
+\*
+
+Background
+
+Scenario Outline (or Scenario Template)
+
+Examples (or Scenarios)
+
+Rule
+
+`"""` (Doc Strings)
+
+`|` (Data Tables)
+
+`@` (Tags)
+
+`#` (Comments)
+
+Free-format text
+
+Localization
+
+# Installation
+
+To install the stable version from CRAN:
+
+``` r
+
+install.packages("cucumber")
+```

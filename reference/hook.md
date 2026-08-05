@@ -1,0 +1,58 @@
+# Hooks
+
+Hooks are blocks of code that can run at various points in the Cucumber
+execution cycle. They are typically used for setup and teardown of the
+environment before and after each scenario.
+
+Where a hook is defined has no impact on what scenarios it is run for.
+
+If you want to run a hook only before or after a specific scenario, use
+it's name to execute hook only for this scenario.
+
+## Usage
+
+``` r
+before(hook)
+
+after(hook)
+```
+
+## Arguments
+
+- hook:
+
+  A function that will be run. The function first argument is context
+  and the scenario name is the second argument.
+
+## Before
+
+Whatever happens in a `before` hook is invisible to people who only read
+the features. You should consider using a background as a more explicit
+alternative, especially if the setup should be readable by non-technical
+people. Only use a `before` hook for low-level logic such as starting a
+browser or deleting data from a database.
+
+## After
+
+After hooks run after the last step of each scenario, even when the
+scenario failed or thrown an error.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+before(function(context, scenario_name) {
+  context$session <- selenider::selenider_session()
+})
+
+after(function(context, scenario_name) {
+  selenider::close_session(context$session)
+})
+
+after(function(context, scenario_name) {
+  if (scenario_name == "Playing one round of the game") {
+    context$game$close()
+  }
+})
+} # }
+```

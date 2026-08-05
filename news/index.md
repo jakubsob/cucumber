@@ -1,0 +1,149 @@
+# Changelog
+
+## cucumber 2.2.0
+
+- ✨ Added support for tags and tag expressions. Scenarios can now be
+  tagged with `@tag` in feature files and filtered by passing `tags` to
+  [`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+  or
+  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md).
+  Feature-level tags are inherited by all scenarios in the feature.
+- ✨ Added
+  [`pending()`](https://jakubsobolewski.com/cucumber/reference/pending.md)
+  function to mark steps as pending. A pending step will cause the
+  scenario to be reported as skipped rather than failed. This is useful
+  when writing the feature files before implementing the steps.
+- ✨ Added step-level reporters. `CucumberReporter` is a base class
+  (extending
+  [`testthat::Reporter`](https://testthat.r-lib.org/reference/Reporter.html))
+  with `start_feature()`/`end_feature()`/`start_step()`/`end_step()`
+  hooks, and `CucumberProgressReporter` prints each step as it runs with
+  its real `Given`/`When`/`Then` keyword. Pass one via the `reporter`
+  argument to
+  [`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+  or
+  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md).
+- ✨ Missing step definitions now report a ready-to-paste snippet (with
+  `{int}`/`{string}` placeholders inferred from the step text) instead
+  of just an error.
+- 🐛 Feature file normalisation now preserves the original
+  `Given`/`When`/`Then` keyword (resolving `And`/`But`/`*` to the
+  preceding one) instead of collapsing every step to a generic keyword.
+
+## cucumber 2.1.1
+
+CRAN release: 2025-07-21
+
+- 🐛 Fix normalisation of feature files.
+  [\#14](https://github.com/jakubsob/cucumber/pull/14)
+
+## cucumber 2.1.0
+
+CRAN release: 2025-05-20
+
+- ✨ Added
+  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md)
+  function to allow running Cucumber tests alongside `testthat` tests.
+- 🐛 Don’t normalize feature files text within docstrings or tables.
+- 🐛 Don’t include docstrings and tables when validating feature files.
+- 🧪 Added cucumber tests in `tests/acceptance`.
+
+## cucumber 2.0.1
+
+CRAN release: 2025-04-26
+
+- 🐛 Fix CRAN Debian checks.
+
+## cucumber 2.0.0
+
+CRAN release: 2025-04-04
+
+See the [migration
+guide](https://jakubsobolewski.com/cucumber/articles/migration-to-2-0-0.html).
+
+- ✨ You can now run specifications directly with
+  [`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+  function.
+
+## cucumber 1.2.1
+
+CRAN release: 2025-03-20
+
+- 🐛 Fix hook registering that previously could only register one hook.
+
+## cucumber 1.2.0
+
+CRAN release: 2025-02-24
+
+- ✨ Added support for “Scenario Outline”, “Background” and “\*”
+  keywords.
+- ⚠️ Keywords are not taken into account when looking for a step
+  definition. See [Gherkin steps
+  reference](https://cucumber.io/docs/gherkin/reference#steps).
+- 🛡️ Added validation of feature files to fail early if malformed:
+  - Checks for consistent indentation.
+  - Check if a feature file has only one Feature.
+- ✨ `after` hook runs even if a scenario fails. This is useful for
+  cleaning up resources even if a test fails unexpectedly.
+- ✨ Added option to set the indent of feature files. Useful when you
+  use a different indent than the default 2 whitespaces. All user-facing
+  options are documented in
+  [`?cucumber::opts`](https://jakubsobolewski.com/cucumber/reference/opts.md).
+- 📝 Added “Gherkin Reference” article.
+
+## cucumber 1.1.0
+
+CRAN release: 2024-10-14
+
+- ✨ Added scenario `before` and `after` hooks.
+- 📝 Added Behavior-Driven Development vignette.
+- 🐛 Fix parsing error when there is a commented-out scenario after a
+  step with a table.
+
+## cucumber 1.0.4
+
+CRAN release: 2024-06-29
+
+- Added `test_interactive` parameter to
+  [`cucumber::test`](https://jakubsobolewski.com/cucumber/reference/test.md).
+  It allows you to interactively select which feature files to run. It
+  can be useful to get quicker feedback when developing new features.
+
+## cucumber 1.0.3
+
+CRAN release: 2024-06-09
+
+- Fixed float detection with multiple leading numbers, e.g. `11.1`,
+  `+11.1`, `-11.1`.
+
+## cucumber 1.0.2
+
+CRAN release: 2024-04-09
+
+- Fixed CRAN debian checks.
+
+## cucumber 1.0.1
+
+CRAN release: 2024-04-03
+
+- ✨ Changed how `{string}` parameter is matched. It now matches on text
+  in quotes. A step `Given I have a {string}` will match on
+  `Given I have a "foo bar"`. This change brings the parser closer to
+  how the original [cucumber
+  expressions](https://github.com/cucumber/cucumber-expressions) work.
+- ✨ Added a `{word}` parameter that matches on a single word. A step
+  like `Given I have a {word}` will match on `Given I have a foo`.
+- 🐛 Fix handling of repeated parameters in the same step. Now if there
+  are steps `Given I have a {string} and a {string}` and
+  `Given I have a {string}` it will match on
+  `Given I have a "foo" and a "bar"` instead of throwing an error that
+  multiple step definitions have been found.
+- 📝 Improved documentation of parameters in `define_parameter_type`
+  function docs.
+- 📝 Added an example with snapshot test.
+
+## cucumber 1.0.0
+
+CRAN release: 2024-03-14
+
+First stable version 🚀

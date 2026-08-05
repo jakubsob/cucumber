@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="reference-gherkin_files/libs/quarto-html/popper.min.js"></script><script src="reference-gherkin_files/libs/quarto-html/tippy.umd.min.js"></script><link href="reference-gherkin_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="reference-gherkin_files/libs/quarto-html/light-border.css" rel="stylesheet">
@@ -35,7 +35,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">cucumber</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,7 +76,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/jakubsob/cucumber/blob/v2.1.1/vignettes/reference-gherkin.qmd" class="external-link"><code>vignettes/reference-gherkin.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/jakubsob/cucumber/blob/main/vignettes/reference-gherkin.qmd" class="external-link"><code>vignettes/reference-gherkin.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -141,6 +141,15 @@
 <ul>
 <li><a href="#doc-strings">Doc Strings</a></li>
 <li><a href="#data-tables">Data Tables</a></li>
+</ul>
+</li>
+<li>
+<a href="#tags">Tags</a>
+<ul>
+<li><a href="#tag-inheritance">Tag inheritance</a></li>
+<li><a href="#running-a-subset-of-scenarios">Running a subset of scenarios</a></li>
+<li><a href="#tag-expressions">Tag expressions</a></li>
+<li><a href="#using-tags-for-documentation">Using tags for documentation</a></li>
 </ul>
 </li>
 </ul>
@@ -401,7 +410,166 @@ Scenario: eating (Example 2)
 <section class="level4"><h5 id="table-cell-escaping">Table Cell Escaping<a class="anchor" aria-label="anchor" href="#table-cell-escaping"></a>
 </h5>
 <p>If you want to use a newline character in a table cell, you can write this as <code>\n</code>. If you need a <code>|</code> as part of the cell, you can escape it as <code>\|</code>.</p>
-</section></section><script id="quarto-html-after-body" type="application/javascript">
+</section></section><section class="section level2"><h2 id="tags">Tags<a class="anchor" aria-label="anchor" href="#tags"></a>
+</h2>
+<p>Tags are a great way to organise your features and scenarios.</p>
+<p>They can be used for two purposes:</p>
+<ul>
+<li>Running a subset of scenarios</li>
+<li>Restricting hooks to a subset of scenarios</li>
+</ul>
+<p>Consider the following example:</p>
+<pre class="gherkin"><code>@billing
+Feature: Verify billing
+
+  @important
+  Scenario: Missing product description
+    Given hello
+
+  Scenario: Several products
+    Given hello</code></pre>
+<p>A feature or scenario can have as many tags as you like. Separate them with spaces:</p>
+<pre class="gherkin"><code>@billing @bicker @annoy
+Feature: Verify billing</code></pre>
+<p>Tags can be placed above the following Gherkin elements:</p>
+<ul>
+<li><code>Feature</code></li>
+<li><code>Scenario</code></li>
+<li><code>Scenario Outline</code></li>
+<li><code>Examples</code></li>
+</ul>
+<p><strong>Note:</strong> Tags placed above <code>Background</code> or steps (<code>Given</code>, <code>When</code>, <code>Then</code>, <code>And</code>, <code>But</code>, <code>*</code>) will cause a validation error. Place tags only on the elements listed above.</p>
+<p>In <code>Scenario Outline</code>, you can use tags on different sets of examples:</p>
+<pre class="gherkin"><code>Scenario Outline: Steps will run conditionally if tagged
+  Given user is logged in
+  When user clicks &lt;link&gt;
+  Then user will be logged out
+
+  @mobile
+  Examples:
+    | link                  |
+    | logout link on mobile |
+
+  @desktop
+  Examples:
+    | link                   |
+    | logout link on desktop |</code></pre>
+<p>Tags placed in invalid locations will result in an error. For example, this is <strong>invalid</strong> and will throw an error:</p>
+<pre class="gherkin"><code>Feature: Invalid tag usage
+  @invalid-here
+  Background:
+    Given setup step
+
+  Scenario: Test
+    @also-invalid
+    Given a step</code></pre>
+<p><strong>Note:</strong> It is not possible to place tags above <code>Background</code> or steps (<code>Given</code>, <code>When</code>, <code>Then</code>, <code>And</code> and <code>But</code>).</p>
+<section class="level2"><h3 id="tag-inheritance">Tag inheritance<a class="anchor" aria-label="anchor" href="#tag-inheritance"></a>
+</h3>
+<p>Tags are inherited by child elements. Tags placed above a <code>Feature</code> will be inherited by <code>Scenario</code>, <code>Scenario Outline</code>, or <code>Examples</code>. Similarly, tags placed above a <code>Scenario Outline</code> will be inherited by <code>Examples</code>.</p>
+</section><section class="level2"><h3 id="running-a-subset-of-scenarios">Running a subset of scenarios<a class="anchor" aria-label="anchor" href="#running-a-subset-of-scenarios"></a>
+</h3>
+<p>You can use the <code>tags</code> parameter in <code><a href="../reference/test.html">cucumber::test()</a></code> or <code><a href="../reference/run.html">cucumber::run()</a></code> to only run scenarios with particular tags.</p>
+<p>Using tag expressions:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run only scenarios tagged with @smoke</span></span>
+<span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/acceptance"</span>, tags <span class="op">=</span> <span class="st">"@smoke"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run scenarios tagged with both @smoke and @fast</span></span>
+<span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/acceptance"</span>, tags <span class="op">=</span> <span class="st">"@smoke and @fast"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run scenarios tagged with @wip but not @slow</span></span>
+<span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/acceptance"</span>, tags <span class="op">=</span> <span class="st">"@wip and not @slow"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run scenarios tagged with either @gui or @database</span></span>
+<span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/acceptance"</span>, tags <span class="op">=</span> <span class="st">"@gui or @database"</span><span class="op">)</span></span></code></pre></div>
+</section><section class="level2"><h3 id="tag-expressions">Tag expressions<a class="anchor" aria-label="anchor" href="#tag-expressions"></a>
+</h3>
+<p>A tag expression is an infix boolean expression. Below are some examples:</p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 48%">
+<col style="width: 52%">
+</colgroup>
+<thead><tr class="header">
+<th>Expression</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>@fast</code></td>
+<td>Scenarios tagged with <span class="citation" data-cites="fast">@fast</span>
+</td>
+</tr>
+<tr class="even">
+<td><code>@wip and not @slow</code></td>
+<td>Scenarios tagged with <span class="citation" data-cites="wip">@wip</span> that aren’t also tagged with <span class="citation" data-cites="slow">@slow</span>
+</td>
+</tr>
+<tr class="odd">
+<td><code>@smoke and @fast</code></td>
+<td>Scenarios tagged with both <span class="citation" data-cites="smoke">@smoke</span> and <span class="citation" data-cites="fast">@fast</span>
+</td>
+</tr>
+<tr class="even">
+<td><code>@gui or @database</code></td>
+<td>Scenarios tagged with either <span class="citation" data-cites="gui">@gui</span> or <span class="citation" data-cites="database">@database</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p>For more advanced tag expressions you can use parentheses for clarity, or to change operator precedence:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/acceptance"</span>, tags <span class="op">=</span> <span class="st">"(@smoke or @ui) and (not @slow)"</span><span class="op">)</span></span></code></pre></div>
+<section class="level3"><h4 id="tag-expression-operators">Tag expression operators<a class="anchor" aria-label="anchor" href="#tag-expression-operators"></a>
+</h4>
+<p>Tag expressions support the following operators:</p>
+<ul>
+<li>
+<code>and</code> - logical AND (both conditions must be true)</li>
+<li>
+<code>or</code> - logical OR (at least one condition must be true)</li>
+<li>
+<code>not</code> - logical NOT (negates the condition)</li>
+<li>
+<code>( )</code> - parentheses for grouping and controlling precedence</li>
+</ul>
+<p><strong>Operator precedence:</strong> <code>not</code> has the highest precedence, followed by <code>and</code>, then <code>or</code>. Use parentheses to change the order of evaluation.</p>
+<p>The operators are case-insensitive (<code>and</code>, <code>AND</code>, and <code>And</code> all work the same way).</p>
+</section><section class="level3"><h4 id="tag-names">Tag names<a class="anchor" aria-label="anchor" href="#tag-names"></a>
+</h4>
+<p>Tag names can contain: * Alphanumeric characters (a-z, A-Z, 0-9) * Underscores (<code>_</code>) * Hyphens (<code>-</code>) * Dots (<code>.</code>)</p>
+<p>Tag names are case-sensitive: <code>@Smoke</code> and <code>@smoke</code> are different tags.</p>
+</section></section><section class="level2"><h3 id="using-tags-for-documentation">Using tags for documentation<a class="anchor" aria-label="anchor" href="#using-tags-for-documentation"></a>
+</h3>
+<p>Your imagination is the only limitation when it comes to using tags for documentation.</p>
+<section class="level3"><h4 id="link-to-other-documents">Link to other documents<a class="anchor" aria-label="anchor" href="#link-to-other-documents"></a>
+</h4>
+<p>Tags can refer to IDs in external systems such as requirement management tools, issue trackers or test management tools:</p>
+<pre class="gherkin"><code>@BJ-x98.77 @BJ-z12.33
+Feature: Convert transaction</code></pre>
+<p>You can use custom reporting to turn these tags into links pointing to documents in your external tool.</p>
+</section><section class="level3"><h4 id="development-process">Development process<a class="anchor" aria-label="anchor" href="#development-process"></a>
+</h4>
+<p>Another creative way to use tags is to keep track of where in the development process a certain feature is:</p>
+<pre class="gherkin"><code>@qa_ready
+Feature: Index projects</code></pre>
+</section><section class="level3"><h4 id="other-common-uses">Other common uses<a class="anchor" aria-label="anchor" href="#other-common-uses"></a>
+</h4>
+<ul>
+<li>
+<code>@smoke</code> - Quick smoke tests that run on every commit</li>
+<li>
+<code>@wip</code> - Work in progress, scenarios that are being developed</li>
+<li>
+<code>@slow</code> - Long-running tests that might be skipped in development</li>
+<li>
+<code>@manual</code> - Tests that require manual verification</li>
+<li>
+<code>@bug</code> - Tests that reproduce a reported bug</li>
+<li>
+<code>@regression</code> - Regression tests for fixed bugs</li>
+</ul></section></section></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -494,7 +662,7 @@ Scenario: eating (Example 2)
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
