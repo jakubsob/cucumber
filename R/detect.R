@@ -31,24 +31,42 @@ detect_docstring <- function(x) {
   )
 }
 
+#' Extract the docstring delimiter of a line, or NA if it is not one
+#' @importFrom stringr str_match
+#' @noRd
+docstring_delimiter <- function(x) {
+  str_match(x, "^\\s*(```|\"\"\"$)")[, 2]
+}
+
+#' Number each line with the docstring block it belongs to, 0 when outside.
+#' Delimiters are included in their block and a block is only closed by the
+#' same delimiter that opened it, so a docstring may quote the other delimiter.
+#' @noRd
+docstring_blocks <- function(lines) {
+  open <- NA_character_
+  block <- 0L
+  vapply(
+    lines,
+    function(x) {
+      delimiter <- docstring_delimiter(x)
+      if (is.na(open)) {
+        if (is.na(delimiter)) {
+          return(0L)
+        }
+        open <<- delimiter
+        block <<- block + 1L
+      } else if (!is.na(delimiter) && delimiter == open) {
+        open <<- NA_character_
+      }
+      block
+    },
+    integer(1),
+    USE.NAMES = FALSE
+  )
+}
+
 #' Check if line is inside a docstring or table
 #' @noRd
 special_mask <- function(lines) {
-  state <- new.env()
-  state$inside_docstring <- FALSE
-  purrr::map_lgl(lines, function(x) {
-    is_docstring_boundary <- detect_docstring_start(x)
-    is_table_line <- detect_table_start(x)
-
-    if (is_docstring_boundary) {
-      state$inside_docstring <- !state$inside_docstring
-      return(TRUE)
-    }
-
-    if (is_table_line) {
-      return(TRUE)
-    }
-
-    return(state$inside_docstring)
-  })
+  docstring_blocks(lines) > 0 | detect_table_start(lines)
 }

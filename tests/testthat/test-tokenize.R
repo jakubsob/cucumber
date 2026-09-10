@@ -480,6 +480,52 @@ describe("tokenize", {
     )
   })
 
+  it("should dedent docstring content when delimiter is indented past the step", {
+    # Arrange
+    lines <- c(
+      "Feature: Docstrings",
+      "  Scenario: Delimiter indented past the step",
+      "    Given the following docstring:",
+      "      \"\"\"",
+      "      foo:",
+      "      - bar: bar_value",
+      "        baz: baz_value",
+      "      \"\"\""
+    )
+
+    # Act
+    data <- tokenize(lines)[[1]]$children[[1]]$children[[1]]$data
+
+    # Assert
+    expect_equal(
+      parse_docstring(data),
+      c("foo:", "- bar: bar_value", "  baz: baz_value")
+    )
+  })
+
+  it("should dedent docstring content when delimiter is aligned with the step", {
+    # Arrange
+    lines <- c(
+      "Feature: Docstrings",
+      "  Scenario: Delimiter aligned with the step",
+      "    Given the following docstring:",
+      "    \"\"\"",
+      "    foo:",
+      "    - bar: bar_value",
+      "      baz: baz_value",
+      "    \"\"\""
+    )
+
+    # Act
+    data <- tokenize(lines)[[1]]$children[[1]]$children[[1]]$data
+
+    # Assert
+    expect_equal(
+      parse_docstring(data),
+      c("foo:", "- bar: bar_value", "  baz: baz_value")
+    )
+  })
+
   it("should tokenize a Data Table", {
     # Arrange
     lines <- c(

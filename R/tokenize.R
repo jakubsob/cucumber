@@ -39,7 +39,18 @@ remove_trailing_colon <- function(x) {
 
 #' @importFrom stringr str_remove_all
 remove_indent <- function(x) {
-  str_remove_all(x, getOption("cucumber.indent", default = "^\\s{2}"))
+  indent <- getOption("cucumber.indent", default = "^\\s{2}")
+  blocks <- docstring_blocks(x)
+  x[blocks == 0] <- str_remove_all(x[blocks == 0], indent)
+  # A docstring is dedented as a unit, by whatever its opening delimiter loses,
+  # so that indentation relative to the delimiter is preserved
+  for (block in seq_len(max(blocks, 0L))) {
+    lines <- which(blocks == block)
+    opening <- x[lines[1]]
+    width <- nchar(opening) - nchar(str_remove_all(opening, indent))
+    x[lines] <- str_remove_all(x[lines], paste0("^\\s{0,", width, "}"))
+  }
+  x
 }
 
 #' @importFrom stringr str_detect

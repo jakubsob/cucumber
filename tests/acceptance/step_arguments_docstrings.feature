@@ -96,3 +96,48 @@ Feature: Docstring step arguments
       """
     Then it passes
     And it has 1 passed
+
+  Scenario: Docstring content is dedented relative to its opening delimiter
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/docstring.feature" with
+      """
+      Feature: Docstrings
+        Scenario: Delimiter indented past the step
+          Given a message
+            ```
+            foo:
+            - bar: bar_value
+              baz: baz_value
+            ```
+          Then the message is the indented yaml
+        Scenario: Delimiter aligned with the step
+          Given a message
+          ```
+          foo:
+          - bar: bar_value
+            baz: baz_value
+          ```
+          Then the message is the indented yaml
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a message", function(message, context) {
+        context$message <- message
+      })
+      then("the message is the indented yaml", function(context) {
+        expect_equal(
+          context$message,
+          c("foo:", "- bar: bar_value", "  baz: baz_value")
+        )
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And it has 2 passed
