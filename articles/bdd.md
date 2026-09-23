@@ -229,7 +229,7 @@ test_that("Bookstore: Adding multiple books to cart", {
   # Then
   bookstore$cart_includes(c("The Hobbit, J.R.R. Tolkien", "The Lord of the Rings, J.R.R. Tolkien"))
 })
-#> Test passed with 1 success 🎉.
+#> Test passed with 1 success 🎊.
 ```
 
 As the system grows, it will be extended with more examples and more
