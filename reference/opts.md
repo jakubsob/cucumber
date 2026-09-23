@@ -16,7 +16,7 @@ The following options are available:
 - `cucumber.reporter_max_docstring_lines`
 
   Max docstring lines
-  [CucumberProgressReporter](https://jakubsobolewski.com/cucumber/reference/CucumberProgressReporter.md)
+  [CucumberProgressReporter](https://jakubsob.github.io/cucumber/reference/CucumberProgressReporter.md)
   prints per step before truncating.
 
   default: `Inf`
@@ -24,7 +24,7 @@ The following options are available:
 - `cucumber.reporter_max_table_lines`
 
   Max data table rows
-  [CucumberProgressReporter](https://jakubsobolewski.com/cucumber/reference/CucumberProgressReporter.md)
+  [CucumberProgressReporter](https://jakubsob.github.io/cucumber/reference/CucumberProgressReporter.md)
   prints per step before truncating.
 
   default: `Inf`

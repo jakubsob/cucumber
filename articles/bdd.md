@@ -210,7 +210,7 @@ test_that("Bookstore: Adding a book to cart", {
   # Then
   bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
 })
-#> Test passed with 1 success 🌈.
+#> Test passed with 1 success 😸.
 ```
 
 With this implementation, we can easily extend tests with checking if we
@@ -229,7 +229,7 @@ test_that("Bookstore: Adding multiple books to cart", {
   # Then
   bookstore$cart_includes(c("The Hobbit, J.R.R. Tolkien", "The Lord of the Rings, J.R.R. Tolkien"))
 })
-#> Test passed with 1 success 🌈.
+#> Test passed with 1 success 😀.
 ```
 
 As the system grows, it will be extended with more examples and more
@@ -295,7 +295,7 @@ cucumber::test()
 ```
 
 What
-[`cucumber::test`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test`](https://jakubsob.github.io/cucumber/reference/test.md)
 function does is it reads the feature files, finds corresponding actions
 implementations and runs them in order. To learn more how it works,
 refer to [How it

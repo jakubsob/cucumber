@@ -4,7 +4,7 @@ It runs tests from specifications in `.feature` files found in the
 `path`.
 
 To run Cucumber tests alongside `testthat` tests, see
-[`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md).
+[`cucumber::run()`](https://jakubsob.github.io/cucumber/reference/run.md).
 
 ## Usage
 
@@ -81,21 +81,21 @@ test(
 
   If you want to run Cucumber tests alongside `testthat` tests, you can
   use
-  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md)
+  [`cucumber::run()`](https://jakubsob.github.io/cucumber/reference/run.md)
   in one of the `test-*.R` files in your `tests/testthat` directory.
 
 - Use
   [`setup-*.R`](https://testthat.r-lib.org/articles/special-files.html#setup-files)
   files for calling
-  [`step()`](https://jakubsobolewski.com/cucumber/reference/step.md),
-  [`define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
-  and [`hook()`](https://jakubsobolewski.com/cucumber/reference/hook.md)
+  [`step()`](https://jakubsob.github.io/cucumber/reference/step.md),
+  [`define_parameter_type()`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md)
+  and [`hook()`](https://jakubsob.github.io/cucumber/reference/hook.md)
   to leverage testthat loading mechanism.
 
   If your
-  [`step()`](https://jakubsobolewski.com/cucumber/reference/step.md),
-  [`define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
-  and [`hook()`](https://jakubsobolewski.com/cucumber/reference/hook.md)
+  [`step()`](https://jakubsob.github.io/cucumber/reference/step.md),
+  [`define_parameter_type()`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md)
+  and [`hook()`](https://jakubsob.github.io/cucumber/reference/hook.md)
   are called from somewhere else, you are responsible for loading them.
 
   Read more about testthat special files in the [testthat

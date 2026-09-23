@@ -91,11 +91,11 @@ extracted value of `{int}` will be passed to the implementation function
 after being transformed with `as.integer`.
 
 To define your own parameter types use
-[`define_parameter_type`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md).
+[`define_parameter_type`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md).
 
 ## See also
 
-[`define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
+[`define_parameter_type()`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md)
 
 ## Examples
 

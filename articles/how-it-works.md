@@ -1,7 +1,7 @@
 # How it works
 
 When
-[`cucumber::test`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test`](https://jakubsob.github.io/cucumber/reference/test.md)
 is called, it scans for the `.feature` files in the `features_dir`
 directory.
 
@@ -108,19 +108,18 @@ If you define your steps in [setup or
 helper](https://testthat.r-lib.org/articles/special-files.html) files
 you don’t have to load step implementations manually. Cucumber will load
 them automatically when
-[`cucumber::test`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test`](https://jakubsob.github.io/cucumber/reference/test.md)
 is called.
 
 If you don’t want them to be loaded automatically from the default
 location, you can create your own command that calls
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
 and loads the step definitions from the desired location.
 
 Steps from feature files are matched against step definitions defined
-with
-[`given()`](https://jakubsobolewski.com/cucumber/reference/step.md),
-[`when()`](https://jakubsobolewski.com/cucumber/reference/step.md), and
-[`then()`](https://jakubsobolewski.com/cucumber/reference/step.md)
+with [`given()`](https://jakubsob.github.io/cucumber/reference/step.md),
+[`when()`](https://jakubsob.github.io/cucumber/reference/step.md), and
+[`then()`](https://jakubsob.github.io/cucumber/reference/step.md)
 functions using regular expressions.
 
 When you define a step by calling any of the step functions, you

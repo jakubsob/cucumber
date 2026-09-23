@@ -4,12 +4,12 @@
 
 - ✨ Added support for tags and tag expressions. Scenarios can now be
   tagged with `@tag` in feature files and filtered by passing `tags` to
-  [`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+  [`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
   or
-  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md).
+  [`cucumber::run()`](https://jakubsob.github.io/cucumber/reference/run.md).
   Feature-level tags are inherited by all scenarios in the feature.
 - ✨ Added
-  [`pending()`](https://jakubsobolewski.com/cucumber/reference/pending.md)
+  [`pending()`](https://jakubsob.github.io/cucumber/reference/pending.md)
   function to mark steps as pending. A pending step will cause the
   scenario to be reported as skipped rather than failed. This is useful
   when writing the feature files before implementing the steps.
@@ -20,15 +20,20 @@
   hooks, and `CucumberProgressReporter` prints each step as it runs with
   its real `Given`/`When`/`Then` keyword. Pass one via the `reporter`
   argument to
-  [`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+  [`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
   or
-  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md).
+  [`cucumber::run()`](https://jakubsob.github.io/cucumber/reference/run.md).
 - ✨ Missing step definitions now report a ready-to-paste snippet (with
   `{int}`/`{string}` placeholders inferred from the step text) instead
   of just an error.
 - 🐛 Feature file normalisation now preserves the original
   `Given`/`When`/`Then` keyword (resolving `And`/`But`/`*` to the
   preceding one) instead of collapsing every step to a generic keyword.
+- 🐛 Doc String content is now dedented relative to its opening
+  delimiter, as the Gherkin specification requires. Previously a Doc
+  String whose `"""` was indented less than the surrounding nesting lost
+  the indentation of its own lines.
+  [\#16](https://github.com/jakubsob/cucumber/issues/16)
 
 ## cucumber 2.1.1
 
@@ -42,7 +47,7 @@ CRAN release: 2025-07-21
 CRAN release: 2025-05-20
 
 - ✨ Added
-  [`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md)
+  [`cucumber::run()`](https://jakubsob.github.io/cucumber/reference/run.md)
   function to allow running Cucumber tests alongside `testthat` tests.
 - 🐛 Don’t normalize feature files text within docstrings or tables.
 - 🐛 Don’t include docstrings and tables when validating feature files.
@@ -62,7 +67,7 @@ See the [migration
 guide](https://jakubsobolewski.com/cucumber/articles/migration-to-2-0-0.html).
 
 - ✨ You can now run specifications directly with
-  [`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+  [`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
   function.
 
 ## cucumber 1.2.1
@@ -88,7 +93,7 @@ CRAN release: 2025-02-24
 - ✨ Added option to set the indent of feature files. Useful when you
   use a different indent than the default 2 whitespaces. All user-facing
   options are documented in
-  [`?cucumber::opts`](https://jakubsobolewski.com/cucumber/reference/opts.md).
+  [`?cucumber::opts`](https://jakubsob.github.io/cucumber/reference/opts.md).
 - 📝 Added “Gherkin Reference” article.
 
 ## cucumber 1.1.0
@@ -105,7 +110,7 @@ CRAN release: 2024-10-14
 CRAN release: 2024-06-29
 
 - Added `test_interactive` parameter to
-  [`cucumber::test`](https://jakubsobolewski.com/cucumber/reference/test.md).
+  [`cucumber::test`](https://jakubsob.github.io/cucumber/reference/test.md).
   It allows you to interactively select which feature files to run. It
   can be useful to get quicker feedback when developing new features.
 

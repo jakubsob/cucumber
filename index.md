@@ -61,7 +61,7 @@ The building blocks of the cucumber tests are Features and Scenarios.
   in a scenario are successful, the scenario is considered successful.
 
 Run the tests with
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md).
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md).
 By default it uses the `CucumberProgressReporter`, which reports every
 Gherkin step as it runs:
 
@@ -221,7 +221,7 @@ The following parameter types are available by default:
 | `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
 
 See
-[`cucumber::define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
+[`cucumber::define_parameter_type()`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md)
 how to define your own parameter types.
 
 ## Supported Gherkin syntax:

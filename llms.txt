@@ -61,7 +61,7 @@ The building blocks of the cucumber tests are Features and Scenarios.
   in a scenario are successful, the scenario is considered successful.
 
 Run the tests with
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md).
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md).
 By default it uses the `CucumberProgressReporter`, which reports every
 Gherkin step as it runs:
 
@@ -221,7 +221,7 @@ The following parameter types are available by default:
 | `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
 
 See
-[`cucumber::define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
+[`cucumber::define_parameter_type()`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md)
 how to define your own parameter types.
 
 ## Supported Gherkin syntax:
@@ -277,37 +277,37 @@ install.packages("cucumber")
 
 ## Add implementation
 
-- [`before()`](https://jakubsobolewski.com/cucumber/reference/hook.md)
-  [`after()`](https://jakubsobolewski.com/cucumber/reference/hook.md) :
+- [`before()`](https://jakubsob.github.io/cucumber/reference/hook.md)
+  [`after()`](https://jakubsob.github.io/cucumber/reference/hook.md) :
   Hooks
-- [`given()`](https://jakubsobolewski.com/cucumber/reference/step.md)
-  [`when()`](https://jakubsobolewski.com/cucumber/reference/step.md)
-  [`then()`](https://jakubsobolewski.com/cucumber/reference/step.md) :
+- [`given()`](https://jakubsob.github.io/cucumber/reference/step.md)
+  [`when()`](https://jakubsob.github.io/cucumber/reference/step.md)
+  [`then()`](https://jakubsob.github.io/cucumber/reference/step.md) :
   Define a step
-- [`pending()`](https://jakubsobolewski.com/cucumber/reference/pending.md)
+- [`pending()`](https://jakubsob.github.io/cucumber/reference/pending.md)
   : Mark a step as pending
 
 ## Run tests
 
-- [`test()`](https://jakubsobolewski.com/cucumber/reference/test.md) :
+- [`test()`](https://jakubsob.github.io/cucumber/reference/test.md) :
   Run Cucumber tests
 
-- [`run()`](https://jakubsobolewski.com/cucumber/reference/run.md) :
+- [`run()`](https://jakubsob.github.io/cucumber/reference/run.md) :
 
   Run Cucumber tests in a `testthat` context
 
 ## Reporters
 
-- [`CucumberReporter`](https://jakubsobolewski.com/cucumber/reference/CucumberReporter.md)
+- [`CucumberReporter`](https://jakubsob.github.io/cucumber/reference/CucumberReporter.md)
   : Cucumber Reporter Base Class
-- [`CucumberProgressReporter`](https://jakubsobolewski.com/cucumber/reference/CucumberProgressReporter.md)
+- [`CucumberProgressReporter`](https://jakubsob.github.io/cucumber/reference/CucumberProgressReporter.md)
   : Progress Reporter for Cucumber
 
 ## Optional
 
-- [`define_parameter_type()`](https://jakubsobolewski.com/cucumber/reference/define_parameter_type.md)
+- [`define_parameter_type()`](https://jakubsob.github.io/cucumber/reference/define_parameter_type.md)
   : Define extra parameters to use in Cucumber steps.
-- [`opts`](https://jakubsobolewski.com/cucumber/reference/opts.md) :
+- [`opts`](https://jakubsob.github.io/cucumber/reference/opts.md) :
   cucumber Options
 
 # Articles
@@ -315,10 +315,10 @@ install.packages("cucumber")
 ### All vignettes
 
 - [Behavior-Driven
-  Development](https://jakubsobolewski.com/cucumber/articles/bdd.md):
+  Development](https://jakubsob.github.io/cucumber/articles/bdd.md):
 - [How it
-  works](https://jakubsobolewski.com/cucumber/articles/how-it-works.md):
+  works](https://jakubsob.github.io/cucumber/articles/how-it-works.md):
 - [Migration to cucumber
-  2.0.0](https://jakubsobolewski.com/cucumber/articles/migration-to-2-0-0.md):
+  2.0.0](https://jakubsob.github.io/cucumber/articles/migration-to-2-0-0.md):
 - [Gherkin
-  Reference](https://jakubsobolewski.com/cucumber/articles/reference-gherkin.md):
+  Reference](https://jakubsob.github.io/cucumber/articles/reference-gherkin.md):

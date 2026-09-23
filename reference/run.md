@@ -48,7 +48,7 @@ run(path = ".", filter = NULL, tags = NULL, reporter = get_reporter(), ...)
 ## Value
 
 NULL, invisibly. To get result and a report, use
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md),
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md),
 or inspect the result of `testthat` function call.
 
 ## Examples

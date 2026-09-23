@@ -23,7 +23,7 @@ Block comments are currently not supported by Gherkin.
 
 The recommended indentation level is two spaces. If you need other
 indentation see
-[`?opts`](https://jakubsobolewski.com/cucumber/reference/opts.md).
+[`?opts`](https://jakubsob.github.io/cucumber/reference/opts.md).
 
 Here is an example:
 
@@ -217,13 +217,13 @@ technology or user interface. Imagine it’s 1922, when there were no
 computers.
 
 Implementation details should be hidden in
-[`step()`](https://jakubsobolewski.com/cucumber/reference/step.md).
+[`step()`](https://jakubsob.github.io/cucumber/reference/step.md).
 
 ### Then
 
 `Then` steps are used to describe an *expected* outcome, or result.
 
-The [`step()`](https://jakubsobolewski.com/cucumber/reference/step.md)
+The [`step()`](https://jakubsob.github.io/cucumber/reference/step.md)
 definition of a `Then` step should use an *assertion* to compare the
 *actual* outcome (what the system actually does) to the *expected*
 outcome (what the step says the system is supposed to do).
@@ -317,7 +317,7 @@ background, by grouping them under a `Background` section.
 A `Background` allows you to add some context to the scenarios that
 follow it. It can contain one or more `Given` steps, which are run
 before *each* scenario, but after any before
-[`hook()`](https://jakubsobolewski.com/cucumber/reference/hook.md).
+[`hook()`](https://jakubsob.github.io/cucumber/reference/hook.md).
 
 A `Background` is placed before the first `Scenario`/`Example`, at the
 same level of indentation.
@@ -355,7 +355,7 @@ need different `Background` steps for different scenarios, consider
 breaking up your set of scenarios into more `Feature`s.
 
 For a less explicit alternative to `Background`, check out
-[`?hook`](https://jakubsobolewski.com/cucumber/reference/hook.md)
+[`?hook`](https://jakubsob.github.io/cucumber/reference/hook.md)
 
 ### Tips for using Background
 
@@ -429,10 +429,9 @@ the examples table. Cucumber will replace these parameters with values
 from the table *before* it tries to match the step against a step
 definition.
 
-If our
-[`?step`](https://jakubsobolewski.com/cucumber/reference/step.md)s use
-{string} parameters, we must use quotes around the values in the table
-for them to match correctly.
+If our [`?step`](https://jakubsob.github.io/cucumber/reference/step.md)s
+use {string} parameters, we must use quotes around the values in the
+table for them to match correctly.
 
 ``` gherkin
 Scenario Outline: eating
@@ -489,7 +488,7 @@ in your pattern.
 
 It will automatically be passed as the last argument in the step
 definition. See
-[`?step`](https://jakubsobolewski.com/cucumber/reference/step.md) for
+[`?step`](https://jakubsob.github.io/cucumber/reference/step.md) for
 details.
 
 Indentation of the opening `"""` is unimportant, although common
@@ -516,7 +515,7 @@ Given the following users exist:
 
 Just like `Doc Strings`, `Data Tables` will be passed to the step
 definition as the last argument. See
-[`?step`](https://jakubsobolewski.com/cucumber/reference/step.md) for
+[`?step`](https://jakubsob.github.io/cucumber/reference/step.md) for
 details.
 
 ##### Table Cell Escaping
@@ -613,9 +612,9 @@ Similarly, tags placed above a `Scenario Outline` will be inherited by
 ### Running a subset of scenarios
 
 You can use the `tags` parameter in
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
 or
-[`cucumber::run()`](https://jakubsobolewski.com/cucumber/reference/run.md)
+[`cucumber::run()`](https://jakubsob.github.io/cucumber/reference/run.md)
 to only run scenarios with particular tags.
 
 Using tag expressions:

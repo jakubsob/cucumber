@@ -11,7 +11,7 @@ The following parameter types are available by default:
 | `{string}` | Matches single-quoted or double-quoted strings, for example `"banana split"` or `'banana split'` (but not `banana split`). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
 
 To use custom parameter types, call `define_parameter_type` before
-[`cucumber::test`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test`](https://jakubsob.github.io/cucumber/reference/test.md)
 is called.
 
 ## Usage

@@ -23,8 +23,8 @@ scenario and feature headers similar to testthat's output:
 ### Usage
 
 Pass a reporter instance to
-[`test()`](https://jakubsobolewski.com/cucumber/reference/test.md) or
-[`run()`](https://jakubsobolewski.com/cucumber/reference/run.md):
+[`test()`](https://jakubsob.github.io/cucumber/reference/test.md) or
+[`run()`](https://jakubsob.github.io/cucumber/reference/run.md):
 
     # Step-level detail
     cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
@@ -41,7 +41,7 @@ Pass a reporter instance to
 ### Creating custom reporters
 
 Extend
-[CucumberReporter](https://jakubsobolewski.com/cucumber/reference/CucumberReporter.md)
+[CucumberReporter](https://jakubsob.github.io/cucumber/reference/CucumberReporter.md)
 to build your own:
 
     HTMLReporter <- R6::R6Class(
@@ -89,13 +89,13 @@ When `end_step()` is called, the step object contains:
 
 ## See also
 
-[CucumberReporter](https://jakubsobolewski.com/cucumber/reference/CucumberReporter.md)
+[CucumberReporter](https://jakubsob.github.io/cucumber/reference/CucumberReporter.md)
 
 ## Super classes
 
 [`testthat::Reporter`](https://testthat.r-lib.org/reference/Reporter.html)
 -\>
-[`cucumber::CucumberReporter`](https://jakubsobolewski.com/cucumber/reference/CucumberReporter.md)
+[`cucumber::CucumberReporter`](https://jakubsob.github.io/cucumber/reference/CucumberReporter.md)
 -\> `CucumberProgressReporter`
 
 ## Public fields

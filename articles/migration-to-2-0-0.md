@@ -11,12 +11,12 @@ version.
 
 In the previous versions, you had to create a `test-cucumber.R` file
 with
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
 call to run the tests.
 
 Now, you can run the tests directly from the console or from the R
 script using the same
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
 function. It now has a new interface and behavior that very similar to
 `devtools::test` and
 [`testthat::test_package`](https://testthat.r-lib.org/reference/test_package.html)
@@ -26,7 +26,7 @@ internally.
 
 ## 2. Move steps definitions to [`setup-*.R` files](https://testthat.r-lib.org/articles/special-files.html#setup-files).
 
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md)
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)
 no longer is responsible for loading step definitions.
 
 Instead it is recommended to store step definitions in
@@ -53,6 +53,6 @@ to
     │   ├── setup-steps2.R
 
 All `test-*.R` files that are in the directory will be ignored by
-[`cucumber::test()`](https://jakubsobolewski.com/cucumber/reference/test.md).
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md).
 To run them use another call to
 [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html).
