@@ -15,10 +15,10 @@ scenario and feature headers similar to testthat's output:
 
     Feature: Addition
       Scenario: Add two numbers
-        ✓ Given I have entered 50 into the calculator
-        ✓ Given I have entered 70 into the calculator
-        ✓ When I press add
-        ✓ Then the result should be 120 on the screen
+        [x] Given I have entered 50 into the calculator
+        [x] Given I have entered 70 into the calculator
+        [x] When I press add
+        [x] Then the result should be 120 on the screen
 
 ### Usage
 
@@ -266,7 +266,7 @@ Start a test (called by testthat for each scenario)
 
 - `test`:
 
-  Test name (will be "Scenario: ")
+  Test name (will be "Scenario: `<name>`")
 
 ------------------------------------------------------------------------
 

@@ -64,7 +64,7 @@ CRAN release: 2025-04-26
 CRAN release: 2025-04-04
 
 See the [migration
-guide](https://jakubsobolewski.com/cucumber/articles/migration-to-2-0-0.html).
+guide](https://jakubsob.github.io/cucumber/articles/migration-to-2-0-0.html).
 
 - ✨ You can now run specifications directly with
   [`cucumber::test()`](https://jakubsob.github.io/cucumber/reference/test.md)

@@ -210,7 +210,7 @@ test_that("Bookstore: Adding a book to cart", {
   # Then
   bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
 })
-#> Test passed with 1 success 🥇.
+#> Test passed with 1 success 😀.
 ```
 
 With this implementation, we can easily extend tests with checking if we
@@ -229,7 +229,7 @@ test_that("Bookstore: Adding multiple books to cart", {
   # Then
   bookstore$cart_includes(c("The Hobbit, J.R.R. Tolkien", "The Lord of the Rings, J.R.R. Tolkien"))
 })
-#> Test passed with 1 success 🎊.
+#> Test passed with 1 success 😀.
 ```
 
 As the system grows, it will be extended with more examples and more
@@ -299,7 +299,7 @@ What
 function does is it reads the feature files, finds corresponding actions
 implementations and runs them in order. To learn more how it works,
 refer to [How it
-works](https://jakubsobolewski.com/cucumber/articles/how-it-works.html)
+works](https://jakubsob.github.io/cucumber/articles/how-it-works.html)
 vignette.
 
 Similar to what we did with base R, we can extend the feature file with
