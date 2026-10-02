@@ -11,16 +11,16 @@ testthat::ProgressReporter but with visibility into individual Gherkin steps.
 Prints each step as it executes with a status indicator, grouped under
 scenario and feature headers similar to testthat's output:
 \itemize{
-\item ✓ for passed steps (green)
-\item ✗ for failed/errored steps (red)
+\item \ifelse{latex}{[x]}{✓} for passed steps (green)
+\item \ifelse{latex}{[ ]}{✗} for failed/errored steps (red)
 }
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Addition
   Scenario: Add two numbers
-    ✓ Given I have entered 50 into the calculator
-    ✓ Given I have entered 70 into the calculator
-    ✓ When I press add
-    ✓ Then the result should be 120 on the screen
+    [x] Given I have entered 50 into the calculator
+    [x] Given I have entered 70 into the calculator
+    [x] When I press add
+    [x] Then the result should be 120 on the screen
 }\if{html}{\out{</div>}}
 \subsection{Usage}{
 
@@ -241,7 +241,7 @@ Start a test (called by testthat for each scenario)
 \describe{
 \item{\code{context}}{Test context}
 
-\item{\code{test}}{Test name (will be "Scenario: \if{html}{\out{<name>}}")}
+\item{\code{test}}{Test name (will be "Scenario: \verb{<name>}")}
 }
 \if{html}{\out{</div>}}
 }

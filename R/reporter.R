@@ -118,16 +118,16 @@ truncate_lines <- function(lines, max_lines) {
 #' Prints each step as it executes with a status indicator, grouped under
 #' scenario and feature headers similar to testthat's output:
 #'
-#' - ✓ for passed steps (green)
-#' - ✗ for failed/errored steps (red)
+#' - \ifelse{latex}{[x]}{✓} for passed steps (green)
+#' - \ifelse{latex}{[ ]}{✗} for failed/errored steps (red)
 #'
 #' ```
 #' Feature: Addition
 #'   Scenario: Add two numbers
-#'     ✓ Given I have entered 50 into the calculator
-#'     ✓ Given I have entered 70 into the calculator
-#'     ✓ When I press add
-#'     ✓ Then the result should be 120 on the screen
+#'     [x] Given I have entered 50 into the calculator
+#'     [x] Given I have entered 70 into the calculator
+#'     [x] When I press add
+#'     [x] Then the result should be 120 on the screen
 #' ```
 #'
 #' ## Usage
@@ -302,7 +302,7 @@ CucumberProgressReporter <- R6::R6Class(
     #' @description
     #' Start a test (called by testthat for each scenario)
     #' @param context Test context
-    #' @param test Test name (will be "Scenario: <name>")
+    #' @param test Test name (will be "Scenario: `<name>`")
     start_test = function(context, test) {
       if (!is.null(super$start_test)) {
         super$start_test(context, test)
