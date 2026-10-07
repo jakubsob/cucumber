@@ -182,7 +182,10 @@ truncate_lines <- function(lines, max_lines) {
 #'
 #' When `end_step()` is called, the step object contains:
 #'
-#' - `keyword` - The step keyword (Given, When, Then, etc.)
+#' - `keyword` - The step keyword as written (Given, When, Then, And, But or *)
+#' - `type` - "Context", "Action" or "Outcome" for Given, When and Then steps,
+#'   And and But steps take the type of the previous step. "Unknown" for `*`
+#'   and for And or But as the first step.
 #' - `text` - The step text
 #' - `status` - One of "passed", "failed", or "error"
 #' - `error` - The error object if the step failed or errored (NULL otherwise)

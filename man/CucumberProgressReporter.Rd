@@ -74,7 +74,10 @@ Extend \link{CucumberReporter} to build your own:
 
 When \code{end_step()} is called, the step object contains:
 \itemize{
-\item \code{keyword} - The step keyword (Given, When, Then, etc.)
+\item \code{keyword} - The step keyword as written (Given, When, Then, And, But or *)
+\item \code{type} - "Context", "Action" or "Outcome" for Given, When and Then steps,
+And and But steps take the type of the previous step. "Unknown" for \code{*}
+and for And or But as the first step.
 \item \code{text} - The step text
 \item \code{status} - One of "passed", "failed", or "error"
 \item \code{error} - The error object if the step failed or errored (NULL otherwise)

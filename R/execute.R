@@ -25,29 +25,27 @@ execute <- function(
   checkmate::assert_list(parameters, min.len = 1)
   checkmate::assert_list(hooks)
 
-  # Phase 1: Validate
-  validated <- validate_feature(feature)
+  # Phase 1: Parse
+  document <- parse_gherkin(feature, uri = feature_file)
 
-  # Phase 2 & 3: Normalize and Tokenize (normalization happens inside tokenize)
-  tokens <- tokenize(validated)
-
-  # Extract feature name for reporter
-  feature_name <- NULL
-  if (length(tokens) > 0 && tokens[[1]]$type == "Feature") {
-    feature_name <- glue("Feature: {tokens[[1]]$value}")
-    # Set feature context for testthat
-    context_start_file(feature_name)
+  # An empty document has nothing to run
+  if (is.null(document$feature)) {
+    return(invisible(list()))
   }
 
-  # Phase 4: Create pickles
-  pickles <- create_pickles(tokens, feature_file = feature_file)
+  feature_name <- glue("{document$feature$keyword}: {document$feature$name}")
+  # Set feature context for testthat
+  context_start_file(feature_name)
+
+  # Phase 2: Create pickles
+  pickles <- create_pickles(document, feature_file = feature_file)
 
   # Filter by tags
   pickles <- filter_pickles_by_tags(pickles, tags)
 
-  # Phase 5: Match steps
+  # Phase 3: Match steps
   pickles <- match_steps(pickles, steps, parameters)
 
-  # Phase 6: Execute
+  # Phase 4: Execute
   execute_pickles(pickles, hooks, reporter = reporter, feature_name = feature_name)
 }

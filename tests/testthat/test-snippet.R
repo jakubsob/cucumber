@@ -3,7 +3,7 @@ describe("match_single_step snippet", {
   it("uses the step keyword and indents the snippet", {
     local_steps()
     given("some other step", function(context) {})
-    step <- new_pickle_step(keyword = "Then", text = "it passes")
+    step <- new_pickle_step(keyword = "Then", type = "Outcome", text = "it passes")
 
     expect_snapshot(
       match_single_step(step),
@@ -16,6 +16,7 @@ describe("match_single_step snippet", {
     given("some other step", function(context) {})
     step <- new_pickle_step(
       keyword = "When",
+      type = "Action",
       text = "I have 5 cucumbers in my basket"
     )
 

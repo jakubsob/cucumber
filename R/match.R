@@ -52,7 +52,7 @@ match_single_step <- function(
 
   # No matching step found
   if (sum(step_mask) == 0) {
-    snippet <- format_step_snippet(step$keyword, description, parameters)
+    snippet <- format_step_snippet(SNIPPET_KEYWORDS[[step$type]], description, parameters)
     snippet_lines <- strsplit(snippet, "\n")[[1]]
     abort(
       glue("No step found for: \"{description}\""),
@@ -108,12 +108,8 @@ match_single_step <- function(
     }
   )
 
-  # Add data table or docstring if present
-  if (!is.null(step$data_table)) {
-    params <- append(params, list(step$data_table))
-  } else if (!is.null(step$docstring)) {
-    params <- append(params, list(step$docstring))
-  }
+  # Add the data table and the docstring, in the order they are written
+  params <- append(params, unname(unclass(step)[step$argument_order]))
 
   # Name parameters according to function formals
   impl_formals <- names(formals(matched_step))
@@ -126,6 +122,9 @@ match_single_step <- function(
 
   step
 }
+
+# A step without a type, like a leading `*`, gets a Given snippet
+SNIPPET_KEYWORDS <- c(Context = "Given", Action = "When", Outcome = "Then", Unknown = "Given")
 
 #' Format a step snippet for error messages
 #'

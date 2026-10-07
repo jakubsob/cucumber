@@ -53,9 +53,8 @@ run <- function(
   }
 
   for (feature_path in features) {
-    feature <- validate_feature(readLines(feature_path))
     execute(
-      feature,
+      read_feature(feature_path),
       feature_file = feature_path,
       tags = tags,
       reporter = reporter
@@ -68,6 +67,10 @@ run <- function(
 #' @importFrom fs dir_ls
 find_features <- function(path) {
   dir_ls(path, glob = "*.feature$", type = "file")
+}
+
+read_feature <- function(path) {
+  readLines(path, warn = FALSE, encoding = "UTF-8")
 }
 
 #' @importFrom fs path_ext_remove path_file

@@ -8,8 +8,11 @@ when("I remove line that contains {string}", function(line, context) {
 })
 
 when("I remove trailing empty lines", function(context) {
-  context$docstring |>
-    purrr::discard(\(x) stringr::str_detect(x, "^\\s*$"))
+  lines <- context$docstring
+  while (length(lines) > 0 && lines[length(lines)] == "") {
+    lines <- lines[-length(lines)]
+  }
+  context$docstring <- lines
 })
 
 then("the docstring looks like this", function(docstring, context) {

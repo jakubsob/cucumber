@@ -16,7 +16,6 @@ Depends:
 Imports:
     checkmate,
     cli,
-    dplyr,
     fs,
     glue,
     purrr,
@@ -32,6 +31,8 @@ Suggests:
     shinytest2,
     chromote,
     covr,
+    dplyr,
+    jsonlite,
     knitr,
     rmarkdown,
     quarto,

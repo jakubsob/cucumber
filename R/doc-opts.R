@@ -7,12 +7,6 @@
 #'
 #' The following options are available:
 #'
-#' - `cucumber.indent`
-#'
-#'   Regular expression for the indent of the feature files.
-#'
-#'   default: `^\\s{2}`
-#'
 #' - `cucumber.reporter_max_docstring_lines`
 #'
 #'   Max docstring lines [CucumberProgressReporter] prints per step before

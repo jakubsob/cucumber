@@ -11,7 +11,7 @@
 #' @return List of pickles with populated metadata
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr walk
+#' @importFrom purrr walk2 map_chr
 #' @importFrom testthat test_that
 #' @importFrom rlang exec format_error_bullets
 #' @importFrom glue glue
@@ -28,8 +28,9 @@ execute_pickles <- function(
     }
   }
 
-  walk(pickles, \(pickle) {
-    execute_single_pickle(pickle, hooks, reporter)
+  test_names <- unique_test_names(map_chr(pickles, "name"))
+  walk2(pickles, test_names, \(pickle, test_name) {
+    execute_single_pickle(pickle, hooks, reporter, test_name)
   })
 
   # Call feature end hook if reporter supports it
@@ -40,12 +41,25 @@ execute_pickles <- function(
   invisible(pickles)
 }
 
+#' Number the scenarios that share a name, like the rows of an outline without
+#' placeholders in its name. testthat merges the results of tests that have the
+#' same name.
+#'
+#' @keywords internal
+#' @noRd
+unique_test_names <- function(names) {
+  repeated <- names %in% names[duplicated(names)]
+  occurrence <- vapply(seq_along(names), \(i) sum(names[seq_len(i)] == names[[i]]), integer(1))
+  names[repeated] <- paste0(names[repeated], " (", occurrence[repeated], ")")
+  names
+}
+
 #' Execute a single pickle
 #'
 #' @keywords internal
 #' @noRd
-execute_single_pickle <- function(pickle, hooks, reporter = NULL) {
-  test_that(glue("Scenario: {pickle$name}"), {
+execute_single_pickle <- function(pickle, hooks, reporter = NULL, test_name = pickle$name) {
+  test_that(glue("Scenario: {test_name}"), {
     .context <- new.env()
 
     after <- get_hook(hooks, "after")

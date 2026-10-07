@@ -7,7 +7,7 @@ describe("parse_table", {
     )
 
     # Act
-    result <- parse_table(x)
+    result <- parse_table(lapply(x, table_cells))
 
     # Assert
     expect_equal(
@@ -27,7 +27,7 @@ describe("parse_table", {
     )
 
     # Act
-    result <- parse_table(x)
+    result <- parse_table(lapply(x, table_cells))
 
     # Assert
     expect_equal(
@@ -49,7 +49,7 @@ describe("parse_table", {
     )
 
     # Act
-    result <- parse_table(x)
+    result <- parse_table(lapply(x, table_cells))
 
     # Assert
     expect_equal(
@@ -70,7 +70,7 @@ describe("parse_table", {
     )
 
     # Act
-    result <- parse_table(x)
+    result <- parse_table(lapply(x, table_cells))
 
     # Assert
     expect_equal(

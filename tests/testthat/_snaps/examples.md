@@ -120,31 +120,31 @@
       Feature: Addition
         Scenario: Addition should work for 3 numbers
           v Given I have 1
-          v Given I have 2
-          v Given I have 3
+          v And I have 2
+          v And I have 3
           v When I add them
-          v When I do nothing more
+          v But I do nothing more
           v Then I get 6
-          v Then it's over
+          v And it's over
         Scenario: Addition should work for 5 numbers
           v Given I have 1
-          v Given I have 2
-          v Given I have 3
-          v Given I have 4
-          v Given I have 5
+          v And I have 2
+          v And I have 3
+          v And I have 4
+          v And I have 5
           v When I add them
           v Then I get 15
         Scenario: Addition should work for 10 numbers
           v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
-          v Given I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
+          v * I have 1
           v When I add them
           v Then I get 10
       
@@ -191,14 +191,17 @@
           v Given I have a docstring
             """
             My docstring
+            
             It has multiple lines
+            
             I will remove this one
             """
           v When I remove line that contains 'I will remove this one'
-          v When I remove trailing empty lines
+          v And I remove trailing empty lines
           v Then the docstring looks like this
             """
             My docstring
+            
             It has multiple lines
             """
       
@@ -267,7 +270,7 @@
           v Then 🤯
         Scenario: I can add two numbers in scientific notation
           v Given I have a number 1e3
-          v Given I have a number 1e3
+          v And I have a number 1e3
           v When I add them
           v Then I get 2e3
       
@@ -381,26 +384,26 @@
     Output
       
       Feature: Eating
-        Scenario: eating (Example 1)
+        Scenario: eating (1)
           v Given there are 12 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 7 cucumbers
-        Scenario: eating (Example 2)
+        Scenario: eating (2)
           v Given there are 20 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 15 cucumbers
-        Scenario: eating (Example 1)
+        Scenario: eating (3)
           v Given there are 12 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 7 cucumbers
-        Scenario: eating (Example 2)
+        Scenario: eating (4)
           v Given there are 20 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 15 cucumbers
-        Scenario: eating (Example 1)
+        Scenario: eating (5)
           v Given there are '5.6' cucumbers
           v Then I should have 5.6 cucumbers
-        Scenario: eating (Example 2)
+        Scenario: eating (6)
           v Given there are "12" cucumbers
           v Then I should have 12 cucumbers
       

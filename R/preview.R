@@ -40,11 +40,9 @@ preview <- function(
 
   pickles <- features |>
     map(\(feature_path) {
-      lines <- readLines(feature_path)
-      validated <- validate_feature(lines)
-      tokens <- tokenize(validated)  # tokenize handles normalization internally
-      pickles <- create_pickles(tokens)
-      pickles
+      read_feature(feature_path) |>
+        parse_gherkin(uri = feature_path) |>
+        create_pickles()
     }) |>
     flatten()
 

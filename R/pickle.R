@@ -1,9 +1,13 @@
 #' Create a pickle step object
 #'
-#' @param keyword Step keyword ("Given", "When", or "Then")
+#' @param keyword Step keyword as written ("Given", "And", "*", ...)
+#' @param type Step type ("Context", "Action", "Outcome" or "Unknown"), And/But
+#'   take the type of the previous step
 #' @param text Step text
 #' @param data_table Data table (tibble or NULL)
 #' @param docstring Docstring (character or NULL)
+#' @param argument_order Names of the step arguments ("docstring",
+#'   "data_table") in the order they are written
 #' @param status Execution status (NULL, "passed", "failed", "skipped", "pending")
 #' @param error Error object if failed
 #' @param duration Execution time in seconds
@@ -18,8 +22,10 @@
 new_pickle_step <- function(
   keyword,
   text,
+  type = "Unknown",
   data_table = NULL,
   docstring = NULL,
+  argument_order = character(),
   status = NULL,
   error = NULL,
   duration = NULL,
@@ -30,9 +36,11 @@ new_pickle_step <- function(
   structure(
     list(
       keyword = keyword,
+      type = type,
       text = text,
       data_table = data_table,
       docstring = docstring,
+      argument_order = argument_order,
       status = status,
       error = error,
       duration = duration,
@@ -65,7 +73,7 @@ new_pickle <- function(
     list(
       id = id,
       name = name,
-      tags = tags,
+      tags = sub("^@", "", tags),
       steps = steps,
       source_line = source_line
     ),
@@ -116,232 +124,124 @@ print.pickle <- function(x, ...) {
   invisible(x)
 }
 
-#' Create pickles from tokens
+#' Compile pickles from a Gherkin document
 #'
 #' @description
-#' Converts a token tree into a list of pickle objects. This includes:
-#' - Expanding scenario outlines into individual scenarios
-#' - Flattening background steps into each scenario
-#' - Propagating tags from feature and scenario levels
+#' A port of the official pickle compiler. It:
+#' - Expands scenario outlines into one pickle per Examples row
+#' - Adds the Feature's and the Rule's Background steps to each scenario that has steps
+#' - Inherits tags from the Feature, the Rule, the scenario and the Examples
 #'
-#' @param tokens Token tree from tokenize()
+#' @param document A document from `parse_gherkin()`
 #' @return List of pickle objects
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr map keep flatten
-#' @importFrom glue glue
-create_pickles <- function(tokens, feature_file = NULL) {
-  # Should have exactly one Feature token at top level
-  if (length(tokens) != 1 || tokens[[1]]$type != "Feature") {
-    abort("Expected exactly one Feature token")
+#' @importFrom purrr map flatten
+create_pickles <- function(document, feature_file = NULL) {
+  feature <- document$feature
+  if (is.null(feature)) {
+    return(list())
   }
 
-  pickles <- create_pickles_from_children(tokens[[1]], list(), list())
+  background <- feature$background$steps
+  rules <- feature$rules |>
+    map(\(rule) {
+      compile_scenarios(
+        rule$scenarios,
+        c(feature$tags, rule$tags),
+        c(background, rule$background$steps)
+      )
+    })
+  pickles <- c(
+    compile_scenarios(feature$scenarios, feature$tags, background),
+    flatten(rules)
+  )
 
   if (!is.null(feature_file)) {
-    pickles <- purrr::map(pickles, \(p) { p$feature_file <- feature_file; p })
+    pickles <- map(pickles, \(p) {
+      p$feature_file <- feature_file
+      p
+    })
   }
 
   pickles
 }
 
-#' Create pickles from the scenarios of a Feature or a Rule
-#'
-#' A Rule's tags and Background are added to the ones inherited from its
-#' Feature, so a Rule's Background runs after the Feature's one.
-#'
 #' @keywords internal
 #' @noRd
-create_pickles_from_children <- function(parent, parent_tags, parent_background) {
-  feature_tags <- unique(c(parent_tags, parent$tags))
-  background_steps <- parent_background
-  children <- parent$children
-
-  if (length(children) > 0 && children[[1]]$type == "Background") {
-    background_steps <- c(background_steps, children[[1]]$children)
-    children <- children[-1]
-  }
-
-  children |>
-    map(\(child) {
-      if (child$type == "Rule") {
-        create_pickles_from_children(child, feature_tags, background_steps)
-      } else if (child$type == "Scenario") {
-        tryCatch({
-          list(create_pickle_from_scenario(
-            child,
-            feature_tags,
-            background_steps
-          ))
-        }, error = function(e) {
-          message("Error in create_pickle_from_scenario: ", conditionMessage(e))
-          stop(e)
-        })
-      } else if (child$type == "Scenario Outline") {
-        tryCatch({
-          expand_scenario_outline_to_pickles(
-            child,
-            feature_tags,
-            background_steps
-          )
-        }, error = function(e) {
-          message("Error in expand_scenario_outline_to_pickles: ", conditionMessage(e))
-          stop(e)
-        })
-      } else {
-        NULL
-      }
-    }) |>
-    keep(\(x) !is.null(x)) |>
-    flatten()
-}
-
-#' Create a pickle from a scenario token
-#'
-#' @keywords internal
-#' @noRd
-create_pickle_from_scenario <- function(
-  scenario_token,
-  feature_tags,
-  background_steps
-) {
-  all_tags <- unique(c(feature_tags, scenario_token$tags))
-
-  # Convert background and scenario steps to pickle_steps
-  all_step_tokens <- c(background_steps, scenario_token$children)
-
-  steps <- all_step_tokens |>
-    map(\(step_token) {
-      new_pickle_step(
-        keyword = step_token$type,
-        text = step_token$value,
-        data_table = if (!is.null(step_token$data)) {
-          if (detect_table(step_token$data)) {
-            parse_table(step_token$data)
-          } else {
-            NULL
-          }
-        } else {
-          NULL
-        },
-        docstring = if (!is.null(step_token$data)) {
-          if (detect_docstring(step_token$data)) {
-            parse_docstring(step_token$data)
-          } else {
-            NULL
-          }
-        } else {
-          NULL
-        }
-      )
-    })
-
-  new_pickle(
-    id = generate_pickle_id(),
-    name = scenario_token$value,
-    tags = all_tags,
-    steps = steps
-  )
-}
-
-#' Expand scenario outline to pickles
-#'
-#' @keywords internal
-#' @noRd
-#' @importFrom purrr map flatten
-expand_scenario_outline_to_pickles <- function(
-  outline_token,
-  feature_tags,
-  background_steps
-) {
-  # Get all Examples sections
-  examples_sections <- outline_token$children |>
-    keep(\(x) x$type == "Scenarios")
-
-  # Get step templates
-  step_templates <- outline_token$children |>
-    keep(\(x) x$type != "Scenarios")
-
-  # Process each Examples section
-  all_pickles <- examples_sections |>
-    map(\(examples) {
-      table_data <- parse_table(examples$data)
-      examples_tags <- examples$tags
-
-      map(seq_len(nrow(table_data)), \(i) {
-        row_data <- table_data[i, ]
-
-        # Substitute placeholders in step templates
-        processed_steps <- step_templates |>
-          map(\(step) {
-            new_text <- step$value
-            for (col in names(row_data)) {
-              placeholder <- glue("<{col}>")
-              new_text <- gsub(
-                placeholder,
-                as.character(row_data[[col]]),
-                new_text,
-                fixed = TRUE
-              )
-            }
-
-            # Create new step token with substituted text
-            new_token(
-              type = step$type,
-              value = new_text,
-              tags = step$tags,
-              children = step$children,
-              data = step$data
-            )
-          })
-
-        # Create pickle from processed steps
-        all_tags <- unique(c(
-          feature_tags,
-          outline_token$tags,
-          examples_tags
-        ))
-
-        # Convert background and processed steps to pickle_steps
-        all_step_tokens <- c(background_steps, processed_steps)
-
-        steps <- all_step_tokens |>
-          map(\(step_token) {
-            new_pickle_step(
-              keyword = step_token$type,
-              text = step_token$value,
-              data_table = if (!is.null(step_token$data)) {
-                if (detect_table(step_token$data)) {
-                  parse_table(step_token$data)
-                } else {
-                  NULL
-                }
-              } else {
-                NULL
-              },
-              docstring = if (!is.null(step_token$data)) {
-                if (detect_docstring(step_token$data)) {
-                  parse_docstring(step_token$data)
-                } else {
-                  NULL
-                }
-              } else {
-                NULL
-              }
-            )
-          })
-
-        new_pickle(
+#' @importFrom purrr map flatten keep
+compile_scenarios <- function(scenarios, tags, background) {
+  scenarios |>
+    map(\(scenario) {
+      if (length(scenario$examples) == 0) {
+        return(list(new_pickle(
           id = generate_pickle_id(),
-          name = glue("{outline_token$value} (Example {i})"),
-          tags = all_tags,
-          steps = steps
-        )
-      })
+          name = scenario$name,
+          tags = c(tags, scenario$tags),
+          steps = pickle_steps(background, scenario$steps),
+          source_line = scenario$line
+        )))
+      }
+      # An outline gives a pickle for each row of each Examples with a table
+      scenario$examples |>
+        keep(\(examples) !is.null(examples$header)) |>
+        map(\(examples) {
+          map(examples$body, \(row) {
+            header <- examples$header$cells
+            new_pickle(
+              id = generate_pickle_id(),
+              name = interpolate(scenario$name, header, row$cells),
+              tags = c(tags, scenario$tags, examples$tags),
+              steps = pickle_steps(background, scenario$steps, header, row$cells),
+              source_line = row$line
+            )
+          })
+        }) |>
+        flatten()
     }) |>
     flatten()
+}
 
-  all_pickles
+#' Background steps run only before a scenario with steps, and outline
+#' placeholders are replaced only in the scenario's own steps.
+#' And/But take the type of the previous step.
+#' @keywords internal
+#' @noRd
+#' @importFrom purrr map2
+#' @importFrom stringr str_trim
+pickle_steps <- function(background, steps, header = character(), values = character()) {
+  if (length(steps) == 0) {
+    return(list())
+  }
+  in_scenario <- rep(c(FALSE, TRUE), c(length(background), length(steps)))
+  type <- "Unknown"
+  map2(c(background, steps), in_scenario, \(step, in_scenario) {
+    fill <- if (in_scenario) \(x) interpolate(x, header, values) else identity
+    if (step$keyword_type != "Conjunction") {
+      type <<- step$keyword_type
+    }
+    arguments <- c(docstring = step$docstring$line, data_table = step$data_table$line)
+    new_pickle_step(
+      keyword = str_trim(step$keyword),
+      type = type,
+      text = fill(step$text),
+      data_table = if (!is.null(step$data_table)) {
+        parse_table(map(step$data_table$rows, \(row) fill(row$cells)))
+      },
+      docstring = if (!is.null(step$docstring)) fill(step$docstring$content),
+      argument_order = as.character(names(sort(arguments)))
+    )
+  })
+}
+
+#' Replace `<name>` placeholders with the values of an Examples row
+#' @keywords internal
+#' @noRd
+interpolate <- function(x, header, values) {
+  for (i in seq_along(header)) {
+    x <- gsub(paste0("<", header[[i]], ">"), values[[i]], x, fixed = TRUE)
+  }
+  x
 }
 
 #' Generate a unique pickle ID

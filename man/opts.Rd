@@ -10,11 +10,6 @@ They allow overriding the default behavior of the package.
 \details{
 The following options are available:
 \itemize{
-\item \code{cucumber.indent}
-
-Regular expression for the indent of the feature files.
-
-default: \verb{^\\\\s\{2\}}
 \item \code{cucumber.reporter_max_docstring_lines}
 
 Max docstring lines \link{CucumberProgressReporter} prints per step before

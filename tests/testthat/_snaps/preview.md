@@ -62,41 +62,41 @@
     Output
       Preview of 6 test case(s):
       
-      [1] Pickle: eating (Example 1)
+      [1] Pickle: eating
         ID: pickle-<id>
         Steps:
           Given there are 12 cucumbers
           When I eat 5 cucumbers
           Then I should have 7 cucumbers
       
-      [2] Pickle: eating (Example 2)
+      [2] Pickle: eating
         ID: pickle-<id>
         Steps:
           Given there are 20 cucumbers
           When I eat 5 cucumbers
           Then I should have 15 cucumbers
       
-      [3] Pickle: eating (Example 1)
+      [3] Pickle: eating
         ID: pickle-<id>
         Steps:
           Given there are 12 cucumbers
           When I eat 5 cucumbers
           Then I should have 7 cucumbers
       
-      [4] Pickle: eating (Example 2)
+      [4] Pickle: eating
         ID: pickle-<id>
         Steps:
           Given there are 20 cucumbers
           When I eat 5 cucumbers
           Then I should have 15 cucumbers
       
-      [5] Pickle: eating (Example 1)
+      [5] Pickle: eating
         ID: pickle-<id>
         Steps:
           Given there are '5.6' cucumbers
           Then I should have 5.6 cucumbers
       
-      [6] Pickle: eating (Example 2)
+      [6] Pickle: eating
         ID: pickle-<id>
         Steps:
           Given there are "12" cucumbers
@@ -113,7 +113,7 @@
         ID: pickle-<id>
         Steps:
           Given I have 1
-          Given I have 2
+          And I have 2
           When I add them
           Then I get 3
 
@@ -128,7 +128,7 @@
         ID: pickle-<id>
         Steps:
           Given I have 1
-          Given I have 2
+          And I have 2
           When I add them
           Then I get 3
 
@@ -161,7 +161,7 @@
           Given I have a docstring
             <docstring>
           When I remove line that contains 'I will remove this one'
-          When I remove trailing empty lines
+          And I remove trailing empty lines
           Then the docstring looks like this
             <docstring>
 

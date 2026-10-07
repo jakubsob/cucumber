@@ -5,7 +5,7 @@
       ...)
     Output
         Error: 
-          Error in `execute(feature, feature_file = feature_path, tags = tags, reporter = reporter)`: No step definitions found.
+          Error in `execute(read_feature(feature_path), feature_file = feature_path, tags = tags, reporter = reporter)`: No step definitions found.
           i Define steps using `given()`, `when()`, or `then()`.
           i Steps are typically placed in `setup-*.R` files and are loaded automatically by cucumber.
       
@@ -235,8 +235,10 @@
       ...)
     Output
         Error: 
-          Error in `validate_indentation(clean_lines)`: All lines must be indented with ^\s{2}
-          i Check the `getOption('cucumber.indent')` option if it is set to your feature file indent.
+          <cucumber_parse_error/rlang_error/error/condition>
+          Error: Can't parse broken.feature
+          x (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Scenario: Missing Feature keyword'
+          x (2:3): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Given something happens'
       
       --------------------------------------------------------------------------------
       Summary

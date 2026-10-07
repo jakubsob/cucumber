@@ -52,6 +52,11 @@ then("only {string} was run", function(feature_name, context) {
   expect_setequal(results$context, sprintf("Feature: %s", feature_name))
 })
 
+then("it ran {string}", function(test_name, context) {
+  results <- as.data.frame(context$result)
+  expect_true(test_name %in% results$test, info = paste(results$test, collapse = ", "))
+})
+
 then("it has {int} errors", function(n, context) {
   results <- as.data.frame(context$result)
   expect_equal(sum(results$error), n)

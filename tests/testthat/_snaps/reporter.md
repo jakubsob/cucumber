@@ -8,7 +8,7 @@
       
       Feature: Addition
           v Given I have entered 50 into the calculator
-          v Given I have entered 70 into the calculator
+          v And I have entered 70 into the calculator
           v When I press add
           v Then the result should be 120
       
@@ -47,7 +47,7 @@
             line one
             line two
             """
-          v Given these people
+          v And these people
             | name  | age |
             | Alice | 30  |
             | Bob   | 7   |

@@ -20,7 +20,7 @@ Comments are only permitted at the start of a new line, anywhere in the feature 
 
 Block comments are currently not supported by Gherkin.
 
-The recommended indentation level is two spaces. If you need other indentation see `?opts`.
+Indentation doesn't change the meaning of a line, the keyword it starts with does. You can indent with spaces or tabs, the recommended indentation level is two spaces.
 
 Here is an example:
 
