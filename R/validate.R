@@ -50,9 +50,10 @@ validate_one_feature_keyword <- function(lines) {
 #' @importFrom stringr str_detect
 #' @importFrom cli cli_abort
 validate_tag_placement <- function(lines) {
-  # Tags can only be placed above: Feature, Scenario, Scenario Outline, Examples
+  # Tags can only be placed above: Feature, Rule, Scenario, Scenario Outline, Examples
   valid_keywords <- c(
     "Feature",
+    "Rule",
     "Scenario",
     "Scenario Outline",
     "Examples",
@@ -99,7 +100,7 @@ validate_tag_placement <- function(lines) {
             cli_abort(
               c(
                 "Tags cannot be placed above {.field {invalid_keyword}} (line {j})",
-                "i" = "Tags can only be placed above: Feature, Scenario, Scenario Outline, or Examples",
+                "i" = "Tags can only be placed above: Feature, Rule, Scenario, Scenario Outline, or Examples",
                 "x" = "Tag found at line {i}: {.val {lines[i]}}"
               ),
               trace = empty_trace()

@@ -246,7 +246,7 @@ types.
 - [x] Background
 - [x] Scenario Outline (or Scenario Template)
 - [x] Examples (or Scenarios)
-- [ ] Rule
+- [x] Rule
 - [x] `"""` (Doc Strings)
 - [x] `|` (Data Tables)
 - [x] `@` (Tags)

@@ -136,22 +136,37 @@ create_pickles <- function(tokens, feature_file = NULL) {
     abort("Expected exactly one Feature token")
   }
 
-  feature <- tokens[[1]]
-  feature_tags <- feature$tags
+  pickles <- create_pickles_from_children(tokens[[1]], list(), list())
 
-  # Extract background steps if present
-  background_steps <- list()
-  children <- feature$children
+  if (!is.null(feature_file)) {
+    pickles <- purrr::map(pickles, \(p) { p$feature_file <- feature_file; p })
+  }
+
+  pickles
+}
+
+#' Create pickles from the scenarios of a Feature or a Rule
+#'
+#' A Rule's tags and Background are added to the ones inherited from its
+#' Feature, so a Rule's Background runs after the Feature's one.
+#'
+#' @keywords internal
+#' @noRd
+create_pickles_from_children <- function(parent, parent_tags, parent_background) {
+  feature_tags <- unique(c(parent_tags, parent$tags))
+  background_steps <- parent_background
+  children <- parent$children
 
   if (length(children) > 0 && children[[1]]$type == "Background") {
-    background_steps <- children[[1]]$children
+    background_steps <- c(background_steps, children[[1]]$children)
     children <- children[-1]
   }
 
-  # Process each scenario/outline
-  pickles <- children |>
+  children |>
     map(\(child) {
-      if (child$type == "Scenario") {
+      if (child$type == "Rule") {
+        create_pickles_from_children(child, feature_tags, background_steps)
+      } else if (child$type == "Scenario") {
         tryCatch({
           list(create_pickle_from_scenario(
             child,
@@ -179,12 +194,6 @@ create_pickles <- function(tokens, feature_file = NULL) {
     }) |>
     keep(\(x) !is.null(x)) |>
     flatten()
-
-  if (!is.null(feature_file)) {
-    pickles <- purrr::map(pickles, \(p) { p$feature_file <- feature_file; p })
-  }
-
-  pickles
 }
 
 #' Create a pickle from a scenario token

@@ -48,6 +48,7 @@ The primary keywords are:
 
 - [Keywords](#keywords)
     - [Feature](#feature)
+    - [Rule](#rule)
     - [Example](#example) (or `Scenario`)
     - [Steps](#steps)
       - [Given](#given)
@@ -117,6 +118,34 @@ Examples follow this same pattern:
 * Describe an initial context (`Given` steps)
 * Describe an event (`When` steps)
 * Describe an expected outcome (`Then` steps)
+
+# Rule
+
+The `Rule` keyword groups together several scenarios that belong to one _business rule_. A `Rule` should contain one or more scenarios that illustrate the particular rule.
+
+```gherkin
+Feature: Highlander
+
+  Rule: There can be only One
+
+    Example: Only One -- More than one alive
+      Given there are 3 ninjas
+      And there are more than one ninja alive
+      When 2 ninjas meet, they will fight
+      Then one ninja dies (but not me)
+      And there is one ninja less alive
+
+    Example: Only One -- One alive
+      Given there is only 1 ninja alive
+      Then they will live forever ;-)
+
+  Rule: There can be Two (in some cases)
+
+    Example: Two -- Dead and Reborn as Phoenix
+      ...
+```
+
+A `Rule` can have its own `Background`. It runs after the `Feature`'s `Background`, only for the scenarios of that `Rule`.
 
 # Steps
 
@@ -284,7 +313,7 @@ Feature: Multiple site support
     Then I should see "Your article was published."
 ```
 
-You can only have one set of `Background` steps per `Feature`. If you need different `Background` steps for different scenarios, consider breaking up your set of scenarios into more `Feature`s.
+You can only have one set of `Background` steps per `Feature` or `Rule`. If you need different `Background` steps for different scenarios, consider breaking up your set of scenarios into more `Rule`s or `Feature`s.
 
 For a less explicit alternative to `Background`, check out `?hook`
 
@@ -492,7 +521,7 @@ Feature: Invalid tag usage
 
 ## Tag inheritance
 
-Tags are inherited by child elements. Tags placed above a `Feature` will be inherited by `Scenario`, `Scenario Outline`, or `Examples`. Similarly, tags placed above a `Scenario Outline` will be inherited by `Examples`.
+Tags are inherited by child elements. Tags placed above a `Feature` will be inherited by `Rule`, `Scenario`, `Scenario Outline`, or `Examples`. Tags placed above a `Rule` will be inherited by its scenarios. Similarly, tags placed above a `Scenario Outline` will be inherited by `Examples`.
 
 ## Running a subset of scenarios
 

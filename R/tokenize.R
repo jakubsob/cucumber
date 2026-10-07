@@ -3,6 +3,7 @@ NODE_REGEX <- paste0(
   paste0(
     c(
       "Feature:",
+      "Rule:",
       "Scenario:", "Example:",
       "Scenarios:", "Examples:",
       "Scenario Outline:", "Scenario Template:",
@@ -108,7 +109,7 @@ tokenize <- function(x) {
       children <- text[!local_indices]
       children <- remove_indent(children)
 
-      if (type %in% c("Feature", "Scenario", "Background", "Scenario Outline")) {
+      if (type %in% c("Feature", "Rule", "Scenario", "Background", "Scenario Outline")) {
         pre_node <- children[!cumsum(detect_node(children))]
         return(
           new_token(
