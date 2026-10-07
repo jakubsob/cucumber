@@ -19,7 +19,6 @@ make_step <- function(prefix) {
     step <- structure(
       implementation,
       description = description,
-      detect = step_regex(description),
       class = c("step", class(implementation))
     )
     register_step(step)
@@ -108,6 +107,18 @@ make_step <- function(prefix) {
 #' })
 #'
 #' @details
+#' Descriptions are [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions).
+#' Text is matched literally, except for:
+#'
+#' | **Syntax**  | **Meaning**                                                                                   |
+#' | ----------- | --------------------------------------------------------------------------------------------- |
+#' | `{int}`     | A parameter, see [define_parameter_type()]. Its value is passed to the implementation.       |
+#' | `{}`        | An anonymous parameter. Matches anything and passes it to the implementation as text.        |
+#' | `(s)`       | Optional text. `"I have {int} cucumber(s)"` matches `I have 1 cucumber` and `I have 2 cucumbers`. |
+#' | `a/b`       | Alternative words. `"I press the Enter/Return key"` matches either word.                     |
+#'
+#' To match `(`, `{` or `/` literally, escape them with a backslash, e.g. `"a\\/b"`.
+#'
 #' Placeholders in expressions are replaced with regular expressions that match values in the feature file.
 #' Regular expressions are generated during runtime based on defined parameter types.
 #'
@@ -161,5 +172,4 @@ assert_step <- function(x) {
   assert_function(x)
   assert_class(x, "step")
   assert_string(attr(x, "description"))
-  assert_string(attr(x, "detect"))
 }

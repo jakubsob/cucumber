@@ -74,6 +74,18 @@ A function of class \code{step}, invisibly. Function should be called for side e
 Provide a description that matches steps in feature files and the implementation function that will be run.
 }
 \details{
+Descriptions are \href{https://github.com/cucumber/cucumber-expressions}{Cucumber Expressions}.
+Text is matched literally, except for:\tabular{ll}{
+   \strong{Syntax} \tab \strong{Meaning} \cr
+   \code{{int}} \tab A parameter, see \code{\link[=define_parameter_type]{define_parameter_type()}}. Its value is passed to the implementation. \cr
+   \code{{}} \tab An anonymous parameter. Matches anything and passes it to the implementation as text. \cr
+   \code{(s)} \tab Optional text. \code{"I have {int} cucumber(s)"} matches \verb{I have 1 cucumber} and \verb{I have 2 cucumbers}. \cr
+   \code{a/b} \tab Alternative words. \code{"I press the Enter/Return key"} matches either word. \cr
+}
+
+
+To match \code{(}, \verb{\{} or \code{/} literally, escape them with a backslash, e.g. \code{"a\\\\/b"}.
+
 Placeholders in expressions are replaced with regular expressions that match values in the feature file.
 Regular expressions are generated during runtime based on defined parameter types.
 

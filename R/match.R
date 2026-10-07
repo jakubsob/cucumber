@@ -33,7 +33,7 @@ match_steps <- function(
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr map_chr map2 keep pluck
+#' @importFrom purrr map map_chr map2
 #' @importFrom stringr str_detect str_match_all
 #' @importFrom glue glue
 match_single_step <- function(
@@ -42,9 +42,9 @@ match_single_step <- function(
   parameters = get_parameters()
 ) {
   # Pattern to detect the step
-  detect <- steps |>
-    map_chr(attr, "detect") |>
-    map_chr(expression_to_pattern, parameters = parameters)
+  patterns <- steps |>
+    map(\(step) expression_to_pattern(attr(step, "description"), parameters))
+  detect <- map_chr(patterns, step_regex)
 
   description <- step$text
 
@@ -80,14 +80,7 @@ match_single_step <- function(
 
   matched_step <- steps[step_mask][[1]]
 
-  # Extract parameter names from step expression
-  parameter_names <- parameters |>
-    map_chr("name") |>
-    paste(collapse = "|")
-  parameter_names <- str_match_all(
-    attr(matched_step, "detect"),
-    paste0("\\{(", parameter_names, ")\\}")
-  )[[1]][, 2]
+  parameter_names <- attr(patterns[step_mask][[1]], "parameters")
 
   # Extract parameter values from step text
   values_character <- str_match_all(
@@ -103,10 +96,11 @@ match_single_step <- function(
     values_character,
     parameter_names,
     \(value, parameter_name) {
-      transformer <- parameters |>
-        keep(~ .x$name == parameter_name) |>
-        pluck(1, "transformer")
-      transformer(value)
+      # `{}` passes the matched text as is
+      if (parameter_name == "") {
+        return(value)
+      }
+      Find(\(x) x$name == parameter_name, parameters)$transformer(value)
     }
   )
 
@@ -138,7 +132,8 @@ match_single_step <- function(
 format_step_snippet <- function(keyword, description, parameters) {
   fn <- tolower(keyword)
   ordered_names <- intersect(c("string", "float", "int"), names(parameters))
-  result <- description
+  # Escape what a Cucumber Expression would read as syntax, for the R string
+  result <- str_replace_all(description, "([\\\\(){}/])", "\\\\\\\\\\1")
   params_found <- character(0)
 
   for (type_name in ordered_names) {
