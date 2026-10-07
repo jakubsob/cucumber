@@ -74,12 +74,12 @@ describe("run", {
       })
     )
     hooks <- list(
-      before = function(context, name) {
-        spies$before(name)
-      },
-      after = function(context, name) {
-        spies$after(name)
-      }
+      list(name = "before", fn = function(context, scenario) {
+        spies$before(scenario$name)
+      }),
+      list(name = "after", fn = function(context, scenario) {
+        spies$after(scenario$name)
+      })
     )
     parameters <- .parameters(
       .parameter(

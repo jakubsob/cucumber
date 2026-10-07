@@ -58,6 +58,17 @@ run <- function(
     )
   }
 
+  # A dry run runs no hooks
+  hooks <- if (dry_run) .hooks() else get_hooks()
+  on.exit({
+    after_error <- run_hooks(get_hooks_to_run(hooks, "after_all"), stop_on_error = FALSE)
+    if (!is.null(after_error)) stop(after_error)
+  })
+  before_error <- run_hooks(get_hooks_to_run(hooks, "before_all"))
+  if (!is.null(before_error)) {
+    stop(before_error)
+  }
+
   for (feature_path in features) {
     execute(
       read_feature(feature_path),

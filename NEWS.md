@@ -15,6 +15,11 @@
 - ✨ A failing `before` hook reports the scenario's steps as skipped and fails the scenario.
 - ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks.
 - ⚠️ `CucumberProgressReporter` summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
+- ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`, e.g. to take a screenshot when a scenario fails. Replace `scenario_name` with `scenario$name`.
+- ✨ Define any number of `before()` and `after()` hooks. Before hooks run in the order they are defined, after hooks in the reverse order. Previously a second hook of a kind failed with "Hook already registered".
+- ✨ `before()`, `after()` and the new step hooks get a `tags` argument, a tag expression. The hook runs only for scenarios that match it, e.g. `before(connect_db, tags = "@db")`.
+- ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword` and `text`, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
+- ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run.
 
 ## New Gherkin parser
 

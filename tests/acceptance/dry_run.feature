@@ -17,9 +17,10 @@ Feature: Dry run
       """
     And a file named "features/setup-steps.R" with
       """
-      before(function(context, scenario_name) {
-        stop("hooks must not run")
-      })
+      before_all(function() stop("hooks must not run"))
+      before(function(context, scenario) stop("hooks must not run"))
+      before_step(function(context, step) stop("hooks must not run"))
+      after_all(function() stop("hooks must not run"))
       given("an empty basket", function(context) {
         stop("steps must not run")
       })

@@ -125,6 +125,21 @@ then("the output includes", function(text, context) {
   )
 })
 
+then("the output includes {string}", function(text, context) {
+  output <- paste(context$output, collapse = "\n")
+  expect_true(grepl(text, output, fixed = TRUE), info = output)
+})
+
+then("the output includes {string} once", function(text, context) {
+  output <- paste(context$output, collapse = "\n")
+  expect_equal(lengths(regmatches(output, gregexpr(text, output, fixed = TRUE))), 1, info = output)
+})
+
+then("the output doesn't include {string}", function(text, context) {
+  output <- paste(context$output, collapse = "\n")
+  expect_false(grepl(text, output, fixed = TRUE), info = output)
+})
+
 after(function(context, scenario_name) {
   # Cleanup environment if package was loaded
   withr::with_dir(context$tempdir, {

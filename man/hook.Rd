@@ -4,21 +4,44 @@
 \alias{hook}
 \alias{before}
 \alias{after}
+\alias{before_step}
+\alias{after_step}
+\alias{before_all}
+\alias{after_all}
 \title{Hooks}
 \usage{
-before(hook)
+before(hook, tags = NULL)
 
-after(hook)
+after(hook, tags = NULL)
+
+before_step(hook, tags = NULL)
+
+after_step(hook, tags = NULL)
+
+before_all(hook)
+
+after_all(hook)
 }
 \arguments{
-\item{hook}{A function that will be run. The function first argument is context and the scenario name is the second argument.}
+\item{hook}{A function that will be run.
+\itemize{
+\item \code{before()} and \code{after()} hooks get the \code{context} and the \code{scenario}: a list with
+the scenario's \code{name}, \code{tags}, \code{uri} (the feature file),
+and in \code{after()} hooks its \code{status} and \code{error}.
+\item \code{before_step()} and \code{after_step()} hooks get the \code{context} and the \code{step}: a list with
+the step's \code{keyword} and \code{text}, and in \code{after_step()} hooks its \code{status} and \code{error}.
+\item \code{before_all()} and \code{after_all()} hooks get no arguments.
+}}
+
+\item{tags}{A tag expression, e.g. \code{"@db and not @slow"}.
+The hook runs only for scenarios that match it. If \code{NULL}, it runs for every scenario.}
 }
 \description{
 Hooks are blocks of code that can run at various points in the Cucumber execution cycle. They are typically used for setup and teardown of the environment before and after each scenario.
 
 Where a hook is defined has no impact on what scenarios it is run for.
 
-If you want to run a hook only before or after a specific scenario, use it's name to execute hook only for this scenario.
+You can define any number of hooks of each kind. Before hooks run in the order they are defined, after hooks in the reverse order.
 }
 \section{Before}{
 
@@ -26,28 +49,57 @@ If you want to run a hook only before or after a specific scenario, use it's nam
 Whatever happens in a \code{before} hook is invisible to people who only read the features.
 You should consider using a background as a more explicit alternative, especially if the setup should be readable by non-technical people.
 Only use a \code{before} hook for low-level logic such as starting a browser or deleting data from a database.
+
+If a \code{before} hook fails, the rest of the \code{before} hooks and all the scenario's steps are skipped, and the scenario fails.
 }
 
 \section{After}{
 
 
 After hooks run after the last step of each scenario, even when the scenario failed or thrown an error.
+A failing \code{after} hook fails the scenario.
+}
+
+\section{Step hooks}{
+
+
+\code{before_step()} and \code{after_step()} hooks run before and after each step that runs.
+They don't run for skipped, undefined or ambiguous steps.
+If a step hook fails, the step fails.
+}
+
+\section{Before all and after all}{
+
+
+\code{before_all()} hooks run once before the first scenario, \code{after_all()} hooks once after the last one,
+even when the run failed.
+
+Hooks don't run in a dry run.
 }
 
 \examples{
 \dontrun{
-before(function(context, scenario_name) {
+before(function(context, scenario) {
   context$session <- selenider::selenider_session()
 })
 
-after(function(context, scenario_name) {
+after(function(context, scenario) {
+  if (scenario$status == "failed") {
+    selenider::take_screenshot(file = paste0(scenario$name, ".png"))
+  }
   selenider::close_session(context$session)
 })
 
-after(function(context, scenario_name) {
-  if (scenario_name == "Playing one round of the game") {
-    context$game$close()
-  }
+before(function(context, scenario) {
+  context$db <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+}, tags = "@db")
+
+after_step(function(context, step) {
+  message(step$text, ": ", step$status)
+})
+
+before_all(function() {
+  options(warn = 2)
 })
 }
 }

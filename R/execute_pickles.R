@@ -83,23 +83,15 @@ execute_single_pickle <- function(
 ) {
   test_that(glue("Scenario: {test_name}"), {
     .context <- new.env()
+    scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
 
     # A dry run matches the steps, but runs neither hooks nor step bodies
-    hook_error <- NULL
+    before_error <- NULL
     if (!dry_run) {
-      after <- get_hook(hooks, "after")
-      before <- get_hook(hooks, "before")
-      on.exit(after(.context, pickle$name))
-      hook_error <- tryCatch(
-        {
-          before(.context, pickle$name)
-          NULL
-        },
-        error = identity
-      )
+      before_error <- run_hooks(get_hooks_to_run(hooks, "before", pickle$tags), .context, scenario)
     }
 
-    skipping <- dry_run || !is.null(hook_error)
+    skipping <- dry_run || !is.null(before_error)
     steps <- list()
     for (step in pickle$steps) {
       if (inherits(reporter, "CucumberReporter")) {
@@ -110,7 +102,7 @@ execute_single_pickle <- function(
         step <- if (skipping) {
           new_step_result(step, "skipped")
         } else {
-          execute_single_step(step, .context, pickle = pickle)
+          execute_step_with_hooks(step, .context, pickle, hooks)
         }
       }
       if (inherits(reporter, "CucumberReporter")) {
@@ -120,13 +112,65 @@ execute_single_pickle <- function(
       steps <- c(steps, list(step))
     }
 
-    if (!is.null(hook_error)) {
-      stop(hook_error)
+    after_error <- NULL
+    if (!dry_run) {
+      scenario <- c(scenario, scenario_result(steps, before_error))
+      after_error <- run_hooks(
+        get_hooks_to_run(hooks, "after", pickle$tags),
+        .context,
+        scenario,
+        stop_on_error = FALSE
+      )
+    }
+
+    # Recorded as errors without stopping, so failed steps are reported too
+    for (error in Filter(Negate(is.null), list(before_error, after_error))) {
+      testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
     }
     signal_scenario_result(steps, strict)
   })
 
   invisible(NULL)
+}
+
+#' The status of a scenario's worst step, and its error. A failed before hook
+#' fails the scenario.
+#'
+#' @keywords internal
+#' @noRd
+scenario_result <- function(steps, before_error = NULL) {
+  if (!is.null(before_error)) {
+    return(list(status = "failed", error = before_error))
+  }
+  statuses <- vapply(steps, \(step) step$status, character(1))
+  status <- STEP_STATUSES[STEP_STATUSES %in% c(statuses, "passed")][[1]]
+  worst <- Find(\(step) step$status == status, steps)
+  list(status = status, error = worst$error)
+}
+
+#' Run a step between its before_step and after_step hooks. A failing step hook
+#' fails the step, a failing before_step hook also stops the step from running.
+#'
+#' @keywords internal
+#' @noRd
+execute_step_with_hooks <- function(step, context, pickle, hooks) {
+  hook_step <- list(keyword = step$keyword, text = step$text)
+  before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step)
+  step <- if (is.null(before_error)) {
+    execute_single_step(step, context, pickle = pickle)
+  } else {
+    new_step_result(step, "failed", before_error)
+  }
+  after_error <- run_hooks(
+    get_hooks_to_run(hooks, "after_step", pickle$tags),
+    context,
+    c(hook_step, list(status = step$status, error = step$error)),
+    stop_on_error = FALSE
+  )
+  if (!is.null(after_error) && step$status == "passed") {
+    step <- new_step_result(step, "failed", after_error, step$duration)
+  }
+  step
 }
 
 #' Report the steps that didn't pass to testthat

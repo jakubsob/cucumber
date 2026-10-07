@@ -53,7 +53,44 @@
             | Bob   | 7   |
       
 
+---
+
+    Code
+      suppressMessages({
+        cucumber:::execute(feature, reporter = reporter)
+      })
+    Output
+      
+      Feature: Step arguments
+          v Given a message
+            """
+            line one
+            line two
+            """
+          v And these people
+            | name  | age |
+            | Alice | 30  |
+            | Bob   | 7   |
+      
+
 # CucumberProgressReporter / truncates long step arguments to max_lines / Scenario: Long docstring
+
+    Code
+      suppressMessages({
+        cucumber:::execute(feature, reporter = reporter)
+      })
+    Output
+      
+      Feature: Step arguments
+          v Given a long message
+            """
+            line one
+            line two
+            ... and 2 more line(s)
+            """
+      
+
+---
 
     Code
       suppressMessages({
