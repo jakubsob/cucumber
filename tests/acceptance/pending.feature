@@ -1,6 +1,8 @@
 Feature: Pending steps
+  A step that calls `pending()` is reported as pending, and the steps after it are skipped.
+  A pending step fails the run, unless it's run with `strict = FALSE`.
 
-  Scenario: A pending step is reported as skipped, not failed
+  Scenario: A pending step fails the scenario
     Given a file named "DESCRIPTION" with
       """
       Package: example
@@ -20,11 +22,24 @@ Feature: Pending steps
       """
     When I run
       """
-      test("features")
+      test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 skipped
+    Then it has 1 failed
+    And the error message includes
+      """
+      Step "a step that is pending" is pending: not yet implemented
+      """
+    And the output includes
+      """
+      P Given a step that is pending
+      """
+    And the output includes
+      """
+      1 scenario (1 pending)
+      1 step (1 pending)
+      """
 
-  Scenario: Steps after a pending step do not run
+  Scenario: Steps after a pending step are skipped
     Given a file named "DESCRIPTION" with
       """
       Package: example
@@ -48,12 +63,20 @@ Feature: Pending steps
       """
     When I run
       """
-      test("features")
+      test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 skipped
-    Then it has 0 errors
+    Then it has 1 failed
+    And it has 0 errors
+    And the output includes
+      """
+      P Given a step that is pending
+      """
+    And the output includes
+      """
+      - Then this step should not run
+      """
 
-  Scenario: A non-pending scenario is not affected
+  Scenario: A pending step skips the scenario when not strict
     Given a file named "DESCRIPTION" with
       """
       Package: example
@@ -83,7 +106,8 @@ Feature: Pending steps
       """
     When I run
       """
-      test("features")
+      test("features", strict = FALSE)
       """
     Then it has 1 passed
     And it has 1 skipped
+    And it has 0 failed

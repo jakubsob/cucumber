@@ -2,7 +2,8 @@
 #'
 #' @description
 #' Enriches pickle steps with matched functions and extracted arguments.
-#' Fails early if step definitions are missing or duplicated.
+#' A step without exactly one matching definition gets the status "undefined"
+#' or "ambiguous" and an error explaining it, so the run can report it.
 #'
 #' @param pickles List of pickle objects
 #' @param steps List of step definition functions
@@ -27,6 +28,21 @@ match_steps <- function(
       }),
     purrr_error_indexed = unwrap_purrr_error
   )
+}
+
+#' Mark a step that can't be run, keeping the reason as its error
+#'
+#' @keywords internal
+#' @noRd
+#' @importFrom rlang error_cnd format_error_bullets
+unmatched_step <- function(step, status, message, body) {
+  step$status <- status
+  step$error <- error_cnd(
+    class = paste0("cucumber_", status),
+    message = paste(c(message, format_error_bullets(body)), collapse = "\n"),
+    trace = empty_trace()
+  )
+  step
 }
 
 #' Match a single step to its definition
@@ -54,14 +70,15 @@ match_single_step <- function(
   if (sum(step_mask) == 0) {
     snippet <- format_step_snippet(SNIPPET_KEYWORDS[[step$type]], description, parameters)
     snippet_lines <- strsplit(snippet, "\n")[[1]]
-    abort(
+    return(unmatched_step(
+      step,
+      "undefined",
       glue("No step found for: \"{description}\""),
-      body = c(
+      c(
         i = "Add a step definition:",
         set_names(snippet_lines, rep(" ", length(snippet_lines)))
-      ),
-      trace = empty_trace()
-    )
+      )
+    ))
   }
 
   # Ambiguous step
@@ -72,14 +89,15 @@ match_single_step <- function(
         location <- if (is.null(location)) "" else glue(" ({location})")
         glue("\"{attr(definition, 'description')}\"{location}")
       })
-    abort(
+    return(unmatched_step(
+      step,
+      "ambiguous",
       glue("Multiple step definitions match: \"{description}\""),
-      body = c(
+      c(
         i = "Make the step match only one of:",
         set_names(definitions, rep("*", length(definitions)))
-      ),
-      trace = empty_trace()
-    )
+      )
+    ))
   }
 
   matched_step <- steps[step_mask][[1]]

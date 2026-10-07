@@ -13,6 +13,8 @@ test(
   load_helpers = TRUE,
   stop_on_failure = TRUE,
   stop_on_warning = FALSE,
+  strict = TRUE,
+  dry_run = FALSE,
   ...
 )
 }
@@ -40,6 +42,12 @@ See \link[testthat]{Reporter} for more details and a list of built-in reporters.
 
 \item{stop_on_warning}{If \code{TRUE}, throw an error if any tests generate
 warnings.}
+
+\item{strict}{If \code{TRUE}, pending and undefined steps fail the scenario.
+If \code{FALSE}, they skip it.}
+
+\item{dry_run}{If \code{TRUE}, steps are matched to step definitions, but neither
+step definitions nor hooks are run. Use it to find undefined and ambiguous steps.}
 
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
@@ -81,6 +89,9 @@ cucumber::test("tests/acceptance", tags = "@smoke")
 cucumber::test("tests/acceptance", tags = "@smoke and @fast")
 cucumber::test("tests/acceptance", tags = "@wip and not @slow")
 cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
+
+# Find undefined steps without running anything
+cucumber::test("tests/acceptance", dry_run = TRUE)
 }
 
 }

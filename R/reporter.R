@@ -24,6 +24,7 @@
 #'
 #' @importFrom R6 R6Class
 #' @importFrom rlang %||%
+#' @importFrom purrr map2_chr
 #' @keywords internal
 #' @export
 CucumberReporter <- R6::R6Class(
@@ -108,6 +109,51 @@ truncate_lines <- function(lines, max_lines) {
   )
 }
 
+#' Order of step statuses from the worst to the best, as in Cucumber summaries
+#'
+#' @keywords internal
+#' @noRd
+STEP_STATUSES <- c("failed", "ambiguous", "undefined", "pending", "skipped", "passed")
+
+status_color <- function(status) {
+  switch(
+    status,
+    passed = cli::col_green,
+    skipped = cli::col_cyan,
+    pending = ,
+    undefined = cli::col_yellow,
+    cli::col_red
+  )
+}
+
+status_symbol <- function(status) {
+  symbol <- switch(
+    status,
+    passed = cli::symbol$tick,
+    failed = cli::symbol$cross,
+    skipped = "-",
+    pending = "P",
+    undefined = "U",
+    ambiguous = "A"
+  )
+  status_color(status)(symbol)
+}
+
+#' Count statuses like Cucumber does, e.g. "3 steps (1 failed, 2 passed)"
+#'
+#' @keywords internal
+#' @noRd
+format_status_counts <- function(statuses, noun) {
+  label <- paste0(length(statuses), " ", noun, if (length(statuses) != 1) "s")
+  counts <- table(factor(statuses, STEP_STATUSES))
+  counts <- counts[counts > 0]
+  if (length(counts) == 0) {
+    return(label)
+  }
+  parts <- map2_chr(names(counts), counts, \(status, n) status_color(status)(paste(n, status)))
+  paste0(label, " (", paste(parts, collapse = ", "), ")")
+}
+
 #' Progress Reporter for Cucumber
 #'
 #' @description
@@ -119,7 +165,13 @@ truncate_lines <- function(lines, max_lines) {
 #' scenario and feature headers similar to testthat's output:
 #'
 #' - \ifelse{latex}{[x]}{✓} for passed steps (green)
-#' - \ifelse{latex}{[ ]}{✗} for failed/errored steps (red)
+#' - \ifelse{latex}{[ ]}{✗} for failed steps (red)
+#' - `-` for skipped steps (cyan)
+#' - `P` for pending steps (yellow)
+#' - `U` for undefined steps (yellow)
+#' - `A` for ambiguous steps (red)
+#'
+#' The summary counts scenarios and steps by status, like Cucumber does.
 #'
 #' ```
 #' Feature: Addition
@@ -187,8 +239,8 @@ truncate_lines <- function(lines, max_lines) {
 #'   And and But steps take the type of the previous step. "Unknown" for `*`
 #'   and for And or But as the first step.
 #' - `text` - The step text
-#' - `status` - One of "passed", "failed", or "error"
-#' - `error` - The error object if the step failed or errored (NULL otherwise)
+#' - `status` - One of "passed", "failed", "skipped", "pending", "undefined" or "ambiguous"
+#' - `error` - The error object if the step failed, is pending, undefined or ambiguous (NULL otherwise)
 #' - `duration` - Execution time in seconds
 #' - `data_table` - Data table if present (NULL otherwise)
 #' - `docstring` - Docstring if present (NULL otherwise)
@@ -218,14 +270,14 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field show_praise Whether to show praise messages
     show_praise = TRUE,
 
-    #' @field step_count Number of steps executed
-    step_count = 0,
+    #' @field step_statuses Statuses of the reported steps
+    step_statuses = NULL,
 
-    #' @field step_passed Number of steps that passed
-    step_passed = 0,
+    #' @field scenario_statuses Statuses of the finished scenarios
+    scenario_statuses = NULL,
 
-    #' @field step_failed Number of steps that failed
-    step_failed = 0,
+    #' @field scenario_failed Whether testthat reported a failure or an error for the current scenario
+    scenario_failed = FALSE,
 
     #' @field current_scenario Name of the scenario currently executing
     current_scenario = NULL,
@@ -236,7 +288,7 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
 
-    #' @field step_errored Whether end_step already rendered an error this scenario
+    #' @field step_errored Whether end_step already rendered a step's error this scenario
     step_errored = FALSE,
 
     #' @field num_colors Terminal color support captured at construction
@@ -271,9 +323,8 @@ CucumberProgressReporter <- R6::R6Class(
       self$show_praise <- show_praise
       self$reporter_max_docstring_lines <- reporter_max_docstring_lines
       self$reporter_max_table_lines <- reporter_max_table_lines
-      self$step_count <- 0
-      self$step_passed <- 0
-      self$step_failed <- 0
+      self$step_statuses <- character()
+      self$scenario_statuses <- character()
       self$current_steps <- list()
       self$failures <- list()
       # ponytail: capture real color support now, before testthat runs. During a
@@ -313,8 +364,27 @@ CucumberProgressReporter <- R6::R6Class(
       self$current_scenario <- test
       self$current_steps <- list()
       self$step_errored <- FALSE
+      self$scenario_failed <- FALSE
       withr::local_options(cli.num_colors = self$num_colors)
       cat("  ", bold_label(test), "\n", sep = "")
+      invisible(self)
+    },
+
+    #' @description
+    #' End a test (called by testthat for each scenario). The scenario gets the
+    #' status of its worst step, or "failed" if a hook failed.
+    #' @param context Test context
+    #' @param test Test name
+    end_test = function(context, test) {
+      if (!is.null(super$end_test)) {
+        super$end_test(context, test)
+      }
+      statuses <- vapply(self$current_steps, \(step) step$status %||% "passed", character(1))
+      status <- STEP_STATUSES[STEP_STATUSES %in% c(statuses, "passed")][[1]]
+      if (self$scenario_failed && status %in% c("passed", "skipped")) {
+        status <- "failed"
+      }
+      self$scenario_statuses <- c(self$scenario_statuses, status)
       invisible(self)
     },
 
@@ -329,6 +399,10 @@ CucumberProgressReporter <- R6::R6Class(
       }
 
       withr::local_options(cli.num_colors = self$num_colors)
+
+      if (inherits(result, c("expectation_error", "expectation_failure"))) {
+        self$scenario_failed <- TRUE
+      }
 
       # Display warnings
       if (inherits(result, "expectation_warning")) {
@@ -379,20 +453,13 @@ CucumberProgressReporter <- R6::R6Class(
 
       withr::local_options(cli.num_colors = self$num_colors)
 
-      self$step_count <- self$step_count + 1
       self$current_steps <- c(self$current_steps, list(step))
 
       status <- step$status %||% "passed"
+      self$step_statuses <- c(self$step_statuses, status)
 
-      if (status == "passed") {
-        self$step_passed <- self$step_passed + 1
-        status_symbol <- cli::col_green(cli::symbol$tick)
-      } else {
-        self$step_failed <- self$step_failed + 1
-        status_symbol <- cli::col_red(cli::symbol$cross)
-        if (identical(status, "error")) {
-          self$step_errored <- TRUE
-        }
+      if (!status %in% c("passed", "skipped")) {
+        self$step_errored <- TRUE
         self$failures <- c(
           self$failures,
           list(list(
@@ -408,7 +475,7 @@ CucumberProgressReporter <- R6::R6Class(
       # is re-enabled via the num_colors option forced above.
       cat(
         "    ",
-        status_symbol,
+        status_symbol(status),
         " ",
         cli::style_bold(step$keyword),
         " ",
@@ -419,7 +486,7 @@ CucumberProgressReporter <- R6::R6Class(
 
       self$print_step_args(step)
 
-      # If step failed or errored, show error details
+      # If the step didn't pass, show why
       if (!is.null(step$error)) {
         # Get error message - for rlang errors this includes full formatting
         error_msg <- conditionMessage(step$error)
@@ -428,7 +495,7 @@ CucumberProgressReporter <- R6::R6Class(
         for (line in error_lines) {
           cat(
             "      ",
-            cli::col_red(line),
+            status_color(status)(line),
             "\n",
             sep = ""
           )
@@ -472,16 +539,8 @@ CucumberProgressReporter <- R6::R6Class(
       cat("\n")
       cat(cli::rule(), "\n", sep = "")
       cat(cli::style_bold("Summary"), "\n", sep = "")
-      cat(
-        "  Total: ",
-        self$step_count,
-        " | Passed: ",
-        cli::col_green(self$step_passed),
-        " | Failed: ",
-        cli::col_red(self$step_failed),
-        "\n",
-        sep = ""
-      )
+      cat("  ", format_status_counts(self$scenario_statuses, "scenario"), "\n", sep = "")
+      cat("  ", format_status_counts(self$step_statuses, "step"), "\n", sep = "")
       cat(cli::rule(), "\n", sep = "")
 
       if (length(self$failures) > 0) {
@@ -490,15 +549,10 @@ CucumberProgressReporter <- R6::R6Class(
           cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
           cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
           for (step in failure$steps) {
-            failed <- !is.null(step$error)
-            symbol <- if (failed) {
-              cli::col_red(cli::symbol$cross)
-            } else {
-              cli::col_green(cli::symbol$tick)
-            }
+            status <- step$status %||% "passed"
             cat(
               "    ",
-              symbol,
+              status_symbol(status),
               " ",
               cli::style_bold(step$keyword),
               " ",
@@ -506,10 +560,10 @@ CucumberProgressReporter <- R6::R6Class(
               "\n",
               sep = ""
             )
-            if (failed) {
+            if (!is.null(step$error)) {
               error_lines <- strsplit(conditionMessage(step$error), "\n")[[1]]
               for (line in error_lines) {
-                cat("      ", cli::col_red(line), "\n", sep = "")
+                cat("      ", status_color(status)(line), "\n", sep = "")
               }
             }
           }

@@ -1,7 +1,7 @@
 Feature: Ambiguous steps
   A step must match exactly one step definition.
-  When it matches more than one, the run fails before executing any step,
-  listing every matching definition.
+  When it matches more than one, the step is reported as ambiguous, listing
+  every matching definition, and the scenario fails.
 
   Scenario: A step matching two definitions fails with both definitions listed
     Given a file named "DESCRIPTION" with
@@ -28,7 +28,7 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes
       """
       Multiple step definitions match: "the user is "John""
@@ -67,7 +67,7 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes
       """
       Multiple step definitions match: "I add an item"
@@ -98,7 +98,7 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes
       """
       Multiple step definitions match: "there are 12 cucumbers"

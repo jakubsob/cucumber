@@ -12,8 +12,14 @@ Prints each step as it executes with a status indicator, grouped under
 scenario and feature headers similar to testthat's output:
 \itemize{
 \item \ifelse{latex}{[x]}{✓} for passed steps (green)
-\item \ifelse{latex}{[ ]}{✗} for failed/errored steps (red)
+\item \ifelse{latex}{[ ]}{✗} for failed steps (red)
+\item \code{-} for skipped steps (cyan)
+\item \code{P} for pending steps (yellow)
+\item \code{U} for undefined steps (yellow)
+\item \code{A} for ambiguous steps (red)
 }
+
+The summary counts scenarios and steps by status, like Cucumber does.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Addition
   Scenario: Add two numbers
@@ -79,8 +85,8 @@ When \code{end_step()} is called, the step object contains:
 And and But steps take the type of the previous step. "Unknown" for \code{*}
 and for And or But as the first step.
 \item \code{text} - The step text
-\item \code{status} - One of "passed", "failed", or "error"
-\item \code{error} - The error object if the step failed or errored (NULL otherwise)
+\item \code{status} - One of "passed", "failed", "skipped", "pending", "undefined" or "ambiguous"
+\item \code{error} - The error object if the step failed, is pending, undefined or ambiguous (NULL otherwise)
 \item \code{duration} - Execution time in seconds
 \item \code{data_table} - Data table if present (NULL otherwise)
 \item \code{docstring} - Docstring if present (NULL otherwise)
@@ -114,11 +120,11 @@ cucumber::test(
 \describe{
 \item{\code{show_praise}}{Whether to show praise messages}
 
-\item{\code{step_count}}{Number of steps executed}
+\item{\code{step_statuses}}{Statuses of the reported steps}
 
-\item{\code{step_passed}}{Number of steps that passed}
+\item{\code{scenario_statuses}}{Statuses of the finished scenarios}
 
-\item{\code{step_failed}}{Number of steps that failed}
+\item{\code{scenario_failed}}{Whether testthat reported a failure or an error for the current scenario}
 
 \item{\code{current_scenario}}{Name of the scenario currently executing}
 
@@ -126,7 +132,7 @@ cucumber::test(
 
 \item{\code{failures}}{Recorded failures for the end-of-run summary}
 
-\item{\code{step_errored}}{Whether end_step already rendered an error this scenario}
+\item{\code{step_errored}}{Whether end_step already rendered a step's error this scenario}
 
 \item{\code{num_colors}}{Terminal color support captured at construction}
 
@@ -143,6 +149,7 @@ cucumber::test(
 \item \href{#method-CucumberProgressReporter-start_feature}{\code{CucumberProgressReporter$start_feature()}}
 \item \href{#method-CucumberProgressReporter-end_feature}{\code{CucumberProgressReporter$end_feature()}}
 \item \href{#method-CucumberProgressReporter-start_test}{\code{CucumberProgressReporter$start_test()}}
+\item \href{#method-CucumberProgressReporter-end_test}{\code{CucumberProgressReporter$end_test()}}
 \item \href{#method-CucumberProgressReporter-add_result}{\code{CucumberProgressReporter$add_result()}}
 \item \href{#method-CucumberProgressReporter-start_step}{\code{CucumberProgressReporter$start_step()}}
 \item \href{#method-CucumberProgressReporter-end_step}{\code{CucumberProgressReporter$end_step()}}
@@ -160,7 +167,6 @@ cucumber::test(
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context'><code>testthat::Reporter$end_context()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context_if_started"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context_if_started'><code>testthat::Reporter$end_context_if_started()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_file"><a href='../../testthat/html/Reporter.html#method-Reporter-end_file'><code>testthat::Reporter$end_file()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_test"><a href='../../testthat/html/Reporter.html#method-Reporter-end_test'><code>testthat::Reporter$end_test()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="is_full"><a href='../../testthat/html/Reporter.html#method-Reporter-is_full'><code>testthat::Reporter$is_full()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="local_user_output"><a href='../../testthat/html/Reporter.html#method-Reporter-local_user_output'><code>testthat::Reporter$local_user_output()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="rule"><a href='../../testthat/html/Reporter.html#method-Reporter-rule'><code>testthat::Reporter$rule()</code></a></span></li>
@@ -245,6 +251,26 @@ Start a test (called by testthat for each scenario)
 \item{\code{context}}{Test context}
 
 \item{\code{test}}{Test name (will be "Scenario: \verb{<name>}")}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberProgressReporter-end_test"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_test}{}}}
+\subsection{Method \code{end_test()}}{
+End a test (called by testthat for each scenario). The scenario gets the
+status of its worst step, or "failed" if a hook failed.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_test(context, test)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{context}}{Test context}
+
+\item{\code{test}}{Test name}
 }
 \if{html}{\out{</div>}}
 }

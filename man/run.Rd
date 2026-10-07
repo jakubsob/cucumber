@@ -4,7 +4,15 @@
 \alias{run}
 \title{Run Cucumber tests in a \code{testthat} context}
 \usage{
-run(path = ".", filter = NULL, tags = NULL, reporter = get_reporter(), ...)
+run(
+  path = ".",
+  filter = NULL,
+  tags = NULL,
+  reporter = get_reporter(),
+  strict = TRUE,
+  dry_run = FALSE,
+  ...
+)
 }
 \arguments{
 \item{path}{Path to the directory containing the \code{.feature} files.
@@ -21,6 +29,12 @@ Tag expressions support \code{and}, \code{or}, \code{not} operators and parenthe
 
 \item{reporter}{Optional reporter instance (testthat::Reporter or cucumber::CucumberReporter).
 If NULL, will use reporter from package options if available.}
+
+\item{strict}{If \code{TRUE}, pending and undefined steps fail the scenario.
+If \code{FALSE}, they skip it.}
+
+\item{dry_run}{If \code{TRUE}, steps are matched to step definitions, but neither
+step definitions nor hooks are run. Use it to find undefined and ambiguous steps.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

@@ -5,10 +5,10 @@ describe("match_single_step snippet", {
     given("some other step", function(context) {})
     step <- new_pickle_step(keyword = "Then", type = "Outcome", text = "it passes")
 
-    expect_snapshot(
-      match_single_step(step),
-      error = TRUE
-    )
+    matched <- match_single_step(step)
+
+    expect_equal(matched$status, "undefined")
+    expect_snapshot(cat(conditionMessage(matched$error)))
   })
 
   it("keeps parameter placeholders in the snippet", {
@@ -20,10 +20,10 @@ describe("match_single_step snippet", {
       text = "I have 5 cucumbers in my basket"
     )
 
-    expect_snapshot(
-      match_single_step(step),
-      error = TRUE
-    )
+    matched <- match_single_step(step)
+
+    expect_equal(matched$status, "undefined")
+    expect_snapshot(cat(conditionMessage(matched$error)))
   })
 })
 

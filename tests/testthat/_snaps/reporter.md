@@ -13,10 +13,10 @@
           v Then the result should be 120
       
 
-# CucumberProgressReporter / shows errors for failing steps / Scenario: This will fail
+# CucumberProgressReporter / shows errors for failing steps
 
     Code
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     Output

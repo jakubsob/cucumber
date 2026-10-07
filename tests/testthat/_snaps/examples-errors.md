@@ -4,15 +4,33 @@
       test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
-        Error: 
-          Error in `execute(read_feature(feature_path), feature_file = feature_path, tags = tags, reporter = reporter)`: No step definitions found.
-          i Define steps using `given()`, `when()`, or `then()`.
-          i Steps are typically placed in `setup-*.R` files and are loaded automatically by cucumber.
+      
+      Feature: Add
+        Scenario: Add
+          U Given I have 1
+            No step found for: "I have 1"
+            i Add a step definition:
+              given("I have {int}", function(int, context) {
+                pending()
+              })
+      
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 0 | Passed: 0 | Failed: 0
+        1 scenario (1 undefined)
+        1 step (1 undefined)
       --------------------------------------------------------------------------------
+      
+      Failures
+      
+      Feature: Add
+        Scenario: Add
+          U Given I have 1
+            No step found for: "I have 1"
+            i Add a step definition:
+              given("I have {int}", function(int, context) {
+                pending()
+              })
 
 # test / error handling / should throw an error if no test files are found
 
@@ -26,7 +44,8 @@
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 0 | Passed: 0 | Failed: 0
+        0 scenarios
+        0 steps
       --------------------------------------------------------------------------------
 
 # test / error handling / should show clean trace when a step throws an error
@@ -46,11 +65,13 @@
             i Step defined at: setup-steps.R:6
             Caused by error:
             ! Addition service is unavailable
+          - Then the result is 3
       
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 2 | Passed: 1 | Failed: 1
+        1 scenario (1 failed)
+        3 steps (1 failed, 1 skipped, 1 passed)
       --------------------------------------------------------------------------------
       
       Failures
@@ -90,7 +111,8 @@
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 1 | Passed: 0 | Failed: 1
+        1 scenario (1 failed)
+        1 step (1 failed)
       --------------------------------------------------------------------------------
       
       Failures
@@ -154,7 +176,8 @@
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 11 | Passed: 8 | Failed: 3
+        5 scenarios (3 failed, 2 passed)
+        11 steps (3 failed, 8 passed)
       --------------------------------------------------------------------------------
       
       Failures
@@ -199,17 +222,36 @@
       test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
-        Error: 
-          Error in `match_single_step(step, steps, parameters)`: No step found for: "I add them"
-          i Add a step definition:
-            when("I add them", function(context) {
-              pending()
-            })
+      
+      Feature: Addition
+        Scenario: Adding two numbers
+          v Given I have 1 and 2
+          U When I add them
+            No step found for: "I add them"
+            i Add a step definition:
+              when("I add them", function(context) {
+                pending()
+              })
+          - Then the result is 3
+      
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 0 | Passed: 0 | Failed: 0
+        1 scenario (1 undefined)
+        3 steps (1 undefined, 1 skipped, 1 passed)
       --------------------------------------------------------------------------------
+      
+      Failures
+      
+      Feature: Addition
+        Scenario: Adding two numbers
+          v Given I have 1 and 2
+          U When I add them
+            No step found for: "I add them"
+            i Add a step definition:
+              when("I add them", function(context) {
+                pending()
+              })
 
 # test / error handling / should show an error when a step has duplicate definitions
 
@@ -217,16 +259,34 @@
       test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
-        Error: 
-          Error in `match_single_step(step, steps, parameters)`: Multiple step definitions match: "I add them"
-          i Make the step match only one of:
-          * "I add them" (setup-steps.R:6)
-          * "I add them" (setup-steps.R:10)
+      
+      Feature: Addition
+        Scenario: Adding two numbers
+          v Given I have 1 and 2
+          A When I add them
+            Multiple step definitions match: "I add them"
+            i Make the step match only one of:
+            * "I add them" (setup-steps.R:6)
+            * "I add them" (setup-steps.R:10)
+          - Then the result is 3
+      
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 0 | Passed: 0 | Failed: 0
+        1 scenario (1 ambiguous)
+        3 steps (1 ambiguous, 1 skipped, 1 passed)
       --------------------------------------------------------------------------------
+      
+      Failures
+      
+      Feature: Addition
+        Scenario: Adding two numbers
+          v Given I have 1 and 2
+          A When I add them
+            Multiple step definitions match: "I add them"
+            i Make the step match only one of:
+            * "I add them" (setup-steps.R:6)
+            * "I add them" (setup-steps.R:10)
 
 # test / error handling / should show an error when a feature file is invalid
 
@@ -242,6 +302,7 @@
       
       --------------------------------------------------------------------------------
       Summary
-        Total: 0 | Passed: 0 | Failed: 0
+        0 scenarios
+        0 steps
       --------------------------------------------------------------------------------
 

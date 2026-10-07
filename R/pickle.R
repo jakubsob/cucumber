@@ -81,49 +81,6 @@ new_pickle <- function(
   )
 }
 
-#' @export
-print.pickle_step <- function(x, indent = 0, ...) {
-  prefix <- strrep("  ", indent)
-  status_str <- if (!is.null(x$status)) {
-    paste0(" [", x$status, "]")
-  } else {
-    ""
-  }
-
-  cat(prefix, x$keyword, " ", x$text, status_str, "\n", sep = "")
-
-  if (!is.null(x$data_table)) {
-    cat(prefix, "  <data table>\n", sep = "")
-  }
-
-  if (!is.null(x$docstring)) {
-    cat(prefix, "  <docstring>\n", sep = "")
-  }
-
-  invisible(x)
-}
-
-#' @export
-print.pickle <- function(x, ...) {
-  tags_str <- if (length(x$tags) > 0) {
-    paste0("  [", paste(paste0("@", x$tags), collapse = " "), "]")
-  } else {
-    ""
-  }
-
-  cat("Pickle: ", x$name, tags_str, "\n", sep = "")
-  cat("  ID: ", x$id, "\n", sep = "")
-
-  if (length(x$steps) > 0) {
-    cat("  Steps:\n")
-    for (step in x$steps) {
-      print(step, indent = 2)
-    }
-  }
-
-  invisible(x)
-}
-
 #' Compile pickles from a Gherkin document
 #'
 #' @description

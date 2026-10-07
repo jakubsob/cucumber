@@ -20,6 +20,10 @@
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
 #'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#' @param strict If `TRUE`, pending and undefined steps fail the scenario.
+#'   If `FALSE`, they skip it.
+#' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
+#'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
 #' @param reporter Optional reporter instance (testthat::Reporter or cucumber::CucumberReporter).
 #'   If NULL, will use reporter from package options if available.
 #' @param ... Additional arguments passed to `grepl()`.
@@ -34,6 +38,8 @@ run <- function(
   filter = NULL,
   tags = NULL,
   reporter = get_reporter(),
+  strict = TRUE,
+  dry_run = FALSE,
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
@@ -57,7 +63,9 @@ run <- function(
       read_feature(feature_path),
       feature_file = feature_path,
       tags = tags,
-      reporter = reporter
+      reporter = reporter,
+      strict = strict,
+      dry_run = dry_run
     )
   }
 
@@ -94,11 +102,13 @@ cleanup <- function() {
 }
 
 #' @importFrom withr defer
-test_cucumber_code <- function(path, filter, tags = NULL, ...) {
+test_cucumber_code <- function(path, filter, tags = NULL, strict = TRUE, dry_run = FALSE, ...) {
   args <- c(
     shQuote(path),
     sprintf("filter = %s", if (is.null(filter)) "NULL" else shQuote(filter)),
-    if (!is.null(tags)) sprintf("tags = %s", deparse(tags))
+    if (!is.null(tags)) sprintf("tags = %s", deparse(tags)),
+    if (!strict) "strict = FALSE",
+    if (dry_run) "dry_run = TRUE"
   )
   sprintf(
     "cucumber::run(%s, reporter = getOption('.cucumber_reporter'))",
@@ -141,6 +151,10 @@ test_cucumber_code <- function(path, filter, tags = NULL, ...) {
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
 #'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#' @param strict If `TRUE`, pending and undefined steps fail the scenario.
+#'   If `FALSE`, they skip it.
+#' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
+#'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
 #'
 #' @examples
 #' \dontrun{
@@ -152,6 +166,9 @@ test_cucumber_code <- function(path, filter, tags = NULL, ...) {
 #' cucumber::test("tests/acceptance", tags = "@smoke and @fast")
 #' cucumber::test("tests/acceptance", tags = "@wip and not @slow")
 #' cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
+#'
+#' # Find undefined steps without running anything
+#' cucumber::test("tests/acceptance", dry_run = TRUE)
 #' }
 #'
 #' @importFrom testthat test_dir
@@ -170,6 +187,8 @@ test <- function(
   load_helpers = TRUE,
   stop_on_failure = TRUE,
   stop_on_warning = FALSE,
+  strict = TRUE,
+  dry_run = FALSE,
   ...
 ) {
   if (!is.null(reporter)) {
@@ -183,6 +202,8 @@ test <- function(
         ".",
         filter = filter,
         tags = tags,
+        strict = strict,
+        dry_run = dry_run,
         ...
       ),
       con = file

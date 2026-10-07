@@ -117,8 +117,9 @@ describe("CucumberProgressReporter", {
 
     reporter <- CucumberProgressReporter$new(show_praise = FALSE)
 
+    # The scenario fails on purpose, keep its failure out of this test's results
     .expect_snapshot({
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     })

@@ -7,6 +7,14 @@
 - ⚠️ A step that matches more than one step definition now fails with an error listing every matching definition and where it is defined. Previously the first registered definition was silently used, unless the definitions were identical.
 - ⚠️ `{float}` now matches the same values as in Cucumber Expressions: integers like `12` and exponents like `1.5E3` too. It no longer matches any character in place of the decimal point. Defining both `{int}` and `{float}` variants of the same step makes integer steps ambiguous, so keep only the `{float}` one.
 - ⚠️ Feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin). See [New Gherkin parser](#new-gherkin-parser) below for every step that is parsed differently.
+- ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped instead of not being reported.
+- ⚠️ Undefined and ambiguous steps no longer stop the run. They fail their scenario, and the other scenarios and feature files still run, so every missing step's snippet is shown. A run without any step definitions reports its steps as undefined instead of failing with "No step definitions found".
+- ⚠️ `pending()` gives the step its own `pending` status and fails the scenario. Previously the scenario was skipped. Run with `strict = FALSE` to skip scenarios with pending or undefined steps instead of failing them.
+- ⚠️ A step's `status` is `"failed"` for both failed expectations and errors. The `"error"` status is removed, which matters for custom reporters.
+- 🐛 A failed expectation, like `expect_equal()`, in a step now fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
+- ✨ A failing `before` hook reports the scenario's steps as skipped and fails the scenario.
+- ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks.
+- ⚠️ `CucumberProgressReporter` summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
 
 ## New Gherkin parser
 

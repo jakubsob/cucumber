@@ -25,9 +25,10 @@ when("I run", function(code, context) {
     {
       cucumber:::set_default_parameters()
       withr::with_dir(context$tempdir, {
-        withr::with_output_sink(nullfile(), {
+        output <- utils::capture.output({
           context$result <- eval(parse(text = code))
         })
+        context$output <- cli::ansi_strip(output)
       })
     }
   )
@@ -60,6 +61,11 @@ then("it ran {string}", function(test_name, context) {
 then("it has {int} errors", function(n, context) {
   results <- as.data.frame(context$result)
   expect_equal(sum(results$error), n)
+})
+
+then("it has {int} failed", function(n, context) {
+  results <- as.data.frame(context$result)
+  expect_equal(sum(results$failed), n)
 })
 
 then("it has {int} skipped", function(n, context) {
@@ -106,6 +112,16 @@ then("the error message includes", function(text, context) {
   expect_true(
     found,
     info = paste0("Expected:\n", paste(text, collapse = "\n"), "\n\nIn messages:\n", paste(messages, collapse = "\n---\n"))
+  )
+})
+
+then("the output includes", function(text, context) {
+  # Compare line by line, ignoring indentation
+  needle <- paste(trimws(text), collapse = "\n")
+  output <- paste(trimws(context$output), collapse = "\n")
+  expect_true(
+    grepl(needle, output, fixed = TRUE),
+    info = paste0("Expected:\n", needle, "\n\nIn output:\n", output)
   )
 })
 

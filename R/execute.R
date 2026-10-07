@@ -1,5 +1,4 @@
 #' @importFrom rlang exec try_fetch cnd_signal abort
-#' @importFrom checkmate test_list
 #' @importFrom purrr walk map
 #' @importFrom testthat context_start_file
 #' @importFrom glue glue
@@ -10,18 +9,11 @@ execute <- function(
   hooks = get_hooks(),
   tags = NULL,
   feature_file = NULL,
-  reporter = NULL
+  reporter = NULL,
+  strict = TRUE,
+  dry_run = FALSE
 ) {
-  if (!checkmate::test_list(steps, min.len = 1)) {
-    abort(
-      "No step definitions found.",
-      body = c(
-        i = "Define steps using `given()`, `when()`, or `then()`.",
-        i = "Steps are typically placed in `setup-*.R` files and are loaded automatically by cucumber." # nolint
-      ),
-      trace = empty_trace()
-    )
-  }
+  checkmate::assert_list(steps)
   checkmate::assert_list(parameters, min.len = 1)
   checkmate::assert_list(hooks)
 
@@ -47,5 +39,12 @@ execute <- function(
   pickles <- match_steps(pickles, steps, parameters)
 
   # Phase 4: Execute
-  execute_pickles(pickles, hooks, reporter = reporter, feature_name = feature_name)
+  execute_pickles(
+    pickles,
+    hooks,
+    reporter = reporter,
+    feature_name = feature_name,
+    strict = strict,
+    dry_run = dry_run
+  )
 }

@@ -20,7 +20,7 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes "No step found for"
     And the error message includes
       """
@@ -49,7 +49,7 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes
       """
       given("I see the message {string}", function(string, context) {
@@ -77,7 +77,7 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes
       """
       then("it passes", function(context) {
