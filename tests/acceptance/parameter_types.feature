@@ -157,3 +157,32 @@ Feature: Parameter types
       """
     Then it passes
     And it has 1 passed
+
+  Scenario: {float} also captures an integer
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Integer as a float
+          Given the price is 12
+          Then I verify the price is 12
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the price is {float}", function(price, context) {
+        context$price <- price
+      })
+      then("I verify the price is {float}", function(price, context) {
+        expect_identical(context$price, price)
+        expect_identical(context$price, 12)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes

@@ -41,13 +41,14 @@ describe("int", {
 })
 
 describe("float", {
-  it("should detect floats", {
+  it("should detect floats and integers", {
     # Arrange
     x <- c(
       "+1.1", "-1.1", "1.1",
       "+11.1", "-11.1", "11.1",
       ".1",
       "+1", "-1", "1",
+      "1.5E3",
       "a"
     )
     param <- get_parameters()$float
@@ -63,7 +64,9 @@ describe("float", {
       c(
         1.1, -1.1, 1.1,
         11.1, -11.1, 11.1,
-        .1
+        .1,
+        1, -1, 1,
+        1500
       )
     )
   })

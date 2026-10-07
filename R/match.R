@@ -131,7 +131,8 @@ match_single_step <- function(
 #' @importFrom glue glue
 format_step_snippet <- function(keyword, description, parameters) {
   fn <- tolower(keyword)
-  ordered_names <- intersect(c("string", "float", "int"), names(parameters))
+  # {int} before {float}, which also matches integers
+  ordered_names <- intersect(c("string", "int", "float"), names(parameters))
   # Escape what a Cucumber Expression would read as syntax, for the R string
   result <- str_replace_all(description, "([\\\\(){}/])", "\\\\\\\\\\1")
   params_found <- character(0)

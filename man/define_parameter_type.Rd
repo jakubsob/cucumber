@@ -22,7 +22,7 @@ An object of class \code{parameter}, invisibly. Function should be called for si
 The following parameter types are available by default:\tabular{ll}{
    \strong{Type} \tab \strong{Description} \cr
    \code{{int}} \tab Matches integers, for example \code{71} or \code{-19}. Converts value with \code{as.integer}. \cr
-   \code{{float}} \tab Matches floats, for example \code{3.6}, \code{.8} or \code{-9.2}. Converts value with \code{as.double}. \cr
+   \code{{float}} \tab Matches floats, for example \code{3.6}, \code{.8}, \code{-9.2} or \code{1.5E3}, and integers like \code{12}. Converts value with \code{as.double}. \cr
    \code{{word}} \tab Matches words without whitespace, for example \code{banana} (but not \verb{banana split}). \cr
    \code{{string}} \tab Matches single-quoted or double-quoted strings, for example \code{"banana split"} or \code{'banana split'} (but not \verb{banana split}). Only the text between the quotes will be extracted. The quotes themselves are discarded. \cr
 }

@@ -225,7 +225,7 @@ The following parameter types are available by default:
 | Parameter Type | Description |
 |----|----|
 | `{int}` | Matches integers, for example `71` or `-19`. Converts value with `as.integer`. |
-| `{float}` | Matches floats, for example `3.6`, `.8` or `-9.2`. Converts value with `as.double`. |
+| `{float}` | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`. |
 | `{word}` | Matches words without whitespace, for example banana (but not banana split). |
 | `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
 

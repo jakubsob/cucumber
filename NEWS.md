@@ -4,6 +4,7 @@
 - ✨ Step descriptions now support the rest of the [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions) syntax: optional text `cucumber(s)`, alternative words `Enter/Return`, and the anonymous parameter `{}`, which matches anything and passes it as text. Use `\\(`, `\\{` or `\\/` to match these characters literally.
 - ⚠️ Text in step descriptions is now matched literally. Previously it was treated as a regular expression, so characters like `.`, `?`, `*`, `|` or `[` could change what a step matched. Undefined parameter types, like `{colour}` without `define_parameter_type("colour", ...)`, now raise an error.
 - 🐛 Missing step snippets escape `(`, `{` and `/`, so the snippet matches the step it was generated for.
+- ⚠️ `{float}` now matches the same values as in Cucumber Expressions: integers like `12` and exponents like `1.5E3` too. It no longer matches any character in place of the decimal point. Defining both `{int}` and `{float}` variants of the same step makes integer steps ambiguous, so keep only the `{float}` one.
 
 # cucumber 2.2.0
 
