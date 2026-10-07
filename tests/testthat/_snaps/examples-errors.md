@@ -124,7 +124,7 @@
               `actual`: 2.1
             `expected`: 5.0
             
-            Step at: setup-steps-addition.R:6
+            Step at: setup-steps-addition.R:5
         Scenario: Adding float and float
           v When I add 1.1 and 1.1
           x Then the result is 5
@@ -133,7 +133,7 @@
               `actual`: 2.2
             `expected`: 5.0
             
-            Step at: setup-steps-addition.R:6
+            Step at: setup-steps-addition.R:5
       
       
       Feature: Guess the word
@@ -168,7 +168,7 @@
               `actual`: 2.1
             `expected`: 5.0
             
-            Step at: setup-steps-addition.R:6
+            Step at: setup-steps-addition.R:5
       
       Feature: Addition
         Scenario: Adding float and float
@@ -179,7 +179,7 @@
               `actual`: 2.2
             `expected`: 5.0
             
-            Step at: setup-steps-addition.R:6
+            Step at: setup-steps-addition.R:5
       
       Feature: Guess the word
         Scenario: Breaker joins a game
@@ -218,8 +218,10 @@
       ...)
     Output
         Error: 
-          Error in `match_single_step(step, steps, parameters)`: Multiple steps found for: "I add them"
-          Check step definitions for duplicates of: "I add them"
+          Error in `match_single_step(step, steps, parameters)`: Multiple step definitions match: "I add them"
+          i Make the step match only one of:
+          * "I add them" (setup-steps.R:6)
+          * "I add them" (setup-steps.R:10)
       
       --------------------------------------------------------------------------------
       Summary

@@ -64,15 +64,19 @@ match_single_step <- function(
     )
   }
 
-  # Check for duplicates
-  unique_steps <- unique(steps[step_mask])
-  are_duplicates <- length(unique_steps) == 1 && length(steps[step_mask]) > 1
-  if (are_duplicates) {
-    step_description <- attr(unique_steps[[1]], "description")
+  # Ambiguous step
+  if (sum(step_mask) > 1) {
+    definitions <- steps[step_mask] |>
+      map_chr(\(definition) {
+        location <- srcref_location(attr(definition, "srcref"))
+        location <- if (is.null(location)) "" else glue(" ({location})")
+        glue("\"{attr(definition, 'description')}\"{location}")
+      })
     abort(
-      glue("Multiple steps found for: \"{description}\""),
-      body = glue(
-        "Check step definitions for duplicates of: \"{step_description}\""
+      glue("Multiple step definitions match: \"{description}\""),
+      body = c(
+        i = "Make the step match only one of:",
+        set_names(definitions, rep("*", length(definitions)))
       ),
       trace = empty_trace()
     )

@@ -12,7 +12,10 @@ unwrap_purrr_error <- function(err) {
 }
 
 step_location <- function(step) {
-  src <- step$definition_location
+  srcref_location(step$definition_location)
+}
+
+srcref_location <- function(src) {
   if (is.null(src)) return(NULL)
   glue(
     "{getSrcFilename(src)}:",

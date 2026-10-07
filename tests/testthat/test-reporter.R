@@ -1,5 +1,6 @@
 describe("CucumberReporter", {
   it("collects step results during execution", {
+    local_steps()
     # Create a simple feature
     feature <- c(
       "Feature: Calculator",
@@ -36,6 +37,7 @@ describe("CucumberReporter", {
   })
 
   it("works with testthat reporters (backward compatibility)", {
+    local_steps()
     feature <- c(
       "Feature: Simple",
       "  Scenario: Basic test",
@@ -59,6 +61,7 @@ describe("CucumberReporter", {
 
 describe("CucumberProgressReporter", {
   it("prints step-by-step progress", {
+    local_steps()
     feature <- c(
       "Feature: Addition",
       "  Scenario: Add two numbers",
@@ -91,6 +94,7 @@ describe("CucumberProgressReporter", {
   })
 
   it("shows errors for failing steps", {
+    local_steps()
     feature <- c(
       "Feature: Failing test",
       "  Scenario: This will fail",
@@ -121,6 +125,7 @@ describe("CucumberProgressReporter", {
   })
 
   it("prints docstring and data table step arguments", {
+    local_steps()
     feature <- c(
       "Feature: Step arguments",
       "  Scenario: Steps with a docstring and a table",
@@ -148,6 +153,7 @@ describe("CucumberProgressReporter", {
   })
 
   it("truncates long step arguments to max_lines", {
+    local_steps()
     feature <- c(
       "Feature: Step arguments",
       "  Scenario: Long docstring",

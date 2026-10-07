@@ -42,19 +42,6 @@ Feature: Addition
 and uses step definitions to run the tests
 
 ``` r
-when("I add {int} and {int}", function(x, y, context) {
-  context$result <- x + y
-  context
-})
-
-then("the result is {int}", function(expected, context) {
-  expect_equal(context$result, expected)
-})
-
-when("I add {int} and {float}", function(x, y, context) {
-  context$result <- x + y
-})
-
 when("I add {float} and {float}", function(x, y, context) {
   context$result <- x + y
 })
@@ -124,7 +111,7 @@ withr::with_dir(fail_dir, {
             `actual`: 2.1
           `expected`: 5.0
           
-          Step at: setup-steps-addition.R:6
+          Step at: setup-steps-addition.R:5
       Scenario: Adding float and float
         v When I add 1.1 and 1.1
         x Then the result is 5
@@ -133,7 +120,7 @@ withr::with_dir(fail_dir, {
             `actual`: 2.2
           `expected`: 5.0
           
-          Step at: setup-steps-addition.R:6
+          Step at: setup-steps-addition.R:5
 
 
     --------------------------------------------------------------------------------
@@ -152,7 +139,7 @@ withr::with_dir(fail_dir, {
             `actual`: 2.1
           `expected`: 5.0
           
-          Step at: setup-steps-addition.R:6
+          Step at: setup-steps-addition.R:5
 
     Feature: Addition
       Scenario: Adding float and float
@@ -163,7 +150,7 @@ withr::with_dir(fail_dir, {
             `actual`: 2.2
           `expected`: 5.0
           
-          Step at: setup-steps-addition.R:6
+          Step at: setup-steps-addition.R:5
 
 Put your acceptance tests in a directory separate to your unit tests:
 
@@ -211,8 +198,22 @@ Step functions are defined using:
   be matched in the description and a `context` parameter - an
   environment for managing state between steps.
 
-If a step parsed from one of `.feature` files is not found, an error
-will be thrown.
+Text in a description is matched literally, except for:
+
+- `{int}` and other [parameter types](#parameter-types), whose values
+  are passed to the implementation,
+- `(s)` – optional text: `"I have {int} cucumber(s)"` matches both
+  `I have 1 cucumber` and `I have 2 cucumbers`,
+- `a/b` – alternative words: `"I press the Enter/Return key"` matches
+  either word.
+
+To match `(`, `{` or `/` literally, escape them with a backslash,
+e.g. `"a\\/b"`.
+
+Each step parsed from the `.feature` files must match exactly one step
+definition. If a step matches none, an error with a ready-to-paste
+snippet is thrown. If it matches more than one, an error listing every
+matching definition is thrown.
 
 ### Parameter types
 
@@ -228,6 +229,7 @@ The following parameter types are available by default:
 | `{float}` | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`. |
 | `{word}` | Matches words without whitespace, for example banana (but not banana split). |
 | `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
+| `{}` | Matches anything. Passes the matched text as is. |
 
 See `cucumber::define_parameter_type()` how to define your own parameter
 types.
