@@ -111,6 +111,37 @@ Feature: Testing a package with cucumber tests in features/ directory
     Then it passes
     Then only "Feature 1" was run
 
+  Scenario: Filter with arguments passed to grepl()
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/test1.feature" with
+      """
+      Feature: Feature 1
+        Scenario: a scenario
+          Given a scenario step
+      """
+    And a file named "features/test2.feature" with
+      """
+      Feature: Feature 2
+        Scenario: another scenario
+          Given a scenario step
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a scenario step", function(context) {
+        expect_true(TRUE)
+      })
+      """
+    When I run
+      """
+      test("features", filter = "TEST1", ignore.case = TRUE)
+      """
+    Then it passes
+    Then only "Feature 1" was run
+
   Scenario: No feature files
     Given a file named "DESCRIPTION" with
       """

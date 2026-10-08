@@ -146,30 +146,12 @@ cleanup <- function() {
   set_default_parameters()
 }
 
-#' @importFrom withr defer
-test_cucumber_code <- function(
-  path,
-  filter,
-  tags = NULL,
-  strict = TRUE,
-  dry_run = FALSE,
-  name = NULL,
-  features = NULL,
-  ...
-) {
-  args <- c(
-    shQuote(path),
-    sprintf("filter = %s", if (is.null(filter)) "NULL" else shQuote(filter)),
-    if (!is.null(tags)) sprintf("tags = %s", deparse(tags)),
-    if (!is.null(name)) sprintf("name = %s", deparse1(name)),
-    if (!is.null(features)) sprintf("features = %s", deparse1(features)),
-    if (!strict) "strict = FALSE",
-    if (dry_run) "dry_run = TRUE"
-  )
-  sprintf(
-    "cucumber::run(%s, reporter = getOption('.cucumber_reporter'))",
-    paste(args, collapse = ", ")
-  )
+#' @importFrom rlang call2 list2
+#' @importFrom purrr compact
+test_cucumber_code <- function(path, ...) {
+  # Arguments left at their default are dropped, so error messages show only what was set
+  call2("run", .ns = "cucumber", path, !!!compact(list2(...)), reporter = quote(getOption(".cucumber_reporter"))) |>
+    deparse1()
 }
 
 #' Run Cucumber tests
@@ -270,8 +252,8 @@ test <- function(
         ".",
         filter = filter,
         tags = tags,
-        strict = strict,
-        dry_run = dry_run,
+        strict = if (!strict) FALSE,
+        dry_run = if (dry_run) TRUE,
         name = name,
         features = features,
         ...

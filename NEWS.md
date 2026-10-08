@@ -12,6 +12,7 @@
 - ⚠️ `pending()` gives the step its own `pending` status and fails the scenario. Previously the scenario was skipped. Run with `strict = FALSE` to skip scenarios with pending or undefined steps instead of failing them.
 - ⚠️ A step's `status` is `"failed"` for both failed expectations and errors. The `"error"` status is removed, which matters for custom reporters.
 - 🐛 A failed expectation, like `expect_equal()`, in a step now fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
+- 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored.
 - ✨ A failing `before` hook reports the scenario's steps as skipped and fails the scenario.
 - ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks.
 - ✨ `test()` and `run()` get `name` and `features` arguments to run only some scenarios. `name = "^Adding"` runs scenarios whose name matches a regular expression. `features = "addition.feature:12"` runs the scenario at line 12 of a feature file, like `cucumber-js features/addition.feature:12`. The line of a Scenario Outline runs all its examples, the line of an example row runs only that example.
