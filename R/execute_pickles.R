@@ -10,10 +10,12 @@
 #' @param feature_name Optional feature name for reporter context
 #' @param strict Whether pending and undefined steps fail the scenario
 #' @param dry_run Whether to skip hooks and step bodies
-#' @return List of pickles with populated metadata
+#' @param fail_fast Whether to skip the scenarios after a failed scenario
+#' @param failed Whether a scenario of an earlier feature failed
+#' @return Whether a scenario failed, invisibly
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr walk2 map_chr
+#' @importFrom purrr map_chr
 #' @importFrom testthat test_that
 #' @importFrom rlang exec format_error_bullets
 #' @importFrom glue glue
@@ -23,7 +25,9 @@ execute_pickles <- function(
   reporter = NULL,
   feature_name = NULL,
   strict = TRUE,
-  dry_run = FALSE
+  dry_run = FALSE,
+  fail_fast = FALSE,
+  failed = FALSE
 ) {
   # Call feature start hook if reporter supports it
   if (inherits(reporter, "CucumberReporter")) {
@@ -33,23 +37,25 @@ execute_pickles <- function(
   }
 
   test_names <- unique_test_names(map_chr(pickles, "name"))
-  walk2(pickles, test_names, \(pickle, test_name) {
-    execute_single_pickle(
-      pickle,
+  for (i in seq_along(pickles)) {
+    # Skipped like in a dry run, so undefined and ambiguous steps are still reported
+    pickle_failed <- execute_single_pickle(
+      pickles[[i]],
       hooks,
       reporter,
-      test_name,
+      test_names[[i]],
       strict = strict,
-      dry_run = dry_run
+      dry_run = dry_run || (fail_fast && failed)
     )
-  })
+    failed <- failed || pickle_failed
+  }
 
   # Call feature end hook if reporter supports it
   if (inherits(reporter, "CucumberReporter")) {
     reporter$end_feature()
   }
 
-  invisible(pickles)
+  invisible(failed)
 }
 
 #' Number the scenarios that share a name, like the rows of an outline without
@@ -71,6 +77,7 @@ unique_test_names <- function(names) {
 #' after a failed before hook, are skipped. Steps without exactly one
 #' definition are always reported as undefined or ambiguous.
 #'
+#' @return Whether the scenario failed, invisibly
 #' @keywords internal
 #' @noRd
 execute_single_pickle <- function(
@@ -81,6 +88,7 @@ execute_single_pickle <- function(
   strict = TRUE,
   dry_run = FALSE
 ) {
+  failed <- FALSE
   test_that(glue("Scenario: {test_name}"), {
     .context <- new.env()
     scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
@@ -123,14 +131,26 @@ execute_single_pickle <- function(
       )
     }
 
+    hook_errors <- Filter(Negate(is.null), list(before_error, after_error))
+    failed <<- length(hook_errors) > 0 || scenario_failed(steps, strict)
     # Recorded as errors without stopping, so failed steps are reported too
-    for (error in Filter(Negate(is.null), list(before_error, after_error))) {
+    for (error in hook_errors) {
       testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
     }
     signal_scenario_result(steps, strict)
   })
 
-  invisible(NULL)
+  invisible(failed)
+}
+
+#' A failed or ambiguous step fails the scenario, a pending or undefined step
+#' only in strict mode
+#'
+#' @keywords internal
+#' @noRd
+scenario_failed <- function(steps, strict = TRUE) {
+  failing <- c("failed", "ambiguous", if (strict) c("pending", "undefined"))
+  any(vapply(steps, \(step) step$status %in% failing, logical(1)))
 }
 
 #' The status of a scenario's worst step, and its error. A failed before hook

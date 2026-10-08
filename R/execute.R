@@ -13,7 +13,9 @@ execute <- function(
   feature_file = NULL,
   reporter = NULL,
   strict = TRUE,
-  dry_run = FALSE
+  dry_run = FALSE,
+  fail_fast = FALSE,
+  failed = FALSE
 ) {
   checkmate::assert_list(steps)
   checkmate::assert_list(parameters, min.len = 1)
@@ -24,7 +26,7 @@ execute <- function(
 
   # An empty document has nothing to run
   if (is.null(document$feature)) {
-    return(invisible(list()))
+    return(invisible(failed))
   }
 
   feature_name <- glue("{document$feature$keyword}: {document$feature$name}")
@@ -50,6 +52,8 @@ execute <- function(
     reporter = reporter,
     feature_name = feature_name,
     strict = strict,
-    dry_run = dry_run
+    dry_run = dry_run,
+    fail_fast = fail_fast,
+    failed = failed
   )
 }

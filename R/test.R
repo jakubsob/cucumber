@@ -30,6 +30,9 @@
 #'   If `FALSE`, they skip it.
 #' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
 #'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
+#' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
+#'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
+#'   undefined step counts as failed.
 #' @param reporter Optional reporter instance (testthat::Reporter or cucumber::CucumberReporter).
 #'   If NULL, will use reporter from package options if available.
 #' @param ... Additional arguments passed to `grepl()`.
@@ -48,6 +51,7 @@ run <- function(
   dry_run = FALSE,
   name = NULL,
   features = NULL,
+  fail_fast = FALSE,
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
@@ -77,8 +81,9 @@ run <- function(
     stop(before_error)
   }
 
+  failed <- FALSE
   for (feature_path in features) {
-    execute(
+    failed <- execute(
       read_feature(feature_path),
       feature_file = feature_path,
       tags = tags,
@@ -86,7 +91,9 @@ run <- function(
       lines = lines[[feature_path]],
       reporter = reporter,
       strict = strict,
-      dry_run = dry_run
+      dry_run = dry_run,
+      fail_fast = fail_fast,
+      failed = failed
     )
   }
 
@@ -199,6 +206,9 @@ test_cucumber_code <- function(path, ...) {
 #'   If `FALSE`, they skip it.
 #' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
 #'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
+#' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
+#'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
+#'   undefined step counts as failed.
 #'
 #' @examples
 #' \dontrun{
@@ -239,6 +249,7 @@ test <- function(
   dry_run = FALSE,
   name = NULL,
   features = NULL,
+  fail_fast = FALSE,
   ...
 ) {
   if (!is.null(reporter)) {
@@ -256,6 +267,7 @@ test <- function(
         dry_run = if (dry_run) TRUE,
         name = name,
         features = features,
+        fail_fast = if (fail_fast) TRUE,
         ...
       ),
       con = file

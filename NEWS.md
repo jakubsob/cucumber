@@ -16,6 +16,7 @@
 - ✨ A failing `before` hook reports the scenario's steps as skipped and fails the scenario.
 - ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks.
 - ✨ `test()` and `run()` get `name` and `features` arguments to run only some scenarios. `name = "^Adding"` runs scenarios whose name matches a regular expression. `features = "addition.feature:12"` runs the scenario at line 12 of a feature file, like `cucumber-js features/addition.feature:12`. The line of a Scenario Outline runs all its examples, the line of an example row runs only that example.
+- ✨ `test()` and `run()` get a `fail_fast` argument. After the first failed scenario, the remaining scenarios are skipped and their hooks don't run, like `cucumber-js --fail-fast`. With `strict = TRUE`, a scenario with a pending or undefined step counts as failed.
 - ⚠️ `CucumberProgressReporter` summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
 - ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`, e.g. to take a screenshot when a scenario fails. Replace `scenario_name` with `scenario$name`.
 - ✨ Define any number of `before()` and `after()` hooks. Before hooks run in the order they are defined, after hooks in the reverse order. Previously a second hook of a kind failed with "Hook already registered".

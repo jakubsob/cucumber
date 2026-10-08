@@ -17,6 +17,7 @@ test(
   dry_run = FALSE,
   name = NULL,
   features = NULL,
+  fail_fast = FALSE,
   ...
 )
 }
@@ -58,6 +59,10 @@ will be executed. For a Scenario Outline, the name is matched after its \verb{<p
 Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}, or several
 lines, e.g. \code{"addition.feature:12:20"}. The line of a Scenario Outline runs all of its examples,
 the line of an example row runs only that example.}
+
+\item{fail_fast}{If \code{TRUE}, the scenarios after the first failed scenario are skipped:
+their hooks and steps don't run. With \code{strict = TRUE}, a scenario with a pending or
+undefined step counts as failed.}
 
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
