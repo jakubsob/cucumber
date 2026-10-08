@@ -11,6 +11,8 @@ run(
   reporter = get_reporter(),
   strict = TRUE,
   dry_run = FALSE,
+  name = NULL,
+  features = NULL,
   ...
 )
 }
@@ -35,6 +37,14 @@ If \code{FALSE}, they skip it.}
 
 \item{dry_run}{If \code{TRUE}, steps are matched to step definitions, but neither
 step definitions nor hooks are run. Use it to find undefined and ambiguous steps.}
+
+\item{name}{If not NULL, only scenarios with names matching any of these regular expressions
+will be executed. For a Scenario Outline, the name is matched after its \verb{<placeholders>} are replaced.}
+
+\item{features}{If not NULL, only these feature files will be executed. Paths are relative to \code{path}.
+Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}, or several
+lines, e.g. \code{"addition.feature:12:20"}. The line of a Scenario Outline runs all of its examples,
+the line of an example row runs only that example.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

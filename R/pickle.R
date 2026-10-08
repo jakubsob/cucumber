@@ -60,6 +60,8 @@ new_pickle_step <- function(
 #' @param tags Character vector of tags
 #' @param steps List of pickle_step objects
 #' @param source_line Line number in feature file
+#' @param lines Lines that select the pickle when running `file:line`: the
+#'   scenario's line, and for an outline row also the row's line
 #' @return A pickle object
 #' @keywords internal
 #' @noRd
@@ -68,7 +70,8 @@ new_pickle <- function(
   name,
   tags = character(),
   steps = list(),
-  source_line = NA_integer_
+  source_line = NA_integer_,
+  lines = source_line
 ) {
   structure(
     list(
@@ -76,7 +79,8 @@ new_pickle <- function(
       name = name,
       tags = sub("^@", "", tags),
       steps = steps,
-      source_line = source_line
+      source_line = source_line,
+      lines = lines
     ),
     class = "pickle"
   )
@@ -151,7 +155,8 @@ compile_scenarios <- function(scenarios, tags, background) {
               name = interpolate(scenario$name, header, row$cells),
               tags = c(tags, scenario$tags, examples$tags),
               steps = pickle_steps(background, scenario$steps, header, row$cells),
-              source_line = row$line
+              source_line = row$line,
+              lines = c(scenario$line, row$line)
             )
           })
         }) |>
@@ -226,4 +231,24 @@ filter_pickles_by_tags <- function(pickles, tags) {
     keep(\(pickle) {
       evaluate_tag_expression(tags, pickle$tags)
     })
+}
+
+#' Keep pickles whose name matches any of the regular expressions in `name`
+#' @keywords internal
+#' @noRd
+filter_pickles_by_name <- function(pickles, name) {
+  if (is.null(name)) {
+    return(pickles)
+  }
+  keep(pickles, \(pickle) any(vapply(name, grepl, logical(1), x = pickle$name)))
+}
+
+#' Keep pickles selected by any of the `lines` of their feature file
+#' @keywords internal
+#' @noRd
+filter_pickles_by_lines <- function(pickles, lines) {
+  if (length(lines) == 0) {
+    return(pickles)
+  }
+  keep(pickles, \(pickle) any(pickle$lines %in% lines))
 }

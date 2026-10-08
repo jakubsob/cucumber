@@ -20,6 +20,12 @@
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
 #'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#' @param name If not NULL, only scenarios with names matching any of these regular expressions
+#'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
+#' @param features If not NULL, only these feature files will be executed. Paths are relative to `path`.
+#'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`, or several
+#'   lines, e.g. `"addition.feature:12:20"`. The line of a Scenario Outline runs all of its examples,
+#'   the line of an example row runs only that example.
 #' @param strict If `TRUE`, pending and undefined steps fail the scenario.
 #'   If `FALSE`, they skip it.
 #' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
@@ -40,12 +46,14 @@ run <- function(
   reporter = get_reporter(),
   strict = TRUE,
   dry_run = FALSE,
+  name = NULL,
+  features = NULL,
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
 
-  features <- path |>
-    find_features() |>
+  lines <- feature_lines(features, path)
+  features <- (if (is.null(features)) find_features(path) else names(lines)) |>
     filter_features(filter, ...)
 
   if (length(features) == 0) {
@@ -74,6 +82,8 @@ run <- function(
       read_feature(feature_path),
       feature_file = feature_path,
       tags = tags,
+      name = name,
+      lines = lines[[feature_path]],
       reporter = reporter,
       strict = strict,
       dry_run = dry_run
@@ -86,6 +96,30 @@ run <- function(
 #' @importFrom fs dir_ls
 find_features <- function(path) {
   dir_ls(path, glob = "*.feature$", type = "file")
+}
+
+#' Split `file:line:line` locations into a list of lines named by file. A file
+#' without lines runs all its scenarios, unless another location of it has lines.
+#' @keywords internal
+#' @noRd
+#' @importFrom fs file_exists
+feature_lines <- function(features, path) {
+  if (is.null(features)) {
+    return(list())
+  }
+  files <- fs::path(path, sub("(:[0-9]+)*$", "", features))
+  missing <- unique(files[!file_exists(files)])
+  if (length(missing) > 0) {
+    abort(
+      "Feature files not found.",
+      body = rlang::set_names(missing, "x"),
+      trace = empty_trace()
+    )
+  }
+  lines <- regmatches(features, regexpr("(:[0-9]+)*$", features)) |>
+    strsplit(":") |>
+    lapply(\(x) as.integer(x[x != ""]))
+  lapply(split(lines, files), \(x) unique(unlist(x, use.names = FALSE)))
 }
 
 read_feature <- function(path) {
@@ -113,11 +147,22 @@ cleanup <- function() {
 }
 
 #' @importFrom withr defer
-test_cucumber_code <- function(path, filter, tags = NULL, strict = TRUE, dry_run = FALSE, ...) {
+test_cucumber_code <- function(
+  path,
+  filter,
+  tags = NULL,
+  strict = TRUE,
+  dry_run = FALSE,
+  name = NULL,
+  features = NULL,
+  ...
+) {
   args <- c(
     shQuote(path),
     sprintf("filter = %s", if (is.null(filter)) "NULL" else shQuote(filter)),
     if (!is.null(tags)) sprintf("tags = %s", deparse(tags)),
+    if (!is.null(name)) sprintf("name = %s", deparse1(name)),
+    if (!is.null(features)) sprintf("features = %s", deparse1(features)),
     if (!strict) "strict = FALSE",
     if (dry_run) "dry_run = TRUE"
   )
@@ -162,6 +207,12 @@ test_cucumber_code <- function(path, filter, tags = NULL, strict = TRUE, dry_run
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
 #'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#' @param name If not NULL, only scenarios with names matching any of these regular expressions
+#'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
+#' @param features If not NULL, only these feature files will be executed. Paths are relative to `path`.
+#'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`, or several
+#'   lines, e.g. `"addition.feature:12:20"`. The line of a Scenario Outline runs all of its examples,
+#'   the line of an example row runs only that example.
 #' @param strict If `TRUE`, pending and undefined steps fail the scenario.
 #'   If `FALSE`, they skip it.
 #' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
@@ -171,6 +222,10 @@ test_cucumber_code <- function(path, filter, tags = NULL, strict = TRUE, dry_run
 #' \dontrun{
 #' cucumber::test("tests/acceptance")
 #' cucumber::test("tests/acceptance", filter = "addition|multiplication")
+#'
+#' # Scenarios by name or by line
+#' cucumber::test("tests/acceptance", name = "^Adding")
+#' cucumber::test("tests/acceptance", features = "addition.feature:12")
 #'
 #' # Tag expressions
 #' cucumber::test("tests/acceptance", tags = "@smoke")
@@ -200,6 +255,8 @@ test <- function(
   stop_on_warning = FALSE,
   strict = TRUE,
   dry_run = FALSE,
+  name = NULL,
+  features = NULL,
   ...
 ) {
   if (!is.null(reporter)) {
@@ -215,6 +272,8 @@ test <- function(
         tags = tags,
         strict = strict,
         dry_run = dry_run,
+        name = name,
+        features = features,
         ...
       ),
       con = file

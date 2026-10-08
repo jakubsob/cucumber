@@ -8,6 +8,8 @@ execute <- function(
   parameters = get_parameters(),
   hooks = get_hooks(),
   tags = NULL,
+  name = NULL,
+  lines = integer(),
   feature_file = NULL,
   reporter = NULL,
   strict = TRUE,
@@ -32,8 +34,11 @@ execute <- function(
   # Phase 2: Create pickles
   pickles <- create_pickles(document, feature_file = feature_file)
 
-  # Filter by tags
-  pickles <- filter_pickles_by_tags(pickles, tags)
+  # Filter by tags, name and line
+  pickles <- pickles |>
+    filter_pickles_by_tags(tags) |>
+    filter_pickles_by_name(name) |>
+    filter_pickles_by_lines(lines)
 
   # Phase 3: Match steps
   pickles <- match_steps(pickles, steps, parameters)
