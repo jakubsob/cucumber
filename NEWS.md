@@ -1,4 +1,4 @@
-# cucumber 2.3.0
+# cucumber 3.0.0
 
 - ✨ Added support for the `Rule` keyword. A `Rule` groups scenarios that illustrate one business rule, can have its own `Background` (run after the `Feature`'s one) and passes its tags to its scenarios.
 - ✨ Step descriptions now support the rest of the [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions) syntax: optional text `cucumber(s)`, alternative words `Enter/Return`, and the anonymous parameter `{}`, which matches anything and passes it as text. Use `\\(`, `\\{` or `\\/` to match these characters literally.
