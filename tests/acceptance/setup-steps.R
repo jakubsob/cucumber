@@ -73,6 +73,13 @@ then("it has {int} skipped", function(n, context) {
   expect_equal(sum(results$skipped), n)
 })
 
+then("the scenario {string} is skipped with {string}", function(name, reason, context) {
+  test <- Find(\(test) test$test == paste("Scenario:", name), context$result)
+  skips <- Filter(\(result) inherits(result, "expectation_skip"), test$results)
+  expect_length(skips, 1)
+  expect_equal(conditionMessage(skips[[1]]), reason)
+})
+
 then("it fails with {string}", function(error_message, context) {
   expect_false(is.null(context$error))
   # Get the full error message including cli formatting

@@ -10,17 +10,17 @@
 \alias{after_all}
 \title{Hooks}
 \usage{
-before(hook, tags = NULL)
+before(hook, tags = NULL, name = NULL)
 
-after(hook, tags = NULL)
+after(hook, tags = NULL, name = NULL)
 
-before_step(hook, tags = NULL)
+before_step(hook, tags = NULL, name = NULL)
 
-after_step(hook, tags = NULL)
+after_step(hook, tags = NULL, name = NULL)
 
-before_all(hook)
+before_all(hook, name = NULL)
 
-after_all(hook)
+after_all(hook, name = NULL)
 }
 \arguments{
 \item{hook}{A function that will be run.
@@ -35,6 +35,8 @@ the step's \code{keyword} and \code{text}, and in \code{after_step()} hooks its 
 
 \item{tags}{A tag expression, e.g. \code{"@db and not @slow"}.
 The hook runs only for scenarios that match it. If \code{NULL}, it runs for every scenario.}
+
+\item{name}{A name for the hook, shown in its error messages, e.g. \verb{Hook "Connect to the database" failed: ...}.}
 }
 \description{
 Hooks are blocks of code that can run at various points in the Cucumber execution cycle. They are typically used for setup and teardown of the environment before and after each scenario.
@@ -51,6 +53,9 @@ You should consider using a background as a more explicit alternative, especiall
 Only use a \code{before} hook for low-level logic such as starting a browser or deleting data from a database.
 
 If a \code{before} hook fails, the rest of the \code{before} hooks and all the scenario's steps are skipped, and the scenario fails.
+
+If a \code{before} hook calls \code{\link[=skip_scenario]{skip_scenario()}}, the rest of the \code{before} hooks and all the scenario's steps are skipped,
+and the scenario is skipped. \code{after} hooks still run and get \code{"skipped"} as the scenario's \code{status}.
 }
 
 \section{After}{
@@ -92,7 +97,11 @@ after(function(context, scenario) {
 
 before(function(context, scenario) {
   context$db <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
-}, tags = "@db")
+}, tags = "@db", name = "Connect to the database")
+
+before(function(context, scenario) {
+  if (!nzchar(Sys.getenv("API_KEY"))) skip_scenario("API_KEY is not set")
+}, tags = "@api")
 
 after_step(function(context, step) {
   message(step$text, ": ", step$status)

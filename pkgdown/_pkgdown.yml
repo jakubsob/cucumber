@@ -50,6 +50,7 @@ reference:
       - hook
       - step
       - pending
+      - skip_scenario
   - title: Run tests
     contents:
       - test

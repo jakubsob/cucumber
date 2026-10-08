@@ -74,7 +74,7 @@ unique_test_names <- function(names) {
 #' Execute a single pickle
 #'
 #' Every step is reported. Steps after a step that didn't pass, and all steps
-#' after a failed before hook, are skipped. Steps without exactly one
+#' after a failed or skipping before hook, are skipped. Steps without exactly one
 #' definition are always reported as undefined or ambiguous.
 #'
 #' @return Whether the scenario failed, invisibly
@@ -96,10 +96,22 @@ execute_single_pickle <- function(
     # A dry run matches the steps, but runs neither hooks nor step bodies
     before_error <- NULL
     if (!dry_run) {
-      before_error <- run_hooks(get_hooks_to_run(hooks, "before", pickle$tags), .context, scenario)
+      before_error <- run_hooks(
+        get_hooks_to_run(hooks, "before", pickle$tags),
+        .context,
+        scenario,
+        can_skip = TRUE
+      )
     }
+    # A before hook calling skip_scenario() skips the scenario
+    skip <- NULL
+    if (inherits(before_error, "cucumber_skip_scenario")) {
+      skip <- before_error
+      before_error <- NULL
+    }
+    skipped <- !is.null(skip)
 
-    skipping <- dry_run || !is.null(before_error)
+    skipping <- dry_run || skipped || !is.null(before_error)
     steps <- list()
     for (step in pickle$steps) {
       if (inherits(reporter, "CucumberReporter")) {
@@ -138,6 +150,9 @@ execute_single_pickle <- function(
       testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
     }
     signal_scenario_result(steps, strict)
+    if (skipped) {
+      testthat::skip(skip$reason)
+    }
   })
 
   invisible(failed)
