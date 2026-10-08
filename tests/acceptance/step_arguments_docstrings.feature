@@ -1,11 +1,7 @@
 Feature: Docstring step arguments
 
   Scenario: A step receives a docstring as its last argument
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/docstring.feature" with
       """
       Feature: Docstrings
@@ -33,11 +29,7 @@ Feature: Docstring step arguments
     And it has 1 passed
 
   Scenario: Docstring preserves multiple lines
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/docstring.feature" with
       """
       Feature: Docstrings
@@ -66,11 +58,7 @@ Feature: Docstring step arguments
     And it has 1 passed
 
   Scenario: Docstring combined with parameter placeholders in step description
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/docstring.feature" with
       """
       Feature: Docstrings
@@ -98,11 +86,7 @@ Feature: Docstring step arguments
     And it has 1 passed
 
   Scenario: Docstring content is dedented relative to its opening delimiter
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/docstring.feature" with
       """
       Feature: Docstrings

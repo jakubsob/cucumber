@@ -3,11 +3,7 @@ Feature: Pending steps
   A pending step fails the run, unless it's run with `strict = FALSE`.
 
   Scenario: A pending step fails the scenario
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/pending.feature" with
       """
       Feature: Pending
@@ -40,11 +36,7 @@ Feature: Pending steps
       """
 
   Scenario: Steps after a pending step are skipped
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/pending.feature" with
       """
       Feature: Pending
@@ -77,11 +69,7 @@ Feature: Pending steps
       """
 
   Scenario: A pending step skips the scenario when not strict
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/mixed.feature" with
       """
       Feature: Mixed

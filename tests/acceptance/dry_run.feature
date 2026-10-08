@@ -3,11 +3,7 @@ Feature: Dry run
   Use it to find undefined and ambiguous steps without running the scenarios.
 
   Scenario: A dry run doesn't run steps or hooks
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/basket.feature" with
       """
       Feature: Basket
@@ -46,11 +42,7 @@ Feature: Dry run
       """
 
   Scenario: A dry run reports undefined steps
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/basket.feature" with
       """
       Feature: Basket

@@ -5,11 +5,7 @@ Feature: Cucumber Expressions
   An invalid expression is an error pointing at the problem.
 
   Scenario: Optional text matches with or without it
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/expressions.feature" with
       """
       Feature: Optional text
@@ -37,11 +33,7 @@ Feature: Cucumber Expressions
     Then it passes
 
   Scenario: Alternative words match any of them
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/expressions.feature" with
       """
       Feature: Alternatives
@@ -66,11 +58,7 @@ Feature: Cucumber Expressions
     Then it passes
 
   Scenario: Anonymous parameter matches anything as text
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/expressions.feature" with
       """
       Feature: Anonymous parameter
@@ -94,11 +82,7 @@ Feature: Cucumber Expressions
     Then it passes
 
   Scenario: Special characters match literally and can be escaped
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/expressions.feature" with
       """
       Feature: Literal text
@@ -128,11 +112,7 @@ Feature: Cucumber Expressions
     Then it passes
 
   Scenario: An escaped space keeps words together in an alternative
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/expressions.feature" with
       """
       Feature: Alternatives with spaces
@@ -157,11 +137,7 @@ Feature: Cucumber Expressions
     Then it passes
 
   Scenario: An invalid expression is an error
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/expressions.feature" with
       """
       Feature: Invalid expression

@@ -1,11 +1,7 @@
 Feature: Scenario outlines
 
   Scenario: A scenario outline runs once per examples row
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/addition.feature" with
       """
       Feature: Addition
@@ -40,11 +36,7 @@ Feature: Scenario outlines
     And it has 3 passed
 
   Scenario: A failing outline row is reported without stopping other rows
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/addition.feature" with
       """
       Feature: Addition

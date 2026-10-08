@@ -4,11 +4,7 @@ Feature: Regular expressions
   The text of each capture group is passed to the step.
 
   Scenario: Capture groups are passed to the step
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/basket.feature" with
       """
       Feature: Basket
@@ -34,11 +30,7 @@ Feature: Regular expressions
     Then it passes
 
   Scenario: A capture group that doesn't match passes NA
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/vegetables.feature" with
       """
       Feature: Vegetables

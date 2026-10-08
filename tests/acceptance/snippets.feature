@@ -1,11 +1,7 @@
 Feature: Step definition snippets
 
   Scenario: Missing step shows a ready-to-paste snippet
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/basket.feature" with
       """
       Feature: Basket
@@ -31,11 +27,7 @@ Feature: Step definition snippets
       """
 
   Scenario: Missing step with a quoted string shows a string placeholder
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/greet.feature" with
       """
       Feature: Greet
@@ -59,11 +51,7 @@ Feature: Step definition snippets
       """
 
   Scenario: Snippet uses the step keyword
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/pass.feature" with
       """
       Feature: Pass
@@ -87,11 +75,7 @@ Feature: Step definition snippets
       """
 
   Scenario: Snippet parameters are in the order they are written
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/order.feature" with
       """
       Feature: Order
@@ -112,11 +96,7 @@ Feature: Step definition snippets
       """
 
   Scenario: Snippet for a step with a data table or a doc string
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/arguments.feature" with
       """
       Feature: Arguments

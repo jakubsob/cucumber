@@ -3,11 +3,7 @@ Feature: Running scenarios by name or line
   or the ones at given lines of a feature file, like `features/addition.feature:3`.
 
   Background:
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/addition.feature" with
       """
       Feature: Addition

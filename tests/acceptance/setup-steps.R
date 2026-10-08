@@ -8,6 +8,11 @@ given("a file named {string} with", function(filename, code, context) {
   writeLines(code, file)
 })
 
+given("a package", function(context) {
+  fs::dir_create(context$tempdir)
+  writeLines(c("Package: example", "Version: 0.1.0"), fs::path(context$tempdir, "DESCRIPTION"))
+})
+
 when("I run", function(code, context) {
   x <- as.character(runif(1))
   .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)

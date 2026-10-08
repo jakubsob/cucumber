@@ -1,11 +1,7 @@
 @tags
 Feature: Tag expression filtering
   Scenario: Single tag expression
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Tags
@@ -35,11 +31,7 @@ Feature: Tag expression filtering
     Then it has 1 passed
 
   Scenario: Tag expression with AND operator
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Tags
@@ -74,11 +66,7 @@ Feature: Tag expression filtering
     Then it has 1 passed
 
   Scenario: Tag expression with OR operator
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Tags
@@ -113,11 +101,7 @@ Feature: Tag expression filtering
     Then it has 2 passed
 
   Scenario: Tag expression with NOT operator
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Tags
@@ -152,11 +136,7 @@ Feature: Tag expression filtering
     Then it has 1 passed
 
   Scenario: Tag expression with parentheses for precedence
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Tags
@@ -196,11 +176,7 @@ Feature: Tag expression filtering
     Then it has 2 passed
 
   Scenario: NOT operator excludes tagged scenarios
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/not-test.feature" with
       """
       Feature: NOT test
@@ -230,11 +206,7 @@ Feature: Tag expression filtering
     Then it has 1 passed
 
   Scenario: Tags on Examples filter Scenario Outline runs
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/examples-tags.feature" with
       """
       Feature: Examples with tags
@@ -270,11 +242,7 @@ Feature: Tag expression filtering
     Then it has 2 passed
 
   Scenario: Filtering Examples with tag expressions
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/examples-tags.feature" with
       """
       Feature: Examples with tag expressions
@@ -313,11 +281,7 @@ Feature: Tag expression filtering
     Then it has 1 passed
 
   Scenario: Tags with special characters like issue tracker IDs
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Issue tracking

@@ -1,10 +1,6 @@
 Feature: Testing a package with cucumber tests in tests/testthat/ directory
   Scenario: One feature file
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/package.feature" with
       """
       Feature: A package
@@ -33,11 +29,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it passes
 
   Scenario: Multiple feature files
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test1.feature" with
       """
       Feature: a feature
@@ -78,11 +70,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it passes
 
   Scenario: Multiple feature files with a filter
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test1.feature" with
       """
       Feature: Feature 1
@@ -124,11 +112,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then only "Feature 1" was run
 
   Scenario: No feature files
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/setup-steps.R" with
       """
       given("a scenario step", function(context) {
@@ -150,11 +134,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it has 1 errors
 
   Scenario: Source code is available in steps
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature
@@ -189,11 +169,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it passes
 
   Scenario: Setup code is available in steps
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature
@@ -229,11 +205,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it passes
 
   Scenario: Helper code is available in steps
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature
@@ -268,11 +240,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it passes
 
   Scenario: Storing steps in custom directory
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature
@@ -309,11 +277,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it passes
 
   Scenario: Testthat files alongside feature files
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature
@@ -354,11 +318,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Then it has 2 passed
 
   Scenario: Registering hooks
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature
@@ -407,11 +367,7 @@ Feature: Testing a package with cucumber tests in tests/testthat/ directory
     Each time hooks, parameters and steps are loaded from setup files, and cleaned up after each run.
     It's observed by tests not throwing errors.
 
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "tests/testthat/test.feature" with
       """
       Feature: a feature

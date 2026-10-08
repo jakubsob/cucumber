@@ -3,11 +3,7 @@ Feature: Rule
   A Rule can have its own Background, which runs after the Feature's Background.
 
   Scenario: Scenarios inside a Rule are run
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/rule.feature" with
       """
       Feature: Basket
@@ -46,11 +42,7 @@ Feature: Rule
     And it has 2 passed
 
   Scenario: A Rule Background runs after the Feature Background, only for its own scenarios
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/rule.feature" with
       """
       Feature: Basket
@@ -99,11 +91,7 @@ Feature: Rule
     And it has 4 passed
 
   Scenario: Rule tags are inherited by its scenarios
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/rule.feature" with
       """
       Feature: Basket

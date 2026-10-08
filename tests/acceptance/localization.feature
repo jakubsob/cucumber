@@ -4,11 +4,7 @@ Feature: Localization
   Step definitions don't change, because steps are matched without their keyword.
 
   Scenario: A feature file written in French
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/addition.feature" with
       """
       # language: fr
@@ -49,11 +45,7 @@ Feature: Localization
     And it has 2 passed
 
   Scenario: An unknown language is a parse error
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/unknown.feature" with
       """
       # language: xx

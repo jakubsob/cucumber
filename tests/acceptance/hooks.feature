@@ -4,11 +4,7 @@ Feature: Hooks
   after hooks in the reverse order.
 
   Background:
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
 
   Scenario: Before hooks run in definition order and after hooks in reverse order
     Given a file named "features/basket.feature" with

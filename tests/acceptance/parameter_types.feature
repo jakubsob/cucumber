@@ -1,11 +1,7 @@
 Feature: Parameter types
 
   Scenario: {int} captures an integer from step text
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -31,11 +27,7 @@ Feature: Parameter types
     And it has 2 passed
 
   Scenario: {float} captures a decimal number from step text
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -61,11 +53,7 @@ Feature: Parameter types
     And it has 2 passed
 
   Scenario: {string} captures a quoted string and strips quotes
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -96,11 +84,7 @@ Feature: Parameter types
     And it has 6 passed
 
   Scenario: {word} captures a single unquoted word
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -125,11 +109,7 @@ Feature: Parameter types
     And it has 1 passed
 
   Scenario: A custom parameter type can be registered and used in steps
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -159,11 +139,7 @@ Feature: Parameter types
     And it has 1 passed
 
   Scenario: {float} also captures an integer
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -188,11 +164,7 @@ Feature: Parameter types
     Then it passes
 
   Scenario: {int} matches only integers without a plus sign
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -210,11 +182,7 @@ Feature: Parameter types
     Then the error message includes "No step found for: \"the count is +5\""
 
   Scenario: {int} fails on a value too big for an R integer
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -233,11 +201,7 @@ Feature: Parameter types
     And the error message includes "3000000000 is out of range for an integer"
 
   Scenario: {word} matches anything without whitespace
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -257,11 +221,7 @@ Feature: Parameter types
     Then it passes
 
   Scenario: {string} unescapes escaped quotes
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -285,11 +245,7 @@ Feature: Parameter types
     Then it passes
 
   Scenario: A custom parameter type's regexp is a plain regular expression
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters
@@ -310,11 +266,7 @@ Feature: Parameter types
     Then it passes
 
   Scenario: A custom parameter type's transformer gets the text of each capture group
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/params.feature" with
       """
       Feature: Parameters

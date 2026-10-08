@@ -1,11 +1,7 @@
 @tags
 Feature: Tags
   Scenario: Single tag runs only matching scenarios
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Addition
@@ -35,11 +31,7 @@ Feature: Tags
     Then it has 1 passed
 
   Scenario: A scenario with multiple tags matches any of them
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       Feature: Addition
@@ -69,11 +61,7 @@ Feature: Tags
     Then it has 2 passed
 
   Scenario: Feature-level tag is inherited by all its scenarios
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/tagged.feature" with
       """
       @smoke

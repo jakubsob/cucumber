@@ -4,11 +4,7 @@ Feature: Ambiguous steps
   every matching definition, and the scenario fails.
 
   Scenario: A step matching two definitions fails with both definitions listed
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/user.feature" with
       """
       Feature: User
@@ -43,11 +39,7 @@ Feature: Ambiguous steps
       """
 
   Scenario: The same step defined twice is ambiguous
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/basket.feature" with
       """
       Feature: Basket
@@ -74,11 +66,7 @@ Feature: Ambiguous steps
       """
 
   Scenario: {int} and {float} definitions are ambiguous for an integer
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/basket.feature" with
       """
       Feature: Basket

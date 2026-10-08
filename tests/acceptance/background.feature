@@ -1,11 +1,7 @@
 Feature: Background
 
   Scenario: Background steps run before each scenario
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/background.feature" with
       """
       Feature: Background example
@@ -35,11 +31,7 @@ Feature: Background
     And it has 2 passed
 
   Scenario: Background steps are independent per scenario
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/background.feature" with
       """
       Feature: Background isolation
@@ -75,11 +67,7 @@ Feature: Background
     And it has 2 passed
 
   Scenario: A failing background step marks the scenario as failed
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/background.feature" with
       """
       Feature: Failing background

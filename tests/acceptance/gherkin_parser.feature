@@ -4,11 +4,7 @@ Feature: Gherkin parser
   and a file that isn't valid Gherkin fails with every error and its line:column.
 
   Scenario: Indentation doesn't matter
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/indent.feature" with
       """
       Feature: Indentation
@@ -36,11 +32,7 @@ Feature: Gherkin parser
     And it has 2 passed
 
   Scenario: A Doc String keeps empty lines and lines starting with #
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/docstring.feature" with
       """
       Feature: Doc Strings
@@ -70,11 +62,7 @@ Feature: Gherkin parser
     And it has 1 passed
 
   Scenario: Outline placeholders are replaced in the name, Doc Strings and Data Tables
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/outline.feature" with
       """
       Feature: Outlines
@@ -116,11 +104,7 @@ Feature: Gherkin parser
     And it ran "Scenario: Greeting Bob"
 
   Scenario: A step gets both a Doc String and a Data Table, in the order they are written
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/arguments.feature" with
       """
       Feature: Step arguments
@@ -151,11 +135,7 @@ Feature: Gherkin parser
     And it has 1 passed
 
   Scenario: Data Table cells unescape \n, \| and \\
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/table.feature" with
       """
       Feature: Escapes
@@ -184,11 +164,7 @@ Feature: Gherkin parser
     And it has 1 passed
 
   Scenario: A feature without scenarios runs nothing
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/empty.feature" with
       """
       Feature: Not written yet
@@ -206,11 +182,7 @@ Feature: Gherkin parser
     And it has 0 passed
 
   Scenario: Every error in a feature file is reported with its line and column
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/broken.feature" with
       """
       Feature: Broken

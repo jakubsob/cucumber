@@ -4,11 +4,7 @@ Feature: Step results
   and the other scenarios still run.
 
   Background:
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
 
   Scenario: Steps after a failing step are skipped
     Given a file named "features/basket.feature" with

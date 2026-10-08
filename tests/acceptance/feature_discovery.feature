@@ -3,11 +3,7 @@ Feature: Finding feature files
   like Cucumber's default `features/**/*.feature`.
 
   Scenario: Feature files in subdirectories are run
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/addition.feature" with
       """
       Feature: Addition

@@ -1,11 +1,7 @@
 Feature: Data table step arguments
 
   Scenario: A step receives a data table as a tibble
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/table.feature" with
       """
       Feature: Tables
@@ -34,11 +30,7 @@ Feature: Data table step arguments
     And it has 1 passed
 
   Scenario: A data table with multiple columns is passed as a tibble
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/table.feature" with
       """
       Feature: Tables
@@ -70,11 +62,7 @@ Feature: Data table step arguments
     And it has 2 passed
 
   Scenario: A table combined with parameter placeholders in step description
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/table.feature" with
       """
       Feature: Tables

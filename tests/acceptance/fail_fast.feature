@@ -3,11 +3,7 @@ Feature: Fail fast
   The scenarios after it are reported as skipped, and their hooks don't run.
 
   Background:
-    Given a file named "DESCRIPTION" with
-      """
-      Package: example
-      Version: 0.1.0
-      """
+    Given a package
     And a file named "features/a.feature" with
       """
       Feature: A
