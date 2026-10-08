@@ -18,7 +18,7 @@ run(
 )
 }
 \arguments{
-\item{path}{Path to the directory containing the \code{.feature} files.
+\item{path}{Path to the directory containing the \code{.feature} files. Its subdirectories are searched too.
 If \code{run()} is placed in a \verb{tests/testthat/test-*.R} file and you call \code{testthat::test_dir} or similar,
 it runs in the \code{tests/testthat} directory. The default value \code{"."} finds all feature
 files in the \code{tests/testthat} directory.}

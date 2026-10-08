@@ -10,7 +10,7 @@
 #' cucumber::run()
 #' }
 #'
-#' @param path Path to the directory containing the `.feature` files.
+#' @param path Path to the directory containing the `.feature` files. Its subdirectories are searched too.
 #'   If `run()` is placed in a `tests/testthat/test-*.R` file and you call `testthat::test_dir` or similar,
 #'   it runs in the `tests/testthat` directory. The default value `"."` finds all feature
 #'   files in the `tests/testthat` directory.
@@ -102,7 +102,7 @@ run <- function(
 
 #' @importFrom fs dir_ls
 find_features <- function(path) {
-  dir_ls(path, glob = "*.feature$", type = "file")
+  dir_ls(path, glob = "*.feature$", type = "file", recurse = TRUE)
 }
 
 #' Split `file:line:line` locations into a list of lines named by file. A file
