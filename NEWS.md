@@ -20,6 +20,16 @@
 - ✨ `before()`, `after()` and the new step hooks get a `tags` argument, a tag expression. The hook runs only for scenarios that match it, e.g. `before(connect_db, tags = "@db")`.
 - ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword` and `text`, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
 - ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run.
+- ✨ A step description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression, as in cucumber-jvm. Each capture group's text is passed to the step, `NA` if the group didn't match. A group whose regexp is a parameter type's regexp, like `(\d+)` for `{int}`, is transformed by that parameter type. ⚠️ Descriptions starting with `^` or ending with `$` were Cucumber Expressions before.
+- ⚠️ Invalid Cucumber Expressions are an error that points at the problem, like in Cucumber: an empty optional `()`, an optional inside an optional, a parameter inside an optional, an alternation inside an optional, an empty alternative (`/about`, `a//b`, `{int}/{int}`), an alternative made of optionals only, a missing `)` or `}`, an illegal character in a parameter name, and escaping a character that can't be escaped. Escape a literal `/` with `\\/`, e.g. `"I visit \\/about"`. When the message suggests an escape, it also shows how to write it in an R string.
+- ✨ A backslash-escaped space keeps words together in an alternative: `"I live in New\\ York/Boston"` matches `I live in New York` and `I live in Boston`. Without the backslash, `New` would be outside the alternative.
+- ⚠️ `{int}` matches `-?\d+` like Cucumber Expressions, so `+5` no longer matches. A value out of R's integer range fails the step instead of becoming `NA`.
+- ⚠️ `{word}` matches anything without whitespace, like `foo-bar` or `a.b`. Before, it matched only letters, digits and `_`.
+- ✨ `{string}` matches strings with escaped quotes, like `"say \"hi\""`, and passes them unescaped: `say "hi"`.
+- ⚠️ A parameter type's `regexp` is used as is. Before, it was a replacement string, so special characters needed four backslashes. Replace `"\\\\d+"` with `"\\d+"`.
+- ⚠️ If a parameter type's `regexp` has capture groups, its transformer gets the text of each group as a separate argument, like in Cucumber. Before, it got the whole match and later parameters of the step got wrong values. Use non-capturing groups, `(?:...)`, to keep the whole match.
+- ✨ `define_parameter_type()` accepts several regexps and gets the `use_for_snippets` and `prefer_for_regexp_match` options.
+- ⚠️ Snippets for undefined steps are generated like cucumber-js. Parameters are in the order they appear in the step, not grouped by type. A value matched by several parameter types gives one suggestion per type, e.g. `{int}` and a commented-out `{float}` for `5`. Custom parameter types are used in snippets. Repeated parameter names are `string`, `string2` instead of `string_1`, `string_2`. A step with a data table or doc string gets a `dataTable` or `docString` argument. Escaped quotes in the step's text are handled.
 
 ## New Gherkin parser
 

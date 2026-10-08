@@ -2,6 +2,7 @@ Feature: Cucumber Expressions
   Step descriptions are Cucumber Expressions:
   text in parentheses is optional, words separated by "/" are alternatives,
   "{}" matches anything, and all other text is matched literally.
+  An invalid expression is an error pointing at the problem.
 
   Scenario: Optional text matches with or without it
     Given a file named "DESCRIPTION" with
@@ -111,7 +112,7 @@ Feature: Cucumber Expressions
       given("the total is {float}?", function(total, context) {
         context$total <- total
       })
-      when("I visit /about", function(context) {
+      when("I visit \\/about", function(context) {
         context$page <- "/about"
       })
       then("I see \\({int}) items on a\\/b", function(n, context) {
@@ -125,3 +126,63 @@ Feature: Cucumber Expressions
       test("features")
       """
     Then it passes
+
+  Scenario: An escaped space keeps words together in an alternative
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Alternatives with spaces
+        Scenario: Either city
+          Given I lived in New York
+          And I lived in Boston
+          Then I lived in 2 cities
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I lived in New\\ York/Boston", function(context) {
+        context$cities <- sum(context$cities, 1)
+      })
+      then("I lived in {int} cities", function(n, context) {
+        expect_equal(context$cities, n)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
+  Scenario: An invalid expression is an error
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: About page
+          When I visit /about
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I visit /about", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes
+      """
+      This Cucumber Expression has a problem at column 9:
+
+      I visit /about
+      ^
+      Alternative may not be empty.
+      If you did not mean to use an alternative you can use '\/' to escape the '/'
+      In an R string, double each backslash: "\\/".
+      """

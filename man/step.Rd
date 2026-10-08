@@ -48,7 +48,10 @@ use:
 \})
 }\if{html}{\out{</div>}}
 
-If no step definition is found an error will be thrown.
+If no step definition is found an error will be thrown, with a snippet of a step definition to add.
+When a value in the step matches more than one parameter type, like \code{5} for \code{{int}} and \code{{float}},
+the snippet suggests one definition per parameter type. The first one is code, the others are
+commented out alternatives. Keep only one of them, as a step matching several definitions is an error.
 
 If multiple steps definitions for a single step are found an error will be thrown.}
 
@@ -84,17 +87,31 @@ Text is matched literally, except for:\tabular{ll}{
 }
 
 
-To match \code{(}, \verb{\{} or \code{/} literally, escape them with a backslash, e.g. \code{"a\\\\/b"}.
+To match \code{(}, \verb{\{}, \code{/} or a space between alternatives literally, escape it with a backslash,
+e.g. \code{"a\\\\/b"} or \code{"I live in New\\\\ York/Boston"}. An invalid expression, like an empty optional \verb{()} or an
+alternative without text, is an error.
 
 Placeholders in expressions are replaced with regular expressions that match values in the feature file.
-Regular expressions are generated during runtime based on defined parameter types.
-
 The expression \code{"I have {int} cucumbers in my basket"} will be converted to
-\code{"I have [+-]?(?<![.])[:digit:]+(?![.]) cucumbers in my basket"}. The extracted value of \code{{int}}
+\code{"^I have ((?:(?:-?\\\\d+)|(?:\\\\d+))) cucumbers in my basket$"}. The extracted value of \code{{int}}
 will be passed to the implementation function after being transformed with \code{as.integer}.
+}
+\section{Regular expressions}{
+A description that starts with \code{^}, ends with \code{$} or is surrounded by \code{/} is a regular expression
+instead of a Cucumber Expression. Each capture group's text is passed to the implementation, in order:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{given("^I have (\\\\d+) (red|green) cucumbers?$", function(n, colour, context) \{
+
+\})
+}\if{html}{\out{</div>}}
+
+A capture group whose regexp is the regexp of a parameter type, like \verb{\\d+} for \code{{int}}, is
+transformed by it. Other capture groups are passed as text, and \code{NA} when they don't match.
+A regular expression without \code{^} and \code{$} can match a part of the step's text.
 
 To define your own parameter types use \code{\link{define_parameter_type}}.
 }
+
 \examples{
 given("I have {int} cucumbers in my basket", function(n_cucumbers, context) {
   context$n_cucumbers <- n_cucumbers

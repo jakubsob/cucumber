@@ -30,7 +30,8 @@ describe("match_single_step snippet", {
 describe("format_step_snippet", {
   it("escapes Cucumber Expression syntax so the snippet matches the step", {
     # Arrange
-    description <- "I see (5) items on a/b {page}"
+    local_steps()
+    description <- "I see (5) items on a/b {page} \\ \"quoted \\\"text\\\"\""
 
     # Act
     snippet <- format_step_snippet("Then", description, get_parameters())
@@ -38,10 +39,41 @@ describe("format_step_snippet", {
     # Assert
     code <- parse(text = snippet)[[1]]
     expression <- code[[2]]
-    expect_equal(expression, "I see \\({int}\\) items on a\\/b \\{page\\}")
-    expect_true(stringr::str_detect(
-      description,
-      step_regex(expression_to_pattern(expression))
-    ))
+    expect_equal(expression, "I see \\({int}) items on a\\/b \\{page} \\\\ {string}")
+    expect_true(stringr::str_detect(description, expression_to_pattern(expression)))
+  })
+
+  it("suggests every parameter type that matches, the first one as code", {
+    local_steps()
+
+    snippet <- format_step_snippet("Given", "I have 5 and 6 cucumbers", get_parameters())
+
+    expect_snapshot(cat(snippet))
+  })
+
+  it("passes parameters in the order they are written", {
+    local_steps()
+
+    snippet <- format_step_snippet("Given", "\"a\" has 1.5 and 'b'", get_parameters())
+
+    expect_snapshot(cat(snippet))
+  })
+
+  it("adds the data table and doc string arguments", {
+    local_steps()
+
+    snippet <- format_step_snippet("When", "I send", get_parameters(), c("dataTable", "docString"))
+
+    expect_snapshot(cat(snippet))
+  })
+
+  it("uses custom parameter types", {
+    local_steps()
+    define_parameter_type("colour", "red|blue", as.character)
+    define_parameter_type("size", "big|small", as.character, use_for_snippets = FALSE)
+
+    snippet <- format_step_snippet("Given", "a big red ball", get_parameters())
+
+    expect_snapshot(cat(snippet))
   })
 })

@@ -1,12 +1,3 @@
-#' Creates a regex from step name and a description
-#'
-#' Allows whitespace before and after the description
-#' @keywords internal
-#' @noRd
-step_regex <- function(description) {
-  paste0("^\\s*", description, "\\s*$")
-}
-
 #' @keywords internal
 #' @importFrom rlang exec
 #' @importFrom checkmate assert_subset assert_string assert_function
@@ -69,7 +60,10 @@ make_step <- function(prefix) {
 #' })
 #' ```
 #'
-#' If no step definition is found an error will be thrown.
+#' If no step definition is found an error will be thrown, with a snippet of a step definition to add.
+#' When a value in the step matches more than one parameter type, like `5` for `{int}` and `{float}`,
+#' the snippet suggests one definition per parameter type. The first one is code, the others are
+#' commented out alternatives. Keep only one of them, as a step matching several definitions is an error.
 #'
 #' If multiple steps definitions for a single step are found an error will be thrown.
 #'
@@ -117,14 +111,29 @@ make_step <- function(prefix) {
 #' | `(s)`       | Optional text. `"I have {int} cucumber(s)"` matches `I have 1 cucumber` and `I have 2 cucumbers`. |
 #' | `a/b`       | Alternative words. `"I press the Enter/Return key"` matches either word.                     |
 #'
-#' To match `(`, `{` or `/` literally, escape them with a backslash, e.g. `"a\\/b"`.
+#' To match `(`, `{`, `/` or a space between alternatives literally, escape it with a backslash,
+#' e.g. `"a\\/b"` or `"I live in New\\ York/Boston"`. An invalid expression, like an empty optional `()` or an
+#' alternative without text, is an error.
 #'
 #' Placeholders in expressions are replaced with regular expressions that match values in the feature file.
-#' Regular expressions are generated during runtime based on defined parameter types.
-#'
 #' The expression `"I have {int} cucumbers in my basket"` will be converted to
-#' `"I have [+-]?(?<![.])[:digit:]+(?![.]) cucumbers in my basket"`. The extracted value of `{int}`
+#' `"^I have ((?:(?:-?\\d+)|(?:\\d+))) cucumbers in my basket$"`. The extracted value of `{int}`
 #' will be passed to the implementation function after being transformed with `as.integer`.
+#'
+#' # Regular expressions
+#'
+#' A description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression
+#' instead of a Cucumber Expression. Each capture group's text is passed to the implementation, in order:
+#'
+#' ```
+#' given("^I have (\\d+) (red|green) cucumbers?$", function(n, colour, context) {
+#'
+#' })
+#' ```
+#'
+#' A capture group whose regexp is the regexp of a parameter type, like `\d+` for `{int}`, is
+#' transformed by it. Other capture groups are passed as text, and `NA` when they don't match.
+#' A regular expression without `^` and `$` can match a part of the step's text.
 #'
 #' To define your own parameter types use \code{\link{define_parameter_type}}.
 #'

@@ -4,16 +4,27 @@
 \alias{define_parameter_type}
 \title{Define extra parameters to use in Cucumber steps.}
 \usage{
-define_parameter_type(name, regexp, transformer)
+define_parameter_type(
+  name,
+  regexp,
+  transformer,
+  use_for_snippets = TRUE,
+  prefer_for_regexp_match = FALSE
+)
 }
 \arguments{
 \item{name}{The name of the parameter.}
 
-\item{regexp}{A regular expression that the parameter will match on. Note that if you want to escape a special character,
-you need to use four backslashes.}
+\item{regexp}{A regular expression that the parameter will match on, or a character vector of them to match any of them.}
 
 \item{transformer}{A function that will transform the parameter from a string to the desired type.
-Must be a function that requires only a single argument.}
+If \code{regexp} has capture groups, the transformer gets the text of each of them as a separate argument
+instead of the whole match. Use non-capturing groups, \verb{(?:...)}, to pass the whole match.}
+
+\item{use_for_snippets}{Whether to use this parameter type in snippets suggested for undefined steps.}
+
+\item{prefer_for_regexp_match}{Whether to use this parameter type for a regular expression step definition's capture group
+whose regexp is the same as the regexp of another parameter type.}
 }
 \value{
 An object of class \code{parameter}, invisibly. Function should be called for side effects.
@@ -21,10 +32,11 @@ An object of class \code{parameter}, invisibly. Function should be called for si
 \description{
 The following parameter types are available by default:\tabular{ll}{
    \strong{Type} \tab \strong{Description} \cr
-   \code{{int}} \tab Matches integers, for example \code{71} or \code{-19}. Converts value with \code{as.integer}. \cr
+   \code{{int}} \tab Matches integers, for example \code{71} or \code{-19}. Converts value with \code{as.integer}, failing the step if it's out of range. \cr
    \code{{float}} \tab Matches floats, for example \code{3.6}, \code{.8}, \code{-9.2} or \code{1.5E3}, and integers like \code{12}. Converts value with \code{as.double}. \cr
-   \code{{word}} \tab Matches words without whitespace, for example \code{banana} (but not \verb{banana split}). \cr
-   \code{{string}} \tab Matches single-quoted or double-quoted strings, for example \code{"banana split"} or \code{'banana split'} (but not \verb{banana split}). Only the text between the quotes will be extracted. The quotes themselves are discarded. \cr
+   \code{{word}} \tab Matches words without whitespace, for example \code{banana} or \code{foo-bar} (but not \verb{banana split}). \cr
+   \code{{string}} \tab Matches single-quoted or double-quoted strings, for example \code{"banana split"} or \code{'banana split'} (but not \verb{banana split}). Only the text between the quotes is extracted, and escaped quotes in it, like \verb{\\"}, are unescaped. \cr
+   \code{{}} \tab Matches anything and passes it as text. \cr
 }
 
 
@@ -34,8 +46,8 @@ To use custom parameter types, call \code{define_parameter_type} before \code{cu
 define_parameter_type("color", "red|blue|green", as.character)
 define_parameter_type(
   name = "sci_number",
-  regexp = "[+-]?\\\\\\\\d*\\\\\\\\.?\\\\\\\\d+(e[+-]?\\\\\\\\d+)?",
-  transform = as.double
+  regexp = "[+-]?\\\\d*\\\\.?\\\\d+(?:e[+-]?\\\\d+)?",
+  transformer = as.double
 )
 
 \dontrun{

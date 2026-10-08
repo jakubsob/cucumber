@@ -86,7 +86,8 @@ withr::with_dir(pass_dir, {
 
     --------------------------------------------------------------------------------
     Summary
-      Total: 6 | Passed: 6 | Failed: 0
+      3 scenarios (3 passed)
+      6 steps (6 passed)
     --------------------------------------------------------------------------------
 
 When a step fails, the reporter shows which step broke and why, and
@@ -125,7 +126,8 @@ withr::with_dir(fail_dir, {
 
     --------------------------------------------------------------------------------
     Summary
-      Total: 6 | Passed: 4 | Failed: 2
+      3 scenarios (2 failed, 1 passed)
+      6 steps (2 failed, 4 passed)
     --------------------------------------------------------------------------------
 
     Failures
@@ -151,6 +153,9 @@ withr::with_dir(fail_dir, {
           `expected`: 5.0
           
           Step at: setup-steps-addition.R:5
+
+    Error:
+    ! Test failures.
 
 Put your acceptance tests in a directory separate to your unit tests:
 
@@ -208,7 +213,13 @@ Text in a description is matched literally, except for:
   either word.
 
 To match `(`, `{` or `/` literally, escape them with a backslash,
-e.g. `"a\\/b"`.
+e.g. `"a\\/b"`. An invalid expression, like `"I visit /about"`, is an
+error.
+
+A description that starts with `^`, ends with `$` or is surrounded by
+`/` is a regular expression instead,
+e.g. `"^I have (\\d+) cucumbers?$"`. Each capture group is passed to the
+implementation.
 
 Each step parsed from the `.feature` files must match exactly one step
 definition. If a step matches none, an error with a ready-to-paste
@@ -227,8 +238,8 @@ The following parameter types are available by default:
 |----|----|
 | `{int}` | Matches integers, for example `71` or `-19`. Converts value with `as.integer`. |
 | `{float}` | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`. |
-| `{word}` | Matches words without whitespace, for example banana (but not banana split). |
-| `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
+| `{word}` | Matches words without whitespace, for example banana or foo-bar (but not banana split). |
+| `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted, with escaped quotes unescaped. |
 | `{}` | Matches anything. Passes the matched text as is. |
 
 See `cucumber::define_parameter_type()` how to define your own parameter

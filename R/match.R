@@ -18,16 +18,28 @@ match_steps <- function(
   parameters = get_parameters()
 ) {
   withCallingHandlers(
-    pickles |>
-      map(\(pickle) {
-        pickle$steps <- pickle$steps |>
-          map(\(step) {
-            match_single_step(step, steps, parameters)
-          })
-        pickle
-      }),
+    {
+      patterns <- compile_steps(steps, parameters)
+      pickles |>
+        map(\(pickle) {
+          pickle$steps <- pickle$steps |>
+            map(\(step) {
+              match_single_step(step, steps, parameters, patterns)
+            })
+          pickle
+        })
+    },
     purrr_error_indexed = unwrap_purrr_error
   )
+}
+
+#' Convert every step definition's expression to a regular expression
+#'
+#' @keywords internal
+#' @noRd
+#' @importFrom purrr map
+compile_steps <- function(steps, parameters) {
+  map(steps, \(step) expression_to_pattern(attr(step, "description"), parameters))
 }
 
 #' Mark a step that can't be run, keeping the reason as its error
@@ -49,26 +61,29 @@ unmatched_step <- function(step, status, message, body) {
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr map map_chr map2
-#' @importFrom stringr str_detect str_match_all
+#' @importFrom purrr map map_chr map_lgl
+#' @importFrom stringr str_detect str_match
+#' @importFrom rlang exec
 #' @importFrom glue glue
 match_single_step <- function(
   step,
   steps = get_steps(),
-  parameters = get_parameters()
+  parameters = get_parameters(),
+  patterns = compile_steps(steps, parameters)
 ) {
-  # Pattern to detect the step
-  patterns <- steps |>
-    map(\(step) expression_to_pattern(attr(step, "description"), parameters))
-  detect <- map_chr(patterns, step_regex)
-
   description <- step$text
 
-  step_mask <- str_detect(description, detect)
+  step_mask <- map_lgl(patterns, \(pattern) str_detect(description, pattern))
 
   # No matching step found
   if (sum(step_mask) == 0) {
-    snippet <- format_step_snippet(SNIPPET_KEYWORDS[[step$type]], description, parameters)
+    argument_names <- c(data_table = "dataTable", docstring = "docString")
+    snippet <- format_step_snippet(
+      SNIPPET_KEYWORDS[[step$type]],
+      description,
+      parameters,
+      unname(argument_names[step$argument_order])
+    )
     snippet_lines <- strsplit(snippet, "\n")[[1]]
     return(unmatched_step(
       step,
@@ -101,41 +116,40 @@ match_single_step <- function(
   }
 
   matched_step <- steps[step_mask][[1]]
+  pattern <- patterns[step_mask][[1]]
 
-  parameter_names <- attr(patterns[step_mask][[1]], "parameters")
-
-  # Extract parameter values from step text
-  values_character <- str_match_all(
-    description,
-    detect[step_mask]
-  )[[1]][, -1]
-
-  # If there are nested match groups, take the outermost one
-  values_character <- values_character[seq_len(length(parameter_names))]
-
-  # Transform values using parameter transformers
-  params <- map2(
-    values_character,
-    parameter_names,
-    \(value, parameter_name) {
-      # `{}` passes the matched text as is
-      if (parameter_name == "") {
-        return(value)
-      }
-      Find(\(x) x$name == parameter_name, parameters)$transformer(value)
-    }
-  )
-
-  # Add the data table and the docstring, in the order they are written
-  params <- append(params, unname(unclass(step)[step$argument_order]))
-
-  # Name parameters according to function formals
+  # Each top-level capture group is an argument. A parameter type's regexp
+  # with capture groups of its own passes their text to its transformer.
+  values <- unname(str_match(description, pattern)[1, -1])
+  groups <- attr(pattern, "groups")
   impl_formals <- names(formals(matched_step))
-  names(params) <- impl_formals[impl_formals != "context"]
+
+  # Transformed when the step runs, so a failing transformer fails the step
+  arguments <- function() {
+    # Map, as purrr would wrap a transformer's error
+    params <- Map(
+      \(group, parameter) {
+        children <- which(groups == group)
+        exec(
+          parameter$transformer,
+          !!!as.list(values[if (length(children)) children else group])
+        )
+      },
+      which(groups == 0),
+      attr(pattern, "parameters")
+    )
+
+    # Add the data table and the docstring, in the order they are written
+    params <- append(params, unname(unclass(step)[step$argument_order]))
+
+    # Name parameters according to function formals
+    names(params) <- impl_formals[impl_formals != "context"]
+    params
+  }
 
   # Enrich step with matched function and arguments
   step$matched_fn <- matched_step
-  step$arguments <- params
+  step$arguments <- arguments
   step$definition_location <- attr(matched_step, "srcref")
 
   step
@@ -146,45 +160,30 @@ SNIPPET_KEYWORDS <- c(Context = "Given", Action = "When", Outcome = "Then", Unkn
 
 #' Format a step snippet for error messages
 #'
+#' Like cucumber-js, each expression that matches the step is suggested, the
+#' first one as code and the others commented out. Parameters are named after
+#' their type, numbered when a type is used more than once: `int`, `int2`.
+#'
+#' @param argument_names Names of the step's data table and doc string
+#'   arguments, in the order they are written.
 #' @keywords internal
 #' @noRd
-#' @importFrom stringr str_count str_replace_all
 #' @importFrom glue glue
-format_step_snippet <- function(keyword, description, parameters) {
+format_step_snippet <- function(keyword, description, parameters, argument_names = character()) {
   fn <- tolower(keyword)
-  # {int} before {float}, which also matches integers
-  ordered_names <- intersect(c("string", "int", "float"), names(parameters))
-  # Escape what a Cucumber Expression would read as syntax, for the R string
-  result <- str_replace_all(description, "([\\\\(){}/])", "\\\\\\\\\\1")
-  params_found <- character(0)
-
-  for (type_name in ordered_names) {
-    param <- parameters[[type_name]]
-    n <- str_count(result, param$regexp)
-    if (n > 0) {
-      params_found <- c(params_found, rep(type_name, n))
-      result <- str_replace_all(
-        result,
-        param$regexp,
-        paste0("{", type_name, "}")
-      )
-    }
-  }
-
-  type_totals <- table(params_found)
-  type_seen <- list()
-  args <- character(length(params_found))
-
-  for (i in seq_along(params_found)) {
-    t <- params_found[[i]]
-    type_seen[[t]] <- (type_seen[[t]] %||% 0L) + 1L
-    args[[i]] <- if (as.integer(type_totals[[t]]) > 1L) {
-      paste0(t, "_", type_seen[[t]])
-    } else {
-      t
-    }
-  }
-
-  arg_str <- paste(c(args, "context"), collapse = ", ")
-  glue('{fn}("{result}", function({arg_str}) {{\n  pending()\n}})')
+  definitions <- vapply(
+    generate_expressions(description, parameters),
+    \(generated) {
+      types <- vapply(generated$parameters, \(p) p$name, character(1))
+      uses <- vapply(seq_along(types), \(i) sum(types[seq_len(i)] == types[[i]]), integer(1))
+      names <- ifelse(uses == 1, types, paste0(types, uses))
+      args <- paste(c(names, argument_names, "context"), collapse = ", ")
+      # Escape the expression for an R string
+      expression <- gsub("([\\\\\"])", "\\\\\\1", generated$expression)
+      glue('{fn}("{expression}", function({args}) {{')
+    },
+    character(1)
+  )
+  definitions[-1] <- paste("#", definitions[-1])
+  paste(c(definitions, "  pending()", "})"), collapse = "\n")
 }

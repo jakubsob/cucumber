@@ -23,122 +23,83 @@ describe("define_parameter_type", {
   })
 })
 
+# Match a step against one parameter and return the value passed to the step
+# with the parameters registered by `local_steps()`
+match_parameter <- function(text, expression) {
+  withr::local_options(test_steps = NULL)
+  given(expression, function(value, context) {})
+  step <- new_pickle_step(keyword = "Given", type = "Context", text = text)
+  matched <- match_single_step(step)
+  if (identical(matched$status, "undefined")) return(NULL)
+  matched$arguments()[[1]]
+}
+
 describe("int", {
-  it("should detect integers", {
-    # Arrange
-    x <- c("1", "-1", "+1", "10", "-10", "+10", ".1", "1.1", "a")
-    int <- get_parameters()$int
+  local_steps()
 
-    # Act
-    result <- stringr::str_extract(x, int$regex)
+  it("should match integers like Cucumber Expressions", {
+    expect_identical(match_parameter("1", "{int}"), 1L)
+    expect_identical(match_parameter("-10", "{int}"), -10L)
+    expect_null(match_parameter("+1", "{int}"))
+    expect_null(match_parameter("1.1", "{int}"))
+    expect_null(match_parameter(".1", "{int}"))
+  })
 
-    # Assert
-    expect_equal(
-      result,
-      c("1", "-1", "+1", "10", "-10", "+10", NA, NA, NA)
-    )
+  it("should fail on an integer out of R's integer range", {
+    expect_error(match_parameter("3000000000", "{int}"), "out of range")
   })
 })
 
 describe("float", {
-  it("should detect floats and integers", {
-    # Arrange
-    x <- c(
-      "+1.1", "-1.1", "1.1",
-      "+11.1", "-11.1", "11.1",
-      ".1",
-      "+1", "-1", "1",
-      "1.5E3",
-      "a"
-    )
-    param <- get_parameters()$float
+  local_steps()
 
-    # Act
-    result <- x |>
-      stringr::str_subset(param$regex) |>
-      param$transformer()
+  it("should match floats and integers", {
+    x <- c("+1.1", "-1.1", "1.1", ".1", "+1", "-1", "1", "1.5E3")
 
-    # Assert
-    expect_equal(
-      result,
-      c(
-        1.1, -1.1, 1.1,
-        11.1, -11.1, 11.1,
-        .1,
-        1, -1, 1,
-        1500
-      )
-    )
+    result <- vapply(x, \(x) match_parameter(x, "{float}"), numeric(1), USE.NAMES = FALSE)
+
+    expect_equal(result, c(1.1, -1.1, 1.1, .1, 1, -1, 1, 1500))
   })
 })
 
 describe("string", {
-  it("should detect strings in single quotes", {
-    # Arrange
-    x <- c("'a'", "'1'", "'1.1'", "'a1'", "'1a'", "'1.1a'")
-    param <- get_parameters()$string
+  local_steps()
 
-    # Act
-    result <- x |>
-      stringr::str_subset(param$regex) |>
-      param$transformer()
-
-    # Assert
-    expect_equal(
-      result,
-      c("a", "1", "1.1", "a1", "1a", "1.1a")
-    )
+  it("should match strings in single or double quotes and remove the quotes", {
+    expect_identical(match_parameter("'a b'", "{string}"), "a b")
+    expect_identical(match_parameter('"a b"', "{string}"), "a b")
+    expect_identical(match_parameter('""', "{string}"), "")
+    expect_null(match_parameter("a", "{string}"))
   })
 
-  it("should detect strings with double quotes", {
-    # Arrange
-    x <- c("\"a\"", "\"1\"", "\"1.1\"", "\"a1\"", "\"1a\"", "\"1.1a\"")
-    param <- get_parameters()$string
-
-    # Act
-    result <- x |>
-      stringr::str_subset(param$regex) |>
-      param$transformer()
-
-    # Assert
-    expect_equal(
-      result,
-      c("a", "1", "1.1", "a1", "1a", "1.1a")
-    )
-  })
-
-  it("shouldn't detect strings without single or double quotes", {
-    # Arrange
-    x <- c("a", "1", "1.1", "a1", "1a", "1.1a")
-    param <- get_parameters()$string
-
-    # Act
-    result <- x |>
-      stringr::str_subset(param$regex) |>
-      param$transformer()
-
-    # Assert
-    expect_equal(result, character(0))
+  it("should unescape escaped quotes", {
+    expect_identical(match_parameter('"say \\"hi\\""', "{string}"), 'say "hi"')
+    expect_identical(match_parameter("'it\\'s'", "{string}"), "it's")
   })
 })
 
 describe("word", {
-  it("should detect words", {
-    # Arrange
-    x <- c("word", "word_2", "num_1_word", "alnum.word", "1")
-    param <- get_parameters()$word
+  local_steps()
 
-    # Act
-    result <- x |>
-      stringr::str_subset(
-        stringr::str_replace_all(param$regex, stringr::fixed("\\\\"), "\\")
-      ) |>
-      param$transformer()
+  it("should match anything without whitespace", {
+    expect_identical(match_parameter("foo-bar", "{word}"), "foo-bar")
+    expect_identical(match_parameter("alnum.word", "{word}"), "alnum.word")
+    expect_null(match_parameter("banana split", "{word}"))
+  })
+})
 
-    # Assert
-    expect_equal(
-      result,
-      c("word", "word_2", "num_1_word", "alnum.word", "1")
-    )
+describe("custom parameter types", {
+  it("should use the regexp as is", {
+    local_steps()
+    define_parameter_type("version", "\\d+\\.\\d+", as.character)
+
+    expect_identical(match_parameter("1.2", "{version}"), "1.2")
+  })
+
+  it("should pass the text of each capture group to the transformer", {
+    local_steps()
+    define_parameter_type("point", "(\\d+),(\\d+)", \(x, y) as.integer(c(x, y)))
+
+    expect_identical(match_parameter("1,2", "{point}"), c(1L, 2L))
   })
 })

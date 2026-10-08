@@ -225,7 +225,7 @@ execute_single_step <- function(step, context, pickle = NULL) {
 
   tryCatch(
     withCallingHandlers(
-      exec(step$matched_fn, !!!step$arguments, context = context),
+      exec(step$matched_fn, !!!step$arguments(), context = context),
       error = function(e) {
         if (
           inherits(e, "expectation") ||

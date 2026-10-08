@@ -186,3 +186,151 @@ Feature: Parameter types
       test("features")
       """
     Then it passes
+
+  Scenario: {int} matches only integers without a plus sign
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Plus sign
+          Given the count is +5
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the count is {int}", function(n, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes "No step found for: \"the count is +5\""
+
+  Scenario: {int} fails on a value too big for an R integer
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Big number
+          Given the count is 3000000000
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the count is {int}", function(n, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 errors
+    And the error message includes "3000000000 is out of range for an integer"
+
+  Scenario: {word} matches anything without whitespace
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Word with a hyphen
+          Given the colour is blue-green
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the colour is {word}", function(colour, context) {
+        expect_equal(colour, "blue-green")
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
+  Scenario: {string} unescapes escaped quotes
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Escaped quotes
+          Given the message is "say \"hi\""
+          And the reply is 'it\'s me'
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the message is {string}", function(message, context) {
+        expect_equal(message, "say \"hi\"")
+      })
+      given("the reply is {string}", function(reply, context) {
+        expect_equal(reply, "it's me")
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
+  Scenario: A custom parameter type's regexp is a plain regular expression
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Version
+          Given the version is 1.2
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      define_parameter_type("version", "\\d+\\.\\d+", numeric_version)
+      given("the version is {version}", function(version, context) {
+        expect_equal(version, numeric_version("1.2"))
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
+  Scenario: A custom parameter type's transformer gets the text of each capture group
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      """
+    And a file named "features/params.feature" with
+      """
+      Feature: Parameters
+        Scenario: Point
+          Given a point at 1,2 and 3 more
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      define_parameter_type("point", "(\\d+),(\\d+)", function(x, y) as.integer(c(x, y)))
+      given("a point at {point} and {int} more", function(point, n, context) {
+        expect_equal(point, c(1L, 2L))
+        expect_equal(n, 3L)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes

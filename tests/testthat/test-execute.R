@@ -28,7 +28,7 @@ describe("run", {
       })
     )
     parameters <- .parameters(
-      .parameter(
+      string = .parameter(
         name = "string",
         regex = "'[:print:]+'",
         transformer = as.character
@@ -82,7 +82,7 @@ describe("run", {
       })
     )
     parameters <- .parameters(
-      .parameter(
+      string = .parameter(
         name = "string",
         regex = "'[:print:]+'",
         transformer = as.character

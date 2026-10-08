@@ -12,7 +12,8 @@
 #' @param error Error object if failed
 #' @param duration Execution time in seconds
 #' @param matched_fn Matched step function (added in matching phase)
-#' @param arguments Named list of arguments (added in matching phase)
+#' @param arguments Function returning the named list of arguments (added in
+#'   matching phase)
 #' @param definition_location Source reference for error reporting
 #' @return A pickle_step object
 #' @keywords internal

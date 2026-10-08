@@ -11,6 +11,7 @@
             No step found for: "I have 1"
             i Add a step definition:
               given("I have {int}", function(int, context) {
+              # given("I have {float}", function(float, context) {
                 pending()
               })
       
@@ -29,6 +30,7 @@
             No step found for: "I have 1"
             i Add a step definition:
               given("I have {int}", function(int, context) {
+              # given("I have {float}", function(float, context) {
                 pending()
               })
 

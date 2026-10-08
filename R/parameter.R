@@ -3,52 +3,76 @@
   structure(list2(...), class = "parameters")
 }
 
-#' @importFrom checkmate assert_string assert_function
-.parameter <- function(name, regexp, transformer) {
+#' @importFrom checkmate assert_string assert_character assert_function assert_flag
+.parameter <- function(
+  name,
+  regexp,
+  transformer,
+  use_for_snippets = TRUE,
+  prefer_for_regexp_match = FALSE
+) {
   assert_string(name)
-  assert_string(regexp)
+  assert_character(regexp, min.len = 1, any.missing = FALSE)
   assert_function(transformer)
+  assert_flag(use_for_snippets)
+  assert_flag(prefer_for_regexp_match)
   structure(
     list(
       name = name,
       regexp = regexp,
-      transformer = transformer
+      transformer = transformer,
+      use_for_snippets = use_for_snippets,
+      prefer_for_regexp_match = prefer_for_regexp_match
     ),
     class = "parameter"
   )
 }
 
+# `{}` matches anything and passes it as text
+ANONYMOUS <- .parameter(
+  name = "",
+  regexp = ".*",
+  transformer = \(x) x,
+  use_for_snippets = FALSE,
+  prefer_for_regexp_match = TRUE
+)
 
 #' Define extra parameters to use in Cucumber steps.
 #'
 #' @description
 #' The following parameter types are available by default:
 #'
-#' | **Type**           | **Description**                                                                                                                                                                                               |
-#' | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-#' | `{int}`            | Matches integers, for example `71` or `-19`. Converts value with `as.integer`.                                                                                                                                      |
-#' | `{float}`          | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`.                                                                                                                                   |
-#' | `{word}`           | Matches words without whitespace, for example `banana` (but not `banana split`).                                                                                                                                  |
-#' | `{string}`         | Matches single-quoted or double-quoted strings, for example `"banana split"` or `'banana split'` (but not `banana split`). Only the text between the quotes will be extracted. The quotes themselves are discarded. |
+#' | **Type**           | **Description**                                                                                                                                         |
+#' | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+#' | `{int}`            | Matches integers, for example `71` or `-19`. Converts value with `as.integer`, failing the step if it's out of range.                                    |
+#' | `{float}`          | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`.                                    |
+#' | `{word}`           | Matches words without whitespace, for example `banana` or `foo-bar` (but not `banana split`).                                                           |
+#' | `{string}`         | Matches single-quoted or double-quoted strings, for example `"banana split"` or `'banana split'` (but not `banana split`). Only the text between the quotes is extracted, and escaped quotes in it, like `\"`, are unescaped. |
+#' | `{}`               | Matches anything and passes it as text.                                                                                                                  |
 #'
 #' To use custom parameter types, call `define_parameter_type` before `cucumber::test` is called.
 #'
 #' @param name
 #'  The name of the parameter.
 #' @param regexp
-#'   A regular expression that the parameter will match on. Note that if you want to escape a special character,
-#'   you need to use four backslashes.
+#'   A regular expression that the parameter will match on, or a character vector of them to match any of them.
 #' @param transformer
 #'  A function that will transform the parameter from a string to the desired type.
-#'  Must be a function that requires only a single argument.
+#'  If `regexp` has capture groups, the transformer gets the text of each of them as a separate argument
+#'  instead of the whole match. Use non-capturing groups, `(?:...)`, to pass the whole match.
+#' @param use_for_snippets
+#'  Whether to use this parameter type in snippets suggested for undefined steps.
+#' @param prefer_for_regexp_match
+#'  Whether to use this parameter type for a regular expression step definition's capture group
+#'  whose regexp is the same as the regexp of another parameter type.
 #' @return An object of class \code{parameter}, invisibly. Function should be called for side effects.
 #'
 #' @examples
 #' define_parameter_type("color", "red|blue|green", as.character)
 #' define_parameter_type(
 #'   name = "sci_number",
-#'   regexp = "[+-]?\\\\d*\\\\.?\\\\d+(e[+-]?\\\\d+)?",
-#'   transform = as.double
+#'   regexp = "[+-]?\\d*\\.?\\d+(?:e[+-]?\\d+)?",
+#'   transformer = as.double
 #' )
 #'
 #' \dontrun{
@@ -59,26 +83,31 @@
 #'
 #' @md
 #' @export
-define_parameter_type <- function(name, regexp, transformer) {
+define_parameter_type <- function(
+  name,
+  regexp,
+  transformer,
+  use_for_snippets = TRUE,
+  prefer_for_regexp_match = FALSE
+) {
   parameters <- get_parameters()
-  parameter <- .parameter(name, regexp, transformer)
+  parameter <- .parameter(
+    name,
+    regexp,
+    transformer,
+    use_for_snippets,
+    prefer_for_regexp_match
+  )
   parameters[[name]] <- parameter
   set_parameters(parameters)
   invisible(parameter)
 }
 
-#' @importFrom purrr compact
 get_parameters <- function() {
-  parameters <- getOption(
+  getOption(
     getOption(".cucumber_parameters_option"),
     default = .parameters()
   )
-  c(
-    parameters[c("int", "float")],
-    parameters[!names(parameters) %in% c("int", "float", "string")],
-    parameters[c("string")]
-  ) |>
-    compact()
 }
 
 #' @importFrom rlang list2 `:=`
@@ -86,34 +115,37 @@ set_parameters <- function(parameters) {
   options(list2(!!getOption(".cucumber_parameters_option") := parameters))
 }
 
-#' @importFrom stringr str_sub str_trim
+#' Convert text to an integer, failing instead of returning NA when it's out of range
+#' @noRd
+as_integer <- function(x) {
+  value <- suppressWarnings(as.integer(x))
+  if (is.na(value) && !is.na(x)) {
+    abort(glue("{x} is out of range for an integer"), trace = empty_trace())
+  }
+  value
+}
+
 set_default_parameters <- function() {
   set_parameters(.parameters())
   define_parameter_type(
-    name = "int",
-    regexp = "[+-]?(?<![.])[:digit:]+(?![.])",
-    transformer = as.integer
+    "int",
+    c("(?:-?\\d+)", "\\d+"),
+    as_integer,
+    prefer_for_regexp_match = TRUE
   )
-
   define_parameter_type(
-    name = "float",
-    # Same as Cucumber Expressions: integers are floats too.
-    # No backslashes, as this regexp is used both as a pattern and a replacement
-    regexp = "[-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?",
-    transformer = as.double
+    "float",
+    "[-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?",
+    as.double
   )
-
+  define_parameter_type("word", "[^\\s]+", as.character, use_for_snippets = FALSE)
   define_parameter_type(
-    name = "string",
-    regexp = "'[^']*'|\"[^\"]*\"",
-    transformer = function(x) {
-      str_sub(x, 2, nchar(x) - 1)
+    "string",
+    c('"([^"\\\\]*(\\\\.[^"\\\\]*)*)"', "'([^'\\\\]*(\\\\.[^'\\\\]*)*)'"),
+    function(double_quoted, single_quoted) {
+      value <- if (is.na(double_quoted)) single_quoted else double_quoted
+      value <- gsub('\\"', '"', value, fixed = TRUE)
+      gsub("\\'", "'", value, fixed = TRUE)
     }
-  )
-
-  define_parameter_type(
-    name = "word",
-    regexp = "\\\\w+",
-    transformer = as.character
   )
 }
