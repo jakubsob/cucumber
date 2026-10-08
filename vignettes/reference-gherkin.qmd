@@ -615,3 +615,22 @@ Feature: Index projects
 * `@manual` - Tests that require manual verification
 * `@bug` - Tests that reproduce a reported bug
 * `@regression` - Regression tests for fixed bugs
+
+# Spoken Languages
+
+The language you choose for Gherkin should be the same language your users and domain experts use when they talk about the domain.
+
+To write a feature file in another language, put a `# language:` header on the first line, followed by the language code:
+
+```gherkin
+# language: fr
+Fonctionnalité: Addition
+  Scénario: Adding one
+    Soit I have 1
+    Quand I add 1
+    Alors I should have 2
+```
+
+A file without the header is in English (`en`). Every language from Cucumber's [gherkin-languages.json](https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json) is supported. See the [Gherkin reference](https://cucumber.io/docs/gherkin/languages/) for the keywords of each language.
+
+Step definitions don't change: steps are matched without their keyword, so `given("I have {int}", ...)` matches `Soit I have 1`.

@@ -1,6 +1,6 @@
 # The good and bad files of the official Gherkin test data
-# (https://github.com/cucumber/gherkin/tree/main/testdata), without the
-# localized ones, with the pickles and errors the official parser gives.
+# (https://github.com/cucumber/gherkin/tree/main/testdata), with the pickles
+# and errors the official parser gives.
 skip_if_not_installed("jsonlite")
 
 read_ndjson <- function(path) {

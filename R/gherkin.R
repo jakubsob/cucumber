@@ -19,6 +19,7 @@ parse_gherkin <- function(lines, uri = NULL) {
   p$queue <- list()
   p$docstring_separator <- NULL
   p$indent_to_remove <- 0L
+  p$dialect <- GHERKIN_DIALECTS$en
   p$errors <- character()
   p$stack <- list(new_ast_node("None"))
 
@@ -37,25 +38,10 @@ parse_gherkin <- function(lines, uri = NULL) {
   get_single(p$stack[[1]], "GherkinDocument")
 }
 
-# English keywords from the official gherkin-languages.json
-GHERKIN_KEYWORDS <- list(
-  FeatureLine = c("Feature", "Business Need", "Ability"),
-  RuleLine = "Rule",
-  BackgroundLine = "Background",
-  ScenarioLine = c("Example", "Scenario", "Scenario Outline", "Scenario Template"),
-  ExamplesLine = c("Examples", "Scenarios")
-)
-
-# Step keywords include the space that has to follow them. `*` is a keyword of
-# every step type, so its type is unknown.
-STEP_KEYWORDS <- c(
-  "Given " = "Context",
-  "When " = "Action",
-  "Then " = "Outcome",
-  "And " = "Conjunction",
-  "But " = "Conjunction",
-  "* " = "Unknown"
-)
+# GHERKIN_DIALECTS in R/sysdata.rda has the keywords of every language from the
+# official gherkin-languages.json, see update_gherkin(). Step keywords include
+# the space that has to follow them. `*` is a keyword of every step type, so
+# its type is unknown.
 
 LANGUAGE_PATTERN <- "^\\s*#\\s*language\\s*:\\s*([a-zA-Z\\-_]+)\\s*$"
 
@@ -170,7 +156,7 @@ rest_trimmed <- function(token, n) {
 }
 
 match_title_line <- function(p, token, type) {
-  for (keyword in GHERKIN_KEYWORDS[[type]]) {
+  for (keyword in p$dialect$titles[[type]]) {
     if (starts_with(token, paste0(keyword, ":"))) {
       return(matched(token, type, rest_trimmed(token, nchar(keyword) + 1L), keyword))
     }
@@ -192,10 +178,10 @@ TOKEN_MATCHERS <- list(
     if (is.na(language)) {
       return(NULL)
     }
-    # ponytail: English only, add gherkin-languages.json for localization
-    if (language != "en") {
+    if (is.null(GHERKIN_DIALECTS[[language]])) {
       gherkin_error(paste0("Language not supported: ", language), token$line, token$indent + 1L)
     }
+    p$dialect <- GHERKIN_DIALECTS[[language]]
     matched(token, "Language", language)
   },
   TagLine = function(p, token) {
@@ -207,14 +193,15 @@ TOKEN_MATCHERS <- list(
   ScenarioLine = function(p, token) match_title_line(p, token, "ScenarioLine"),
   ExamplesLine = function(p, token) match_title_line(p, token, "ExamplesLine"),
   StepLine = function(p, token) {
-    for (keyword in names(STEP_KEYWORDS)) {
+    steps <- p$dialect$steps
+    for (keyword in names(steps)) {
       if (starts_with(token, keyword)) {
         return(matched(
           token,
           "StepLine",
           rest_trimmed(token, nchar(keyword)),
           keyword,
-          keyword_type = STEP_KEYWORDS[[keyword]]
+          keyword_type = steps[[keyword]]
         ))
       }
     }

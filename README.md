@@ -265,7 +265,7 @@ types.
 - [x] `@` (Tags)
 - [x] `#` (Comments)
 - [x] Free-format text
-- [ ] Localization
+- [x] Localization (`# language:`)
 
 # Installation
 

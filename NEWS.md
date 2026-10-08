@@ -6,6 +6,7 @@
 - 🐛 Missing step snippets escape `(`, `{` and `/`, so the snippet matches the step it was generated for.
 - ⚠️ A step that matches more than one step definition now fails with an error listing every matching definition and where it is defined. Previously the first registered definition was silently used, unless the definitions were identical.
 - ⚠️ `{float}` now matches the same values as in Cucumber Expressions: integers like `12` and exponents like `1.5E3` too. It no longer matches any character in place of the decimal point. Defining both `{int}` and `{float}` variants of the same step makes integer steps ambiguous, so keep only the `{float}` one.
+- ✨ Feature files can be written in any of the 80 languages of the official Gherkin parser, by starting them with a `# language:` line, e.g. `# language: fr` for `Fonctionnalité`, `Scénario`, `Soit`, `Quand` and `Alors`. Step definitions don't change.
 - ⚠️ Feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin). See [New Gherkin parser](#new-gherkin-parser) below for every step that is parsed differently.
 - ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped instead of not being reported.
 - ⚠️ Undefined and ambiguous steps no longer stop the run. They fail their scenario, and the other scenarios and feature files still run, so every missing step's snippet is shown. A run without any step definitions reports its steps as undefined instead of failing with "No step definitions found".
@@ -165,7 +166,7 @@ These were ignored without a warning, so their steps never ran. Now they fail wi
 - A tag at the end of the file, with no `Scenario:`, `Rule:` or `Examples:` after it.
 - Two Doc Strings after one step. Before, they were merged into one Doc String.
 - A tag with whitespace, like `@with space`. Before, it was the tag `@with`.
-- `# language: fr`, or any language other than `en`, fails with `Language not supported: fr`. Before, the line was read as a comment.
+- `# language:` with an unknown language, like `# language: xx`, fails with `Language not supported: xx`. Before, the line was read as a comment.
 
 ### Feature files that failed and now run
 

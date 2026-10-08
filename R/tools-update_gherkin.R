@@ -1,6 +1,6 @@
 # Updates the parts of the Gherkin parser that come from the official one:
-# R/gherkin_states.R, its state machine, and tests/testthat/gherkin, its test
-# data. It's internal, call it from the package root:
+# R/gherkin_states.R, its state machine, R/sysdata.rda, the keywords of every
+# language, and tests/testthat/gherkin, its test data. It's internal, call it from the package root:
 #
 #   devtools::load_all()
 #   update_gherkin()            # latest main
@@ -123,8 +123,6 @@
 #   GherkinClassicTokenMatcher.ts and GherkinLine.ts
 # - lookahead() in R/gherkin.R, from lookahead_0/lookahead_1 in Parser.ts
 # - transform_node() and table_rows() in R/gherkin.R, from AstBuilder.ts
-# - GHERKIN_KEYWORDS and STEP_KEYWORDS in R/gherkin.R, from "en" in
-#   gherkin-languages.json
 # - create_pickles(), pickle_steps() and interpolate() in R/pickle.R, from
 #   pickles/compile.ts
 #
@@ -138,13 +136,12 @@
 #    commit in its header.
 # 3. Replaces the official test data in tests/testthat/gherkin: the good
 #    *.feature files with their .pickles.ndjson and the bad ones with their
-#    .errors.ndjson. Localized files (i18n_*, spaces_in_language,
-#    prefixed-keywords) and .feature.md files are left out, and
+#    .errors.ndjson. The .feature.md files are left out, and
 #    scenario_outline_with_value_with_* are renamed to outline_value_with_*,
 #    because R CMD check flags paths over 100 bytes. It stops if another path
 #    is too long.
-# 4. Checks that GHERKIN_KEYWORDS and STEP_KEYWORDS match "en" in
-#    gherkin-languages.json, and stops if they don't.
+# 4. Regenerates GHERKIN_DIALECTS in R/sysdata.rda, the keywords of every
+#    language, from gherkin-languages.json.
 # 5. Writes the changes to the hand-ported files since the commit the states
 #    were generated from to a patch file, and returns its path.
 # 6. Runs the corpus tests, testthat::test_local(filter = "gherkin"). They compare
@@ -163,8 +160,7 @@ HAND_PORTED <- c(
   "javascript/src/GherkinClassicTokenMatcher.ts",
   "javascript/src/GherkinLine.ts",
   "javascript/src/AstBuilder.ts",
-  "javascript/src/pickles/compile.ts",
-  "gherkin-languages.json"
+  "javascript/src/pickles/compile.ts"
 )
 
 #' Update the parser from the official Gherkin parser
@@ -196,7 +192,10 @@ update_gherkin <- function(ref = "main", pkg = ".") {
     states
   )
   copy_test_data(repo, file.path(pkg, "tests", "testthat", "gherkin"))
-  check_keywords(file.path(repo, "gherkin-languages.json"))
+  write_dialects(
+    file.path(repo, "gherkin-languages.json"),
+    file.path(pkg, "R", "sysdata.rda")
+  )
   patch <- hand_ported_changes(repo, previous, commit)
 
   testthat::test_local(pkg, filter = "gherkin")
@@ -218,12 +217,10 @@ run_git <- function(...) {
 }
 
 copy_test_data <- function(repo, to) {
-  excluded <- "^(i18n_|spaces_in_language|prefixed-keywords)"
   expected <- c(good = ".pickles.ndjson", bad = ".errors.ndjson")
   for (kind in names(expected)) {
     from <- file.path(repo, "testdata", kind)
     features <- list.files(from, pattern = "\\.feature$")
-    features <- features[!grepl(excluded, features)]
     names <- sub(
       "^scenario_outline_with_value_with_",
       "outline_value_with_",
@@ -263,53 +260,47 @@ copy_test_data <- function(repo, to) {
   )
 }
 
-# The keywords are ported by hand, so compare them with the official ones.
+# Keywords of every language, like the dialects of GherkinClassicTokenMatcher.ts.
 # A step keyword of more than one type (like `* `) has an unknown type, and
-# keywords are tried longest first, like in GherkinClassicTokenMatcher.ts.
-check_keywords <- function(languages) {
-  en <- jsonlite::read_json(languages)$en
-
-  titles <- list(
-    FeatureLine = unlist(en$feature),
-    RuleLine = unlist(en$rule),
-    BackgroundLine = unlist(en$background),
-    ScenarioLine = c(unlist(en$scenario), unlist(en$scenarioOutline)),
-    ExamplesLine = unlist(en$examples)
-  )
-  types <- c(
-    given = "Context",
-    when = "Action",
-    then = "Outcome",
-    and = "Conjunction",
-    but = "Conjunction"
-  )
-  keywords <- unlist(lapply(names(types), \(type) unlist(en[[type]])))
-  keyword_types <- rep(
-    types,
-    vapply(names(types), \(type) length(en[[type]]), integer(1))
-  )
-  steps <- unique(keywords)
-  steps <- steps[order(-nchar(steps))]
-  steps <- vapply(
-    steps,
-    \(keyword) {
-      type <- keyword_types[keywords == keyword]
-      if (length(type) > 1) "Unknown" else unname(type)
-    },
-    character(1)
-  )
-
-  if (
-    !identical(GHERKIN_KEYWORDS, titles) ||
-      !identical(STEP_KEYWORDS, steps)
-  ) {
-    stop(
-      "Update GHERKIN_KEYWORDS and STEP_KEYWORDS in R/gherkin.R to:\n",
-      paste(deparse(titles), collapse = "\n"),
-      "\n",
-      paste(deparse(steps), collapse = "\n")
+# step keywords are tried longest first.
+read_dialects <- function(languages) {
+  lapply(jsonlite::read_json(languages), \(dialect) {
+    titles <- list(
+      FeatureLine = unlist(dialect$feature),
+      RuleLine = unlist(dialect$rule),
+      BackgroundLine = unlist(dialect$background),
+      ScenarioLine = c(unlist(dialect$scenario), unlist(dialect$scenarioOutline)),
+      ExamplesLine = unlist(dialect$examples)
     )
-  }
+    types <- c(
+      given = "Context",
+      when = "Action",
+      then = "Outcome",
+      and = "Conjunction",
+      but = "Conjunction"
+    )
+    keywords <- unlist(lapply(names(types), \(type) unlist(dialect[[type]])))
+    keyword_types <- rep(
+      types,
+      vapply(names(types), \(type) length(dialect[[type]]), integer(1))
+    )
+    steps <- unique(keywords)
+    steps <- steps[order(-nchar(steps))]
+    steps <- vapply(
+      steps,
+      \(keyword) {
+        type <- keyword_types[keywords == keyword]
+        if (length(type) > 1) "Unknown" else unname(type)
+      },
+      character(1)
+    )
+    list(titles = titles, steps = steps)
+  })
+}
+
+write_dialects <- function(languages, out) {
+  GHERKIN_DIALECTS <- read_dialects(languages)
+  save(GHERKIN_DIALECTS, file = out, compress = "xz")
 }
 
 hand_ported_changes <- function(repo, from, to) {

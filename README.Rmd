@@ -171,7 +171,7 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [x] `@` (Tags)
 - [x] `#` (Comments)
 - [x] Free-format text
-- [ ] Localization
+- [x] Localization (`# language:`)
 
 # Installation
 
