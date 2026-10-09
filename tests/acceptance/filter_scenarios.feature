@@ -50,6 +50,15 @@ Feature: Running scenarios by name or line
     And it ran "Scenario: Adding small numbers"
     And it ran "Scenario: Subtracting small numbers"
 
+  Scenario: Features without matching scenarios aren't reported
+    When I run
+      """
+      test("features", name = "big")
+      """
+    Then only "Addition" was run
+    And the output includes "Feature: Addition"
+    And the output doesn't include "Feature: Subtraction"
+
   Scenario: A scenario runs if its name matches any of the regular expressions
     When I run
       """

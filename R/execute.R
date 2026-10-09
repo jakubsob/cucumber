@@ -29,10 +29,6 @@ execute <- function(
     return(invisible(failed))
   }
 
-  feature_name <- glue("{document$feature$keyword}: {document$feature$name}")
-  # Set feature context for testthat
-  context_start_file(feature_name)
-
   # Phase 2: Create pickles
   pickles <- create_pickles(document, feature_file = feature_file)
 
@@ -41,6 +37,15 @@ execute <- function(
     filter_pickles_by_tags(tags) |>
     filter_pickles_by_name(name) |>
     filter_pickles_by_lines(lines)
+
+  # A feature without scenarios to run isn't reported
+  if (length(pickles) == 0) {
+    return(invisible(failed))
+  }
+
+  feature_name <- glue("{document$feature$keyword}: {document$feature$name}")
+  # Set feature context for testthat
+  context_start_file(feature_name)
 
   # Phase 3: Match steps
   pickles <- match_steps(pickles, steps, parameters)
