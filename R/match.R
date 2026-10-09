@@ -77,12 +77,11 @@ match_single_step <- function(
 
   # No matching step found
   if (sum(step_mask) == 0) {
-    argument_names <- c(data_table = "dataTable", docstring = "docString")
     snippet <- format_step_snippet(
       SNIPPET_KEYWORDS[[step$type]],
       description,
       parameters,
-      unname(argument_names[step$argument_order])
+      unname(STEP_ARGUMENT_NAMES[step$argument_order])
     )
     snippet_lines <- strsplit(snippet, "\n")[[1]]
     return(unmatched_step(
@@ -126,6 +125,11 @@ match_single_step <- function(
 
   # Transformed when the step runs, so a failing transformer fails the step
   arguments <- function() {
+    check_arity(
+      impl_formals,
+      map_chr(attr(pattern, "parameters"), "name"),
+      unname(STEP_ARGUMENT_NAMES[step$argument_order])
+    )
     # Map, as purrr would wrap a transformer's error
     params <- Map(
       \(group, parameter) {
@@ -142,8 +146,10 @@ match_single_step <- function(
     # Add the data table and the docstring, in the order they are written
     params <- append(params, unname(unclass(step)[step$argument_order]))
 
-    # Name parameters according to function formals
-    names(params) <- impl_formals[impl_formals != "context"]
+    # Name parameters according to function formals, or pass them by position to `...`
+    if (!"..." %in% impl_formals) {
+      names(params) <- impl_formals[impl_formals != "context"]
+    }
     params
   }
 
@@ -153,6 +159,46 @@ match_single_step <- function(
   step$definition_location <- attr(matched_step, "srcref")
 
   step
+}
+
+#' Fail when a step definition can't take the step's arguments: its parameters,
+#' data table or doc string, and `context`. A definition with `...` takes any
+#' number of them.
+#'
+#' @param formals Names of the step definition's arguments
+#' @param types Names of the parameter types of the step's parameters
+#' @param argument_names Names of the step's data table and doc string arguments
+#' @keywords internal
+#' @noRd
+check_arity <- function(formals, types, argument_names) {
+  expected <- length(types) + length(argument_names) + 1
+  if ("..." %in% formals || length(formals) == expected) {
+    return(invisible())
+  }
+  # A regular expression's capture group or `{}` has no type name to use
+  types[make.names(types) != types] <- "arg"
+  args <- paste(c(snippet_argument_names(types), argument_names, "context"), collapse = ", ")
+  abort(
+    glue(
+      "The step definition has {length(formals)} argument{if (length(formals) == 1) '' else 's'}, ",
+      "but the step passes {expected}."
+    ),
+    body = c(i = glue("Use `function({args})`.")),
+    call = NULL,
+    trace = empty_trace()
+  )
+}
+
+# Snippet names of a step's data table and doc string arguments
+STEP_ARGUMENT_NAMES <- c(data_table = "dataTable", docstring = "docString")
+
+#' Name arguments after their parameter types, numbered when a type is used
+#' more than once: `int`, `int2`
+#' @keywords internal
+#' @noRd
+snippet_argument_names <- function(types) {
+  uses <- vapply(seq_along(types), \(i) sum(types[seq_len(i)] == types[[i]]), integer(1))
+  ifelse(uses == 1, types, paste0(types, uses))
 }
 
 # A step without a type, like a leading `*`, gets a Given snippet
@@ -175,9 +221,7 @@ format_step_snippet <- function(keyword, description, parameters, argument_names
     generate_expressions(description, parameters),
     \(generated) {
       types <- vapply(generated$parameters, \(p) p$name, character(1))
-      uses <- vapply(seq_along(types), \(i) sum(types[seq_len(i)] == types[[i]]), integer(1))
-      names <- ifelse(uses == 1, types, paste0(types, uses))
-      args <- paste(c(names, argument_names, "context"), collapse = ", ")
+      args <- paste(c(snippet_argument_names(types), argument_names, "context"), collapse = ", ")
       # Escape the expression for an R string
       expression <- gsub("([\\\\\"])", "\\\\\\1", generated$expression)
       glue('{fn}("{expression}", function({args}) {{')
