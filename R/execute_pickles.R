@@ -156,8 +156,10 @@ execute_single_pickle <- function(
     if (!dry_run && !skipped && !failed && passed && expectations == 0) {
       testthat::succeed()
     }
-    if (skipped) {
-      testthat::skip(skip$reason)
+    # A step calling skip_scenario() or testthat::skip() skips the scenario too
+    skip <- skip %||% Find(\(step) inherits(step$error, "skip"), steps)$error
+    if (!is.null(skip)) {
+      stop(skip)
     }
   })
 
@@ -291,6 +293,12 @@ execute_single_step <- function(step, context, pickle = NULL) {
         message = glue("Step \"{step$text}\" is pending: {e$reason}"),
         trace = empty_trace()
       )
+    },
+    # skip_scenario() or testthat::skip() skips the step and the scenario.
+    # After cucumber_pending, as pending() is a skip too
+    skip = function(e) {
+      status <<- "skipped"
+      step_error <<- e
     },
     expectation_failure = function(e) {
       location <- step_location(step)

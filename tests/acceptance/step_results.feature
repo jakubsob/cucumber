@@ -130,6 +130,72 @@ Feature: Step results
     Then it has 1 skipped
     And it has 0 failed
 
+  Scenario: A step skips the scenario with skip_scenario()
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+          When I sync the basket
+          Then the basket is synced
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\n"))
+      given("an empty basket", function(context) {})
+      when("I sync the basket", function(context) skip_scenario("the API is down"))
+      then("the basket is synced", function(context) stop("this step must not execute"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it has 0 errors
+    And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    And the output includes
+      """
+      Scenario: Sync the basket
+        v Given an empty basket
+        - When I sync the basket
+          Reason: the API is down
+        - Then the basket is synced
+      after: Sync the basket skipped
+      """
+    And the output includes
+      """
+      1 scenario (1 skipped)
+      3 steps (2 skipped, 1 passed)
+      """
+
+  Scenario: testthat::skip() in a step skips the scenario
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          When I sync the basket
+          Then the basket is synced
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\n"))
+      when("I sync the basket", function(context) testthat::skip("the API is down"))
+      then("the basket is synced", function(context) stop("this step must not execute"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it has 0 errors
+    And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    And the output includes
+      """
+      Scenario: Sync the basket
+        - When I sync the basket
+          Reason: the API is down
+        - Then the basket is synced
+      after: Sync the basket skipped
+      """
+
   Scenario: An ambiguous step fails the scenario even when not strict
     Given a file named "features/basket.feature" with
       """

@@ -240,7 +240,7 @@ Feature: Hooks
       3 steps (2 skipped, 1 passed)
       """
 
-  Scenario: skip_scenario() fails outside of a before hook
+  Scenario: skip_scenario() fails in hooks other than before hooks
     Given a file named "features/basket.feature" with
       """
       Feature: Basket
@@ -257,4 +257,4 @@ Feature: Hooks
       test("features", stop_on_failure = FALSE)
       """
     Then it has 1 errors
-    And the error message includes "`skip_scenario()` can only be called in a `before()` hook."
+    And the error message includes "`skip_scenario()` can only be called in a `before()` hook or a step."

@@ -24,10 +24,12 @@ make_hook <- function(kind, arguments) {
 
 #' Skip a scenario
 #'
-#' Call `skip_scenario()` in a [before()] hook to skip the scenario, e.g. when
-#' a service it needs isn't available. The rest of the `before` hooks and all
-#' the scenario's steps are skipped, and the scenario is reported as skipped.
+#' Call `skip_scenario()` in a [before()] hook or in a step to skip the scenario,
+#' e.g. when a service it needs isn't available. In a `before` hook, the rest of
+#' the `before` hooks and all the scenario's steps are skipped. In a step, that
+#' step and the steps after it are skipped. The scenario is reported as skipped.
 #' `after` hooks still run and get `"skipped"` as the scenario's `status`.
+#' [testthat::skip()] in a step does the same.
 #'
 #' Calling it in any other hook is an error. Outside of a Cucumber run
 #' `skip_scenario()` skips the test like [testthat::skip()].
@@ -225,7 +227,7 @@ run_hooks <- function(fns, ..., stop_on_error = TRUE, can_skip = FALSE) {
         if (can_skip) {
           return(cnd)
         }
-        error_cnd(message = "`skip_scenario()` can only be called in a `before()` hook.")
+        error_cnd(message = "`skip_scenario()` can only be called in a `before()` hook or a step.")
       },
       error = identity
     )
