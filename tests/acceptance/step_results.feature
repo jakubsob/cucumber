@@ -41,6 +41,31 @@ Feature: Step results
       3 steps (1 failed, 1 skipped, 1 passed)
       """
 
+  Scenario: A scenario whose steps pass without expectations passes
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {
+        context$basket <- list()
+      })
+      when("I add an item", function(context) {
+        context$basket <- c(context$basket, "item")
+      })
+      """
+    When I run
+      """
+      test("features", reporter = testthat::ListReporter$new())
+      """
+    Then it passes
+    And it has 1 passed
+    And it has 0 skipped
+
   Scenario: An undefined step doesn't stop the run
     Given a file named "features/basket.feature" with
       """

@@ -113,7 +113,8 @@ execute_single_pickle <- function(
 
     skipping <- dry_run || skipped || !is.null(before_error)
     steps <- list()
-    for (step in pickle$steps) {
+    expectations <- 0
+    withCallingHandlers(for (step in pickle$steps) {
       if (inherits(reporter, "CucumberReporter")) {
         reporter$start_step(step)
       }
@@ -130,7 +131,7 @@ execute_single_pickle <- function(
       }
       skipping <- skipping || step$status != "passed"
       steps <- c(steps, list(step))
-    }
+    }, expectation = function(e) expectations <<- expectations + 1)
 
     after_error <- NULL
     if (!dry_run) {
@@ -150,6 +151,11 @@ execute_single_pickle <- function(
       testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
     }
     signal_scenario_result(steps, strict)
+    # testthat reports a test without expectations as skipped
+    passed <- all(vapply(steps, \(step) step$status == "passed", logical(1)))
+    if (!dry_run && !skipped && !failed && passed && expectations == 0) {
+      testthat::succeed()
+    }
     if (skipped) {
       testthat::skip(skip$reason)
     }

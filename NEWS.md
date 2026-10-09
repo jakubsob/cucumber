@@ -66,6 +66,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Bug fixes
 
+- 🐛 A scenario whose steps pass without calling any `expect_*()` function is reported as passed. Previously testthat reported it as skipped ("empty test"), e.g. in `JunitReporter` output.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
 - 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored.
 
