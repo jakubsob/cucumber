@@ -217,7 +217,7 @@ Feature: Step results
       """
     Then it has 1 errors
     And the error message includes "<message>"
-    And the error message includes "Use `function(int, dataTable, context)`."
+    And the error message includes "Use `function(int, data_table, context)`."
 
     Examples:
       | case                 | definition                               | message                                                    |

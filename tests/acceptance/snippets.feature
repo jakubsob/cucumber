@@ -119,9 +119,9 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      given("these people", function(dataTable, context) {
+      given("these people", function(data_table, context) {
       """
     And the error message includes
       """
-      when("I send", function(docString, context) {
+      when("I send", function(doc_string, context) {
       """

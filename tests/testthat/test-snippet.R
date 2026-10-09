@@ -62,7 +62,7 @@ describe("format_step_snippet", {
   it("adds the data table and doc string arguments", {
     local_steps()
 
-    snippet <- format_step_snippet("When", "I send", get_parameters(), c("dataTable", "docString"))
+    snippet <- format_step_snippet("When", "I send", get_parameters(), c("data_table", "doc_string"))
 
     expect_snapshot(cat(snippet))
   })

@@ -190,7 +190,7 @@ check_arity <- function(formals, types, argument_names) {
 }
 
 # Snippet names of a step's data table and doc string arguments
-STEP_ARGUMENT_NAMES <- c(data_table = "dataTable", docstring = "docString")
+STEP_ARGUMENT_NAMES <- c(data_table = "data_table", docstring = "doc_string")
 
 #' Name arguments after their parameter types, numbered when a type is used
 #' more than once: `int`, `int2`

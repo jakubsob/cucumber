@@ -434,7 +434,7 @@ Snippets for undefined steps are generated like cucumber-js:
 - A value matched by several parameter types gives one suggestion per type, e.g. `{int}` and a commented-out `{float}` for `5`.
 - Custom parameter types are used.
 - Repeated parameter names are `string`, `string2`.
-- A step with a data table or doc string gets a `dataTable` or `docString` argument.
+- A step with a data table or doc string gets a `data_table` or `doc_string` argument.
 - `(`, `{` and `/` in the step's text are escaped, so the snippet matches the step it was generated for.
 - A step starting with `And`, `But` or `*` gets `given()`, `when()` or `then()` from its type, `given()` when it's unknown. Before, it suggested `step()`, which doesn't exist.
 

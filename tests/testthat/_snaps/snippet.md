@@ -47,7 +47,7 @@
     Code
       cat(snippet)
     Output
-      when("I send", function(dataTable, docString, context) {
+      when("I send", function(data_table, doc_string, context) {
         pending()
       })
 
