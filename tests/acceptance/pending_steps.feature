@@ -1,10 +1,13 @@
 Feature: Pending steps
-  A step that calls `pending()` is reported as pending, and the steps after it are skipped.
-  A pending step fails the run, unless it's run with `strict = FALSE`.
+  Call `pending()` in a step to mark it as not implemented yet.
+  The step is reported as pending, and the steps after it are skipped.
+  A pending scenario fails the run, unless it's run with `strict = FALSE`.
+
+  Background:
+    Given a package
 
   Scenario: A pending step fails the scenario
-    Given a package
-    And a file named "features/pending.feature" with
+    Given a file named "features/pending.feature" with
       """
       Feature: Pending
         Scenario: Not yet implemented
@@ -36,8 +39,7 @@ Feature: Pending steps
       """
 
   Scenario: Steps after a pending step are skipped
-    Given a package
-    And a file named "features/pending.feature" with
+    Given a file named "features/pending.feature" with
       """
       Feature: Pending
         Scenario: Skips the rest
@@ -68,34 +70,39 @@ Feature: Pending steps
       - Then this step should not run
       """
 
-  Scenario: A pending step skips the scenario when not strict
-    Given a package
-    And a file named "features/mixed.feature" with
-      """
-      Feature: Mixed
-        Scenario: Implemented
-          Given I have 1
-          Then I get 1
+  Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
+    A pending scenario fails the run only in strict mode, like a pending step.
 
-        Scenario: Not yet implemented
-          Given a step that is pending
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
       """
     And a file named "features/setup-steps.R" with
       """
-      given("I have {int}", function(n, context) {
-        context$value <- n
-      })
-      then("I get {int}", function(n, context) {
-        expect_equal(context$value, n)
-      })
-      given("a step that is pending", function(context) {
-        pending()
-      })
+      before(function(context, scenario) pending("the API client isn't written yet"))
+      after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\n"))
+      given("an empty basket", function(context) stop("this step must not execute"))
       """
     When I run
       """
-      test("features", strict = FALSE)
+      test("features", strict = <strict>, stop_on_failure = FALSE)
       """
-    Then it has 1 passed
-    And it has 1 skipped
-    And it has 0 failed
+    Then the scenario "Sync the basket" is <outcome> with "<message>"
+    And the output includes
+      """
+      Scenario: Sync the basket
+        - Given an empty basket
+      after: Sync the basket pending
+      """
+    And the output includes
+      """
+      1 scenario (1 pending)
+      1 step (1 skipped)
+      """
+
+    Examples:
+      | strict | outcome | message                                                   |
+      | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
+      | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |

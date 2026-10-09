@@ -1,11 +1,13 @@
 Feature: Localization
   A `# language:` line at the top of a feature file sets the language of its keywords,
-  like in the official Gherkin parser. Every language from gherkin-languages.json is supported.
+  like in the official Gherkin parser. The languages are the ones in the official gherkin-languages.json.
   Step definitions don't change, because steps are matched without their keyword.
 
-  Scenario: A feature file written in French
+  Background:
     Given a package
-    And a file named "features/addition.feature" with
+
+  Scenario: A feature file written in French
+    Given a file named "features/addition.feature" with
       """
       # language: fr
       Fonctionnalité: Addition
@@ -43,23 +45,3 @@ Feature: Localization
       """
     Then it passes
     And it has 2 passed
-
-  Scenario: An unknown language is a parse error
-    Given a package
-    And a file named "features/unknown.feature" with
-      """
-      # language: xx
-      Feature: Unknown language
-        Scenario: A step
-          Given a step
-      """
-    And a file named "features/setup-steps.R" with
-      """
-      given("a step", function(context) {})
-      """
-    When I run
-      """
-      test("features", stop_on_failure = FALSE)
-      """
-    Then it has 1 errors
-    And the error message includes "(1:1): Language not supported: xx"

@@ -44,13 +44,24 @@ when("I run", function(code, context) {
 
 then("it passes", function(context) {
   results <- as.data.frame(context$result)
-  expect_equal(sum(results$errors), 0)
-  expect_true(sum(results$passed > 0) == nrow(results))
+  expect_equal(sum(results$error), 0)
+  expect_equal(sum(results$failed), 0)
+  expect_equal(sum(results$skipped), 0)
+  expect_true(all(results$passed > 0))
 })
 
-then("it has {int} passed", function(n, context) {
+# Each row of testthat's results is one scenario (or one test_that() block),
+# so the counts below are of scenarios, not of expectations.
+scenario_status <- function(context) {
   results <- as.data.frame(context$result)
-  expect_equal(sum(results$passed), n)
+  ifelse(
+    results$error | results$failed > 0, "failed",
+    ifelse(results$skipped, "skipped", "passed")
+  )
+}
+
+then("it has {int} passed", function(n, context) {
+  expect_equal(sum(scenario_status(context) == "passed"), n)
 })
 
 then("only {string} was run", function(feature_name, context) {
@@ -63,19 +74,22 @@ then("it ran {string}", function(test_name, context) {
   expect_true(test_name %in% results$test, info = paste(results$test, collapse = ", "))
 })
 
+then("only these scenarios ran:", function(scenarios, context) {
+  results <- as.data.frame(context$result)
+  expect_equal(sort(results$test), sort(paste("Scenario:", scenarios$scenario)))
+})
+
 then("it has {int} errors", function(n, context) {
   results <- as.data.frame(context$result)
   expect_equal(sum(results$error), n)
 })
 
 then("it has {int} failed", function(n, context) {
-  results <- as.data.frame(context$result)
-  expect_equal(sum(results$failed), n)
+  expect_equal(sum(scenario_status(context) == "failed"), n)
 })
 
 then("it has {int} skipped", function(n, context) {
-  results <- as.data.frame(context$result)
-  expect_equal(sum(results$skipped), n)
+  expect_equal(sum(scenario_status(context) == "skipped"), n)
 })
 
 then("the scenario {string} is {word} with {string}", function(name, outcome, message, context) {

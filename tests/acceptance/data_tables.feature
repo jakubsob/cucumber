@@ -1,8 +1,12 @@
-Feature: Data table step arguments
+Feature: Data Tables
+  A Data Table is a table under a step. Its first row holds the column names.
+  The step definition gets it as a tibble, after the step's parameters.
+
+  Background:
+    Given a package
 
   Scenario: A step receives a data table as a tibble
-    Given a package
-    And a file named "features/table.feature" with
+    Given a file named "features/table.feature" with
       """
       Feature: Tables
         Scenario: Step with table
@@ -16,6 +20,7 @@ Feature: Data table step arguments
     And a file named "features/setup-steps.R" with
       """
       given("a list of numbers", function(table, context) {
+        expect_s3_class(table, "tbl_df")
         context$numbers <- as.integer(table$value)
       })
       then("the sum is {int}", function(n, context) {
@@ -27,11 +32,9 @@ Feature: Data table step arguments
       test("features")
       """
     Then it passes
-    And it has 1 passed
 
-  Scenario: A data table with multiple columns is passed as a tibble
-    Given a package
-    And a file named "features/table.feature" with
+  Scenario: Each column of a data table is a column of the tibble
+    Given a file named "features/table.feature" with
       """
       Feature: Tables
         Scenario: Multi-column table
@@ -59,11 +62,10 @@ Feature: Data table step arguments
       test("features")
       """
     Then it passes
-    And it has 2 passed
+    And it has 1 passed
 
-  Scenario: A table combined with parameter placeholders in step description
-    Given a package
-    And a file named "features/table.feature" with
+  Scenario: A data table comes after the step's parameters
+    Given a file named "features/table.feature" with
       """
       Feature: Tables
         Scenario: Table with parameter
@@ -89,4 +91,32 @@ Feature: Data table step arguments
       test("features")
       """
     Then it passes
-    And it has 2 passed
+    And it has 1 passed
+
+  Scenario: Data Table cells unescape \n, \| and \\
+    Given a file named "features/table.feature" with
+      """
+      Feature: Escapes
+        Scenario: Escaped cells
+          Given cells
+            | text |
+            | a\nb |
+            | a\|b |
+            | a\\b |
+          Then the cells are unescaped
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("cells", function(table, context) {
+        context$cells <- table$text
+      })
+      then("the cells are unescaped", function(context) {
+        expect_equal(context$cells, c("a\nb", "a|b", "a\\b"))
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And it has 1 passed

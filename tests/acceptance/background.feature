@@ -1,4 +1,6 @@
 Feature: Background
+  A Background holds the steps that every scenario of a feature starts with.
+  It runs before each scenario, as part of it: a failing Background step fails the scenario.
 
   Scenario: Background steps run before each scenario
     Given a package
@@ -30,7 +32,7 @@ Feature: Background
     Then it passes
     And it has 2 passed
 
-  Scenario: Background steps are independent per scenario
+  Scenario: Each scenario runs the Background anew
     Given a package
     And a file named "features/background.feature" with
       """

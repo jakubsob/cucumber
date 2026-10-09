@@ -127,4 +127,6 @@ Feature: Rule
       """
       test("features", tags = "@adding")
       """
-    Then it has 1 passed
+    Then only these scenarios ran:
+      | scenario     |
+      | Add one item |

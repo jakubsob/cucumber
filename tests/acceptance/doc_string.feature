@@ -1,8 +1,12 @@
-Feature: Docstring step arguments
+Feature: Doc Strings
+  A Doc String is a block of text under a step, between ``` or """ delimiters.
+  The step definition gets it as a character vector of lines, after the step's parameters.
 
-  Scenario: A step receives a docstring as its last argument
+  Background:
     Given a package
-    And a file named "features/docstring.feature" with
+
+  Scenario: A step definition gets the Doc String
+    Given a file named "features/docstring.feature" with
       """
       Feature: Docstrings
         Scenario: Step with docstring
@@ -28,9 +32,8 @@ Feature: Docstring step arguments
     Then it passes
     And it has 1 passed
 
-  Scenario: Docstring preserves multiple lines
-    Given a package
-    And a file named "features/docstring.feature" with
+  Scenario: A multi-line Doc String keeps every line
+    Given a file named "features/docstring.feature" with
       """
       Feature: Docstrings
         Scenario: Multiline docstring
@@ -57,9 +60,8 @@ Feature: Docstring step arguments
     Then it passes
     And it has 1 passed
 
-  Scenario: Docstring combined with parameter placeholders in step description
-    Given a package
-    And a file named "features/docstring.feature" with
+  Scenario: A Doc String comes after the step's parameters
+    Given a file named "features/docstring.feature" with
       """
       Feature: Docstrings
         Scenario: Docstring with parameter
@@ -85,9 +87,8 @@ Feature: Docstring step arguments
     Then it passes
     And it has 1 passed
 
-  Scenario: Docstring content is dedented relative to its opening delimiter
-    Given a package
-    And a file named "features/docstring.feature" with
+  Scenario: A Doc String is dedented relative to its opening delimiter
+    Given a file named "features/docstring.feature" with
       """
       Feature: Docstrings
         Scenario: Delimiter indented past the step
@@ -125,3 +126,32 @@ Feature: Docstring step arguments
       """
     Then it passes
     And it has 2 passed
+
+  Scenario: A Doc String keeps empty lines and lines starting with #
+    Given a file named "features/docstring.feature" with
+      """
+      Feature: Doc Strings
+        Scenario: A script
+          Given a script
+            ```r
+            # Say hello
+
+            print("hello")
+            ```
+          Then the script keeps every line
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a script", function(script, context) {
+        context$script <- script
+      })
+      then("the script keeps every line", function(context) {
+        expect_equal(context$script, c("# Say hello", "", "print(\"hello\")"))
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And it has 1 passed

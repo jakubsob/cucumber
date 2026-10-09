@@ -64,6 +64,14 @@ Feature: Ambiguous steps
       """
       Multiple step definitions match: "I add an item"
       """
+    And the error message includes
+      """
+      "I add an item" (setup-steps.R:1)
+      """
+    And the error message includes
+      """
+      "I add an item" (setup-steps.R:4)
+      """
 
   Scenario: {int} and {float} definitions are ambiguous for an integer
     Given a package
@@ -90,4 +98,12 @@ Feature: Ambiguous steps
     And the error message includes
       """
       Multiple step definitions match: "there are 12 cucumbers"
+      """
+    And the error message includes
+      """
+      "there are {int} cucumbers" (setup-steps.R:1)
+      """
+    And the error message includes
+      """
+      "there are {float} cucumbers" (setup-steps.R:4)
       """

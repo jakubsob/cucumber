@@ -1,9 +1,10 @@
 Feature: Regular expressions
   A step description that starts with "^", ends with "$" or is surrounded by "/"
   is a regular expression instead of a Cucumber Expression.
-  The text of each capture group is passed to the step.
+  Each capture group is passed to the step. A group whose regexp is the regexp of a parameter type,
+  like `(\\d+)` for `{int}`, is converted like that parameter; any other group is passed as text.
 
-  Scenario: Capture groups are passed to the step
+  Scenario: Capture groups are passed to the step, converted by parameter type
     Given a package
     And a file named "features/basket.feature" with
       """
@@ -43,7 +44,7 @@ Feature: Regular expressions
       given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) {
         context$vegetables <- c(first, second, third)
       })
-      then("^the vegetables are (.*)$", function(names, context) {
+      then("^the vegetables are cucumber and carrot$", function(context) {
         expect_equal(context$vegetables, c("cucumber", "carrot", NA))
       })
       """
