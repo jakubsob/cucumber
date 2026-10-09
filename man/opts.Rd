@@ -10,6 +10,11 @@ They allow overriding the default behavior of the package.
 \details{
 The following options are available:
 \itemize{
+\item \code{cucumber.path}
+
+Directory with \code{.feature} files that \code{\link[=test]{test()}} runs when called without \code{path}.
+
+default: \code{"tests/acceptance"}
 \item \code{cucumber.reporter_max_docstring_lines}
 
 Max docstring lines \link{CucumberProgressReporter} prints per step before

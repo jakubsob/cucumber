@@ -7,6 +7,12 @@
 #'
 #' The following options are available:
 #'
+#' - `cucumber.path`
+#'
+#'   Directory with `.feature` files that [test()] runs when called without `path`.
+#'
+#'   default: `"tests/acceptance"`
+#'
 #' - `cucumber.reporter_max_docstring_lines`
 #'
 #'   Max docstring lines [CucumberProgressReporter] prints per step before

@@ -39,6 +39,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks.
 - ✨ `test()` and `run()` get `name` and `features` arguments to run only some scenarios. `name = "^Adding"` runs scenarios whose name matches a regular expression. `features = "addition.feature:12"` runs the scenario at line 12 of a feature file, like `cucumber-js features/addition.feature:12`. The line of a Scenario Outline runs all its examples, the line of an example row runs only that example.
 - ✨ `test()` and `run()` get a `fail_fast` argument. After the first failed scenario, the remaining scenarios are skipped and their hooks don't run, like `cucumber-js --fail-fast`. With `strict = TRUE`, a scenario with a pending or undefined step counts as failed.
+- ✨ `test()` runs feature files from the directory set in the `cucumber.path` option when called without `path`, e.g. `options(cucumber.path = "features")`. It defaults to `"tests/acceptance"`, the previous default value.
 
 ## Hooks
 

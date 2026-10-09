@@ -191,6 +191,8 @@ test_cucumber_code <- function(path, ...) {
 #'   `testthat::test_dir("tests/acceptance")`.
 #'
 #' @inheritParams testthat::test_dir
+#' @param path Path to the directory containing the `.feature` files. Its subdirectories are
+#'   searched too. Defaults to the `cucumber.path` option, or `"tests/acceptance"` if it's not set.
 #' @param filter If not NULL, only features with file names matching this regular expression
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
 #' @param tags If not NULL, filter scenarios by tag expression string
@@ -237,7 +239,7 @@ test_cucumber_code <- function(path, ...) {
 #' @export
 #' @md
 test <- function(
-  path = "tests/acceptance",
+  path = getOption("cucumber.path", "tests/acceptance"),
   filter = NULL,
   tags = NULL,
   reporter = get_reporter(),
