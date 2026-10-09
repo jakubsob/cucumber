@@ -145,12 +145,21 @@ execute_single_pickle <- function(
     }
 
     hook_errors <- Filter(Negate(is.null), list(before_error, after_error))
-    failed <<- length(hook_errors) > 0 || scenario_failed(steps, strict)
+    if (inherits(reporter, "CucumberReporter")) {
+      for (error in hook_errors) reporter$end_hook(hook_status(error), error)
+    }
+    # A pending hook counts like a pending step
+    pending_hooks <- lapply(
+      Filter(\(error) inherits(error, "cucumber_pending"), hook_errors),
+      \(error) list(status = "pending", error = error)
+    )
+    hook_errors <- Filter(\(error) !inherits(error, "cucumber_pending"), hook_errors)
+    failed <<- length(hook_errors) > 0 || scenario_failed(c(pending_hooks, steps), strict)
     # Recorded as errors without stopping, so failed steps are reported too
     for (error in hook_errors) {
       testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
     }
-    signal_scenario_result(steps, strict)
+    signal_scenario_result(c(pending_hooks, steps), strict)
     # testthat reports a test without expectations as skipped
     passed <- all(vapply(steps, \(step) step$status == "passed", logical(1)))
     if (!dry_run && !skipped && !failed && passed && expectations == 0) {
@@ -176,14 +185,14 @@ scenario_failed <- function(steps, strict = TRUE) {
   any(vapply(steps, \(step) step$status %in% failing, logical(1)))
 }
 
-#' The status of a scenario's worst step, and its error. A failed before hook
-#' fails the scenario.
+#' The status of a scenario's worst step, and its error. A failed or pending
+#' before hook gives the scenario its status.
 #'
 #' @keywords internal
 #' @noRd
 scenario_result <- function(steps, before_error = NULL) {
   if (!is.null(before_error)) {
-    return(list(status = "failed", error = before_error))
+    return(list(status = hook_status(before_error), error = before_error))
   }
   statuses <- vapply(steps, \(step) step$status, character(1))
   status <- STEP_STATUSES[STEP_STATUSES %in% c(statuses, "passed")][[1]]
@@ -191,8 +200,16 @@ scenario_result <- function(steps, before_error = NULL) {
   list(status = status, error = worst$error)
 }
 
+#' A hook that called pending() is pending, any other hook error fails it
+#' @keywords internal
+#' @noRd
+hook_status <- function(error) {
+  if (inherits(error, "cucumber_pending")) "pending" else "failed"
+}
+
 #' Run a step between its before_step and after_step hooks. A failing step hook
-#' fails the step, a failing before_step hook also stops the step from running.
+#' fails the step, a pending one makes it pending. A failing or pending
+#' before_step hook also stops the step from running.
 #'
 #' @keywords internal
 #' @noRd
@@ -202,7 +219,7 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)
   } else {
-    new_step_result(step, "failed", before_error)
+    new_step_result(step, hook_status(before_error), before_error)
   }
   after_error <- run_hooks(
     get_hooks_to_run(hooks, "after_step", pickle$tags),
@@ -211,7 +228,7 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     stop_on_error = FALSE
   )
   if (!is.null(after_error) && step$status == "passed") {
-    step <- new_step_result(step, "failed", after_error, step$duration)
+    step <- new_step_result(step, hook_status(after_error), after_error, step$duration)
   }
   step
 }

@@ -240,6 +240,43 @@ Feature: Hooks
       3 steps (2 skipped, 1 passed)
       """
 
+  Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
+    A pending scenario fails the run only in strict mode, like a pending step.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) pending("the API client isn't written yet"))
+      after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\n"))
+      given("an empty basket", function(context) stop("this step must not execute"))
+      """
+    When I run
+      """
+      test("features", strict = <strict>, stop_on_failure = FALSE)
+      """
+    Then the scenario "Sync the basket" is <outcome> with "<message>"
+    And the output includes
+      """
+      Scenario: Sync the basket
+        - Given an empty basket
+      after: Sync the basket pending
+      """
+    And the output includes
+      """
+      1 scenario (1 pending)
+      1 step (1 skipped)
+      """
+
+    Examples:
+      | strict | outcome | message                                                   |
+      | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
+      | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |
+
   Scenario: skip_scenario() fails in hooks other than before hooks
     Given a file named "features/basket.feature" with
       """

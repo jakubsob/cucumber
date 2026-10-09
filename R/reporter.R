@@ -20,6 +20,7 @@
 #'   \item{`end_feature()`}{Called after all scenarios in a feature complete}
 #'   \item{`start_step(step)`}{Called before executing a step}
 #'   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
+#'   \item{`end_hook(status, error)`}{Called after a scenario's hooks if one of them didn't pass}
 #' }
 #'
 #' @importFrom R6 R6Class
@@ -63,6 +64,14 @@ CucumberReporter <- R6::R6Class(
     #' End a step (called after execution with status/error/duration populated)
     #' @param step Pickle step object with execution results
     end_step = function(step) {
+      invisible(self)
+    },
+
+    #' @description
+    #' Called after a scenario's `before` or `after` hooks if one of them didn't pass
+    #' @param status `"failed"` or `"pending"`
+    #' @param error The hook's error
+    end_hook = function(status, error) {
       invisible(self)
     }
   )
@@ -285,6 +294,9 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field current_steps Steps executed so far in the current scenario
     current_steps = NULL,
 
+    #' @field hook_statuses Statuses of the current scenario's hooks that didn't pass
+    hook_statuses = NULL,
+
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
 
@@ -363,6 +375,7 @@ CucumberProgressReporter <- R6::R6Class(
       }
       self$current_scenario <- test
       self$current_steps <- list()
+      self$hook_statuses <- character()
       self$step_errored <- FALSE
       self$scenario_failed <- FALSE
       withr::local_options(cli.num_colors = self$num_colors)
@@ -380,6 +393,7 @@ CucumberProgressReporter <- R6::R6Class(
         super$end_test(context, test)
       }
       statuses <- vapply(self$current_steps, \(step) step$status %||% "passed", character(1))
+      statuses <- c(statuses, self$hook_statuses)
       status <- STEP_STATUSES[STEP_STATUSES %in% c(statuses, "passed")][[1]]
       if (self$scenario_failed && status %in% c("passed", "skipped")) {
         status <- "failed"
@@ -434,6 +448,16 @@ CucumberProgressReporter <- R6::R6Class(
         }
       }
 
+      invisible(self)
+    },
+
+    #' @description
+    #' Record the status of a scenario's hook that didn't pass
+    #' @param status `"failed"` or `"pending"`
+    #' @param error The hook's error
+    end_hook = function(status, error) {
+      super$end_hook(status, error)
+      self$hook_statuses <- c(self$hook_statuses, status)
       invisible(self)
     },
 

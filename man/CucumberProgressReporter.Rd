@@ -130,6 +130,8 @@ cucumber::test(
 
 \item{\code{current_steps}}{Steps executed so far in the current scenario}
 
+\item{\code{hook_statuses}}{Statuses of the current scenario's hooks that didn't pass}
+
 \item{\code{failures}}{Recorded failures for the end-of-run summary}
 
 \item{\code{step_errored}}{Whether end_step already rendered a step's error this scenario}
@@ -151,6 +153,7 @@ cucumber::test(
 \item \href{#method-CucumberProgressReporter-start_test}{\code{CucumberProgressReporter$start_test()}}
 \item \href{#method-CucumberProgressReporter-end_test}{\code{CucumberProgressReporter$end_test()}}
 \item \href{#method-CucumberProgressReporter-add_result}{\code{CucumberProgressReporter$add_result()}}
+\item \href{#method-CucumberProgressReporter-end_hook}{\code{CucumberProgressReporter$end_hook()}}
 \item \href{#method-CucumberProgressReporter-start_step}{\code{CucumberProgressReporter$start_step()}}
 \item \href{#method-CucumberProgressReporter-end_step}{\code{CucumberProgressReporter$end_step()}}
 \item \href{#method-CucumberProgressReporter-print_step_args}{\code{CucumberProgressReporter$print_step_args()}}
@@ -292,6 +295,25 @@ Add a result (warning, skip, failure, etc.)
 \item{\code{test}}{Test object}
 
 \item{\code{result}}{Test result object}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberProgressReporter-end_hook"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_hook}{}}}
+\subsection{Method \code{end_hook()}}{
+Record the status of a scenario's hook that didn't pass
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_hook(status, error)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{status}}{\code{"failed"} or \code{"pending"}}
+
+\item{\code{error}}{The hook's error}
 }
 \if{html}{\out{</div>}}
 }

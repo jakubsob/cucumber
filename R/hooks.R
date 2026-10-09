@@ -229,6 +229,13 @@ run_hooks <- function(fns, ..., stop_on_error = TRUE, can_skip = FALSE) {
         }
         error_cnd(message = "`skip_scenario()` can only be called in a `before()` hook or a step.")
       },
+      cucumber_pending = function(cnd) {
+        error_cnd(
+          class = "cucumber_pending",
+          message = glue("Hook is pending: {cnd$reason}"),
+          trace = empty_trace()
+        )
+      },
       error = identity
     )
     if (inherits(error, "cucumber_skip_scenario")) {

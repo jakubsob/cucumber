@@ -78,11 +78,12 @@ then("it has {int} skipped", function(n, context) {
   expect_equal(sum(results$skipped), n)
 })
 
-then("the scenario {string} is skipped with {string}", function(name, reason, context) {
+then("the scenario {string} is {word} with {string}", function(name, outcome, message, context) {
   test <- Find(\(test) test$test == paste("Scenario:", name), context$result)
-  skips <- Filter(\(result) inherits(result, "expectation_skip"), test$results)
-  expect_length(skips, 1)
-  expect_equal(conditionMessage(skips[[1]]), reason)
+  results <- Filter(\(result) !inherits(result, "expectation_success"), test$results)
+  expect_length(results, 1)
+  expect_s3_class(results[[1]], c(skipped = "expectation_skip", failed = "expectation_failure")[[outcome]])
+  expect_equal(conditionMessage(results[[1]]), message)
 })
 
 then("it fails with {string}", function(error_message, context) {
