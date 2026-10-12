@@ -51,7 +51,8 @@ warnings.}
 If \code{FALSE}, they skip it.}
 
 \item{dry_run}{If \code{TRUE}, steps are matched to step definitions, but neither
-step definitions nor hooks are run. Use it to find undefined and ambiguous steps.}
+step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
+They are reported, but don't fail a dry run: a scenario with one is skipped.}
 
 \item{name}{If not NULL, only scenarios with names matching any of these regular expressions
 will be executed. For a Scenario Outline, the name is matched after its \verb{<placeholders>} are replaced.}

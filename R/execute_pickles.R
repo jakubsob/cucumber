@@ -45,7 +45,8 @@ execute_pickles <- function(
       reporter,
       test_names[[i]],
       strict = strict,
-      dry_run = dry_run || (fail_fast && failed)
+      skip_steps = dry_run || (fail_fast && failed),
+      dry_run = dry_run
     )
     failed <- failed || pickle_failed
   }
@@ -77,6 +78,9 @@ unique_test_names <- function(names) {
 #' after a failed or skipping before hook, are skipped. Steps without exactly one
 #' definition are always reported as undefined or ambiguous.
 #'
+#' With `skip_steps`, neither hooks nor step bodies run. In a dry run, undefined and
+#' ambiguous steps don't fail the scenario either: they skip it.
+#'
 #' @return Whether the scenario failed, invisibly
 #' @keywords internal
 #' @noRd
@@ -86,6 +90,7 @@ execute_single_pickle <- function(
   reporter = NULL,
   test_name = pickle$name,
   strict = TRUE,
+  skip_steps = FALSE,
   dry_run = FALSE
 ) {
   failed <- FALSE
@@ -95,7 +100,7 @@ execute_single_pickle <- function(
 
     # A dry run matches the steps, but runs neither hooks nor step bodies
     before_error <- NULL
-    if (!dry_run) {
+    if (!skip_steps) {
       before_error <- run_hooks(
         get_hooks_to_run(hooks, "before", pickle$tags),
         .context,
@@ -111,7 +116,7 @@ execute_single_pickle <- function(
     }
     skipped <- !is.null(skip)
 
-    skipping <- dry_run || skipped || !is.null(before_error)
+    skipping <- skip_steps || skipped || !is.null(before_error)
     steps <- list()
     expectations <- 0
     withCallingHandlers(for (step in pickle$steps) {
@@ -134,7 +139,7 @@ execute_single_pickle <- function(
     }, expectation = function(e) expectations <<- expectations + 1)
 
     after_error <- NULL
-    if (!dry_run) {
+    if (!skip_steps) {
       scenario <- c(scenario, scenario_result(steps, before_error))
       after_error <- run_hooks(
         get_hooks_to_run(hooks, "after", pickle$tags),
@@ -154,15 +159,15 @@ execute_single_pickle <- function(
       \(error) list(status = "pending", error = error)
     )
     hook_errors <- Filter(\(error) !inherits(error, "cucumber_pending"), hook_errors)
-    failed <<- length(hook_errors) > 0 || scenario_failed(c(pending_hooks, steps), strict)
+    failed <<- length(hook_errors) > 0 || (!dry_run && scenario_failed(c(pending_hooks, steps), strict))
     # Recorded as errors without stopping, so failed steps are reported too
     for (error in hook_errors) {
       testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
     }
-    signal_scenario_result(c(pending_hooks, steps), strict)
+    signal_scenario_result(c(pending_hooks, steps), strict, dry_run)
     # testthat reports a test without expectations as skipped
     passed <- all(vapply(steps, \(step) step$status == "passed", logical(1)))
-    if (!dry_run && !skipped && !failed && passed && expectations == 0) {
+    if (!skip_steps && !skipped && !failed && passed && expectations == 0) {
       testthat::succeed()
     }
     # A step calling skip_scenario() or testthat::skip() skips the scenario too
@@ -236,13 +241,13 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
 #' Report the steps that didn't pass to testthat
 #'
 #' Ambiguous steps always fail the scenario, pending and undefined steps only
-#' in strict mode. Otherwise they skip it.
+#' in strict mode. Otherwise they skip it. In a dry run none of them fail it.
 #'
 #' @keywords internal
 #' @noRd
 #' @importFrom purrr keep
-signal_scenario_result <- function(steps, strict = TRUE) {
-  lenient <- if (strict) character(0) else c("pending", "undefined")
+signal_scenario_result <- function(steps, strict = TRUE, dry_run = FALSE) {
+  lenient <- c(if (!strict || dry_run) c("pending", "undefined"), if (dry_run) "ambiguous")
   not_run <- keep(steps, \(step) step$status %in% c("pending", "undefined", "ambiguous"))
   failing <- keep(not_run, \(step) !step$status %in% lenient)
   # a loop, purrr would wrap the expectations testthat signals as errors

@@ -30,6 +30,7 @@
 #'   If `FALSE`, they skip it.
 #' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
 #'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
+#'   They are reported, but don't fail a dry run: a scenario with one is skipped.
 #' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
 #'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
 #'   undefined step counts as failed.
@@ -208,6 +209,7 @@ test_cucumber_code <- function(path, ...) {
 #'   If `FALSE`, they skip it.
 #' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
 #'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
+#'   They are reported, but don't fail a dry run: a scenario with one is skipped.
 #' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
 #'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
 #'   undefined step counts as failed.

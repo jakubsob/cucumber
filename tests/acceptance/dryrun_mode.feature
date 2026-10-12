@@ -1,6 +1,7 @@
 Feature: Dry run
-  A dry run matches every step to a step definition, but runs neither steps nor hooks.
+  `test(dry_run = TRUE)` matches every step to a step definition, but runs neither steps nor hooks.
   Use it to find undefined and ambiguous steps without running the scenarios.
+  Undefined and ambiguous steps are reported, but they don't fail a dry run: a scenario with one is skipped.
 
   Scenario: A dry run doesn't run steps or hooks
     Given a package
@@ -41,7 +42,7 @@ Feature: Dry run
       2 steps (2 skipped)
       """
 
-  Scenario: A dry run reports undefined steps
+  Scenario: A dry run reports undefined steps without failing
     Given a package
     And a file named "features/basket.feature" with
       """
@@ -58,10 +59,10 @@ Feature: Dry run
       """
     When I run
       """
-      test("features", dry_run = TRUE, stop_on_failure = FALSE)
+      test("features", dry_run = TRUE)
       """
-    Then it has 1 failed
-    And it has 0 errors
+    Then it has 0 failed
+    And it has 1 skipped
     And the output includes
       """
       - Given an empty basket
@@ -70,4 +71,65 @@ Feature: Dry run
     And the output includes
       """
       when("I add an item", function(context) {
+      """
+    And the output includes
+      """
+      1 scenario (1 undefined)
+      2 steps (1 undefined, 1 skipped)
+      """
+
+  Scenario: A dry run reports ambiguous steps without failing
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) {})
+      when("I add an {word}", function(thing, context) {})
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE)
+      """
+    Then it has 0 failed
+    And it has 1 skipped
+    And the output includes
+      """
+      A When I add an item
+      """
+    And the output includes
+      """
+      1 scenario (1 ambiguous)
+      """
+
+  Scenario: A step that would be pending is skipped in a dry run
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) pending())
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE)
+      """
+    Then it has 0 failed
+    And it has 1 skipped
+    And the output includes
+      """
+      - When I add an item
+      """
+    And the output includes
+      """
+      1 scenario (1 skipped)
+      1 step (1 skipped)
       """
