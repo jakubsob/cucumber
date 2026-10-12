@@ -44,7 +44,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Hooks
 
-- ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`. Replace `scenario_name` with `scenario$name`.
+- ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`. Replace `scenario_name` with `scenario$name`. Like in cucumber-js, the status is the worst result of the scenario's steps and of the hooks that ran before, including earlier `after()` hooks.
 - ✨ Define any number of `before()` and `after()` hooks. Before hooks run in the order they are defined, after hooks in the reverse order. Previously a second hook of the same kind failed with "Hook already registered".
 - ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword` and `text`, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
 - ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run.
@@ -59,6 +59,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ A step's `status` is `"failed"` for both failed expectations and errors. The `"error"` status is removed.
 - ⚠️ A step keeps the keyword it's written with, so `step$keyword` can be `And`, `But` or `*`. The new `step$type` is `"Context"`, `"Action"`, `"Outcome"` or `"Unknown"`.
 - ⚠️ `CucumberProgressReporter` prints the keyword as written and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
+- ✨ `CucumberProgressReporter` prints a failed or pending hook's error where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
 
 ## Snippets
 

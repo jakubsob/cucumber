@@ -93,6 +93,8 @@ Feature: Pending steps
     And the output includes
       """
       Scenario: Sync the basket
+        Pending:
+          Hook is pending: the API client isn't written yet
         - Given an empty basket
       after: Sync the basket pending
       """

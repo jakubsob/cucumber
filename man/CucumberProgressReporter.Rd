@@ -124,19 +124,17 @@ cucumber::test(
 
 \item{\code{scenario_statuses}}{Statuses of the finished scenarios}
 
-\item{\code{scenario_failed}}{Whether testthat reported a failure or an error for the current scenario}
+\item{\code{scenario_failed}}{Whether testthat reported a failure or an error for the current test}
+
+\item{\code{scenario_status}}{Status of the current scenario, once its steps and hooks ran}
 
 \item{\code{current_scenario}}{Name of the scenario currently executing}
 
 \item{\code{current_steps}}{Steps executed so far in the current scenario}
 
-\item{\code{hook_statuses}}{Statuses of the current scenario's hooks that didn't pass}
-
-\item{\code{hook_errors}}{Messages of the current scenario's failed hooks, already printed by end_hook}
+\item{\code{current_hooks}}{Results of the current scenario's hooks that failed or are pending}
 
 \item{\code{failures}}{Recorded failures for the end-of-run summary}
-
-\item{\code{step_errored}}{Whether end_step already rendered a step's error this scenario}
 
 \item{\code{num_colors}}{Terminal color support captured at construction}
 
@@ -154,6 +152,7 @@ cucumber::test(
 \item \href{#method-CucumberProgressReporter-end_feature}{\code{CucumberProgressReporter$end_feature()}}
 \item \href{#method-CucumberProgressReporter-start_test}{\code{CucumberProgressReporter$start_test()}}
 \item \href{#method-CucumberProgressReporter-end_test}{\code{CucumberProgressReporter$end_test()}}
+\item \href{#method-CucumberProgressReporter-end_scenario}{\code{CucumberProgressReporter$end_scenario()}}
 \item \href{#method-CucumberProgressReporter-add_result}{\code{CucumberProgressReporter$add_result()}}
 \item \href{#method-CucumberProgressReporter-end_hook}{\code{CucumberProgressReporter$end_hook()}}
 \item \href{#method-CucumberProgressReporter-start_step}{\code{CucumberProgressReporter$start_step()}}
@@ -264,8 +263,9 @@ Start a test (called by testthat for each scenario)
 \if{html}{\out{<a id="method-CucumberProgressReporter-end_test"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_test}{}}}
 \subsection{Method \code{end_test()}}{
-End a test (called by testthat for each scenario). The scenario gets the
-status of its worst step, or "failed" if a hook failed.
+End a test (called by testthat for each scenario). A scenario has the
+status given to end_scenario(). A test that isn't a scenario, or one that
+stopped before its end, fails if testthat reported a failure or an error.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_test(context, test)}\if{html}{\out{</div>}}
 }
@@ -276,6 +276,23 @@ status of its worst step, or "failed" if a hook failed.
 \item{\code{context}}{Test context}
 
 \item{\code{test}}{Test name}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberProgressReporter-end_scenario"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_scenario}{}}}
+\subsection{Method \code{end_scenario()}}{
+Record a scenario's status, and the scenario for the summary if it didn't pass
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_scenario(status)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{status}}{The scenario's status}
 }
 \if{html}{\out{</div>}}
 }
@@ -305,7 +322,7 @@ Add a result (warning, skip, failure, etc.)
 \if{html}{\out{<a id="method-CucumberProgressReporter-end_hook"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_hook}{}}}
 \subsection{Method \code{end_hook()}}{
-Record the status of a scenario's hook that didn't pass
+Print the error of a scenario's hook that failed or is pending
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_hook(status, error)}\if{html}{\out{</div>}}
 }

@@ -78,6 +78,10 @@ unique_test_names <- function(names) {
 #' after a failed or skipping before hook, are skipped. Steps without exactly one
 #' definition are always reported as undefined or ambiguous.
 #'
+#' Like in cucumber-js, hooks and steps are the scenario's test steps: the
+#' scenario gets the worst of their results, and each after hook gets the worst
+#' result so far.
+#'
 #' With `skip_steps`, neither hooks nor step bodies run. In a dry run, undefined and
 #' ambiguous steps don't fail the scenario either: they skip it.
 #'
@@ -97,27 +101,29 @@ execute_single_pickle <- function(
   test_that(glue("Scenario: {test_name}"), {
     .context <- new.env()
     scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
+    # The results of the steps and of the hooks that didn't pass
+    results <- list()
+    add_hook_result <- function(error) {
+      if (is.null(error)) return()
+      result <- hook_result(error)
+      if (inherits(reporter, "CucumberReporter") && result$status != "skipped") {
+        reporter$end_hook(result$status, result$error)
+      }
+      results <<- c(results, list(result))
+    }
 
     # A dry run matches the steps, but runs neither hooks nor step bodies
-    before_error <- NULL
     if (!skip_steps) {
-      before_error <- run_hooks(
+      add_hook_result(run_hooks(
         get_hooks_to_run(hooks, "before", pickle$tags),
         .context,
         scenario,
         can_skip = TRUE
-      )
+      ))
     }
-    # A before hook calling skip_scenario() or testthat::skip() skips the scenario
-    skip <- NULL
-    if (inherits(before_error, "skip")) {
-      skip <- before_error
-      before_error <- NULL
-    }
-    skipped <- !is.null(skip)
 
-    skipping <- skip_steps || skipped || !is.null(before_error)
-    steps <- list()
+    # A failed, pending or skipping before hook skips the steps
+    skipping <- skip_steps || length(results) > 0
     expectations <- 0
     withCallingHandlers(for (step in pickle$steps) {
       if (inherits(reporter, "CucumberReporter")) {
@@ -135,82 +141,68 @@ execute_single_pickle <- function(
         reporter$end_step(step)
       }
       skipping <- skipping || step$status != "passed"
-      steps <- c(steps, list(step))
+      results <- c(results, list(step))
     }, expectation = function(e) expectations <<- expectations + 1)
 
-    after_error <- NULL
     if (!skip_steps) {
-      scenario <- c(scenario, scenario_result(steps, before_error))
-      after_error <- run_hooks(
-        get_hooks_to_run(hooks, "after", pickle$tags),
-        .context,
-        scenario,
-        stop_on_error = FALSE
-      )
+      for (fn in get_hooks_to_run(hooks, "after", pickle$tags)) {
+        add_hook_result(run_hooks(list(fn), .context, c(scenario, worst_result(results))))
+      }
     }
 
-    hook_errors <- Filter(Negate(is.null), list(before_error, after_error))
+    result <- worst_result(results)
     if (inherits(reporter, "CucumberReporter")) {
-      for (error in hook_errors) reporter$end_hook(hook_status(error), error)
+      reporter$end_scenario(result$status)
     }
-    # A pending hook counts like a pending step
-    pending_hooks <- lapply(
-      Filter(\(error) inherits(error, "cucumber_pending"), hook_errors),
-      \(error) list(status = "pending", error = error)
-    )
-    hook_errors <- Filter(\(error) !inherits(error, "cucumber_pending"), hook_errors)
-    failed <<- length(hook_errors) > 0 || (!dry_run && scenario_failed(c(pending_hooks, steps), strict))
-    # Recorded as failures without stopping, so failed steps are reported too.
-    # An "error" expectation would be recorded twice by testthat.
-    for (error in hook_errors) {
-      testthat::fail(conditionMessage(error))
-    }
-    signal_scenario_result(c(pending_hooks, steps), strict, dry_run)
+    failing <- failing_statuses(strict, dry_run)
+    failed <<- result$status %in% failing
+    signal_scenario_result(results, result, failing)
     # testthat reports a test without expectations as skipped
-    passed <- all(vapply(steps, \(step) step$status == "passed", logical(1)))
-    if (!skip_steps && !skipped && !failed && passed && expectations == 0) {
+    if (!skip_steps && result$status == "passed" && expectations == 0) {
       testthat::succeed()
-    }
-    # A step calling skip_scenario() or testthat::skip() skips the scenario too
-    skip <- skip %||% Find(\(step) inherits(step$error, "skip"), steps)$error
-    if (!is.null(skip)) {
-      stop(skip)
     }
   })
 
   invisible(failed)
 }
 
-#' A failed or ambiguous step fails the scenario, a pending or undefined step
-#' only in strict mode
+#' The statuses that fail a scenario. Failed and ambiguous steps always do,
+#' pending and undefined steps only in strict mode. In a dry run, nothing runs,
+#' so only a failure to run fails it.
 #'
 #' @keywords internal
 #' @noRd
-scenario_failed <- function(steps, strict = TRUE) {
-  failing <- c("failed", "ambiguous", if (strict) c("pending", "undefined"))
-  any(vapply(steps, \(step) step$status %in% failing, logical(1)))
+failing_statuses <- function(strict = TRUE, dry_run = FALSE) {
+  if (dry_run) {
+    return("failed")
+  }
+  c("failed", "ambiguous", if (strict) c("undefined", "pending"))
 }
 
-#' The status of a scenario's worst step, and its error. A failed or pending
-#' before hook gives the scenario its status.
+#' The worst of a scenario's results, by `STEP_STATUSES`, and its error
 #'
 #' @keywords internal
 #' @noRd
-scenario_result <- function(steps, before_error = NULL) {
-  if (!is.null(before_error)) {
-    return(list(status = hook_status(before_error), error = before_error))
-  }
-  statuses <- vapply(steps, \(step) step$status, character(1))
+worst_result <- function(results) {
+  statuses <- vapply(results, \(result) result$status, character(1))
   status <- STEP_STATUSES[STEP_STATUSES %in% c(statuses, "passed")][[1]]
-  worst <- Find(\(step) step$status == status, steps)
+  worst <- Find(\(result) result$status == status, results)
   list(status = status, error = worst$error)
 }
 
-#' A hook that called pending() is pending, any other hook error fails it
+#' A hook that called skip_scenario() or testthat::skip() is skipped, one that
+#' called pending() is pending, any other hook error fails it
 #' @keywords internal
 #' @noRd
-hook_status <- function(error) {
-  if (inherits(error, "cucumber_pending")) "pending" else "failed"
+hook_result <- function(error) {
+  status <- if (inherits(error, "skip")) {
+    "skipped"
+  } else if (inherits(error, "cucumber_pending")) {
+    "pending"
+  } else {
+    "failed"
+  }
+  list(status = status, error = error, hook = TRUE)
 }
 
 #' Run a step between its before_step and after_step hooks. A failing step hook
@@ -225,7 +217,7 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)
   } else {
-    new_step_result(step, hook_status(before_error), before_error)
+    new_step_result(step, hook_result(before_error)$status, before_error)
   }
   after_error <- run_hooks(
     get_hooks_to_run(hooks, "after_step", pickle$tags),
@@ -233,41 +225,41 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     c(hook_step, list(status = step$status, error = step$error)),
     stop_on_error = FALSE
   )
-  # The step gets the worse of its own status and the hook's
-  if (!is.null(after_error) && match(hook_status(after_error), STEP_STATUSES) < match(step$status, STEP_STATUSES)) {
-    step <- new_step_result(step, hook_status(after_error), after_error, step$duration)
+  # The step gets the worse of its own result and the hook's
+  if (!is.null(after_error)) {
+    worst <- worst_result(list(step, hook_result(after_error)))
+    step <- new_step_result(step, worst$status, worst$error, step$duration)
   }
   step
 }
 
-#' Report the steps that didn't pass to testthat
+#' Report a scenario's result to testthat
 #'
-#' Ambiguous steps always fail the scenario, pending and undefined steps only
-#' in strict mode. Otherwise they skip it. In a dry run none of them fail it.
+#' Each result with a failing status is a failure. A failed step's error is
+#' signalled last, as it ends the test. A scenario that didn't fail but didn't
+#' pass either is skipped with the reason of its worst result.
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr keep
-signal_scenario_result <- function(steps, strict = TRUE, dry_run = FALSE) {
-  lenient <- c(if (!strict || dry_run) c("pending", "undefined"), if (dry_run) "ambiguous")
-  not_run <- keep(steps, \(step) step$status %in% c("pending", "undefined", "ambiguous"))
-  failing <- keep(not_run, \(step) !step$status %in% lenient)
+signal_scenario_result <- function(results, result, failing) {
+  failures <- Filter(\(result) result$status %in% failing, results)
+  failed_step <- Find(\(result) result$status == "failed" && !isTRUE(result$hook), failures)
   # a loop, purrr would wrap the expectations testthat signals as errors
-  for (step in failing) {
-    testthat::fail(conditionMessage(step$error))
+  for (failure in failures) {
+    if (identical(failure, failed_step)) next
+    testthat::fail(conditionMessage(failure$error))
   }
-
-  failed <- Find(\(step) step$status == "failed", steps)
-  if (!is.null(failed)) {
-    if (inherits(failed$error, "expectation")) {
-      testthat::exp_signal(failed$error)
+  if (!is.null(failed_step)) {
+    if (inherits(failed_step$error, "expectation")) {
+      testthat::exp_signal(failed_step$error)
     } else {
-      stop(failed$error)
+      stop(failed_step$error)
     }
   }
-
-  if (is.null(failed) && length(failing) == 0 && length(not_run) > 0) {
-    testthat::skip(conditionMessage(not_run[[1]]$error))
+  if (length(failures) == 0 && result$status != "passed" && !is.null(result$error)) {
+    # skip_scenario() or testthat::skip() keep their condition
+    if (inherits(result$error, "skip")) stop(result$error)
+    testthat::skip(conditionMessage(result$error))
   }
 }
 

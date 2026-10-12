@@ -140,7 +140,23 @@ Feature: Hooks
       test("features", stop_on_failure = FALSE)
       """
     Then it has 1 failed
-    And the output includes "can't close the database" once
+    And the output includes
+      """
+      v Given an empty basket
+      Error:
+      can't close the database
+
+      """
+    And the output includes
+      """
+      Failures
+
+      Feature: Basket
+      Scenario: Add an item
+      v Given an empty basket
+      Error:
+      can't close the database
+      """
     And the output includes
       """
       1 scenario (1 failed)
@@ -169,3 +185,23 @@ Feature: Hooks
       Error:
       can't close the database
       """
+
+  Scenario: An after hook gets the result of the after hooks that ran before it
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) cat("after:", scenario$status, conditionMessage(scenario$error), "\n"))
+      after(function(context, scenario) stop("can't close the database"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 failed
+    And the output includes "after: failed can't close the database"

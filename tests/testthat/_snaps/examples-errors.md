@@ -88,6 +88,7 @@
             i Step defined at: setup-steps.R:6
             Caused by error:
             ! Addition service is unavailable
+          - Then the result is 3
 
 # test / error handling / should run after hook, even after error in step
 
@@ -254,6 +255,7 @@
               when("I add them", function(context) {
                 pending()
               })
+          - Then the result is 3
 
 # test / error handling / should show an error when a step has duplicate definitions
 
@@ -289,6 +291,7 @@
             i Make the step match only one of:
             * "I add them" (setup-steps.R:6)
             * "I add them" (setup-steps.R:10)
+          - Then the result is 3
 
 # test / error handling / should show an error when a feature file is invalid
 

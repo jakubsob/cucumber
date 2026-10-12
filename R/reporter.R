@@ -20,7 +20,8 @@
 #'   \item{`end_feature()`}{Called after all scenarios in a feature complete}
 #'   \item{`start_step(step)`}{Called before executing a step}
 #'   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
-#'   \item{`end_hook(status, error)`}{Called after a scenario's hooks if one of them didn't pass}
+#'   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed or is pending}
+#'   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
 #' }
 #'
 #' @importFrom R6 R6Class
@@ -68,10 +69,17 @@ CucumberReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Called after a scenario's `before` or `after` hooks if one of them didn't pass
+    #' Called after a scenario's `before` or `after` hook that failed or is pending
     #' @param status `"failed"` or `"pending"`
     #' @param error The hook's error
     end_hook = function(status, error) {
+      invisible(self)
+    },
+
+    #' @description
+    #' Called after a scenario's steps and hooks, with the worst of their statuses
+    #' @param status The scenario's status
+    end_scenario = function(status) {
       invisible(self)
     }
   )
@@ -122,10 +130,12 @@ truncate_lines <- function(lines, max_lines) {
 #'
 #' @keywords internal
 #' @noRd
-print_error <- function(message) {
-  cat("  ", cli::col_red(cli::style_bold("Error: ")), "\n", sep = "")
+print_error <- function(message, status = "failed") {
+  color <- status_color(status)
+  label <- if (status == "pending") "Pending: " else "Error: "
+  cat("  ", color(cli::style_bold(label)), "\n", sep = "")
   for (line in strsplit(message, "\n")[[1]]) {
-    cat("    ", cli::col_red(line), "\n", sep = "")
+    cat("    ", color(line), "\n", sep = "")
   }
 }
 
@@ -292,8 +302,11 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field scenario_statuses Statuses of the finished scenarios
     scenario_statuses = NULL,
 
-    #' @field scenario_failed Whether testthat reported a failure or an error for the current scenario
+    #' @field scenario_failed Whether testthat reported a failure or an error for the current test
     scenario_failed = FALSE,
+
+    #' @field scenario_status Status of the current scenario, once its steps and hooks ran
+    scenario_status = NULL,
 
     #' @field current_scenario Name of the scenario currently executing
     current_scenario = NULL,
@@ -301,17 +314,11 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field current_steps Steps executed so far in the current scenario
     current_steps = NULL,
 
-    #' @field hook_statuses Statuses of the current scenario's hooks that didn't pass
-    hook_statuses = NULL,
-
-    #' @field hook_errors Messages of the current scenario's failed hooks, already printed by end_hook
-    hook_errors = NULL,
+    #' @field current_hooks Results of the current scenario's hooks that failed or are pending
+    current_hooks = NULL,
 
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
-
-    #' @field step_errored Whether end_step already rendered a step's error this scenario
-    step_errored = FALSE,
 
     #' @field num_colors Terminal color support captured at construction
     num_colors = 1L,
@@ -385,9 +392,8 @@ CucumberProgressReporter <- R6::R6Class(
       }
       self$current_scenario <- test
       self$current_steps <- list()
-      self$hook_statuses <- character()
-      self$hook_errors <- character()
-      self$step_errored <- FALSE
+      self$current_hooks <- list()
+      self$scenario_status <- NULL
       self$scenario_failed <- FALSE
       withr::local_options(cli.num_colors = self$num_colors)
       cat("  ", bold_label(test), "\n", sep = "")
@@ -395,21 +401,37 @@ CucumberProgressReporter <- R6::R6Class(
     },
 
     #' @description
-    #' End a test (called by testthat for each scenario). The scenario gets the
-    #' status of its worst step, or "failed" if a hook failed.
+    #' End a test (called by testthat for each scenario). A scenario has the
+    #' status given to end_scenario(). A test that isn't a scenario, or one that
+    #' stopped before its end, fails if testthat reported a failure or an error.
     #' @param context Test context
     #' @param test Test name
     end_test = function(context, test) {
       if (!is.null(super$end_test)) {
         super$end_test(context, test)
       }
-      statuses <- vapply(self$current_steps, \(step) step$status %||% "passed", character(1))
-      statuses <- c(statuses, self$hook_statuses)
-      status <- STEP_STATUSES[STEP_STATUSES %in% c(statuses, "passed")][[1]]
-      if (self$scenario_failed && status %in% c("passed", "skipped")) {
-        status <- "failed"
-      }
+      status <- self$scenario_status %||% (if (self$scenario_failed) "failed" else "passed")
       self$scenario_statuses <- c(self$scenario_statuses, status)
+      invisible(self)
+    },
+
+    #' @description
+    #' Record a scenario's status, and the scenario for the summary if it didn't pass
+    #' @param status The scenario's status
+    end_scenario = function(status) {
+      super$end_scenario(status)
+      self$scenario_status <- status
+      if (!status %in% c("passed", "skipped")) {
+        self$failures <- c(
+          self$failures,
+          list(list(
+            feature = self$current_feature,
+            scenario = self$current_scenario,
+            steps = self$current_steps,
+            hooks = self$current_hooks
+          ))
+        )
+      }
       invisible(self)
     },
 
@@ -444,14 +466,11 @@ CucumberProgressReporter <- R6::R6Class(
         }
       }
 
-      # Display errors that occur outside of test_that (e.g., during setup).
-      # Skip step errors already rendered by end_step to avoid double reporting.
-      # Hook errors are printed by end_hook.
+      # Display errors that occur outside of a scenario's steps and hooks, e.g.
+      # during setup. A scenario's errors were printed by end_step and end_hook.
       if (
-        !self$step_errored &&
-          !conditionMessage(result) %in% self$hook_errors &&
-          (inherits(result, "expectation_error") ||
-            inherits(result, "expectation_failure"))
+        is.null(self$scenario_status) &&
+          inherits(result, c("expectation_error", "expectation_failure"))
       ) {
         print_error(conditionMessage(result))
       }
@@ -460,17 +479,14 @@ CucumberProgressReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Record the status of a scenario's hook that didn't pass
+    #' Print the error of a scenario's hook that failed or is pending
     #' @param status `"failed"` or `"pending"`
     #' @param error The hook's error
     end_hook = function(status, error) {
       super$end_hook(status, error)
-      self$hook_statuses <- c(self$hook_statuses, status)
-      if (status == "failed") {
-        withr::local_options(cli.num_colors = self$num_colors)
-        print_error(conditionMessage(error))
-        self$hook_errors <- c(self$hook_errors, conditionMessage(error))
-      }
+      self$current_hooks <- c(self$current_hooks, list(list(status = status, error = error)))
+      withr::local_options(cli.num_colors = self$num_colors)
+      print_error(conditionMessage(error), status)
       invisible(self)
     },
 
@@ -494,18 +510,6 @@ CucumberProgressReporter <- R6::R6Class(
 
       status <- step$status %||% "passed"
       self$step_statuses <- c(self$step_statuses, status)
-
-      if (!status %in% c("passed", "skipped")) {
-        self$step_errored <- TRUE
-        self$failures <- c(
-          self$failures,
-          list(list(
-            feature = self$current_feature,
-            scenario = self$current_scenario,
-            steps = self$current_steps
-          ))
-        )
-      }
 
       # Format: "    ✓ Given I have 5 cucumbers"
       # ponytail: cat to stdout so expect_snapshot can capture step output; color
@@ -603,6 +607,9 @@ CucumberProgressReporter <- R6::R6Class(
                 cat("      ", status_color(status)(line), "\n", sep = "")
               }
             }
+          }
+          for (hook in failure$hooks) {
+            print_error(conditionMessage(hook$error), hook$status)
           }
         }
       }
