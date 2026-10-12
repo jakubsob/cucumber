@@ -122,6 +122,13 @@ truncate_lines <- function(lines, max_lines) {
 #'
 #' @keywords internal
 #' @noRd
+print_error <- function(message) {
+  cat("  ", cli::col_red(cli::style_bold("Error: ")), "\n", sep = "")
+  for (line in strsplit(message, "\n")[[1]]) {
+    cat("    ", cli::col_red(line), "\n", sep = "")
+  }
+}
+
 STEP_STATUSES <- c("failed", "ambiguous", "undefined", "pending", "skipped", "passed")
 
 status_color <- function(status) {
@@ -297,6 +304,9 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field hook_statuses Statuses of the current scenario's hooks that didn't pass
     hook_statuses = NULL,
 
+    #' @field hook_errors Messages of the current scenario's failed hooks, already printed by end_hook
+    hook_errors = NULL,
+
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
 
@@ -376,6 +386,7 @@ CucumberProgressReporter <- R6::R6Class(
       self$current_scenario <- test
       self$current_steps <- list()
       self$hook_statuses <- character()
+      self$hook_errors <- character()
       self$step_errored <- FALSE
       self$scenario_failed <- FALSE
       withr::local_options(cli.num_colors = self$num_colors)
@@ -435,17 +446,14 @@ CucumberProgressReporter <- R6::R6Class(
 
       # Display errors that occur outside of test_that (e.g., during setup).
       # Skip step errors already rendered by end_step to avoid double reporting.
+      # Hook errors are printed by end_hook.
       if (
         !self$step_errored &&
+          !conditionMessage(result) %in% self$hook_errors &&
           (inherits(result, "expectation_error") ||
             inherits(result, "expectation_failure"))
       ) {
-        cat("  ", cli::col_red(cli::style_bold("Error: ")), "\n", sep = "")
-        error_msg <- conditionMessage(result)
-        error_lines <- strsplit(error_msg, "\n")[[1]]
-        for (line in error_lines) {
-          cat("    ", cli::col_red(line), "\n", sep = "")
-        }
+        print_error(conditionMessage(result))
       }
 
       invisible(self)
@@ -458,6 +466,11 @@ CucumberProgressReporter <- R6::R6Class(
     end_hook = function(status, error) {
       super$end_hook(status, error)
       self$hook_statuses <- c(self$hook_statuses, status)
+      if (status == "failed") {
+        withr::local_options(cli.num_colors = self$num_colors)
+        print_error(conditionMessage(error))
+        self$hook_errors <- c(self$hook_errors, conditionMessage(error))
+      }
       invisible(self)
     },
 

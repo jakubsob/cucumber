@@ -64,3 +64,27 @@ Feature: Step hooks
       1 scenario (1 failed)
       2 steps (1 failed, 1 skipped)
       """
+
+  Scenario: A failing after step hook fails a pending step
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after_step(function(context, step) stop("step left a mess"))
+      given("an empty basket", function(context) pending())
+      """
+    When I run
+      """
+      test("features", strict = FALSE, stop_on_failure = FALSE)
+      """
+    Then it has 1 failed
+    And the error message includes "step left a mess"
+    And the output includes
+      """
+      1 scenario (1 failed)
+      1 step (1 failed)
+      """

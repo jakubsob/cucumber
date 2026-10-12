@@ -233,7 +233,8 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     c(hook_step, list(status = step$status, error = step$error)),
     stop_on_error = FALSE
   )
-  if (!is.null(after_error) && step$status == "passed") {
+  # The step gets the worse of its own status and the hook's
+  if (!is.null(after_error) && match(hook_status(after_error), STEP_STATUSES) < match(step$status, STEP_STATUSES)) {
     step <- new_step_result(step, hook_status(after_error), after_error, step$duration)
   }
   step

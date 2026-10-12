@@ -73,3 +73,22 @@ Feature: Regular expressions
       test("features")
       """
     Then it passes
+
+  Scenario: An invalid regular expression is an error that shows it
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Pay
+          Given I pay 5
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I pay {int}$", function(n, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes "This Regular Expression has a problem:"
+    And the error message includes "I pay {int}$"

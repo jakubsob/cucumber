@@ -58,6 +58,7 @@ run <- function(
   ...
 ) {
   withr::defer(cleanup(), testthat::teardown_env())
+  check_grepl_args(...)
 
   lines <- feature_lines(features, path)
   features <- (if (is.null(features)) find_features(path) else names(lines)) |>
@@ -142,6 +143,22 @@ context_name <- function(feature) {
   feature |>
     path_file() |>
     path_ext_remove()
+}
+
+#' `...` of test() and run() is passed to grepl(), so a misspelled argument
+#' would be ignored without a filter
+#' @keywords internal
+#' @noRd
+check_grepl_args <- function(...) {
+  allowed <- setdiff(names(formals(grepl)), c("pattern", "x"))
+  unknown <- setdiff(names(list(...)), c(allowed, ""))
+  if (length(unknown) > 0) {
+    abort(
+      paste0("Unknown argument", if (length(unknown) > 1) "s", ": ", paste0("`", unknown, "`", collapse = ", "), "."),
+      body = c(i = paste0("Arguments of `grepl()` for `filter` can be passed in `...`: ", paste0("`", allowed, "`", collapse = ", "), ".")),
+      trace = empty_trace()
+    )
+  }
 }
 
 filter_features <- function(features, filter = NULL, ...) {

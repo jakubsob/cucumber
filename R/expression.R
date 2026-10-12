@@ -17,6 +17,7 @@
 expression_to_pattern <- function(x, parameters = get_parameters()) {
   if (startsWith(x, "^") || endsWith(x, "$") || grepl("^/.*/$", x)) {
     pattern <- if (grepl("^/.*/$", x)) substr(x, 2, nchar(x) - 1) else x
+    check_regex(pattern)
     groups <- regex_groups(pattern)
     types <- lapply(
       groups$source[groups$parent == 0],
@@ -28,6 +29,25 @@ expression_to_pattern <- function(x, parameters = get_parameters()) {
     groups <- regex_groups(pattern)
   }
   structure(c(pattern), parameters = types, groups = groups$parent)
+}
+
+#' Fail on an invalid regular expression before any step is matched with it
+#' @keywords internal
+#' @noRd
+#' @importFrom stringr str_detect
+check_regex <- function(pattern) {
+  tryCatch(
+    str_detect("", pattern),
+    error = function(e) {
+      abort(
+        paste0("This Regular Expression has a problem:\n\n", pattern, "\n\n", conditionMessage(e)),
+        class = "cucumber_expression_error",
+        call = NULL,
+        trace = empty_trace()
+      )
+    }
+  )
+  invisible(pattern)
 }
 
 #' The capture groups of a regular expression, in order

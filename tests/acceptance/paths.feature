@@ -89,3 +89,10 @@ Feature: Choosing feature files
       Then only these scenarios ran:
         | scenario |
         | Adding   |
+
+    Scenario: An argument that isn't an argument of test() or grepl() is an error
+      When I run
+        """
+        test("features", fail_fst = TRUE, stop_on_failure = FALSE)
+        """
+      Then the error message includes "Unknown argument: `fail_fst`."

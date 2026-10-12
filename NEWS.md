@@ -17,7 +17,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ Text in step descriptions is matched literally. Previously it was treated as a regular expression, so characters like `.`, `?`, `*`, `|` or `[` could change what a step matched.
 - ⚠️ A step that matches more than one step definition fails with an error listing every matching definition and where it is defined. Previously the first registered definition was silently used.
 - ⚠️ Invalid Cucumber Expressions, like an empty optional `()`, an unescaped `/` in `"I visit /about"` or an undefined parameter type like `{colour}`, are an error that points at the problem.
-- ⚠️ A step description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression. Each capture group's text is passed to the step, `NA` if the group didn't match. A group whose regexp is a parameter type's regexp, like `(\d+)` for `{int}`, is transformed by that parameter type.
+- ⚠️ A step description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression. Each capture group's text is passed to the step, `NA` if the group didn't match. A group whose regexp is a parameter type's regexp, like `(\d+)` for `{int}`, is transformed by that parameter type. An invalid regular expression is an error that shows it.
 - ✨ Step descriptions support the rest of the Cucumber Expressions syntax: optional text `cucumber(s)`, alternative words `Enter/Return`, and the anonymous parameter `{}`, which matches anything and passes it as text. Use `\\(`, `\\{` or `\\/` to match these characters literally. A backslash-escaped space keeps words together in an alternative: `"I live in New\\ York/Boston"`.
 
 ## Parameter types
@@ -73,7 +73,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - 🐛 `testthat::skip()` in a step or a `before()` hook skips the scenario like `skip_scenario()`. Previously `after()` hooks didn't run and the steps after it weren't reported. In other hooks it is an error, like `skip_scenario()`.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
-- 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored.
+- 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored. An argument that isn't an argument of `test()` or `grepl()`, like a misspelled `fail_fst = TRUE`, is an error.
 
 # cucumber 2.2.0
 

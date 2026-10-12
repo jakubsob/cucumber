@@ -132,6 +132,8 @@ cucumber::test(
 
 \item{\code{hook_statuses}}{Statuses of the current scenario's hooks that didn't pass}
 
+\item{\code{hook_errors}}{Messages of the current scenario's failed hooks, already printed by end_hook}
+
 \item{\code{failures}}{Recorded failures for the end-of-run summary}
 
 \item{\code{step_errored}}{Whether end_step already rendered a step's error this scenario}

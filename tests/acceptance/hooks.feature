@@ -146,3 +146,26 @@ Feature: Hooks
       1 scenario (1 failed)
       1 step (1 passed)
       """
+
+  Scenario: A failing after hook is reported after a failing step
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) stop("can't close the database"))
+      given("an empty basket", function(context) stop("basket is broken"))
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      ! basket is broken
+      Error:
+      can't close the database
+      """

@@ -98,7 +98,7 @@ describe("test", {
         source("tests/acceptance/steps/steps.R", local = env)
         source("tests/acceptance/support/expect.R", local = env)
         cucumber::test(
-          tests_path = "tests/acceptance",
+          path = "tests/acceptance",
           reporter = CucumberProgressReporter$new(show_praise = FALSE),
           stop_on_failure = FALSE,
           env = env
