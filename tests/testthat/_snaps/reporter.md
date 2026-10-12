@@ -30,7 +30,7 @@
               `actual`: 10.0
             `expected`:  5.0
             
-            Step at: test-reporter.R:116
+            Step at: test-reporter.R:55
       
 
 # CucumberProgressReporter / prints docstring and data table step arguments
