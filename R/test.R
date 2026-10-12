@@ -19,7 +19,9 @@
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
-#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping,
+#'   like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions).
+#'   Tags are written with their `@`. Escape a parenthesis in a tag with a backslash, e.g. `"@wip\\(x\\)"`.
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
 #'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
 #' @param features If not NULL, only these feature files will be executed. Paths are relative to `path`.
@@ -198,7 +200,9 @@ test_cucumber_code <- function(path, ...) {
 #'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
 #' @param tags If not NULL, filter scenarios by tag expression string
 #'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
-#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping.
+#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping,
+#'   like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions).
+#'   Tags are written with their `@`. Escape a parenthesis in a tag with a backslash, e.g. `"@wip\\(x\\)"`.
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
 #'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
 #' @param features If not NULL, only these feature files will be executed. Paths are relative to `path`.

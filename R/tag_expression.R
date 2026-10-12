@@ -1,12 +1,16 @@
 #' Parse and evaluate tag expressions
 #'
 #' @description
-#' Tag expressions are boolean expressions that can be used to filter scenarios.
+#' Tag expressions are boolean expressions that can be used to filter scenarios,
+#' parsed like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions).
 #' They support the following operators:
 #' - `and` - logical AND
 #' - `or` - logical OR
 #' - `not` - logical NOT
 #' - `()` - parentheses for grouping
+#'
+#' A tag is everything up to whitespace or a parenthesis, and is matched as written, with its `@`.
+#' A backslash escapes a parenthesis, whitespace or a backslash in a tag.
 #'
 #' @param expression A tag expression string (e.g., "@smoke and not @slow")
 #' @param scenario_tags A character vector of tags for a scenario (without @ prefix)
@@ -22,185 +26,139 @@ evaluate_tag_expression <- function(expression, scenario_tags) {
   if (is.null(expression) || length(expression) == 0) {
     return(TRUE)
   }
-
-  # Remove @ symbols from the expression
-  expr <- gsub("@", "", expression)
-
-  # Tokenize the expression
-  tokens <- tokenize_tag_expression(expr)
-
-  # Parse into an AST
-  ast <- parse_tag_tokens(tokens)
-
-  # Evaluate the AST
-  eval_tag_ast(ast, scenario_tags)
+  match_tag_expression(expression, paste0("@", scenario_tags))
 }
 
-#' Tokenize a tag expression
+#' Whether tags, as written, match a tag expression
 #' @keywords internal
 #' @noRd
-tokenize_tag_expression <- function(expr) {
-  # Remove extra whitespace
-  expr <- trimws(expr)
-
-  tokens <- list()
-  i <- 1
-  n <- nchar(expr)
-
-  while (i <= n) {
-    char <- substr(expr, i, i)
-
-    # Skip whitespace
-    if (grepl("\\s", char)) {
-      i <- i + 1
-      next
-    }
-
-    # Handle parentheses
-    if (char == "(") {
-      tokens <- c(tokens, list(list(type = "lparen", value = "(")))
-      i <- i + 1
-      next
-    }
-
-    if (char == ")") {
-      tokens <- c(tokens, list(list(type = "rparen", value = ")")))
-      i <- i + 1
-      next
-    }
-
-    # Try to match a keyword (and, or, not)
-    remaining <- substr(expr, i, n)
-
-    if (grepl("^and\\b", remaining, ignore.case = TRUE)) {
-      tokens <- c(tokens, list(list(type = "and", value = "and")))
-      i <- i + 3
-      next
-    }
-
-    if (grepl("^or\\b", remaining, ignore.case = TRUE)) {
-      tokens <- c(tokens, list(list(type = "or", value = "or")))
-      i <- i + 2
-      next
-    }
-
-    if (grepl("^not\\b", remaining, ignore.case = TRUE)) {
-      tokens <- c(tokens, list(list(type = "not", value = "not")))
-      i <- i + 3
-      next
-    }
-
-    # Match a tag (alphanumeric, underscore, hyphen, and dot)
-    match <- regexpr("^[[:alnum:]_.-]+", remaining)
-    if (match > 0) {
-      tag_name <- regmatches(remaining, match)
-      tokens <- c(tokens, list(list(type = "tag", value = tag_name)))
-      i <- i + attr(match, "match.length")
-      next
-    }
-
-    # Unexpected character
-    rlang::abort(sprintf("Unexpected character '%s' at position %d in tag expression", char, i))
-  }
-
-  tokens
+match_tag_expression <- function(expression, tags) {
+  eval_tag_ast(parse_tag_expression(expression), tags)
 }
 
-#' Parse tag tokens into an AST
+TAG_OPERATORS <- c("or", "and", "not")
+TAG_PRECEDENCE <- c("(" = -2, ")" = -1, or = 0, and = 1, not = 2)
+
+#' Parse a tag expression into an AST, with the shunting-yard algorithm of the
+#' official implementation
 #' @keywords internal
 #' @noRd
-parse_tag_tokens <- function(tokens) {
-  pos <- 1
-
-  # Parse OR expression (lowest precedence)
-  parse_or <- function() {
-    left <- parse_and()
-
-    while (pos <= length(tokens) && tokens[[pos]]$type == "or") {
-      pos <<- pos + 1
-      right <- parse_and()
-      left <- list(type = "or", left = left, right = right)
-    }
-
-    left
+parse_tag_expression <- function(expression) {
+  syntax_error <- function(message) {
+    abort(
+      sprintf('Tag expression "%s" could not be parsed because of syntax error: %s', expression, message),
+      call = NULL
+    )
+  }
+  expect <- function(expected, actual) {
+    if (expected != actual) syntax_error(sprintf("Expected %s.", expected))
   }
 
-  # Parse AND expression (higher precedence than OR)
-  parse_and <- function() {
-    left <- parse_not()
-
-    while (pos <= length(tokens) && tokens[[pos]]$type == "and") {
-      pos <<- pos + 1
-      right <- parse_not()
-      left <- list(type = "and", left = left, right = right)
-    }
-
-    left
-  }
-
-  # Parse NOT expression (highest precedence)
-  parse_not <- function() {
-    if (pos <= length(tokens) && tokens[[pos]]$type == "not") {
-      pos <<- pos + 1
-      operand <- parse_primary()
-      return(list(type = "not", operand = operand))
-    }
-
-    parse_primary()
-  }
-
-  # Parse primary expression (tag or parenthesized expression)
-  parse_primary <- function() {
-    if (pos > length(tokens)) {
-      rlang::abort("Unexpected end of tag expression")
-    }
-
-    token <- tokens[[pos]]
-
-    if (token$type == "lparen") {
-      pos <<- pos + 1
-      expr <- parse_or()
-
-      if (pos > length(tokens) || tokens[[pos]]$type != "rparen") {
-        rlang::abort("Missing closing parenthesis in tag expression")
-      }
-
-      pos <<- pos + 1
-      return(expr)
-    }
-
-    if (token$type == "tag") {
-      pos <<- pos + 1
-      return(list(type = "tag", value = token$value))
-    }
-
-    rlang::abort(sprintf("Unexpected token '%s' in tag expression", token$value))
-  }
-
+  tokens <- tokenize_tag_expression(expression, syntax_error)
   if (length(tokens) == 0) {
-    return(list(type = "literal", value = TRUE))
+    return(list(type = "true"))
   }
 
-  ast <- parse_or()
+  expressions <- list()
+  operators <- character()
+  push_expression <- function(operator) {
+    arity <- if (operator == "not") 1 else 2
+    if (length(expressions) < arity) syntax_error("Expected operand.")
+    n <- length(expressions)
+    node <- if (arity == 1) {
+      list(type = "not", operand = expressions[[n]])
+    } else {
+      list(type = operator, left = expressions[[n - 1]], right = expressions[[n]])
+    }
+    expressions <<- c(expressions[seq_len(n - arity)], list(node))
+  }
+  pop_operator <- function() {
+    operator <- operators[[length(operators)]]
+    operators <<- operators[-length(operators)]
+    operator
+  }
+  peek <- function() operators[[length(operators)]]
 
-  if (pos <= length(tokens)) {
-    rlang::abort(sprintf("Unexpected token '%s' after complete expression", tokens[[pos]]$value))
+  expected <- "operand"
+  for (token in tokens) {
+    if (token == "not") {
+      expect(expected, "operand")
+      operators <- c(operators, token)
+      expected <- "operand"
+    } else if (token %in% c("and", "or")) {
+      expect(expected, "operator")
+      # Both are left associative
+      while (length(operators) > 0 && peek() %in% TAG_OPERATORS && TAG_PRECEDENCE[[token]] <= TAG_PRECEDENCE[[peek()]]) {
+        push_expression(pop_operator())
+      }
+      operators <- c(operators, token)
+      expected <- "operand"
+    } else if (token == "(") {
+      expect(expected, "operand")
+      operators <- c(operators, token)
+      expected <- "operand"
+    } else if (token == ")") {
+      expect(expected, "operator")
+      while (length(operators) > 0 && peek() != "(") {
+        push_expression(pop_operator())
+      }
+      if (length(operators) == 0) syntax_error("Unmatched ).")
+      pop_operator()
+      expected <- "operator"
+    } else {
+      expect(expected, "operand")
+      expressions <- c(expressions, list(list(type = "tag", value = token)))
+      expected <- "operator"
+    }
   }
 
-  ast
+  while (length(operators) > 0) {
+    if (peek() == "(") syntax_error("Unmatched (.")
+    push_expression(pop_operator())
+  }
+
+  expressions[[1]]
+}
+
+#' Split a tag expression into tags, operators and parentheses. A backslash
+#' escapes a parenthesis, whitespace or a backslash.
+#' @keywords internal
+#' @noRd
+tokenize_tag_expression <- function(expression, syntax_error) {
+  tokens <- character()
+  token <- ""
+  escaped <- FALSE
+  for (char in strsplit(expression, "")[[1]]) {
+    if (escaped) {
+      if (!char %in% c("(", ")", "\\") && !grepl("\\s", char)) {
+        syntax_error(sprintf('Illegal escape before "%s".', char))
+      }
+      token <- paste0(token, char)
+      escaped <- FALSE
+    } else if (char == "\\") {
+      escaped <- TRUE
+    } else if (char %in% c("(", ")") || grepl("\\s", char)) {
+      if (nchar(token) > 0) tokens <- c(tokens, token)
+      token <- ""
+      if (!grepl("\\s", char)) tokens <- c(tokens, char)
+    } else {
+      token <- paste0(token, char)
+    }
+  }
+  if (nchar(token) > 0) tokens <- c(tokens, token)
+  tokens
 }
 
 #' Evaluate a tag expression AST
 #' @keywords internal
 #' @noRd
-eval_tag_ast <- function(ast, scenario_tags) {
+eval_tag_ast <- function(ast, tags) {
   switch(
     ast$type,
-    "literal" = ast$value,
-    "tag" = ast$value %in% scenario_tags,
-    "not" = !eval_tag_ast(ast$operand, scenario_tags),
-    "and" = eval_tag_ast(ast$left, scenario_tags) && eval_tag_ast(ast$right, scenario_tags),
-    "or" = eval_tag_ast(ast$left, scenario_tags) || eval_tag_ast(ast$right, scenario_tags),
-    rlang::abort(sprintf("Unknown AST node type: %s", ast$type))
+    "true" = TRUE,
+    "tag" = ast$value %in% tags,
+    "not" = !eval_tag_ast(ast$operand, tags),
+    "and" = eval_tag_ast(ast$left, tags) && eval_tag_ast(ast$right, tags),
+    "or" = eval_tag_ast(ast$left, tags) || eval_tag_ast(ast$right, tags)
   )
 }

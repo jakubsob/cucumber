@@ -365,6 +365,20 @@ cucumber::test("tests/acceptance", strict = FALSE)
 
 A run without any step definitions reports its steps as undefined, instead of failing with "No step definitions found".
 
+### Tag expressions
+
+Tag expressions are parsed like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions). Write tags with their `@`, and `and`, `or` and `not` in lowercase:
+
+```r
+# Before
+cucumber::test(tags = "smoke AND NOT slow")
+
+# Now
+cucumber::test(tags = "@smoke and not @slow")
+```
+
+A tag is everything up to whitespace or a parenthesis, so tags with `:`, `/` or `#` work. Escape a parenthesis in a tag with a backslash: `tags = "@wip\\(x\\)"`.
+
 ### Failed expectations fail the run
 
 Before, a failed expectation in a step, like `expect_equal()`, wasn't recorded by testthat, so the scenario was reported as skipped. Now it fails the run, so tests that seemed to pass may fail.
@@ -477,5 +491,6 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 
 - Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
 - Implement pending and undefined steps, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).
+- Write tags in `tags` arguments with their `@`, and `and`, `or` and `not` in lowercase, in `test()`, `run()` and hooks. See [Tag expressions](#tag-expressions).
 - Fix failing expectations that were reported as skipped before. See [Failed expectations fail the run](#failed-expectations-fail-the-run).
 - Update scenario names used in `filter`, `name` or when comparing test results: outline scenarios no longer get an `(Example n)` suffix, and repeated names are numbered. See [Scenario names](#scenario-names).

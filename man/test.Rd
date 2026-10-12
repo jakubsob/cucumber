@@ -30,7 +30,9 @@ will be executed. Matching is performed on the file name after it's stripped of 
 
 \item{tags}{If not NULL, filter scenarios by tag expression string
 (e.g., \code{"@smoke and not @slow"}, \code{"@gui or @database"}).
-Tag expressions support \code{and}, \code{or}, \code{not} operators and parentheses for grouping.}
+Tag expressions support \code{and}, \code{or}, \code{not} operators and parentheses for grouping,
+like the official \href{https://github.com/cucumber/tag-expressions}{cucumber/tag-expressions}.
+Tags are written with their \code{@}. Escape a parenthesis in a tag with a backslash, e.g. \code{"@wip\\\\(x\\\\)"}.}
 
 \item{reporter}{Reporter to use to summarise output. Can be supplied
 as a string (e.g. "summary") or as an R6 object

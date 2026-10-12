@@ -1,6 +1,7 @@
 Feature: Running scenarios by tag
   Run only the scenarios whose tags match a tag expression, like `test(tags = "@smoke and not @slow")`.
-  A tag expression combines tags with `and`, `or`, `not` and parentheses.
+  A tag expression combines tags with `and`, `or`, `not` and parentheses, like the official
+  cucumber/tag-expressions. Tags are written with their `@`, and `and`, `or` and `not` are lowercase.
   Scenarios inherit the tags of their Feature, and examples inherit the tags of their Examples.
 
   Background:
@@ -56,15 +57,15 @@ Feature: Running scenarios by tag
         | Smoke and fast |
         | Smoke and slow |
 
-    Scenario: The @ of a tag can be left out
+    Scenario: A tag without its @ doesn't match
       When I run
         """
-        test("features", tags = "smoke")
+        test("features", tags = "smoke or @ui")
         """
       Then only these scenarios ran:
-        | scenario       |
-        | Smoke and fast |
-        | Smoke and slow |
+        | scenario    |
+        | UI and fast |
+        | UI and slow |
 
     Scenario: "and" runs the scenarios that have both tags
       When I run
@@ -167,26 +168,77 @@ Feature: Running scenarios by tag
         | Running on 1 |
         | Running on 2 |
 
-  Rule: Tags can contain any character but whitespace
+  Rule: A tag in an expression is everything up to whitespace or a parenthesis
 
-    Scenario: Tags like issue tracker IDs can be used in an expression
+    A backslash escapes a parenthesis, a whitespace or a backslash in a tag: `@wip\(x\)` matches the tag `@wip(x)`.
+    In an R string the backslash itself is escaped: `tags = "@wip\\(x\\)"`.
+
+    Background:
       Given a file named "features/tagged.feature" with
         """
         Feature: Issues
           @BJ-x98.77
-          Scenario: First issue
+          Scenario: Issue tracker ID
             Given I have 1
             Then I get 1
 
-          @JIRA-123
-          Scenario: Second issue
+          @team:payments
+          Scenario: Team
             Given I have 2
             Then I get 2
+
+          @and-more
+          Scenario: Starts like an operator
+            Given I have 3
+            Then I get 3
+
+          @wip(x)
+          Scenario: With parentheses
+            Given I have 4
+            Then I get 4
+        """
+
+    Scenario: Tags with punctuation can be used in an expression
+      When I run
+        """
+        test("features", tags = "@BJ-x98.77 or @team:payments or @and-more")
+        """
+      Then only these scenarios ran:
+        | scenario                |
+        | Issue tracker ID        |
+        | Team                    |
+        | Starts like an operator |
+
+    Scenario: Parentheses in a tag are escaped with a backslash
+      When I run
+        """
+        test("features", tags = "@wip\\(x\\)")
+        """
+      Then only these scenarios ran:
+        | scenario         |
+        | With parentheses |
+
+  Rule: An invalid tag expression is an error
+
+    Scenario Outline: An invalid tag expression is an error, <case>
+      Given a file named "features/tagged.feature" with
+        """
+        Feature: Tagged
+          @smoke
+          Scenario: Smoke
+            Given I have 1
+            Then I get 1
         """
       When I run
         """
-        test("features", tags = "@BJ-x98.77")
+        test("features", tags = "<expression>", stop_on_failure = FALSE)
         """
-      Then only these scenarios ran:
-        | scenario    |
-        | First issue |
+      Then it has 1 errors
+      And the error message includes "Tag expression \"<expression>\" could not be parsed because of syntax error: <message>"
+
+      Examples:
+        | case               | expression     | message              |
+        | missing operator   | @a @b          | Expected operator.   |
+        | missing operand    | @a and         | Expected operand.    |
+        | unmatched (        | ( @a and @b    | Unmatched (.         |
+        | unmatched )        | @a )           | Unmatched ).         |
