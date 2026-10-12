@@ -96,11 +96,11 @@ Feature: Step definition snippets
 
   Scenario: A snippet uses the step's keyword
     Given a package
-    And a file named "features/pass.feature" with
+    And a file named "features/result.feature" with
       """
-      Feature: Pass
-        Scenario: It passes
-          Then it passes
+      Feature: Result
+        Scenario: Show the result
+          Then the result is shown
       """
     When I run
       """
@@ -110,7 +110,7 @@ Feature: Step definition snippets
     And the error message includes
       """
       Add a step definition:
-        then("it passes", function(context) {
+        then("the result is shown", function(context) {
           pending()
         })
       """
