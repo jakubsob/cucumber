@@ -198,4 +198,6 @@ Feature: Cucumber Expressions
       | unmatched {                     | I have {int          | 8      | The '{' does not have a matching '}'.                                              |
       | parameter name with parenthesis | I have {i(n)t}       | 10     | Parameter names may not contain '{', '}', '(', ')', '\\' or '/'.                   |
       | escape of a letter              | I have \a            | 9      | Only the characters '{', '}', '(', ')', '\\', '/' and whitespace can be escaped.  |
+      | empty alternative               | a//b                 | 3      | Alternative may not be empty.                                                      |
+      | parameter types as alternatives | {int}/{int}          | 6      | Alternative may not be empty.                                                      |
       | escaped end of line             | I have \\            | 8      | The end of line can not be escaped.                                                |
