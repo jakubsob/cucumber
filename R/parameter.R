@@ -129,7 +129,7 @@ set_default_parameters <- function() {
   set_parameters(.parameters())
   define_parameter_type(
     "int",
-    c("(?:-?\\d+)", "\\d+"),
+    c("-?\\d+", "\\d+"),
     as_integer,
     prefer_for_regexp_match = TRUE
   )

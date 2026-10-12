@@ -93,7 +93,7 @@ alternative without text, is an error.
 
 Placeholders in expressions are replaced with regular expressions that match values in the feature file.
 The expression \code{"I have {int} cucumbers in my basket"} will be converted to
-\code{"^I have ((?:(?:-?\\\\d+)|(?:\\\\d+))) cucumbers in my basket$"}. The extracted value of \code{{int}}
+\code{"^I have ((?:-?\\\\d+)|(?:\\\\d+)) cucumbers in my basket$"}. The extracted value of \code{{int}}
 will be passed to the implementation function after being transformed with \code{as.integer}.
 }
 \section{Regular expressions}{

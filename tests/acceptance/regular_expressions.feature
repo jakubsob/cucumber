@@ -30,6 +30,26 @@ Feature: Regular expressions
       """
     Then it passes
 
+  Scenario: A group with the regexp of a negative {int} is converted to an integer
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Debt
+          Then I owe -3 cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      then("^I owe (-?\\d+) cucumbers$", function(n, context) {
+        expect_identical(n, -3L)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
   Scenario: A capture group that doesn't match passes NA
     Given a package
     And a file named "features/vegetables.feature" with

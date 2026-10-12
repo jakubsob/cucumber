@@ -117,7 +117,7 @@ make_step <- function(prefix) {
 #'
 #' Placeholders in expressions are replaced with regular expressions that match values in the feature file.
 #' The expression `"I have {int} cucumbers in my basket"` will be converted to
-#' `"^I have ((?:(?:-?\\d+)|(?:\\d+))) cucumbers in my basket$"`. The extracted value of `{int}`
+#' `"^I have ((?:-?\\d+)|(?:\\d+)) cucumbers in my basket$"`. The extracted value of `{int}`
 #' will be passed to the implementation function after being transformed with `as.integer`.
 #'
 #' # Regular expressions
