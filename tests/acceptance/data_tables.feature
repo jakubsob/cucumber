@@ -5,7 +5,7 @@ Feature: Data Tables
   Background:
     Given a package
 
-  Scenario: A step receives a data table as a tibble
+  Scenario: A step receives a Data Table as a tibble
     Given a file named "features/table.feature" with
       """
       Feature: Tables
@@ -33,7 +33,7 @@ Feature: Data Tables
       """
     Then it passes
 
-  Scenario: Each column of a data table is a column of the tibble
+  Scenario: Each column of a Data Table is a column of the tibble
     Given a file named "features/table.feature" with
       """
       Feature: Tables
@@ -64,7 +64,7 @@ Feature: Data Tables
     Then it passes
     And it has 1 passed
 
-  Scenario: A data table comes after the step's parameters
+  Scenario: A Data Table comes after the step's parameters
     Given a file named "features/table.feature" with
       """
       Feature: Tables

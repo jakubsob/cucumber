@@ -1,12 +1,12 @@
 Feature: Step definition arguments
-  A step definition is a function. It gets the step's parameters, then its data table or doc string,
+  A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
   then `context`, in this order.
 
   Background:
     Given a package
 
   Scenario Outline: A step definition with the wrong number of arguments fails the step, <case>
-    A step definition gets the step's parameters, then its data table or doc string, then `context`.
+    A step definition gets the step's parameters, then its Data Table or Doc String, then `context`.
 
     Given a file named "features/basket.feature" with
       """
@@ -31,7 +31,7 @@ Feature: Step definition arguments
     Examples:
       | case                 | definition                               | message                                                    |
       | missing parameter    | function(context) {}                    | The step definition has 1 argument, but the step passes 3.  |
-      | missing data table   | function(n, context) {}                 | The step definition has 2 arguments, but the step passes 3. |
+      | missing Data Table   | function(n, context) {}                 | The step definition has 2 arguments, but the step passes 3. |
       | extra argument       | function(n, table, extra, context) {}   | The step definition has 4 arguments, but the step passes 3. |
 
   Scenario Outline: A step definition without `context` as its last argument is an error, <case>

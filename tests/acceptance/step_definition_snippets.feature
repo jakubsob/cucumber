@@ -135,7 +135,7 @@ Feature: Step definition snippets
         })
       """
 
-  Scenario: A snippet gets an argument for a data table or a doc string
+  Scenario: A snippet gets an argument for a Data Table or a Doc String
     Given a package
     And a file named "features/arguments.feature" with
       """

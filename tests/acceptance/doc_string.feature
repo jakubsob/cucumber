@@ -9,8 +9,8 @@ Feature: Doc Strings
   Scenario: A step definition gets the Doc String
     Given a file named "features/docstring.feature" with
       """
-      Feature: Docstrings
-        Scenario: Step with docstring
+      Feature: Doc Strings
+        Scenario: Step with a Doc String
           Given a message
             ```
             Hello, world!
@@ -36,8 +36,8 @@ Feature: Doc Strings
   Scenario: A multi-line Doc String is one string with its lines joined by newlines
     Given a file named "features/docstring.feature" with
       """
-      Feature: Docstrings
-        Scenario: Multiline docstring
+      Feature: Doc Strings
+        Scenario: Multi-line Doc String
           Given a message
             ```
             line one
@@ -64,8 +64,8 @@ Feature: Doc Strings
   Scenario: A Doc String comes after the step's parameters
     Given a file named "features/docstring.feature" with
       """
-      Feature: Docstrings
-        Scenario: Docstring with parameter
+      Feature: Doc Strings
+        Scenario: Doc String with a parameter
           Given file "greeting.txt" contains
             ```
             Hello!
@@ -91,7 +91,7 @@ Feature: Doc Strings
   Scenario: A Doc String is dedented relative to its opening delimiter
     Given a file named "features/docstring.feature" with
       """
-      Feature: Docstrings
+      Feature: Doc Strings
         Scenario: Delimiter indented past the step
           Given a message
             ```
