@@ -1,5 +1,6 @@
 Feature: Running scenarios by line
-  Run only the scenarios at given lines of a feature file, like `test(features = "addition.feature:3")`.
+  Run only the scenarios at given lines of a feature file, like `test(features = "addition.feature:2")`.
+  Each line is the line of a Scenario or an Examples row.
 
   Background:
     Given a package
