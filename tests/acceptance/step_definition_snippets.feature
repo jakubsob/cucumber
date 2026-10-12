@@ -21,7 +21,8 @@ Feature: Step definition snippets
       """
     And the error message includes
       """
-      given("an empty basket", function(context) {
+      Add a step definition:
+        given("an empty basket", function(context) {
           pending()
         })
       """
@@ -41,8 +42,33 @@ Feature: Step definition snippets
     Then it has 1 failed
     And the error message includes
       """
-      given("I have {int} cucumbers in my basket", function(int, context) {
-      # given("I have {float} cucumbers in my basket", function(float, context) {
+      Add a step definition:
+        given("I have {int} cucumbers in my basket", function(int, context) {
+        # given("I have {float} cucumbers in my basket", function(float, context) {
+          pending()
+        })
+      """
+
+  Scenario: Every combination of matching parameter types is listed, and a repeated type's argument is numbered
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Count cucumbers
+          Given I have 5 and 6 cucumbers
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 failed
+    And the error message includes
+      """
+      Add a step definition:
+        given("I have {int} and {int} cucumbers", function(int, int2, context) {
+        # given("I have {int} and {float} cucumbers", function(int, float, context) {
+        # given("I have {float} and {int} cucumbers", function(float, int, context) {
+        # given("I have {float} and {float} cucumbers", function(float, float2, context) {
           pending()
         })
       """
@@ -62,7 +88,8 @@ Feature: Step definition snippets
     Then it has 1 failed
     And the error message includes
       """
-      given("I see the message {string}", function(string, context) {
+      Add a step definition:
+        given("I see the message {string}", function(string, context) {
           pending()
         })
       """
@@ -82,7 +109,8 @@ Feature: Step definition snippets
     Then it has 1 failed
     And the error message includes
       """
-      then("it passes", function(context) {
+      Add a step definition:
+        then("it passes", function(context) {
           pending()
         })
       """
@@ -101,7 +129,10 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      given("{string} has {float} cucumbers and {string} has none", function(string, float, string2, context) {
+      Add a step definition:
+        given("{string} has {float} cucumbers and {string} has none", function(string, float, string2, context) {
+          pending()
+        })
       """
 
   Scenario: A snippet gets an argument for a data table or a doc string
@@ -124,11 +155,17 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      given("these people", function(data_table, context) {
+      Add a step definition:
+        given("these people", function(data_table, context) {
+          pending()
+        })
       """
     And the error message includes
       """
-      when("I send", function(doc_string, context) {
+      Add a step definition:
+        when("I send", function(doc_string, context) {
+          pending()
+        })
       """
 
   Scenario Outline: A snippet for a step written with <keyword> after <previous> uses <function>()
@@ -148,7 +185,10 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      <function>("I pick a cucumber", function(context) {
+      Add a step definition:
+        <function>("I pick a cucumber", function(context) {
+          pending()
+        })
       """
 
     Examples:
@@ -174,7 +214,10 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      given("I pick a cucumber", function(context) {
+      Add a step definition:
+        given("I pick a cucumber", function(context) {
+          pending()
+        })
       """
 
   Scenario: A snippet escapes the characters that Cucumber Expressions give a meaning to
@@ -191,7 +234,10 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      given("I visit \\/about \\(beta) \\{draft}", function(context) {
+      Add a step definition:
+        given("I visit \\/about \\(beta) \\{draft}", function(context) {
+          pending()
+        })
       """
 
   Scenario: A snippet uses custom parameter types, unless they aren't for snippets
@@ -213,5 +259,8 @@ Feature: Step definition snippets
       """
     Then the error message includes
       """
-      given("a big {colour} ball", function(colour, context) {
+      Add a step definition:
+        given("a big {colour} ball", function(colour, context) {
+          pending()
+        })
       """
