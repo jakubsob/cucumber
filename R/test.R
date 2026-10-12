@@ -104,9 +104,11 @@ run <- function(
   invisible(NULL)
 }
 
-#' @importFrom fs dir_ls
+#' @importFrom fs dir_ls is_file
 find_features <- function(path) {
-  dir_ls(path, glob = "*.feature$", type = "file", recurse = TRUE)
+  # A symbolic link to a feature file is run too
+  features <- dir_ls(path, glob = "*.feature$", type = c("file", "symlink"), recurse = TRUE)
+  features[is_file(features)]
 }
 
 #' Split `file:line:line` locations into a list of lines named by file. A file
@@ -131,7 +133,8 @@ feature_lines <- function(features, path) {
   lines <- regmatches(features, regexpr("(:[0-9]+)*$", features)) |>
     strsplit(":") |>
     lapply(\(x) as.integer(x[x != ""]))
-  lapply(split(lines, files), \(x) unique(unlist(x, use.names = FALSE)))
+  # A factor keeps the files in the order they're given
+  lapply(split(lines, factor(files, unique(files))), \(x) unique(unlist(x, use.names = FALSE)))
 }
 
 read_feature <- function(path) {

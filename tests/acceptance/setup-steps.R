@@ -13,7 +13,8 @@ given("a package", function(context) {
   writeLines(c("Package: example", "Version: 0.1.0"), fs::path(context$tempdir, "DESCRIPTION"))
 })
 
-when("I run", function(code, context) {
+# With `catch_error`, an error of the code is kept in `context$error` instead of failing the step
+run_code <- function(code, context, catch_error = FALSE) {
   x <- as.character(runif(1))
   .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)
   .cucumber_steps_option <- paste0(".cucumber_steps_", x)
@@ -31,7 +32,17 @@ when("I run", function(code, context) {
       cucumber:::set_default_parameters()
       withr::with_dir(context$tempdir, {
         output <- utils::capture.output({
-          context$result <- eval(parse(text = code))
+          if (catch_error) {
+            context$error <- tryCatch(
+              {
+                eval(parse(text = code))
+                NULL
+              },
+              error = identity
+            )
+          } else {
+            context$result <- eval(parse(text = code))
+          }
         })
         context$output <- cli::ansi_strip(output)
       })
@@ -40,7 +51,11 @@ when("I run", function(code, context) {
   options(rlang::list2(!!.cucumber_hooks_option := NULL))
   options(rlang::list2(!!.cucumber_steps_option := NULL))
   options(rlang::list2(!!.cucumber_parameters_option := NULL))
-})
+}
+
+when("I run", function(code, context) run_code(code, context))
+
+when("I run it and it fails", function(code, context) run_code(code, context, catch_error = TRUE))
 
 then("it passes", function(context) {
   results <- as.data.frame(context$result)
@@ -72,6 +87,11 @@ then("only {string} was run", function(feature_name, context) {
 then("it ran {string}", function(test_name, context) {
   results <- as.data.frame(context$result)
   expect_true(test_name %in% results$test, info = paste(results$test, collapse = ", "))
+})
+
+then("these scenarios ran in this order:", function(scenarios, context) {
+  results <- as.data.frame(context$result)
+  expect_equal(results$test, paste("Scenario:", scenarios$scenario))
 })
 
 then("only these scenarios ran:", function(scenarios, context) {

@@ -161,6 +161,9 @@ execute_single_pickle <- function(
     if (!skip_steps && result$status == "passed" && expectations == 0) {
       testthat::succeed()
     }
+    if (skip_steps && !dry_run && result$status == "skipped") {
+      testthat::skip("A previous scenario failed and `fail_fast = TRUE`.")
+    }
   })
 
   invisible(failed)

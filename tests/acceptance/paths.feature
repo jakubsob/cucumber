@@ -47,6 +47,26 @@ Feature: Choosing feature files
       | Subtracting |
       | Dividing    |
 
+  Scenario: A symbolic link to a feature file is run
+    Given a file named "elsewhere/multiplication.feature" with
+      """
+      Feature: Multiplication
+        Scenario: Multiplying
+          Given I have 4
+          Then I get 4
+      """
+    When I run
+      """
+      fs::link_create(fs::path_abs("elsewhere/multiplication.feature"), "features/multiplication.feature")
+      test("features")
+      """
+    Then only these scenarios ran:
+      | scenario    |
+      | Adding      |
+      | Subtracting |
+      | Dividing    |
+      | Multiplying |
+
   Rule: `features` lists the feature files to run
 
     Scenario: Only the listed feature files are run
@@ -58,6 +78,16 @@ Feature: Choosing feature files
         | scenario    |
         | Adding      |
         | Subtracting |
+
+    Scenario: The listed feature files run in the order they are listed
+      When I run
+        """
+        test("features", features = c("math/subtraction.feature", "addition.feature"))
+        """
+      Then these scenarios ran in this order:
+        | scenario    |
+        | Subtracting |
+        | Adding      |
 
     Scenario: A feature file that doesn't exist is an error
       When I run

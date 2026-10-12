@@ -52,3 +52,23 @@ Feature: Step definition arguments
       test("features")
       """
     Then it passes
+
+  Scenario: A step definition's arguments with a default value can be left out
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          When I add 3 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add {int} items", function(n, unit = "piece", context) {
+        expect_equal(n, 3L)
+        expect_equal(unit, "piece")
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes

@@ -286,3 +286,24 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
+
+    Scenario: A parameter type can't be defined twice
+      When I run it and it fails
+        """
+        define_parameter_type("int", "\\d+", as.integer)
+        """
+      Then it fails with "There is already a parameter type with name int"
+
+    Scenario: A parameter type's name can't contain {, }, (, ), \ or /
+      When I run it and it fails
+        """
+        define_parameter_type("a/b", "x", as.character)
+        """
+      Then it fails with "Illegal character in parameter name {a/b}."
+
+    Scenario: Only one parameter type with the same regexp can be preferred for regular expressions
+      When I run it and it fails
+        """
+        define_parameter_type("count", "-?\\d+", as.integer, prefer_for_regexp_match = TRUE)
+        """
+      Then it fails with "There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}"

@@ -92,3 +92,24 @@ Feature: Regular expressions
       """
     Then the error message includes "This Regular Expression has a problem:"
     And the error message includes "I pay {int}$"
+
+  Scenario: A character class can start with ]
+    Given a package
+    And a file named "features/brackets.feature" with
+      """
+      Feature: Brackets
+        Scenario: Brackets
+          Given the brackets ]( and 3
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("^the brackets ([](]+) and (\\d+)$", function(brackets, n, context) {
+        expect_equal(brackets, "](")
+        expect_identical(n, 3L)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes

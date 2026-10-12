@@ -98,9 +98,39 @@ define_parameter_type <- function(
     use_for_snippets,
     prefer_for_regexp_match
   )
+  check_parameter_type(parameter, parameters)
   parameters[[name]] <- parameter
   set_parameters(parameters)
   invisible(parameter)
+}
+
+#' Fail like cucumber-expressions' ParameterTypeRegistry on a parameter type
+#' that can't be added to the others
+#' @keywords internal
+#' @noRd
+check_parameter_type <- function(parameter, parameters) {
+  fail <- function(message) abort(message, class = "cucumber_expression_error", call = NULL, trace = empty_trace())
+  if (grepl("[{}()\\\\/]", parameter$name)) {
+    fail(paste0(
+      "Illegal character in parameter name {", parameter$name, "}. ",
+      "Parameter names may not contain '{', '}', '(', ')', '\\' or '/'"
+    ))
+  }
+  if (!is.null(parameters[[parameter$name]])) {
+    fail(paste0("There is already a parameter type with name ", parameter$name))
+  }
+  if (parameter$prefer_for_regexp_match) {
+    for (existing in parameters) {
+      regexp <- intersect(existing$regexp, parameter$regexp)
+      if (existing$prefer_for_regexp_match && length(regexp) > 0) {
+        fail(paste0(
+          "There can only be one preferential parameter type per regexp. ",
+          "The regexp /", regexp[[1]], "/ is used for two preferential parameter types, ",
+          "{", existing$name, "} and {", parameter$name, "}"
+        ))
+      }
+    }
+  }
 }
 
 get_parameters <- function() {

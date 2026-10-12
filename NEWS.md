@@ -27,12 +27,13 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ `{word}` matches anything without whitespace, like `foo-bar` or `a.b`. Previously it matched only letters, digits and `_`.
 - ⚠️ A parameter type's `regexp` is used as is. Previously it was a replacement string, so special characters needed four backslashes. Replace `"\\\\d+"` with `"\\d+"`.
 - ⚠️ If a parameter type's `regexp` has capture groups, its transformer gets the text of each group as a separate argument. Use non-capturing groups, `(?:...)`, to keep the whole match.
+- ⚠️ `define_parameter_type()` fails on a name that is already defined, like `int`, or that contains `{`, `}`, `(`, `)`, `\` or `/`, and on a second type with `prefer_for_regexp_match = TRUE` for the same regexp, like cucumber-expressions. Previously a second definition silently replaced the first.
 - ✨ `{string}` matches strings with escaped quotes, like `"say \"hi\""`, and passes them unescaped: `say "hi"`.
 - ✨ `define_parameter_type()` accepts several regexps and gets the `use_for_snippets` and `prefer_for_regexp_match` options.
 
 ## Running tests
 
-- ⚠️ `test()` and `run()` find feature files in subdirectories of `path` too, like Cucumber's default `features/**/*.feature`. Previously only the files directly in `path` ran.
+- ⚠️ `test()` and `run()` find feature files in subdirectories of `path` too, like Cucumber's default `features/**/*.feature`. Previously only the files directly in `path` ran. Symbolic links to feature files are run too.
 - ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped.
 - ⚠️ Undefined and ambiguous steps no longer stop the run. They fail their scenario, and the other scenarios still run, so every missing step's snippet is shown.
 - ⚠️ `pending()` gives the step a `pending` status and fails the scenario. Previously the scenario was skipped. Run with `strict = FALSE` to skip scenarios with pending or undefined steps instead.

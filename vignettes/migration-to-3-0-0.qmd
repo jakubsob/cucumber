@@ -323,6 +323,10 @@ define_parameter_type("colour", "(dark )?(red|blue)", as.character)
 define_parameter_type("colour", "(?:dark )?(?:red|blue)", as.character)
 ```
 
+### Parameter types can't be redefined
+
+`define_parameter_type()` fails on a name that is already defined, like `int`. Before, the second definition silently replaced the first. Give your parameter type its own name, e.g. `{count}`. A name can't contain `{`, `}`, `(`, `)`, `\` or `/`, and only one parameter type with the same regexp can have `prefer_for_regexp_match = TRUE`.
+
 # Running tests
 
 Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped.
@@ -477,6 +481,7 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 
 - Replace four backslashes with two in `define_parameter_type()` regexps, e.g. `"\\\\d+"` with `"\\d+"`. See [Regexps are used as is](#regexps-are-used-as-is).
 - Replace capture groups `(...)` with non-capturing groups `(?:...)`, or give the transformer one argument per group. See [Capture groups](#capture-groups).
+- Rename parameter types that redefine another one, like `int`. See [Parameter types can't be redefined](#parameter-types-cant-be-redefined).
 
 ## In hooks
 

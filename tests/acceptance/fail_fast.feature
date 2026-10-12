@@ -49,6 +49,13 @@ Feature: Fail fast
     And the output doesn't include "before After the failure"
     And the output doesn't include "before In the next feature file"
 
+  Scenario: Scenarios skipped by fail fast say why
+    When I run
+      """
+      test("features", fail_fast = TRUE, stop_on_failure = FALSE)
+      """
+    Then the scenario "After the failure" is skipped with "Reason: A previous scenario failed and `fail_fast = TRUE`."
+
   Scenario: Without fail fast every scenario runs
     When I run
       """

@@ -65,12 +65,16 @@ regex_groups <- function(pattern) {
   stack <- list()
   escaping <- FALSE
   char_class <- FALSE
+  class_start <- 0L
   for (i in seq_along(chars)) {
     char <- chars[[i]]
-    if (!escaping && char == "[") {
+    if (!escaping && !char_class && char == "[") {
       char_class <- TRUE
+      class_start <- i
     } else if (!escaping && char == "]") {
-      char_class <- FALSE
+      # A ] right after [ or [^ is a literal, like in []a] or [^]a]
+      first <- i == class_start + 1 || (i == class_start + 2 && chars[[class_start + 1]] == "^")
+      char_class <- char_class && first
     } else if (!escaping && !char_class && char == "(") {
       scope <- if (length(stack)) stack[[length(stack)]]$scope else 0L
       # (X) and (?<name>X) capture, (?:X), (?=X), (?<=X), (?<!X) etc. don't

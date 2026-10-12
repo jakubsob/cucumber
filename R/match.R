@@ -121,7 +121,7 @@ match_single_step <- function(
   # with capture groups of its own passes their text to its transformer.
   values <- unname(str_match(description, pattern)[1, -1])
   groups <- attr(pattern, "groups")
-  impl_formals <- names(formals(matched_step))
+  impl_formals <- formals(matched_step)
 
   # Transformed when the step runs, so a failing transformer fails the step
   arguments <- function() {
@@ -147,8 +147,8 @@ match_single_step <- function(
     params <- append(params, unname(unclass(step)[step$argument_order]))
 
     # Name parameters according to function formals, or pass them by position to `...`
-    if (!"..." %in% impl_formals) {
-      names(params) <- impl_formals[impl_formals != "context"]
+    if (!"..." %in% names(impl_formals)) {
+      names(params) <- setdiff(names(impl_formals), "context")[seq_along(params)]
     }
     params
   }
@@ -163,16 +163,18 @@ match_single_step <- function(
 
 #' Fail when a step definition can't take the step's arguments: its parameters,
 #' data table or doc string, and `context`. A definition with `...` takes any
-#' number of them.
+#' number of them, and its arguments with a default value can be left out.
 #'
-#' @param formals Names of the step definition's arguments
+#' @param formals The step definition's arguments, from `formals()`
 #' @param types Names of the parameter types of the step's parameters
 #' @param argument_names Names of the step's data table and doc string arguments
 #' @keywords internal
 #' @noRd
 check_arity <- function(formals, types, argument_names) {
   expected <- length(types) + length(argument_names) + 1
-  if ("..." %in% formals || length(formals) == expected) {
+  # `context` is passed by name, the other arguments by position
+  required <- max(0, which(vapply(formals, rlang::is_missing, logical(1))[names(formals) != "context"])) + 1
+  if ("..." %in% names(formals) || (expected >= required && expected <= length(formals))) {
     return(invisible())
   }
   # A regular expression's capture group or `{}` has no type name to use
