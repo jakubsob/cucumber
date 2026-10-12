@@ -130,3 +130,88 @@ Feature: Step definition snippets
       """
       when("I send", function(doc_string, context) {
       """
+
+  Scenario Outline: A snippet for a step written with <keyword> after <previous> uses <function>()
+    Steps written with `And` and `But` take the type of the step before them.
+
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Shopping
+          <previous> I start shopping
+          <keyword> I pick a cucumber
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes
+      """
+      <function>("I pick a cucumber", function(context) {
+      """
+
+    Examples:
+      | previous | keyword | function |
+      | Given    | And     | given    |
+      | When     | And     | when     |
+      | Then     | But     | then     |
+
+  Scenario: A step written with * is of unknown type, so its snippet uses given()
+    `*` is a keyword of every step type, so unlike `And` and `But` it doesn't take the type of the step before it.
+
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Shopping
+          Then I start shopping
+          * I pick a cucumber
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes
+      """
+      given("I pick a cucumber", function(context) {
+      """
+
+  Scenario: A snippet escapes the characters that Cucumber Expressions give a meaning to
+    Given a package
+    And a file named "features/pages.feature" with
+      """
+      Feature: Pages
+        Scenario: Draft
+          Given I visit /about (beta) {draft}
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes
+      """
+      given("I visit \\/about \\(beta) \\{draft}", function(context) {
+      """
+
+  Scenario: A snippet uses custom parameter types, unless they aren't for snippets
+    Given a package
+    And a file named "features/balls.feature" with
+      """
+      Feature: Balls
+        Scenario: Pick a ball
+          Given a big red ball
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      define_parameter_type("colour", "red|green", as.character)
+      define_parameter_type("size", "big|small", as.character, use_for_snippets = FALSE)
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes
+      """
+      given("a big {colour} ball", function(colour, context) {
+      """

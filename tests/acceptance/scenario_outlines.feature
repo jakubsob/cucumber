@@ -117,3 +117,59 @@ Feature: Scenario Outlines
     And it has 2 passed
     And it ran "Scenario: Greeting Alice"
     And it ran "Scenario: Greeting Bob"
+
+  Scenario: Scenarios that share a name are numbered
+    Given a file named "features/eating.feature" with
+      """
+      Feature: Eating
+        Scenario Outline: eating
+          Given I have <a>
+
+          Examples:
+            | a |
+            | 1 |
+            | 2 |
+
+        Scenario: drinking
+          Given I have 3
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I have {int}", function(n, context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then these scenarios ran in this order:
+      | scenario   |
+      | eating (1) |
+      | eating (2) |
+      | drinking   |
+
+  Scenario: Examples under a Scenario make it an outline, and they can have a name and a description
+    Given a file named "features/eating.feature" with
+      """
+      Feature: Eating
+        Scenario: eating <a> cucumbers
+          Given I have <a>
+
+          Examples: Small numbers
+            Only numbers that fit in a hand.
+
+            | a |
+            | 1 |
+            | 2 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I have {int}", function(n, context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then these scenarios ran in this order:
+      | scenario           |
+      | eating 1 cucumbers |
+      | eating 2 cucumbers |

@@ -99,6 +99,29 @@ Feature: Parameter types
         """
       Then it passes
 
+    Scenario: {float} captures a number with an exponent
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Exponents
+            Given the distance is 1.5E3
+            And the size is -2E-3
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the distance is {float}", function(distance, context) {
+          expect_identical(distance, 1500)
+        })
+        given("the size is {float}", function(size, context) {
+          expect_identical(size, -0.002)
+        })
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
     Scenario: {string} captures a quoted string and strips quotes
       Given a file named "features/params.feature" with
         """
@@ -258,6 +281,28 @@ Feature: Parameter types
         define_parameter_type("version", "\\d+\\.\\d+", numeric_version)
         given("the version is {version}", function(version, context) {
           expect_equal(version, numeric_version("1.2"))
+        })
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: A custom parameter type can have several regexps
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Answers
+            Given the answer is yes
+            And the answer is no
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        define_parameter_type("answer", c("yes", "no"), \(x) x == "yes")
+        given("the answer is {answer}", function(answer, context) {
+          context$answers <- c(context$answers, answer)
+          if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))
         })
         """
       When I run

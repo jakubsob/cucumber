@@ -193,3 +193,26 @@ Feature: Gherkin
     Then it has 1 errors
     And the error message includes "got 'junk 11'"
     And the error message doesn't include "got 'junk 12'"
+
+  Scenario Outline: <keyword> can be used instead of Feature
+    Given a file named "features/eating.feature" with
+      """
+      <keyword>: Eating
+        Scenario: Eat a cucumber
+          Given a step
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And the output includes "<keyword>: Eating"
+
+    Examples:
+      | keyword       |
+      | Ability       |
+      | Business Need |

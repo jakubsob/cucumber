@@ -108,3 +108,39 @@ Feature: Pending steps
       | strict | outcome | message                                                   |
       | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
       | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |
+
+  Scenario Outline: pending() in <hook>() makes the scenario pending, strict = <strict>
+    A pending step hook makes its step pending. A pending after hook makes the scenario pending.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+          Then the basket is synced
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      <hook>(function(context, <argument>) pending("the API client isn't written yet"))
+      given("an empty basket", function(context) {})
+      then("the basket is synced", function(context) {})
+      """
+    When I run
+      """
+      test("features", strict = <strict>, stop_on_failure = FALSE)
+      """
+    Then the scenario "Sync the basket" is <outcome> with "<message>"
+    And the output includes
+      """
+      1 scenario (1 pending)
+      <steps>
+      """
+
+    Examples:
+      | hook        | argument | strict | outcome | message                                                   | steps                          |
+      | before_step | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | 2 steps (1 pending, 1 skipped) |
+      | after_step  | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | 2 steps (1 pending, 1 skipped) |
+      | after       | scenario | TRUE   | failed  | Hook is pending: the API client isn't written yet         | 2 steps (2 passed)             |
+      | before_step | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | 2 steps (1 pending, 1 skipped) |
+      | after_step  | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | 2 steps (1 pending, 1 skipped) |
+      | after       | scenario | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | 2 steps (2 passed)             |
