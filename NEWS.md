@@ -72,6 +72,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 - 🐛 A scenario whose steps pass without calling any `expect_*()` function is reported as passed. Previously testthat reported it as skipped ("empty test"), e.g. in `JunitReporter` output.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.
+- 🐛 Defining a step without `context` as its last argument is an error that says so and the function to use, e.g. `Use \`function(n, context)\``. Previously it was a checkmate assertion error, `Must be a subset of {'n'}`.
 - 🐛 `CucumberProgressReporter` prints a step's warnings under the step. Previously they were printed above it.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
 - 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored. An argument that isn't an argument of `test()` or `grepl()`, like a misspelled `fail_fst = TRUE`, is an error.

@@ -34,6 +34,29 @@ Feature: Step definition arguments
       | missing data table   | function(n, context) {}                 | The step definition has 2 arguments, but the step passes 3. |
       | extra argument       | function(n, table, extra, context) {}   | The step definition has 4 arguments, but the step passes 3. |
 
+  Scenario Outline: A step definition without `context` as its last argument is an error, <case>
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          When I add 3 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add {int} items", <definition>)
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then it fails with "A step definition must have `context` as its last argument."
+    And it fails with "Use `function(n, context)`."
+
+    Examples:
+      | case             | definition              |
+      | missing context  | function(n) {}          |
+      | context not last | function(context, n) {} |
+
   Scenario: A step definition with `...` gets any number of arguments
     Given a file named "features/basket.feature" with
       """

@@ -1,12 +1,18 @@
 #' @keywords internal
 #' @importFrom rlang exec
-#' @importFrom checkmate assert_subset assert_string assert_function
+#' @importFrom checkmate assert_string assert_function
 make_step <- function(prefix) {
   function(description, implementation) {
     assert_string(description)
     assert_function(implementation)
-    args <- formals(implementation)
-    assert_subset("context", names(args[length(args)]))
+    args <- names(formals(implementation))
+    if (!identical(args[length(args)], "context")) {
+      suggested <- paste(c(setdiff(args, "context"), "context"), collapse = ", ")
+      abort(
+        message = "A step definition must have `context` as its last argument.",
+        body = c(i = glue("Use `function({suggested})`."))
+      )
+    }
     step <- structure(
       implementation,
       description = description,
