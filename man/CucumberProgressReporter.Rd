@@ -324,7 +324,8 @@ Add a result (warning, skip, failure, etc.)
 \if{html}{\out{<a id="method-CucumberProgressReporter-end_hook"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_hook}{}}}
 \subsection{Method \code{end_hook()}}{
-Print the error of a scenario's hook that failed or is pending
+Print the error of a scenario's hook that failed or is pending, or the
+reason of one that skipped the scenario
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_hook(status, error)}\if{html}{\out{</div>}}
 }
@@ -332,7 +333,7 @@ Print the error of a scenario's hook that failed or is pending
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{status}}{\code{"failed"} or \code{"pending"}}
+\item{\code{status}}{\code{"failed"}, \code{"pending"} or \code{"skipped"}}
 
 \item{\code{error}}{The hook's error}
 }

@@ -20,7 +20,7 @@
 #'   \item{`end_feature()`}{Called after all scenarios in a feature complete}
 #'   \item{`start_step(step)`}{Called before executing a step}
 #'   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
-#'   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed or is pending}
+#'   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
 #'   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
 #' }
 #'
@@ -69,8 +69,8 @@ CucumberReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Called after a scenario's `before` or `after` hook that failed or is pending
-    #' @param status `"failed"` or `"pending"`
+    #' Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario
+    #' @param status `"failed"`, `"pending"` or `"skipped"`
     #' @param error The hook's error
     end_hook = function(status, error) {
       invisible(self)
@@ -132,8 +132,9 @@ truncate_lines <- function(lines, max_lines) {
 #' @noRd
 print_error <- function(message, status = "failed") {
   color <- status_color(status)
-  label <- if (status == "pending") "Pending: " else "Error: "
-  cat("  ", color(cli::style_bold(label)), "\n", sep = "")
+  # A skip's message already starts with "Reason: "
+  label <- switch(status, pending = "Pending: ", skipped = NULL, "Error: ")
+  if (!is.null(label)) cat("  ", color(cli::style_bold(label)), "\n", sep = "")
   for (line in strsplit(message, "\n")[[1]]) {
     cat("    ", color(line), "\n", sep = "")
   }
@@ -483,8 +484,9 @@ CucumberProgressReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Print the error of a scenario's hook that failed or is pending
-    #' @param status `"failed"` or `"pending"`
+    #' Print the error of a scenario's hook that failed or is pending, or the
+    #' reason of one that skipped the scenario
+    #' @param status `"failed"`, `"pending"` or `"skipped"`
     #' @param error The hook's error
     end_hook = function(status, error) {
       super$end_hook(status, error)

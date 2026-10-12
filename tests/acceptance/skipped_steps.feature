@@ -71,6 +71,7 @@ Feature: Skipped steps
     And the output includes
       """
       Scenario: Sync the basket
+        Reason: the API is down
         - Given an empty basket
         - When I sync the basket
       after: Sync the basket skipped
@@ -157,6 +158,7 @@ Feature: Skipped steps
       And the output includes
         """
         Scenario: Sync the basket
+          Reason: the API is down
           - When I sync the basket
         after: Sync the basket skipped
         """

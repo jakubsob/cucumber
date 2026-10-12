@@ -5,6 +5,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 ## Gherkin
 
 - ⚠️ Feature files are parsed by a port of the official Gherkin parser. A line's meaning comes from its keyword, not its indentation, so the `cucumber.indent` option is removed. Some feature files that ran before fail to parse, and some steps get different text or arguments. Every parse error is reported with its line and column.
+- ⚠️ Every feature file is parsed before anything runs. If any file can't be parsed, no scenario runs and the parse errors of every file are reported, each as `Parse error in "<file>" (line:column): ...`, like cucumber-js. Previously the files before the broken one ran and the files after it were skipped.
 - ⚠️ Scenario Outline names are the outline name with placeholders replaced, without an `(Example n)` suffix. Scenarios that share a name are numbered in test results: `eating (1)`, `eating (2)`.
 - ✨ Added support for the `Rule` keyword. A `Rule` groups scenarios that illustrate one business rule, can have its own `Background` (run after the `Feature`'s one) and passes its tags to its scenarios.
 - ✨ Feature files can be written in any of the 80 languages of the official Gherkin parser, by starting them with a `# language:` line, e.g. `# language: fr` for `Fonctionnalité`, `Scénario`, `Soit`, `Quand` and `Alors`. Step definitions don't change.
@@ -60,7 +61,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ A step's `status` is `"failed"` for both failed expectations and errors. The `"error"` status is removed.
 - ⚠️ A step keeps the keyword it's written with, so `step$keyword` can be `And`, `But` or `*`. The new `step$type` is `"Context"`, `"Action"`, `"Outcome"` or `"Unknown"`.
 - ⚠️ `CucumberProgressReporter` prints the keyword as written and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
-- ✨ `CucumberProgressReporter` prints a failed or pending hook's error where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
+- ✨ `CucumberProgressReporter` prints a failed or pending hook's error, or the reason a hook skipped the scenario, where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
 
 ## Snippets
 

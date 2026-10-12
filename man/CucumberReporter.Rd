@@ -24,7 +24,7 @@ continue to work unchanged, reporting only at the scenario (test) level.
   \item{`end_feature()`}{Called after all scenarios in a feature complete}
   \item{`start_step(step)`}{Called before executing a step}
   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
-  \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed or is pending}
+  \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
 }
 }
@@ -143,7 +143,7 @@ End a step (called after execution with status/error/duration populated)
 \if{html}{\out{<a id="method-CucumberReporter-end_hook"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberReporter-end_hook}{}}}
 \subsection{Method \code{end_hook()}}{
-Called after a scenario's `before` or `after` hook that failed or is pending
+Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_hook(status, error)}\if{html}{\out{</div>}}
 }
@@ -151,7 +151,7 @@ Called after a scenario's `before` or `after` hook that failed or is pending
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{status}}{`"failed"` or `"pending"`}
+\item{\code{status}}{`"failed"`, `"pending"` or `"skipped"`}
 
 \item{\code{error}}{The hook's error}
 }

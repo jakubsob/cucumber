@@ -106,7 +106,7 @@ execute_single_pickle <- function(
     add_hook_result <- function(error) {
       if (is.null(error)) return()
       result <- hook_result(error)
-      if (inherits(reporter, "CucumberReporter") && result$status != "skipped") {
+      if (inherits(reporter, "CucumberReporter")) {
         reporter$end_hook(result$status, result$error)
       }
       results <<- c(results, list(result))

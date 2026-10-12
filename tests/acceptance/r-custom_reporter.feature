@@ -109,3 +109,28 @@ Feature: Custom reporter
       end scenario: failed
       end feature
       """
+
+  Scenario: A reporter gets the hooks that skipped the scenario
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) skip_scenario("the API is down"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      source("event-reporter.R")
+      test("features", reporter = EventReporter$new())
+      """
+    Then the output includes
+      """
+      end hook: skipped Reason: the API is down
+      start step: Given an empty basket
+      end step: Given Context an empty basket skipped
+      end scenario: skipped
+      """
