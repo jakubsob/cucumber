@@ -1,4 +1,4 @@
-Feature: Localization
+Feature: Language
   A `# language:` line at the top of a feature file sets the language of its keywords,
   like in the official Gherkin parser. The languages are the ones in the official gherkin-languages.json.
   Step definitions don't change, because steps are matched without their keyword.
