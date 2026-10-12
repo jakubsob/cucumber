@@ -1,7 +1,7 @@
-# CucumberProgressReporter / prints step-by-step progress / Scenario: Add two numbers
+# CucumberProgressReporter / prints step-by-step progress
 
     Code
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     Output
@@ -30,13 +30,13 @@
               `actual`: 10.0
             `expected`:  5.0
             
-            Step at: test-reporter.R:114
+            Step at: test-reporter.R:116
       
 
-# CucumberProgressReporter / prints docstring and data table step arguments / Scenario: Steps with a docstring and a table
+# CucumberProgressReporter / prints docstring and data table step arguments
 
     Code
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     Output
@@ -53,47 +53,10 @@
             | Bob   | 7   |
       
 
----
+# CucumberProgressReporter / truncates long step arguments to max_lines
 
     Code
-      suppressMessages({
-        cucumber:::execute(feature, reporter = reporter)
-      })
-    Output
-      
-      Feature: Step arguments
-          v Given a message
-            """
-            line one
-            line two
-            """
-          v And these people
-            | name  | age |
-            | Alice | 30  |
-            | Bob   | 7   |
-      
-
-# CucumberProgressReporter / truncates long step arguments to max_lines / Scenario: Long docstring
-
-    Code
-      suppressMessages({
-        cucumber:::execute(feature, reporter = reporter)
-      })
-    Output
-      
-      Feature: Step arguments
-          v Given a long message
-            """
-            line one
-            line two
-            ... and 2 more line(s)
-            """
-      
-
----
-
-    Code
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     Output

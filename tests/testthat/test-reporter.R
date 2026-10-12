@@ -86,8 +86,10 @@ describe("CucumberProgressReporter", {
 
     reporter <- CucumberProgressReporter$new(show_praise = FALSE)
 
+    # Run the scenario under its own testthat reporter, so the snapshot is
+    # recorded under this test and not under the scenario's nested test
     .expect_snapshot({
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     })
@@ -146,8 +148,10 @@ describe("CucumberProgressReporter", {
 
     reporter <- CucumberProgressReporter$new(show_praise = FALSE)
 
+    # Run the scenario under its own testthat reporter, so the snapshot is
+    # recorded under this test and not under the scenario's nested test
     .expect_snapshot({
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     })
@@ -174,8 +178,10 @@ describe("CucumberProgressReporter", {
       reporter_max_docstring_lines = 2
     )
 
+    # Run the scenario under its own testthat reporter, so the snapshot is
+    # recorded under this test and not under the scenario's nested test
     .expect_snapshot({
-      suppressMessages({
+      testthat::with_reporter(testthat::SilentReporter$new(), {
         cucumber:::execute(feature, reporter = reporter)
       })
     })
