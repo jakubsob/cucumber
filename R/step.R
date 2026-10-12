@@ -1,7 +1,7 @@
 #' @keywords internal
 #' @importFrom rlang exec
 #' @importFrom checkmate assert_string assert_function
-make_step <- function(prefix) {
+make_step <- function() {
   function(description, implementation) {
     assert_string(description)
     assert_function(implementation)
@@ -150,15 +150,15 @@ NULL
 
 #' @rdname step
 #' @export
-given <- make_step("Given")
+given <- make_step()
 
 #' @rdname step
 #' @export
-when <- make_step("When")
+when <- make_step()
 
 #' @rdname step
 #' @export
-then <- make_step("Then")
+then <- make_step()
 
 #' @importFrom rlang list2
 .steps <- function(...) {

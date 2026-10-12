@@ -55,7 +55,6 @@ new_pickle_step <- function(
 
 #' Create a pickle object
 #'
-#' @param id Unique identifier
 #' @param name Scenario name
 #' @param tags Character vector of tags
 #' @param steps List of pickle_step objects
@@ -66,7 +65,6 @@ new_pickle_step <- function(
 #' @keywords internal
 #' @noRd
 new_pickle <- function(
-  id,
   name,
   tags = character(),
   steps = list(),
@@ -75,7 +73,6 @@ new_pickle <- function(
 ) {
   structure(
     list(
-      id = id,
       name = name,
       tags = sub("^@", "", tags),
       steps = steps,
@@ -137,7 +134,6 @@ compile_scenarios <- function(scenarios, tags, background) {
     map(\(scenario) {
       if (length(scenario$examples) == 0) {
         return(list(new_pickle(
-          id = generate_pickle_id(),
           name = scenario$name,
           tags = c(tags, scenario$tags),
           steps = pickle_steps(background, scenario$steps),
@@ -151,7 +147,6 @@ compile_scenarios <- function(scenarios, tags, background) {
           map(examples$body, \(row) {
             header <- examples$header$cells
             new_pickle(
-              id = generate_pickle_id(),
               name = interpolate(scenario$name, header, row$cells),
               tags = c(tags, scenario$tags, examples$tags),
               steps = pickle_steps(background, scenario$steps, header, row$cells),
@@ -205,14 +200,6 @@ interpolate <- function(x, header, values) {
     x <- gsub(paste0("<", header[[i]], ">"), values[[i]], x, fixed = TRUE)
   }
   x
-}
-
-#' Generate a unique pickle ID
-#'
-#' @keywords internal
-#' @noRd
-generate_pickle_id <- function() {
-  paste0("pickle-", as.character(as.numeric(Sys.time()) * 1000000))
 }
 
 #' Filter pickles by tag expression
