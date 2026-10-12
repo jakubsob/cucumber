@@ -30,6 +30,40 @@ Feature: Running tests more than once
       """
     Then it passes
 
+  Scenario: Testthat tests with run() can be run twice in the same session
+    Given a package
+    And a file named "tests/testthat/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one
+          Given I calculate 1
+          Then the result is 2
+      """
+    And a file named "tests/testthat/setup-hooks.R" with
+      """
+      before(function(context, scenario) context$add <- (context$add %||% 0) + 1)
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      define_parameter_type(name = "number", regexp = "\\d+", transformer = as.numeric)
+      given("I calculate {number}", function(x, context) {
+        context$result <- x + context$add
+      })
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run()
+      """
+    When I run
+      """
+      testthat::test_local()
+      testthat::test_local()
+      """
+    Then it passes
+
   Scenario: Step definitions don't outlive the run that loaded them
     Given a package
     And a file named "features/calculate.feature" with
