@@ -1,7 +1,7 @@
 Feature: Running scenarios alongside testthat tests
   `run()` in a `tests/testthat/test-*.R` file runs the feature files in `tests/testthat`
   as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.
-  It takes the same arguments as `test()` to choose what to run.
+  It chooses what to run like `test()`, with `filter`, `features`, `tags` and `name`.
 
   Background:
     Given a package
@@ -45,7 +45,7 @@ Feature: Running scenarios alongside testthat tests
     And it ran "Scenario: Adding one"
     And it ran "calculate adds one"
 
-  Scenario: Step definitions outside setup files are loaded through testthat's env
+  Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
     Given a file named "tests/testthat/steps/steps.R" with
       """
       given("I calculate", function(context) {
@@ -63,10 +63,11 @@ Feature: Running scenarios alongside testthat tests
       """
     Then it passes
 
-  Scenario: run() chooses feature files like test()
+  Scenario Outline: run() chooses what to run like test(), with <argument>
     Given a file named "tests/testthat/other.feature" with
       """
       Feature: Other
+        @slow
         Scenario: Not run
           Given I calculate
       """
@@ -81,7 +82,7 @@ Feature: Running scenarios alongside testthat tests
       """
     And a file named "tests/testthat/test-acceptance.R" with
       """
-      run(filter = "calculate")
+      run(<argument> = "<value>")
       """
     When I run
       """
@@ -91,3 +92,9 @@ Feature: Running scenarios alongside testthat tests
       | scenario   |
       | Adding one |
 
+    Examples:
+      | argument | value             |
+      | filter   | calculate         |
+      | features | calculate.feature |
+      | tags     | not @slow         |
+      | name     | Adding one        |
