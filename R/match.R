@@ -144,7 +144,11 @@ match_single_step <- function(
     )
 
     # Add the data table and the docstring, in the order they are written
-    params <- append(params, unname(unclass(step)[step$argument_order]))
+    step_arguments <- unclass(step)[step$argument_order]
+    if (!is.null(step$docstring)) {
+      step_arguments$docstring <- docstring_argument(step$docstring)
+    }
+    params <- append(params, unname(step_arguments))
 
     # Name parameters according to function formals, or pass them by position to `...`
     if (!"..." %in% names(impl_formals)) {
@@ -188,6 +192,19 @@ check_arity <- function(formals, types, argument_names) {
     body = c(i = glue("Use `function({args})`.")),
     call = NULL,
     trace = empty_trace()
+  )
+}
+
+#' A doc string as a step gets it: one string, or its lines with the
+#' `cucumber.docstring_as_lines` option, with its media type in either case
+#'
+#' @param lines The pickle step's doc string lines
+#' @keywords internal
+#' @noRd
+docstring_argument <- function(lines) {
+  new_docstring(
+    if (getOption("cucumber.docstring_as_lines", FALSE)) c(lines) else paste(lines, collapse = "\n"),
+    attr(lines, "media_type")
   )
 }
 

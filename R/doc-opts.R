@@ -13,6 +13,13 @@
 #'
 #'   default: `"tests/acceptance"`
 #'
+#' - `cucumber.docstring_as_lines`
+#'
+#'   If `TRUE`, step definitions get a Doc String as a character vector of lines,
+#'   like in cucumber 2.x, instead of one string.
+#'
+#'   default: `FALSE`
+#'
 #' - `cucumber.reporter_max_docstring_lines`
 #'
 #'   Max docstring lines [CucumberProgressReporter] prints per step before

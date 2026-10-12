@@ -5,7 +5,8 @@
 #'   take the type of the previous step
 #' @param text Step text
 #' @param data_table Data table (tibble or NULL)
-#' @param docstring Docstring (character or NULL)
+#' @param docstring Docstring lines (character or NULL), with its media type in
+#'   the `media_type` attribute
 #' @param argument_order Names of the step arguments ("docstring",
 #'   "data_table") in the order they are written
 #' @param status Execution status (NULL, "passed", "failed", "skipped", "pending")
@@ -51,6 +52,18 @@ new_pickle_step <- function(
     ),
     class = "pickle_step"
   )
+}
+
+#' Create a docstring: its text with its media type in the `media_type`
+#' attribute, left out when the docstring has none
+#'
+#' @param content Docstring text, its lines or one string
+#' @param media_type Media type, like "json" (character or NULL)
+#' @return A character vector
+#' @keywords internal
+#' @noRd
+new_docstring <- function(content, media_type = NULL) {
+  structure(content, media_type = media_type)
 }
 
 #' Create a pickle object
@@ -186,7 +199,12 @@ pickle_steps <- function(background, steps, header = character(), values = chara
       data_table = if (!is.null(step$data_table)) {
         parse_table(map(step$data_table$rows, \(row) fill(row$cells)))
       },
-      docstring = if (!is.null(step$docstring)) fill(step$docstring$content),
+      docstring = if (!is.null(step$docstring)) {
+        new_docstring(
+          fill(step$docstring$content),
+          if (!is.null(step$docstring$media_type)) fill(step$docstring$media_type)
+        )
+      },
       argument_order = as.character(names(sort(arguments)))
     )
   })

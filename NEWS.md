@@ -15,6 +15,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Step definitions
 
+- ⚠️ A step definition gets a Doc String as one string, with its lines joined by `"\n"`, like Cucumber does. Previously it got a character vector of lines. The Doc String's media type, like `json` for `"""json`, is in its `media_type` attribute. Set `options(cucumber.docstring_as_lines = TRUE)` to keep getting a character vector of lines.
 - ⚠️ Text in step descriptions is matched literally. Previously it was treated as a regular expression, so characters like `.`, `?`, `*`, `|` or `[` could change what a step matched.
 - ⚠️ A step that matches more than one step definition fails with an error listing every matching definition and where it is defined. Previously the first registered definition was silently used.
 - ⚠️ Invalid Cucumber Expressions, like an empty optional `()`, an unescaped `/` in `"I visit /about"` or an undefined parameter type like `{colour}`, are an error that points at the problem.

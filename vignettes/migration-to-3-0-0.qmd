@@ -95,7 +95,20 @@ Fonctionnalité: Panier
   given("a request", function(headers, body, context) { ... })
   ```
 
-- A Doc String can have a media type after `"""`, like `"""json`. The media type isn't passed to the step.
+- A step gets a Doc String as one string, with its lines joined by `"\n"`, instead of a character vector of lines. Its media type, written after `"""` like `"""json`, is in the `media_type` attribute:
+
+  ```r
+  given("a request", function(body, context) {
+    attr(body, "media_type") # "json"
+    jsonlite::fromJSON(body)
+  })
+  ```
+
+  To keep getting a character vector of lines, set the `cucumber.docstring_as_lines` option, e.g. in a `setup-*.R` file next to your feature files:
+
+  ```r
+  options(cucumber.docstring_as_lines = TRUE)
+  ```
 
 ## Other additions
 
@@ -159,9 +172,9 @@ These were ignored without a warning, so their steps never ran. Now they fail wi
 
 | Feature file | Before | Now |
 |---|---|---|
-| Doc String with an empty line and a line starting with `#` | both lines dropped: `"x <- 1"` | kept: `c("# comment", "", "x <- 1")` |
+| Doc String with an empty line and a line starting with `#` | both lines dropped: `"x <- 1"` | kept: `"# comment\n\nx <- 1"` |
 | Doc String with `\"\"\"` inside | `say \"\"\"` | `say """` |
-| Doc String whose `"""` is indented 4 spaces past its step | 2 extra spaces on each line: `c("  x", "    y")` | dedented relative to the `"""`: `c("x", "  y")` |
+| Doc String whose `"""` is indented 4 spaces past its step | 2 extra spaces on each line: `c("  x", "    y")` | dedented relative to the `"""`: `"x\n  y"` |
 | Table cell `a\nb` | `a\nb` (a backslash and `n`) | `a` and `b` separated by a newline |
 | Table cell `a\\b` | `a\\b` | `a\b` |
 | Table header `\| a \| \|` | columns `a`, `V2` and a deprecation warning | columns `a` and `""` |

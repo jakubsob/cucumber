@@ -21,7 +21,9 @@ official_pickles <- function(path) {
           list(
             text = step$text,
             type = step$type,
-            docstring = if (!is.null(docstring)) strsplit(docstring$content, "\n")[[1]],
+            docstring = if (!is.null(docstring)) {
+              structure(strsplit(docstring$content, "\n")[[1]], media_type = docstring$mediaType)
+            },
             table = if (!is.null(table)) {
               lapply(table$rows, \(row) vapply(row$cells, \(cell) cell$value, character(1)))
             }

@@ -66,6 +66,9 @@ function should be \verb{function(n, context)}. The \code{{int}} value will be p
 
 If a table or a docstring is defined for a step, it will be passed as an argument after placeholder parameters
 and before \code{context}. The function should be a \verb{function(n, table, context)}.
+A docstring is one string, with its media type (like \code{json} for \verb{"""json}) in the
+\code{media_type} attribute. Set the \code{cucumber.docstring_as_lines} option to \code{TRUE} to get it
+as a character vector of lines instead, see \link{opts}.
 See
 \href{https://github.com/jakubsob/cucumber/blob/main/inst/examples/table/tests/acceptance/setup-steps.R}{an example}
 on how to write implementation that uses tables or docstrings.}

@@ -1,5 +1,5 @@
 given("I have a docstring", function(docstring, context) {
-  context$docstring <- docstring
+  context$docstring <- strsplit(docstring, "\n")[[1]]
 })
 
 when("I remove line that contains {string}", function(line, context) {
@@ -16,5 +16,5 @@ when("I remove trailing empty lines", function(context) {
 })
 
 then("the docstring looks like this", function(docstring, context) {
-  expect_equal(context$docstring, docstring)
+  expect_equal(paste(context$docstring, collapse = "\n"), docstring)
 })

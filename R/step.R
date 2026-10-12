@@ -84,6 +84,9 @@ make_step <- function() {
 #'
 #' If a table or a docstring is defined for a step, it will be passed as an argument after placeholder parameters
 #' and before `context`. The function should be a `function(n, table, context)`.
+#' A docstring is one string, with its media type (like `json` for `"""json`) in the
+#' `media_type` attribute. Set the `cucumber.docstring_as_lines` option to `TRUE` to get it
+#' as a character vector of lines instead, see [opts].
 #' See
 #' \href{https://github.com/jakubsob/cucumber/blob/main/inst/examples/table/tests/acceptance/setup-steps.R}{an example}
 #' on how to write implementation that uses tables or docstrings.

@@ -159,9 +159,9 @@ then("the error message doesn't include {string}", function(text, context) {
 
 then("the error message includes", function(text, context) {
   messages <- extract_error_messages(context$result)
-  # text is a character vector of lines from a docstring; normalize whitespace
-  # so indentation differences between the feature file and the error message don't matter
-  needle <- paste(trimws(text), collapse = " ")
+  # Normalize whitespace so indentation differences between the feature file
+  # and the error message don't matter
+  needle <- paste(trimws(strsplit(text, "\n")[[1]]), collapse = " ")
   normalize <- function(s) paste(trimws(strsplit(s, "\n")[[1]]), collapse = " ")
   found <- any(vapply(messages, function(m) grepl(needle, normalize(m), fixed = TRUE), logical(1)))
   expect_true(
@@ -172,7 +172,7 @@ then("the error message includes", function(text, context) {
 
 then("the output includes", function(text, context) {
   # Compare line by line, ignoring indentation
-  needle <- paste(trimws(text), collapse = "\n")
+  needle <- paste(trimws(strsplit(text, "\n")[[1]]), collapse = "\n")
   output <- paste(trimws(context$output), collapse = "\n")
   expect_true(
     grepl(needle, output, fixed = TRUE),

@@ -1,6 +1,7 @@
 Feature: Doc Strings
   A Doc String is a block of text under a step, between ``` or """ delimiters.
-  The step definition gets it as a character vector of lines, after the step's parameters.
+  The step definition gets it as one string, after the step's parameters.
+  Its media type, like `json` in ```json, is in the string's `media_type` attribute.
 
   Background:
     Given a package
@@ -32,7 +33,7 @@ Feature: Doc Strings
     Then it passes
     And it has 1 passed
 
-  Scenario: A multi-line Doc String keeps every line
+  Scenario: A multi-line Doc String is one string with its lines joined by newlines
     Given a file named "features/docstring.feature" with
       """
       Feature: Docstrings
@@ -42,15 +43,15 @@ Feature: Doc Strings
             line one
             line two
             ```
-          Then the message has 2 lines
+          Then the message has both lines
       """
     And a file named "features/setup-steps.R" with
       """
       given("a message", function(message, context) {
         context$message <- message
       })
-      then("the message has {int} lines", function(n, context) {
-        expect_equal(length(context$message), n)
+      then("the message has both lines", function(context) {
+        expect_equal(context$message, "line one\nline two")
       })
       """
     When I run
@@ -114,10 +115,7 @@ Feature: Doc Strings
         context$message <- message
       })
       then("the message is the indented yaml", function(context) {
-        expect_equal(
-          context$message,
-          c("foo:", "- bar: bar_value", "  baz: baz_value")
-        )
+        expect_equal(context$message, "foo:\n- bar: bar_value\n  baz: baz_value")
       })
       """
     When I run
@@ -133,7 +131,7 @@ Feature: Doc Strings
       Feature: Doc Strings
         Scenario: A script
           Given a script
-            ```r
+            ```
             # Say hello
 
             print("hello")
@@ -146,12 +144,78 @@ Feature: Doc Strings
         context$script <- script
       })
       then("the script keeps every line", function(context) {
-        expect_equal(context$script, c("# Say hello", "", "print(\"hello\")"))
+        expect_equal(context$script, "# Say hello\n\nprint(\"hello\")")
       })
       """
     When I run
       """
       test("features")
+      """
+    Then it passes
+    And it has 1 passed
+
+  Scenario: A Doc String's media type is in its media_type attribute
+    Given a file named "features/docstring.feature" with
+      """
+      Feature: Doc Strings
+        Scenario: A request body
+          Given a body
+            ```json
+            {"id": 1}
+            ```
+          Then the body is JSON
+        Scenario: Text without a media type
+          Given a body
+            ```
+            Hello
+            ```
+          Then the body has no media type
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a body", function(body, context) {
+        context$body <- body
+      })
+      then("the body is JSON", function(context) {
+        expect_equal(attr(context$body, "media_type"), "json")
+        expect_equal(c(context$body), "{\"id\": 1}")
+      })
+      then("the body has no media type", function(context) {
+        expect_null(attr(context$body, "media_type"))
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And it has 2 passed
+
+  Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
+    Given a file named "features/docstring.feature" with
+      """
+      Feature: Doc Strings
+        Scenario: A script
+          Given a script
+            ```r
+            x <- 1
+            y <- 2
+            ```
+          Then the script is a vector of lines
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a script", function(script, context) {
+        context$script <- script
+      })
+      then("the script is a vector of lines", function(context) {
+        expect_equal(c(context$script), c("x <- 1", "y <- 2"))
+        expect_equal(attr(context$script, "media_type"), "r")
+      })
+      """
+    When I run
+      """
+      withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
       """
     Then it passes
     And it has 1 passed

@@ -15,6 +15,12 @@ The following options are available:
 Directory with \code{.feature} files that \code{\link[=test]{test()}} runs when called without \code{path}.
 
 default: \code{"tests/acceptance"}
+\item \code{cucumber.docstring_as_lines}
+
+If \code{TRUE}, step definitions get a Doc String as a character vector of lines,
+like in cucumber 2.x, instead of one string.
+
+default: \code{FALSE}
 \item \code{cucumber.reporter_max_docstring_lines}
 
 Max docstring lines \link{CucumberProgressReporter} prints per step before

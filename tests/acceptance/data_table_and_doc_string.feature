@@ -25,7 +25,7 @@ Feature: Data Table and Doc String
         context$body <- body
       })
       then("the request is ready", function(context) {
-        expect_equal(list(context$headers$value, context$body), list("json", "{\"id\": 1}"))
+        expect_equal(list(context$headers$value, c(context$body)), list("json", "{\"id\": 1}"))
       })
       """
     When I run
@@ -54,7 +54,7 @@ Feature: Data Table and Doc String
         context$body <- body
       })
       then("the request is ready", function(context) {
-        expect_equal(list(context$headers$value, context$body), list("json", "{\"id\": 1}"))
+        expect_equal(list(context$headers$value, c(context$body)), list("json", "{\"id\": 1}"))
       })
       """
     When I run
