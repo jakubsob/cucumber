@@ -49,6 +49,15 @@ Feature: Running scenarios by line
       | scenario           |
       | Adding big numbers |
 
+  Scenario: An absolute path can be given
+    When I run
+      """
+      test("features", features = fs::path_abs("features/addition.feature:6"))
+      """
+    Then only these scenarios ran:
+      | scenario           |
+      | Adding big numbers |
+
   Scenario: Several lines and several files can be given
     When I run
       """

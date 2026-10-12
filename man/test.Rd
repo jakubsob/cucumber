@@ -59,7 +59,7 @@ They are reported, but don't fail a dry run: a scenario with one is skipped.}
 \item{name}{If not NULL, only scenarios with names matching any of these regular expressions
 will be executed. For a Scenario Outline, the name is matched after its \verb{<placeholders>} are replaced.}
 
-\item{features}{If not NULL, only these feature files will be executed. Paths are relative to \code{path}.
+\item{features}{If not NULL, only these feature files will be executed. Relative paths are relative to \code{path}.
 Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}, or several
 lines, e.g. \code{"addition.feature:12:20"}. The line of a Scenario Outline runs all of its examples,
 the line of an example row runs only that example.}

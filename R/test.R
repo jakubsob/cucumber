@@ -24,7 +24,7 @@
 #'   Tags are written with their `@`. Escape a parenthesis in a tag with a backslash, e.g. `"@wip\\(x\\)"`.
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
 #'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
-#' @param features If not NULL, only these feature files will be executed. Paths are relative to `path`.
+#' @param features If not NULL, only these feature files will be executed. Relative paths are relative to `path`.
 #'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`, or several
 #'   lines, e.g. `"addition.feature:12:20"`. The line of a Scenario Outline runs all of its examples,
 #'   the line of an example row runs only that example.
@@ -117,7 +117,8 @@ feature_lines <- function(features, path) {
   if (is.null(features)) {
     return(list())
   }
-  files <- fs::path(path, sub("(:[0-9]+)*$", "", features))
+  files <- sub("(:[0-9]+)*$", "", features)
+  files <- ifelse(fs::is_absolute_path(files), files, fs::path(path, files))
   missing <- unique(files[!file_exists(files)])
   if (length(missing) > 0) {
     abort(
@@ -205,7 +206,7 @@ test_cucumber_code <- function(path, ...) {
 #'   Tags are written with their `@`. Escape a parenthesis in a tag with a backslash, e.g. `"@wip\\(x\\)"`.
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
 #'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
-#' @param features If not NULL, only these feature files will be executed. Paths are relative to `path`.
+#' @param features If not NULL, only these feature files will be executed. Relative paths are relative to `path`.
 #'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`, or several
 #'   lines, e.g. `"addition.feature:12:20"`. The line of a Scenario Outline runs all of its examples,
 #'   the line of an example row runs only that example.
