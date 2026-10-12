@@ -175,6 +175,37 @@ Feature: Running scenarios by tag
         | Running on 1 |
         | Running on 2 |
 
+    Scenario: A tag expression combines the tags of different Examples
+      Given a file named "features/outline.feature" with
+        """
+        Feature: Platforms
+          Scenario Outline: Running on <n>
+            Given I have <n>
+            Then I get <n>
+
+            @mobile @fast
+            Examples:
+              | n |
+              | 1 |
+
+            @desktop @fast
+            Examples:
+              | n |
+              | 2 |
+
+            @desktop @slow
+            Examples:
+              | n |
+              | 3 |
+        """
+      When I run
+        """
+        test("features", tags = "@desktop and @fast")
+        """
+      Then only these scenarios ran:
+        | scenario     |
+        | Running on 2 |
+
   Rule: A tag in an expression is everything up to whitespace or a parenthesis
 
     A backslash escapes a parenthesis, a whitespace or a backslash in a tag: `@wip\(x\)` matches the tag `@wip(x)`.
