@@ -113,3 +113,31 @@ Feature: Regular expressions
       test("features")
       """
     Then it passes
+
+  Scenario: A group with the regexp of two parameter types is an error unless one is preferred
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Colours
+          Given I have a red cucumber
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      define_parameter_type("colour", "red|green", as.character)
+      define_parameter_type("ripeness", "red|green", as.character)
+      given("^I have a (red|green) cucumber$", function(colour, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 failed
+    And the error message includes
+      """
+      Your Regular Expression ^I have a (red|green) cucumber$
+      matches multiple parameter types with regexp red|green:
+      {colour}
+      {ripeness}
+      """
+    And the error message includes "with `prefer_for_regexp_match = TRUE`."

@@ -205,3 +205,62 @@ Feature: Hooks
       """
     Then it has 1 failed
     And the output includes "after: failed can't close the database"
+
+  Scenario Outline: A failing <hook>() hook fails the scenario
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      <hook>(function(context, <argument>) stop("the hook failed"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 failed
+    And the error message includes "the hook failed"
+    And the output includes
+      """
+      1 scenario (1 failed)
+      <steps>
+      """
+
+    Examples:
+      | hook        | argument | steps              |
+      | before      | scenario | 1 step (1 skipped) |
+      | after       | scenario | 1 step (1 passed)  |
+      | before_step | step     | 1 step (1 failed)  |
+      | after_step  | step     | 1 step (1 failed)  |
+
+  Scenario Outline: <hook>() with the wrong number of arguments is an error
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      <hook>(function(context, scenario, step) {})
+      given("an empty basket", function(context) {})
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then it fails with "A `<hook>` hook must have <count> arguments."
+    And it fails with "Use `function(<arguments>)`."
+
+    Examples:
+      | hook        | count | arguments         |
+      | before      | 2     | context, scenario |
+      | after       | 2     | context, scenario |
+      | before_step | 2     | context, step     |
+      | after_step  | 2     | context, step     |
+      | before_all  | 0     |                   |
+      | after_all   | 0     |                   |

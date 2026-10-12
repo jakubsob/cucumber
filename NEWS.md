@@ -74,6 +74,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - 🐛 `pending()` in a hook makes the scenario pending, like a pending step: it fails the run, or skips the scenario with `strict = FALSE`. In a `before_step()` or `after_step()` hook it makes the step pending. Previously `pending()` in a `before()` hook skipped the scenario, even in strict mode, and `after()` hooks didn't run.
 - 🐛 `testthat::skip()` in a step or a `before()` hook skips the scenario like `skip_scenario()`. Previously `after()` hooks didn't run and the steps after it weren't reported. In other hooks it is an error, like `skip_scenario()`.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.
+- 🐛 `CucumberProgressReporter` prints a step's warnings under the step. Previously they were printed above it.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
 - 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored. An argument that isn't an argument of `test()` or `grepl()`, like a misspelled `fail_fst = TRUE`, is an error.
 

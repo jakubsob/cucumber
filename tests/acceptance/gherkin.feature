@@ -99,3 +99,97 @@ Feature: Gherkin
       """
     Then it has 1 errors
     And the error message includes "(1:1): Language not supported: xx"
+
+  Scenario: An empty feature file runs nothing
+    Given a file named "features/empty.feature" with
+      """
+
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it has 0 passed
+
+  Scenario: A scenario without steps passes
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Not written yet
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And it has 1 passed
+
+  Scenario: A tag with whitespace is a parse error
+    Given a file named "features/tagged.feature" with
+      """
+      @work in progress
+      Feature: Tagged
+        Scenario: A step
+          Given a step
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 errors
+    And the error message includes "(1:1): A tag may not contain whitespace"
+
+  Scenario: A feature file that ends too early is a parse error
+    Given a file named "features/tagged.feature" with
+      """
+      @wip
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 errors
+    And the error message includes "(2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment"
+
+  Scenario: Parsing stops after 10 errors
+    Given a file named "features/broken.feature" with
+      """
+      Feature: Broken
+        Scenario: Junk
+          Given a step
+          junk 1
+          junk 2
+          junk 3
+          junk 4
+          junk 5
+          junk 6
+          junk 7
+          junk 8
+          junk 9
+          junk 10
+          junk 11
+          junk 12
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 errors
+    And the error message includes "got 'junk 11'"
+    And the error message doesn't include "got 'junk 12'"

@@ -109,6 +109,13 @@ Feature: Running scenarios by tag
         | Smoke and fast |
         | UI and fast    |
 
+    Scenario: An empty tag expression runs every scenario
+      When I run
+        """
+        test("features", tags = "")
+        """
+      Then it has 5 passed
+
   Rule: Scenarios inherit tags
 
     Scenario: A Feature's tags apply to all its scenarios
@@ -242,3 +249,19 @@ Feature: Running scenarios by tag
         | missing operand    | @a and         | Expected operand.    |
         | unmatched (        | ( @a and @b    | Unmatched (.         |
         | unmatched )        | @a )           | Unmatched ).         |
+
+    Scenario: A backslash before anything but a parenthesis, a backslash or whitespace is an error
+      Given a file named "features/tagged.feature" with
+        """
+        Feature: Tagged
+          @smoke
+          Scenario: Smoke
+            Given I have 1
+            Then I get 1
+        """
+      When I run
+        """
+        test("features", tags = "@a\\b", stop_on_failure = FALSE)
+        """
+      Then it has 1 errors
+      And the error message includes "could not be parsed because of syntax error: Illegal escape before \"b\"."

@@ -134,6 +134,8 @@ cucumber::test(
 
 \item{\code{current_hooks}}{Results of the current scenario's hooks that failed or are pending}
 
+\item{\code{step_warnings}}{Warnings of the step currently executing, printed when it ends}
+
 \item{\code{failures}}{Recorded failures for the end-of-run summary}
 
 \item{\code{num_colors}}{Terminal color support captured at construction}

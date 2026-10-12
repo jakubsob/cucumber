@@ -162,3 +162,40 @@ Feature: Cucumber Expressions
       If you did not mean to use an alternative you can use '\/' to escape the '/'
       In an R string, double each backslash: "\\/".
       """
+
+  Scenario Outline: An invalid expression is an error, <case>
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[<expression>]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it has 1 failed
+    And the error message includes "This Cucumber Expression has a problem at column <column>:"
+    And the error message includes
+      """
+      <problem>
+      """
+
+    Examples:
+      | case                            | expression           | column | problem                                                                            |
+      | empty optional                  | I have ()            | 8      | An optional must contain some text.                                                |
+      | parameter in an optional        | I have ({int})       | 9      | An optional may not contain a parameter type.                                      |
+      | optional in an optional         | I have ((very) big)  | 9      | An optional may not contain an other optional.                                     |
+      | alternative of only optionals   | I have (big)/(small) | 8      | An alternative may not exclusively contain optionals.                              |
+      | alternation in an optional      | I have (big/small)   | 12     | An alternation can not be used inside an optional.                                 |
+      | undefined parameter type        | I have {colour}      | 8      | Undefined parameter type 'colour'.                                                 |
+      | unmatched (                     | I have (big          | 8      | The '(' does not have a matching ')'.                                              |
+      | unmatched {                     | I have {int          | 8      | The '{' does not have a matching '}'.                                              |
+      | parameter name with parenthesis | I have {i(n)t}       | 10     | Parameter names may not contain '{', '}', '(', ')', '\\' or '/'.                   |
+      | escape of a letter              | I have \a            | 9      | Only the characters '{', '}', '(', ')', '\\', '/' and whitespace can be escaped.  |
+      | escaped end of line             | I have \\            | 8      | The end of line can not be escaped.                                                |

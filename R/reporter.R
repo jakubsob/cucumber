@@ -139,6 +139,13 @@ print_error <- function(message, status = "failed") {
   }
 }
 
+print_warning <- function(message) {
+  cat("    ", cli::col_yellow(cli::style_italic("Warning: ")), "\n", sep = "")
+  for (line in strsplit(message, "\n")[[1]]) {
+    cat("      ", cli::col_yellow(line), "\n", sep = "")
+  }
+}
+
 STEP_STATUSES <- c("failed", "ambiguous", "undefined", "pending", "skipped", "passed")
 
 status_color <- function(status) {
@@ -317,6 +324,9 @@ CucumberProgressReporter <- R6::R6Class(
     #' @field current_hooks Results of the current scenario's hooks that failed or are pending
     current_hooks = NULL,
 
+    #' @field step_warnings Warnings of the step currently executing, printed when it ends
+    step_warnings = NULL,
+
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
 
@@ -451,18 +461,12 @@ CucumberProgressReporter <- R6::R6Class(
         self$scenario_failed <- TRUE
       }
 
-      # Display warnings
+      # A step's warnings are printed by end_step, under the step
       if (inherits(result, "expectation_warning")) {
-        warning_msg <- conditionMessage(result)
-        warning_lines <- strsplit(warning_msg, "\n")[[1]]
-        cat(
-          "    ",
-          cli::col_yellow(cli::style_italic("Warning: ")),
-          "\n",
-          sep = ""
-        )
-        for (line in warning_lines) {
-          cat("      ", cli::col_yellow(line), "\n", sep = "")
+        if (is.null(self$step_warnings)) {
+          print_warning(conditionMessage(result))
+        } else {
+          self$step_warnings <- c(self$step_warnings, conditionMessage(result))
         }
       }
 
@@ -495,6 +499,7 @@ CucumberProgressReporter <- R6::R6Class(
     #' @param step Pickle step object
     start_step = function(step) {
       super$start_step(step)
+      self$step_warnings <- character()
       invisible(self)
     },
 
@@ -526,6 +531,11 @@ CucumberProgressReporter <- R6::R6Class(
       )
 
       self$print_step_args(step)
+
+      for (warning in self$step_warnings) {
+        print_warning(warning)
+      }
+      self$step_warnings <- NULL
 
       # If the step didn't pass, show why
       if (!is.null(step$error)) {

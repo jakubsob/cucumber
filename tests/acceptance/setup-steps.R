@@ -149,6 +149,14 @@ then("the error message includes {string}", function(text, context) {
   )
 })
 
+then("the error message doesn't include {string}", function(text, context) {
+  messages <- extract_error_messages(context$result)
+  expect_false(
+    any(vapply(messages, function(m) grepl(text, m, fixed = TRUE), logical(1))),
+    info = paste("Messages found:\n", paste(messages, collapse = "\n---\n"))
+  )
+})
+
 then("the error message includes", function(text, context) {
   messages <- extract_error_messages(context$result)
   # text is a character vector of lines from a docstring; normalize whitespace
