@@ -24,9 +24,10 @@ run_code <- function(code, context, catch_error = FALSE) {
       .cucumber_steps_option = .cucumber_steps_option,
       .cucumber_hooks_option = .cucumber_hooks_option,
       .cucumber_parameters_option = .cucumber_parameters_option,
-      # Isolate the reporter: nested runs demonstrate failures on purpose, so
-      # their step results must not accumulate into the outer run's summary.
-      .cucumber_reporter = cucumber::CucumberProgressReporter$new()
+      # Unset the outer run's reporter: nested runs demonstrate failures on purpose,
+      # so their step results must not accumulate into the outer run's summary.
+      # Unset, each nested test() gets a reporter of its own, as in a fresh session.
+      .cucumber_reporter = NULL
     ),
     {
       cucumber:::set_default_parameters()
