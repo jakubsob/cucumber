@@ -101,7 +101,7 @@ Feature: Skipped steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes "`skip_scenario()` can only be called in a `before()` hook or a step."
 
   Rule: testthat::skip() also skips the scenario

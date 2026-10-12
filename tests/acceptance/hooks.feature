@@ -86,7 +86,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes "Hook \"Connect to the database\" failed: connection refused"
 
   Scenario: A failing before hook skips the steps and fails the scenario
@@ -109,7 +109,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
     And the error message includes "no database"
     And the output includes
       """
@@ -139,7 +139,8 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then it has 1 failed
+    And the output includes "can't close the database" once
     And the output includes
       """
       1 scenario (1 failed)

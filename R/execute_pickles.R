@@ -160,9 +160,10 @@ execute_single_pickle <- function(
     )
     hook_errors <- Filter(\(error) !inherits(error, "cucumber_pending"), hook_errors)
     failed <<- length(hook_errors) > 0 || (!dry_run && scenario_failed(c(pending_hooks, steps), strict))
-    # Recorded as errors without stopping, so failed steps are reported too
+    # Recorded as failures without stopping, so failed steps are reported too.
+    # An "error" expectation would be recorded twice by testthat.
     for (error in hook_errors) {
-      testthat::exp_signal(testthat::expectation("error", conditionMessage(error)))
+      testthat::fail(conditionMessage(error))
     }
     signal_scenario_result(c(pending_hooks, steps), strict, dry_run)
     # testthat reports a test without expectations as skipped
