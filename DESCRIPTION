@@ -26,7 +26,6 @@ Imports:
     tibble,
     withr
 Suggests:
-    mockery,
     box,
     shinytest2,
     chromote,
