@@ -346,7 +346,7 @@ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipp
 
 Undefined and ambiguous steps don't stop the run. They fail their scenario, and the other scenarios and feature files still run, so every missing step's snippet is shown.
 
-`test()` and `run()` find feature files in subdirectories of `path` too, like Cucumber's default `features/**/*.feature`.
+`test()` and `run()` search `path` recursively for feature files.
 
 `test()` and `run()` get new arguments:
 

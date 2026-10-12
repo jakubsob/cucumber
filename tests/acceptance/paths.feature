@@ -1,6 +1,5 @@
 Feature: Choosing feature files
-  `test(path)` runs every `.feature` file in `path` and its subdirectories,
-  like Cucumber's default `features/**/*.feature`.
+  `test(path)` runs every `.feature` file in `path`, searched recursively.
   Run only some of them by listing them in `features`, or with a `filter` on their file names.
 
   Background:
