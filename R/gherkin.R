@@ -479,6 +479,7 @@ abort_gherkin <- function(p) {
     paste("Can't parse", p$uri %||% "feature"),
     body = set_names(p$errors, rep("x", length(p$errors))),
     class = "cucumber_parse_error",
+    uri = p$uri,
     errors = p$errors,
     trace = empty_trace(),
     call = NULL

@@ -74,6 +74,8 @@ run <- function(
     )
   }
 
+  documents <- parse_features(features)
+
   # A dry run runs no hooks
   hooks <- if (dry_run) .hooks() else get_hooks()
   on.exit({
@@ -88,7 +90,7 @@ run <- function(
   failed <- FALSE
   for (feature_path in features) {
     failed <- execute(
-      read_feature(feature_path),
+      documents[[feature_path]],
       feature_file = feature_path,
       tags = tags,
       name = name,
@@ -139,6 +141,31 @@ feature_lines <- function(features, path) {
 
 read_feature <- function(path) {
   readLines(path, warn = FALSE, encoding = "UTF-8")
+}
+
+# Like cucumber-js, nothing runs if any feature file can't be parsed,
+# and the errors of every file are reported
+#' @importFrom rlang try_fetch abort
+#' @importFrom purrr map set_names
+parse_features <- function(paths) {
+  documents <- map(paths, \(path) {
+    try_fetch(
+      parse_gherkin(read_feature(path), uri = path),
+      cucumber_parse_error = identity
+    )
+  })
+  errors <- Filter(\(document) inherits(document, "cucumber_parse_error"), documents)
+  if (length(errors) > 0) {
+    messages <- unlist(map(errors, \(error) sprintf('Parse error in "%s" %s', error$uri, error$errors)))
+    abort(
+      "Can't parse feature files",
+      body = set_names(messages, rep("x", length(messages))),
+      class = "cucumber_parse_error",
+      trace = empty_trace(),
+      call = NULL
+    )
+  }
+  set_names(documents, paths)
 }
 
 #' @importFrom fs path_ext_remove path_file

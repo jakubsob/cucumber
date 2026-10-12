@@ -29,7 +29,7 @@ describe("CucumberProgressReporter", {
     # recorded under this test and not under the scenario's nested test
     .expect_snapshot({
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     })
   })
@@ -61,7 +61,7 @@ describe("CucumberProgressReporter", {
     # The scenario fails on purpose, keep its failure out of this test's results
     .expect_snapshot({
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     })
   })
@@ -91,7 +91,7 @@ describe("CucumberProgressReporter", {
     # recorded under this test and not under the scenario's nested test
     .expect_snapshot({
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     })
   })
@@ -121,7 +121,7 @@ describe("CucumberProgressReporter", {
     # recorded under this test and not under the scenario's nested test
     .expect_snapshot({
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     })
   })

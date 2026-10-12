@@ -301,9 +301,9 @@
     Output
         Error: 
           <cucumber_parse_error/rlang_error/error/condition>
-          Error: Can't parse broken.feature
-          x (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Scenario: Missing Feature keyword'
-          x (2:3): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Given something happens'
+          Error: Can't parse feature files
+          x Parse error in "broken.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Scenario: Missing Feature keyword'
+          x Parse error in "broken.feature" (2:3): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Given something happens'
       
       --------------------------------------------------------------------------------
       Summary

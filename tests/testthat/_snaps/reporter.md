@@ -2,7 +2,7 @@
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     Output
       
@@ -17,7 +17,7 @@
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     Output
       
@@ -37,7 +37,7 @@
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     Output
       
@@ -57,7 +57,7 @@
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(feature, reporter = reporter)
+        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
       })
     Output
       

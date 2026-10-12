@@ -3,7 +3,7 @@
 #' @importFrom testthat context_start_file
 #' @importFrom glue glue
 execute <- function(
-  feature,
+  document,
   steps = get_steps(),
   parameters = get_parameters(),
   hooks = get_hooks(),
@@ -21,15 +21,12 @@ execute <- function(
   checkmate::assert_list(parameters, min.len = 1)
   checkmate::assert_list(hooks)
 
-  # Phase 1: Parse
-  document <- parse_gherkin(feature, uri = feature_file)
-
   # An empty document has nothing to run
   if (is.null(document$feature)) {
     return(invisible(failed))
   }
 
-  # Phase 2: Create pickles
+  # Phase 1: Create pickles
   pickles <- create_pickles(document, feature_file = feature_file)
 
   # Filter by tags, name and line
@@ -47,10 +44,10 @@ execute <- function(
   # Set feature context for testthat
   context_start_file(feature_name)
 
-  # Phase 3: Match steps
+  # Phase 2: Match steps
   pickles <- match_steps(pickles, steps, parameters)
 
-  # Phase 4: Execute
+  # Phase 3: Execute
   execute_pickles(
     pickles,
     hooks,
