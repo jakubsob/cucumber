@@ -108,9 +108,9 @@ execute_single_pickle <- function(
         can_skip = TRUE
       )
     }
-    # A before hook calling skip_scenario() skips the scenario
+    # A before hook calling skip_scenario() or testthat::skip() skips the scenario
     skip <- NULL
-    if (inherits(before_error, "cucumber_skip_scenario")) {
+    if (inherits(before_error, "skip")) {
       skip <- before_error
       before_error <- NULL
     }

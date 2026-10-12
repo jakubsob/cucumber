@@ -210,8 +210,8 @@ get_hooks_to_run <- function(hooks, name, tags = character()) {
 
 #' Run hooks and return the first error, or NULL. Before hooks stop at the
 #' first error, after hooks all run. With `can_skip`, a hook calling
-#' skip_scenario() stops the hooks and its condition is returned. Otherwise
-#' skip_scenario() is an error.
+#' skip_scenario() or testthat::skip() stops the hooks and its condition is
+#' returned. Otherwise skipping is an error.
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
@@ -223,12 +223,6 @@ run_hooks <- function(fns, ..., stop_on_error = TRUE, can_skip = FALSE) {
         fn(...)
         NULL
       },
-      cucumber_skip_scenario = function(cnd) {
-        if (can_skip) {
-          return(cnd)
-        }
-        error_cnd(message = "`skip_scenario()` can only be called in a `before()` hook or a step.")
-      },
       cucumber_pending = function(cnd) {
         error_cnd(
           class = "cucumber_pending",
@@ -236,9 +230,18 @@ run_hooks <- function(fns, ..., stop_on_error = TRUE, can_skip = FALSE) {
           trace = empty_trace()
         )
       },
+      # skip_scenario() or testthat::skip(). After cucumber_pending, as
+      # pending() is a skip too
+      skip = function(cnd) {
+        if (can_skip) {
+          return(cnd)
+        }
+        fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
+        error_cnd(message = glue("`{fn}` can only be called in a `before()` hook or a step."))
+      },
       error = identity
     )
-    if (inherits(error, "cucumber_skip_scenario")) {
+    if (inherits(error, "skip")) {
       return(error)
     }
     first_error <- first_error %||% error
