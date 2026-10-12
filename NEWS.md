@@ -66,13 +66,11 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 - ⚠️ Snippets for undefined steps are generated like cucumber-js: parameters in the order they appear in the step, one suggestion per matching parameter type, custom parameter types used, `data_table` and `doc_string` arguments, and repeated parameter names `string`, `string2`.
 - 🐛 Snippets escape `(`, `{` and `/`, so the snippet matches the step it was generated for.
-- 🐛 The snippet for a step starting with `And`, `But` or `*` uses `given()`, `when()` or `then()` from its type. Previously it suggested `step()`, which doesn't exist.
+- 🐛 The snippet for an undefined first step written with `*` uses `given()`. Previously it suggested `step()`, which doesn't exist.
 
 ## Bug fixes
 
 - 🐛 A scenario whose steps pass without calling any `expect_*()` function is reported as passed. Previously testthat reported it as skipped ("empty test"), e.g. in `JunitReporter` output.
-- 🐛 `pending()` in a hook makes the scenario pending, like a pending step: it fails the run, or skips the scenario with `strict = FALSE`. In a `before_step()` or `after_step()` hook it makes the step pending. Previously `pending()` in a `before()` hook skipped the scenario, even in strict mode, and `after()` hooks didn't run.
-- 🐛 `testthat::skip()` in a step or a `before()` hook skips the scenario like `skip_scenario()`. Previously `after()` hooks didn't run and the steps after it weren't reported. In other hooks it is an error, like `skip_scenario()`.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.
 - 🐛 `CucumberProgressReporter` prints a step's warnings under the step. Previously they were printed above it.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
