@@ -12,6 +12,7 @@ full compatibility with testthat reporters.
 CucumberReporter extends testthat's Reporter class to add:
 - Feature-level hooks: `start_feature()`, `end_feature()`
 - Step-level hooks: `start_step()`, `end_step()`
+- Every [Cucumber Message](https://github.com/cucumber/messages) of the run: `add_message()`
 
 These additional hooks are called during cucumber test execution to provide
 visibility into individual step execution. Standard testthat reporters will
@@ -26,7 +27,10 @@ continue to work unchanged, reporting only at the scenario (test) level.
   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
+  \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
 }
+
+Combine reporters with [CucumberMultiReporter].
 }
 
 \keyword{internal}
@@ -51,6 +55,7 @@ continue to work unchanged, reporting only at the scenario (test) level.
 \item \href{#method-CucumberReporter-end_step}{\code{CucumberReporter$end_step()}}
 \item \href{#method-CucumberReporter-end_hook}{\code{CucumberReporter$end_hook()}}
 \item \href{#method-CucumberReporter-end_scenario}{\code{CucumberReporter$end_scenario()}}
+\item \href{#method-CucumberReporter-add_message}{\code{CucumberReporter$add_message()}}
 \item \href{#method-CucumberReporter-clone}{\code{CucumberReporter$clone()}}
 }
 }
@@ -171,6 +176,24 @@ Called after a scenario's steps and hooks, with the worst of their statuses
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{status}}{The scenario's status}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberReporter-add_message"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-add_message}{}}}
+\subsection{Method \code{add_message()}}{
+Called with each Cucumber Message of the run
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$add_message(envelope)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{envelope}}{A list with one element, named by the message's type,
+like `list(testCaseStarted = list(...))`}
 }
 \if{html}{\out{</div>}}
 }

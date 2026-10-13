@@ -77,13 +77,14 @@ match_single_step <- function(
 
   # No matching step found
   if (sum(step_mask) == 0) {
-    snippet <- format_step_snippet(
+    definitions <- snippet_definitions(
       SNIPPET_KEYWORDS[[step$type]],
       description,
       parameters,
       unname(STEP_ARGUMENT_NAMES[step$argument_order])
     )
-    snippet_lines <- strsplit(snippet, "\n")[[1]]
+    step$snippets <- paste0(definitions, "\n", SNIPPET_BODY)
+    snippet_lines <- strsplit(format_step_snippet(definitions), "\n")[[1]]
     return(unmatched_step(
       step,
       "undefined",
@@ -94,6 +95,10 @@ match_single_step <- function(
       )
     ))
   }
+
+  # The definitions that match, for the step's test step message
+  step$definition_ids <- unlist(lapply(unname(steps[step_mask]), attr, "id"))
+  step$match_arguments <- lapply(unname(patterns[step_mask]), \(pattern) step_match_arguments(description, pattern))
 
   # Ambiguous step
   if (sum(step_mask) > 1) {
@@ -229,14 +234,28 @@ SNIPPET_KEYWORDS <- c(Context = "Given", Action = "When", Outcome = "Then", Unkn
 #' first one as code and the others commented out. Parameters are named after
 #' their type, numbered when a type is used more than once: `int`, `int2`.
 #'
+#' @param definitions The step definitions of the snippet, from
+#'   `snippet_definitions()`
+#' @keywords internal
+#' @noRd
+format_step_snippet <- function(definitions) {
+  definitions[-1] <- paste("#", definitions[-1])
+  paste(c(definitions, SNIPPET_BODY), collapse = "\n")
+}
+
+SNIPPET_BODY <- "  pending()\n})"
+
+#' The first line of a step definition for each expression that matches the
+#' step, its call up to the opening brace of the function body
+#'
 #' @param argument_names Names of the step's data table and doc string
 #'   arguments, in the order they are written.
 #' @keywords internal
 #' @noRd
 #' @importFrom glue glue
-format_step_snippet <- function(keyword, description, parameters, argument_names = character()) {
+snippet_definitions <- function(keyword, description, parameters, argument_names = character()) {
   fn <- tolower(keyword)
-  definitions <- vapply(
+  vapply(
     generate_expressions(description, parameters),
     \(generated) {
       types <- vapply(generated$parameters, \(p) p$name, character(1))
@@ -247,6 +266,4 @@ format_step_snippet <- function(keyword, description, parameters, argument_names
     },
     character(1)
   )
-  definitions[-1] <- paste("#", definitions[-1])
-  paste(c(definitions, "  pending()", "})"), collapse = "\n")
 }

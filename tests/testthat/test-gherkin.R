@@ -1,69 +1,43 @@
 # The good and bad files of the official Gherkin test data
-# (https://github.com/cucumber/gherkin/tree/main/testdata), with the pickles
-# and errors the official parser gives.
+# (https://github.com/cucumber/gherkin/tree/main/testdata), with the source,
+# document, pickles and errors the official parser gives.
 skip_if_not_installed("jsonlite")
 
 read_ndjson <- function(path) {
-  lapply(readLines(path, warn = FALSE), jsonlite::fromJSON, simplifyVector = FALSE)
+  lapply(readLines(path, warn = FALSE, encoding = "UTF-8"), jsonlite::fromJSON, simplifyVector = FALSE)
 }
 
-official_pickles <- function(path) {
-  read_ndjson(path) |>
-    lapply(\(message) {
-      pickle <- message$pickle
-      list(
-        name = pickle$name,
-        line = pickle$location$line,
-        tags = vapply(pickle$tags, \(tag) sub("^@", "", tag$name), character(1)),
-        steps = lapply(pickle$steps, \(step) {
-          docstring <- step$argument$docString
-          table <- step$argument$dataTable
-          list(
-            text = step$text,
-            type = step$type,
-            docstring = if (!is.null(docstring)) {
-              structure(strsplit(docstring$content, "\n")[[1]], media_type = docstring$mediaType)
-            },
-            table = if (!is.null(table)) {
-              lapply(table$rows, \(row) vapply(row$cells, \(cell) cell$value, character(1)))
-            }
-          )
-        })
-      )
-    })
+#' A message as it reads from NDJSON, with its fields in alphabetical order
+#' and without the uri, which is relative to another directory in the test data
+normalize <- function(x) {
+  if (!is.list(x)) {
+    return(x)
+  }
+  if (!is.null(names(x))) {
+    x <- x[setdiff(sort(names(x)), "uri")]
+  }
+  lapply(x, normalize)
 }
 
-compiled_pickles <- function(path) {
-  read_feature(path) |>
-    parse_gherkin(uri = path) |>
-    create_pickles() |>
-    lapply(\(pickle) {
-      list(
-        name = pickle$name,
-        line = pickle$source_line,
-        tags = pickle$tags,
-        steps = lapply(pickle$steps, \(step) {
-          table <- step$data_table
-          list(
-            text = step$text,
-            type = step$type,
-            docstring = step$docstring,
-            table = if (!is.null(table)) {
-              c(list(names(table)), lapply(seq_len(nrow(table)), \(i) unname(unlist(table[i, ]))))
-            }
-          )
-        })
-      )
-    })
+as_read <- function(message) {
+  normalize(jsonlite::fromJSON(envelope_json(message), simplifyVector = FALSE))
 }
 
 describe("parse_gherkin", {
   for (path in fs::dir_ls(test_path("gherkin", "good"), glob = "*.feature")) {
-    it(paste("gives the official pickles for", fs::path_file(path)), {
-      expect_equal(
-        compiled_pickles(path),
-        official_pickles(paste0(path, ".pickles.ndjson"))
-      )
+    expected <- function(kind) normalize(read_ndjson(paste0(path, ".", kind, ".ndjson")))
+
+    it(paste("gives the official source for", fs::path_file(path)), {
+      expect_equal(as_read(list(source = source_message(path))), expected("source")[[1]])
+    })
+
+    it(paste("gives the official document and pickles for", fs::path_file(path)), {
+      reset_ids()
+      document <- parse_gherkin(read_feature(path), uri = path)
+      pickles <- create_pickles(document)
+
+      expect_equal(as_read(list(gherkinDocument = document)), expected("ast")[[1]])
+      expect_equal(lapply(pickles, \(pickle) as_read(list(pickle = pickle$message))), expected("pickles"))
     })
   }
 

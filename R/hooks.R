@@ -17,7 +17,7 @@ make_hook <- function(kind, arguments) {
     assert_string(name, null.ok = TRUE)
     # Fail at registration on an invalid tag expression
     evaluate_tag_expression(tags, character())
-    register_hook(name_hook(hook, name), kind, tags)
+    register_hook(name_hook(hook, name), kind, tags, hook_name = name, srcref = attr(hook, "srcref"))
     invisible(hook)
   }
 }
@@ -29,7 +29,9 @@ make_hook <- function(kind, arguments) {
 #' the `before` hooks and all the scenario's steps are skipped. In a step, that
 #' step and the steps after it are skipped. The scenario is reported as skipped.
 #' `after` hooks still run and get `"skipped"` as the scenario's `status`.
-#' [testthat::skip()] in a step does the same.
+#' In an [after()] hook, only that hook is skipped, and the scenario is reported
+#' as skipped if it didn't fail.
+#' [testthat::skip()] does the same.
 #'
 #' Calling it in any other hook is an error. Outside of a Cucumber run
 #' `skip_scenario()` skips the test like [testthat::skip()].
@@ -105,6 +107,8 @@ name_hook <- function(hook, name) {
 #'
 #' After hooks run after the last step of each scenario, even when the scenario failed or thrown an error.
 #' A failing `after` hook fails the scenario.
+#' If an `after` hook calls [skip_scenario()], that hook is skipped, the next `after` hooks still run,
+#' and the scenario is skipped if it didn't fail.
 #'
 #' @section Step hooks:
 #'
@@ -186,12 +190,17 @@ after_all <- function(hook, name = NULL) {
 }
 
 #' @importFrom rlang `:=` list2
-register_hook <- function(hook, name, tags = NULL) {
+register_hook <- function(hook, name, tags = NULL, hook_name = NULL, srcref = NULL) {
   hooks <- get_hooks()
-  hooks <- structure(
-    c(hooks, list(list(name = name, fn = hook, tags = tags))),
-    class = "hooks"
+  hook <- list(
+    name = name,
+    fn = hook,
+    tags = tags,
+    hook_name = hook_name,
+    srcref = srcref,
+    order = next_registration()
   )
+  hooks <- structure(c(hooks, list(hook)), class = "hooks")
   options(list2(!!getOption(".cucumber_hooks_option") := hooks))
   invisible(hooks)
 }
@@ -200,12 +209,10 @@ register_hook <- function(hook, name, tags = NULL) {
 #' they run: after hooks in the reverse order of definition
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr keep map
+#' @importFrom purrr keep
 get_hooks_to_run <- function(hooks, name, tags = character()) {
-  fns <- hooks |>
-    keep(\(hook) hook$name == name && evaluate_tag_expression(hook$tags, tags)) |>
-    map("fn")
-  if (startsWith(name, "after")) rev(fns) else fns
+  hooks <- keep(hooks, \(hook) hook$name == name && evaluate_tag_expression(hook$tags, tags))
+  if (startsWith(name, "after")) rev(hooks) else hooks
 }
 
 #' Run hooks and return the first error, or NULL. Before hooks stop at the
@@ -215,12 +222,12 @@ get_hooks_to_run <- function(hooks, name, tags = character()) {
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
-run_hooks <- function(fns, ..., stop_on_error = TRUE, can_skip = FALSE) {
+run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE) {
   first_error <- NULL
-  for (fn in fns) {
+  for (hook in hooks) {
     error <- tryCatch(
       {
-        fn(...)
+        hook$fn(...)
         NULL
       },
       cucumber_pending = function(cnd) {
@@ -237,7 +244,7 @@ run_hooks <- function(fns, ..., stop_on_error = TRUE, can_skip = FALSE) {
           return(cnd)
         }
         fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
-        error_cnd(message = glue("`{fn}` can only be called in a `before()` hook or a step."))
+        error_cnd(message = glue("`{fn}` can only be called in a `before()` or `after()` hook or a step."))
       },
       error = identity
     )

@@ -99,6 +99,7 @@ define_parameter_type <- function(
     prefer_for_regexp_match
   )
   check_parameter_type(parameter, parameters)
+  parameter$order <- next_registration()
   parameters[[name]] <- parameter
   set_parameters(parameters)
   invisible(parameter)
@@ -178,4 +179,10 @@ set_default_parameters <- function() {
       gsub("\\'", "'", value, fixed = TRUE)
     }
   )
+  # Built-in parameter types aren't reported in Cucumber Messages
+  parameters <- get_parameters()
+  for (name in names(parameters)) {
+    parameters[[name]]$builtin <- TRUE
+  }
+  set_parameters(parameters)
 }

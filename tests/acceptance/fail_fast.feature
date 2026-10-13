@@ -56,6 +56,19 @@ Feature: Fail fast
       """
     Then the scenario "After the failure" is skipped with "Reason: A previous scenario failed and `fail_fast = TRUE`."
 
+  Scenario: A scenario without steps after a failed scenario is skipped too
+    Given a file named "features/b.feature" with
+      """
+      Feature: B
+        Scenario: Not written yet
+      """
+    When I run
+      """
+      test("features", fail_fast = TRUE, stop_on_failure = FALSE)
+      """
+    Then the scenario "Not written yet" is skipped with "Reason: A previous scenario failed and `fail_fast = TRUE`."
+    And the output doesn't include "before Not written yet"
+
   Scenario: Without fail fast every scenario runs
     When I run
       """

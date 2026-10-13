@@ -15,7 +15,7 @@
 #' @keywords internal
 #' @noRd
 expression_to_pattern <- function(x, parameters = get_parameters()) {
-  if (startsWith(x, "^") || endsWith(x, "$") || grepl("^/.*/$", x)) {
+  if (is_regular_expression(x)) {
     pattern <- if (grepl("^/.*/$", x)) substr(x, 2, nchar(x) - 1) else x
     check_regex(pattern)
     groups <- regex_groups(pattern)
@@ -29,6 +29,10 @@ expression_to_pattern <- function(x, parameters = get_parameters()) {
     groups <- regex_groups(pattern)
   }
   structure(c(pattern), parameters = types, groups = groups$parent)
+}
+
+is_regular_expression <- function(x) {
+  startsWith(x, "^") || endsWith(x, "$") || grepl("^/.*/$", x)
 }
 
 #' Fail on an invalid regular expression before any step is matched with it
@@ -126,7 +130,10 @@ parameter_for_regexp <- function(source, pattern, parameters) {
   }
   if (length(preferred)) return(preferred[[1]])
   if (length(candidates)) return(candidates[[1]])
-  .parameter(source, source, \(x, ...) x)
+  # Like cucumber-js, a group of no parameter type gets an unnamed one, as `{}`
+  # does, so its step match argument in Cucumber Messages has no
+  # parameterTypeName
+  .parameter("", source, \(x, ...) x)
 }
 
 #' Raise a Cucumber Expression error pointing at the problem

@@ -180,6 +180,7 @@ cucumber::test(
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_file"><a href='../../testthat/html/Reporter.html#method-Reporter-start_file'><code>testthat::Reporter$start_file()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_reporter"><a href='../../testthat/html/Reporter.html#method-Reporter-start_reporter'><code>testthat::Reporter$start_reporter()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_message"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_message'><code>cucumber::CucumberReporter$add_message()</code></a></span></li>
 </ul>
 </details>
 }}

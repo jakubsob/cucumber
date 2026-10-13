@@ -9,6 +9,7 @@
 #' CucumberReporter extends testthat's Reporter class to add:
 #' - Feature-level hooks: `start_feature()`, `end_feature()`
 #' - Step-level hooks: `start_step()`, `end_step()`
+#' - Every [Cucumber Message](https://github.com/cucumber/messages) of the run: `add_message()`
 #'
 #' These additional hooks are called during cucumber test execution to provide
 #' visibility into individual step execution. Standard testthat reporters will
@@ -22,7 +23,10 @@
 #'   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
 #'   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
 #'   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
+#'   \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
 #' }
+#'
+#' Combine reporters with [CucumberMultiReporter].
 #'
 #' @importFrom R6 R6Class
 #' @importFrom rlang %||%
@@ -80,6 +84,191 @@ CucumberReporter <- R6::R6Class(
     #' Called after a scenario's steps and hooks, with the worst of their statuses
     #' @param status The scenario's status
     end_scenario = function(status) {
+      invisible(self)
+    },
+
+    #' @description
+    #' Called with each Cucumber Message of the run
+    #' @param envelope A list with one element, named by the message's type,
+    #'   like `list(testCaseStarted = list(...))`
+    add_message = function(envelope) {
+      invisible(self)
+    }
+  )
+)
+
+#' Call a cucumber event on a reporter. Reporters that aren't a
+#' CucumberReporter don't get cucumber events.
+#' @keywords internal
+#' @noRd
+cucumber_event <- function(reporter, method, ...) {
+  if (inherits(reporter, "CucumberReporter")) {
+    reporter[[method]](...)
+  }
+  invisible()
+}
+
+#' Combine reporters
+#'
+#' @description
+#' Passes every call to each of its reporters, like [testthat::MultiReporter],
+#' and is a [CucumberReporter] itself: its reporters that are
+#' `CucumberReporter`s also get the step, hook, scenario and message calls.
+#' Use it, for example, to print the progress of a run and write its
+#' messages.
+#'
+#' @examples
+#' \dontrun{
+#' cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
+#'   cucumber::CucumberProgressReporter$new(),
+#'   cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
+#' )))
+#' }
+#'
+#' @export
+CucumberMultiReporter <- R6::R6Class(
+  "CucumberMultiReporter",
+  inherit = CucumberReporter,
+  public = list(
+    #' @field reporters The reporters to pass the calls to
+    reporters = list(),
+
+    #' @description
+    #' Combine reporters
+    #' @param reporters A list of reporters, testthat ones or `CucumberReporter`s
+    initialize = function(reporters = list()) {
+      super$initialize()
+      self$reporters <- reporters
+    },
+
+    #' @description Pass to each reporter
+    start_reporter = function() private$each("start_reporter"),
+    #' @description Pass to each reporter
+    #' @param filename Test file name
+    start_file = function(filename) private$each("start_file", filename),
+    #' @description Pass to each reporter
+    #' @param context Context name
+    start_context = function(context) private$each("start_context", context),
+    #' @description Pass to each reporter
+    #' @param context Context name
+    #' @param test Test name
+    start_test = function(context, test) private$each("start_test", context, test),
+    #' @description Pass to each reporter
+    #' @param context Context name
+    #' @param test Test name
+    #' @param result The expectation
+    add_result = function(context, test, result) {
+      private$each("add_result", context = context, test = test, result = result)
+    },
+    #' @description Pass to each reporter
+    #' @param context Context name
+    #' @param test Test name
+    end_test = function(context, test) private$each("end_test", context, test),
+    #' @description Pass to each reporter
+    #' @param context Context name
+    end_context = function(context) private$each("end_context", context),
+    #' @description Pass to each reporter
+    end_reporter = function() private$each("end_reporter"),
+    #' @description Pass to each reporter
+    end_file = function() private$each("end_file"),
+    #' @description Pass to each reporter
+    update = function() private$each("update"),
+
+    #' @description Pass to each `CucumberReporter`
+    #' @param feature_name Name of the feature
+    start_feature = function(feature_name) private$each_cucumber("start_feature", feature_name),
+    #' @description Pass to each `CucumberReporter`
+    end_feature = function() private$each_cucumber("end_feature"),
+    #' @description Pass to each `CucumberReporter`
+    #' @param step Pickle step object
+    start_step = function(step) private$each_cucumber("start_step", step),
+    #' @description Pass to each `CucumberReporter`
+    #' @param step Pickle step object with execution results
+    end_step = function(step) private$each_cucumber("end_step", step),
+    #' @description Pass to each `CucumberReporter`
+    #' @param status The hook's status
+    #' @param error The hook's error
+    end_hook = function(status, error) private$each_cucumber("end_hook", status, error),
+    #' @description Pass to each `CucumberReporter`
+    #' @param status The scenario's status
+    end_scenario = function(status) private$each_cucumber("end_scenario", status),
+    #' @description Pass to each `CucumberReporter`
+    #' @param envelope A list with one element, named by the message's type
+    add_message = function(envelope) private$each_cucumber("add_message", envelope)
+  ),
+  private = list(
+    each = function(method, ...) {
+      for (reporter in self$reporters) {
+        reporter[[method]](...)
+      }
+      invisible(self)
+    },
+    each_cucumber = function(method, ...) {
+      for (reporter in self$reporters) {
+        cucumber_event(reporter, method, ...)
+      }
+      invisible(self)
+    }
+  )
+)
+
+#' Cucumber Messages Reporter
+#'
+#' @description
+#' Writes the run as [Cucumber Messages](https://github.com/cucumber/messages):
+#' one JSON message per line (NDJSON), like the `message` formatter of other
+#' Cucumber implementations. The official tools read it, like the HTML,
+#' JUnit and JSON formatters.
+#'
+#' It reports only the messages. To also see the progress of the run, combine
+#' it with another reporter in a [CucumberMultiReporter].
+#'
+#' The messages follow the protocol version 34.2.1 and are checked with the
+#' Cucumber Compatibility Kit. Locations of step definitions and hooks need
+#' their source references, kept when the files are sourced with
+#' `keep.source = TRUE`, as testthat does.
+#'
+#' @examples
+#' \dontrun{
+#' cucumber::test(reporter = cucumber::CucumberMessagesReporter$new("cucumber.ndjson"))
+#'
+#' # With the progress of the run
+#' cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
+#'   cucumber::CucumberProgressReporter$new(),
+#'   cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
+#' )))
+#' }
+#'
+#' @export
+CucumberMessagesReporter <- R6::R6Class(
+  "CucumberMessagesReporter",
+  inherit = CucumberReporter,
+  public = list(
+    #' @field file Path or connection the messages are written to
+    file = NULL,
+
+    #' @description
+    #' Create a messages reporter
+    #' @param file Path of the file to write, replaced by each run, or a
+    #'   connection, like `stdout()`. A relative path is relative to the
+    #'   working directory when the reporter is created.
+    initialize = function(file = "cucumber.ndjson") {
+      rlang::check_installed("jsonlite", "to write Cucumber Messages.")
+      super$initialize()
+      self$file <- if (is.character(file)) as.character(fs::path_abs(file)) else file
+    },
+
+    #' @description
+    #' Write a message as a line of JSON
+    #' @param envelope A list with one element, named by the message's type
+    add_message = function(envelope) {
+      line <- paste0(envelope_json(envelope), "\n")
+      if (is.character(self$file)) {
+        # ponytail: the file is opened for each message, keep it open if large runs get slow
+        cat(line, file = self$file, append = names(envelope) != "meta")
+      } else {
+        cat(line, file = self$file)
+      }
       invisible(self)
     }
   )

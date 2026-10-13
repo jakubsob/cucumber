@@ -16,6 +16,7 @@ make_step <- function() {
     step <- structure(
       implementation,
       description = description,
+      order = next_registration(),
       class = c("step", class(implementation))
     )
     register_step(step)

@@ -63,6 +63,8 @@ and the scenario is skipped. \code{after} hooks still run and get \code{"skipped
 
 After hooks run after the last step of each scenario, even when the scenario failed or thrown an error.
 A failing \code{after} hook fails the scenario.
+If an \code{after} hook calls \code{\link[=skip_scenario]{skip_scenario()}}, that hook is skipped, the next \code{after} hooks still run,
+and the scenario is skipped if it didn't fail.
 }
 
 \section{Step hooks}{

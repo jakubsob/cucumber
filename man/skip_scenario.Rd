@@ -15,7 +15,9 @@ e.g. when a service it needs isn't available. In a `before` hook, the rest of
 the `before` hooks and all the scenario's steps are skipped. In a step, that
 step and the steps after it are skipped. The scenario is reported as skipped.
 `after` hooks still run and get `"skipped"` as the scenario's `status`.
-[testthat::skip()] in a step does the same.
+In an [after()] hook, only that hook is skipped, and the scenario is reported
+as skipped if it didn't fail.
+[testthat::skip()] does the same.
 }
 \details{
 Calling it in any other hook is an error. Outside of a Cucumber run

@@ -1,8 +1,8 @@
 Feature: Before all and after all hooks
   `before_all()` and `after_all()` run code once, before the first scenario and after the last one,
   like starting and stopping a server.
-  A failing `before_all()` hook stops the run before any scenario. `after_all()` hooks run even when the run failed,
-  and a failing one fails the run.
+  A failing `before_all()` hook stops the run before any scenario, after the other `before_all()` hooks ran.
+  `after_all()` hooks run even when the run failed, and a failing one fails the run.
 
   Background:
     Given a package
@@ -108,6 +108,21 @@ Feature: Before all and after all hooks
         """
         0 scenarios
         """
+
+    Scenario: The before all hooks after a failing one still run
+      Given a file named "features/setup-steps.R" with
+        """
+        before_all(function() stop("the server didn't start"))
+        before_all(function() cat("start the database\n"))
+        given("an empty basket", function(context) stop("this step must not execute"))
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then it has 1 errors
+      And the error message includes "the server didn't start"
+      And the output includes "start the database" once
 
     Scenario: A failing after all hook fails the run after every scenario has run
       Given a file named "features/setup-steps.R" with

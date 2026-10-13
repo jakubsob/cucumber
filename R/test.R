@@ -74,27 +74,54 @@ run <- function(
     )
   }
 
-  documents <- parse_features(features)
-
+  # A run nested in another one, like in a step that tests cucumber, has ids of
+  # its own, and the outer run's ids continue after it
+  outer_id <- ids$next_id
+  reset_ids()
+  on.exit(ids$next_id <- outer_id, add = TRUE)
+  emit(reporter, "meta", meta_message())
+  sources <- parse_features(features, reporter)
+  glue <- emit_glue(reporter, get_steps(), get_hooks(), get_parameters())
   # A dry run runs no hooks
-  hooks <- if (dry_run) .hooks() else get_hooks()
+  hooks <- if (dry_run) .hooks() else glue$hooks
+
+  test_run_started <- list(id = new_id(), timestamp = timestamp())
+  emit(reporter, "testRunStarted", test_run_started)
+  failed <- FALSE
+  before_error <- NULL
   on.exit({
-    after_error <- run_hooks(get_hooks_to_run(hooks, "after_all"), stop_on_error = FALSE)
+    after_error <- run_test_run_hooks(get_hooks_to_run(hooks, "after_all"), reporter, test_run_started$id)
+    emit(reporter, "testRunFinished", list(
+      testRunStartedId = test_run_started$id,
+      timestamp = timestamp(),
+      success = !failed && is.null(before_error) && is.null(after_error)
+    ))
     if (!is.null(after_error)) stop(after_error)
-  })
-  before_error <- run_hooks(get_hooks_to_run(hooks, "before_all"))
+  }, add = TRUE, after = FALSE)
+  # Like in cucumber-js, every before all hook runs, but no scenario runs if one failed
+  before_error <- run_test_run_hooks(get_hooks_to_run(hooks, "before_all"), reporter, test_run_started$id)
   if (!is.null(before_error)) {
     stop(before_error)
   }
 
-  failed <- FALSE
-  for (feature_path in features) {
-    failed <- execute(
-      documents[[feature_path]],
-      feature_file = feature_path,
+  pickles <- map(set_names(features), \(path) {
+    prepare_pickles(
+      sources[[path]]$pickles,
+      glue$steps,
+      get_parameters(),
+      hooks,
       tags = tags,
       name = name,
-      lines = lines[[feature_path]],
+      lines = lines[[path]],
+      reporter = reporter,
+      test_run_started_id = test_run_started$id
+    )
+  })
+  for (path in features) {
+    failed <- execute_feature(
+      sources[[path]]$document,
+      pickles[[path]],
+      hooks,
       reporter = reporter,
       strict = strict,
       dry_run = dry_run,
@@ -104,6 +131,26 @@ run <- function(
   }
 
   invisible(NULL)
+}
+
+#' Run before all or after all hooks, each reported as a test run hook. All of
+#' them run, and the first error is returned.
+#' @keywords internal
+#' @noRd
+run_test_run_hooks <- function(hooks, reporter, test_run_started_id) {
+  first_error <- NULL
+  for (hook in hooks) {
+    started <- list(id = new_id(), testRunStartedId = test_run_started_id, hookId = hook$id, timestamp = timestamp())
+    emit(reporter, "testRunHookStarted", started)
+    result <- run_hook_step(hook)
+    emit(reporter, "testRunHookFinished", list(
+      testRunHookStartedId = started$id,
+      result = test_step_result(result),
+      timestamp = timestamp()
+    ))
+    first_error <- first_error %||% result$error
+  }
+  first_error
 }
 
 #' @importFrom fs dir_ls is_file
@@ -143,16 +190,32 @@ read_feature <- function(path) {
   readLines(path, warn = FALSE, encoding = "UTF-8")
 }
 
-# Like cucumber-js, nothing runs if any feature file can't be parsed,
-# and the errors of every file are reported
+#' Parse feature files and compile their pickles, reporting the source,
+#' document and pickles of each file
+#'
+#' Like cucumber-js, nothing runs if any feature file can't be parsed, and the
+#' errors of every file are reported.
+#'
+#' @return A list named by path, with the `document` and the `pickles` of each file
+#' @keywords internal
+#' @noRd
 #' @importFrom rlang try_fetch abort
-#' @importFrom purrr map set_names
-parse_features <- function(paths) {
+#' @importFrom purrr map set_names walk
+parse_features <- function(paths, reporter = NULL) {
   documents <- map(paths, \(path) {
-    try_fetch(
+    emit(reporter, "source", source_message(path))
+    document <- try_fetch(
       parse_gherkin(read_feature(path), uri = path),
       cucumber_parse_error = identity
     )
+    if (inherits(document, "cucumber_parse_error")) {
+      walk(document$errors, \(error) emit(reporter, "parseError", parse_error_message(path, error)))
+      return(document)
+    }
+    emit(reporter, "gherkinDocument", document)
+    pickles <- create_pickles(document, feature_file = path)
+    walk(pickles, \(pickle) emit(reporter, "pickle", pickle$message))
+    list(document = document, pickles = pickles)
   })
   errors <- Filter(\(document) inherits(document, "cucumber_parse_error"), documents)
   if (length(errors) > 0) {

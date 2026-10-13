@@ -16,6 +16,8 @@
 #' @param arguments Function returning the named list of arguments (added in
 #'   matching phase)
 #' @param definition_location Source reference for error reporting
+#' @param id Id of the step's PickleStep message
+#' @param message The PickleStep message
 #' @return A pickle_step object
 #' @keywords internal
 #' @noRd
@@ -33,7 +35,9 @@ new_pickle_step <- function(
   duration = NULL,
   matched_fn = NULL,
   arguments = NULL,
-  definition_location = NULL
+  definition_location = NULL,
+  id = NULL,
+  message = NULL
 ) {
   structure(
     list(
@@ -48,7 +52,9 @@ new_pickle_step <- function(
       duration = duration,
       matched_fn = matched_fn,
       arguments = arguments,
-      definition_location = definition_location
+      definition_location = definition_location,
+      id = id,
+      message = message
     ),
     class = "pickle_step"
   )
@@ -74,6 +80,7 @@ new_docstring <- function(content, media_type = NULL) {
 #' @param source_line Line number in feature file
 #' @param lines Lines that select the pickle when running `file:line`: the
 #'   scenario's line, and for an outline row also the row's line
+#' @param message The Pickle message
 #' @return A pickle object
 #' @keywords internal
 #' @noRd
@@ -82,7 +89,8 @@ new_pickle <- function(
   tags = character(),
   steps = list(),
   source_line = NA_integer_,
-  lines = source_line
+  lines = source_line,
+  message = NULL
 ) {
   structure(
     list(
@@ -90,7 +98,8 @@ new_pickle <- function(
       tags = sub("^@", "", tags),
       steps = steps,
       source_line = source_line,
-      lines = lines
+      lines = lines,
+      message = message
     ),
     class = "pickle"
   )
@@ -99,35 +108,47 @@ new_pickle <- function(
 #' Compile pickles from a Gherkin document
 #'
 #' @description
-#' A port of the official pickle compiler. It:
+#' A port of the official pickle compiler, pickles/compile.ts. It:
 #' - Expands scenario outlines into one pickle per Examples row
 #' - Adds the Feature's and the Rule's Background steps to each scenario that has steps
 #' - Inherits tags from the Feature, the Rule, the scenario and the Examples
 #'
+#' Each pickle keeps its Pickle message, with ids from `new_id()` assigned in
+#' the official order.
+#'
 #' @param document A document from `parse_gherkin()`
+#' @param feature_file The uri of the pickles, the document's by default
 #' @return List of pickle objects
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr map flatten
 create_pickles <- function(document, feature_file = NULL) {
   feature <- document$feature
   if (is.null(feature)) {
     return(list())
   }
+  compile <- function(tags, background, scenario) {
+    compile_scenario(tags, background, scenario, feature$language, feature_file %||% document$uri)
+  }
 
-  background <- feature$background$steps
-  rules <- feature$rules |>
-    map(\(rule) {
-      compile_scenarios(
-        rule$scenarios,
-        c(feature$tags, rule$tags),
-        c(background, rule$background$steps)
-      )
-    })
-  pickles <- c(
-    compile_scenarios(feature$scenarios, feature$tags, background),
-    flatten(rules)
-  )
+  pickles <- list()
+  background <- list()
+  for (child in feature$children) {
+    if (!is.null(child$background)) {
+      background <- child$background$steps
+    } else if (!is.null(child$rule)) {
+      rule <- child$rule
+      rule_background <- background
+      for (rule_child in rule$children) {
+        if (!is.null(rule_child$background)) {
+          rule_background <- c(rule_background, rule_child$background$steps)
+        } else {
+          pickles <- c(pickles, compile(c(feature$tags, rule$tags), rule_background, rule_child$scenario))
+        }
+      }
+    } else {
+      pickles <- c(pickles, compile(feature$tags, background, child$scenario))
+    }
+  }
 
   if (!is.null(feature_file)) {
     pickles <- map(pickles, \(p) {
@@ -139,75 +160,124 @@ create_pickles <- function(document, feature_file = NULL) {
   pickles
 }
 
+#' A scenario's pickle, or for an outline a pickle for each row of each
+#' Examples with a table
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr map flatten keep
-compile_scenarios <- function(scenarios, tags, background) {
-  scenarios |>
-    map(\(scenario) {
-      if (length(scenario$examples) == 0) {
-        return(list(new_pickle(
-          name = scenario$name,
-          tags = c(tags, scenario$tags),
-          steps = pickle_steps(background, scenario$steps),
-          source_line = scenario$line
-        )))
-      }
-      # An outline gives a pickle for each row of each Examples with a table
-      scenario$examples |>
-        keep(\(examples) !is.null(examples$header)) |>
-        map(\(examples) {
-          map(examples$body, \(row) {
-            header <- examples$header$cells
-            new_pickle(
-              name = interpolate(scenario$name, header, row$cells),
-              tags = c(tags, scenario$tags, examples$tags),
-              steps = pickle_steps(background, scenario$steps, header, row$cells),
-              source_line = row$line,
-              lines = c(scenario$line, row$line)
-            )
-          })
-        }) |>
-        flatten()
+#' @importFrom purrr map keep flatten
+compile_scenario <- function(tags, background, scenario, language, uri) {
+  pickle <- function(steps, tags, row = NULL) {
+    # The steps get their ids before the pickle
+    force(steps)
+    header <- examples_header(row)
+    name <- interpolate(scenario$name, header, map_chr(row$row$cells, "value"))
+    message <- drop_null(list(
+      id = new_id(),
+      uri = uri,
+      location = row$row$location %||% scenario$location,
+      astNodeIds = as.list(c(scenario$id, row$row$id)),
+      tags = map(tags, \(tag) list(name = tag$name, astNodeId = tag$id)),
+      name = name,
+      language = language,
+      steps = map(steps, "message")
+    ))
+    new_pickle(
+      name = name,
+      tags = map_chr(tags, "name"),
+      steps = steps,
+      source_line = message$location$line,
+      lines = unique(c(scenario$location$line, row$row$location$line)),
+      message = message
+    )
+  }
+
+  if (length(scenario$examples) == 0) {
+    return(list(pickle(pickle_steps(background, scenario$steps), c(tags, scenario$tags))))
+  }
+  scenario$examples |>
+    keep(\(examples) !is.null(examples$tableHeader)) |>
+    map(\(examples) {
+      map(examples$tableBody, \(row) {
+        row <- list(row = row, header = examples$tableHeader)
+        steps <- pickle_steps(background, scenario$steps, row)
+        pickle(steps, c(tags, scenario$tags, examples$tags), row)
+      })
     }) |>
     flatten()
+}
+
+examples_header <- function(row) {
+  map_chr(row$header$cells, "value")
 }
 
 #' Background steps run only before a scenario with steps, and outline
 #' placeholders are replaced only in the scenario's own steps.
 #' And/But take the type of the previous step.
+#'
+#' @param row An Examples row, with the `row` and the `header` of its table
 #' @keywords internal
 #' @noRd
-#' @importFrom purrr map2
+#' @importFrom purrr map map2 map_chr
 #' @importFrom stringr str_trim
-pickle_steps <- function(background, steps, header = character(), values = character()) {
+pickle_steps <- function(background, steps, row = NULL) {
   if (length(steps) == 0) {
     return(list())
   }
+  header <- examples_header(row)
+  values <- map_chr(row$row$cells, "value")
   in_scenario <- rep(c(FALSE, TRUE), c(length(background), length(steps)))
   type <- "Unknown"
   map2(c(background, steps), in_scenario, \(step, in_scenario) {
     fill <- if (in_scenario) \(x) interpolate(x, header, values) else identity
-    if (step$keyword_type != "Conjunction") {
-      type <<- step$keyword_type
+    if (step$keywordType != "Conjunction") {
+      type <<- step$keywordType
     }
-    arguments <- c(docstring = step$docstring$line, data_table = step$data_table$line)
+    table <- step$dataTable
+    docstring <- step$docString
+    arguments <- c(docstring = docstring$location$line, data_table = table$location$line)
+    argument_order <- as.character(names(sort(arguments)))
+    # The index of an argument, when a step has both
+    index <- function(name) if (length(arguments) > 1) match(name, argument_order)
+    rows <- map(table$rows, \(row) fill(map_chr(row$cells, "value")))
+    media_type <- if (!is.null(docstring$mediaType)) fill(docstring$mediaType)
+    content <- if (!is.null(docstring)) fill(docstring$content)
+
+    argument <- drop_null(list(
+      docString = if (!is.null(docstring)) {
+        drop_null(list(argumentIndex = index("docstring"), content = content, mediaType = media_type))
+      },
+      dataTable = if (!is.null(table)) {
+        drop_null(list(
+          argumentIndex = index("data_table"),
+          rows = map(rows, \(cells) list(cells = map(cells, \(value) list(value = value))))
+        ))
+      }
+    ))
+    message <- drop_null(list(
+      id = new_id(),
+      text = fill(step$text),
+      type = type,
+      argument = if (length(argument) > 0) argument,
+      astNodeIds = as.list(c(step$id, if (in_scenario) row$row$id))
+    ))
     new_pickle_step(
       keyword = str_trim(step$keyword),
       type = type,
-      text = fill(step$text),
-      data_table = if (!is.null(step$data_table)) {
-        parse_table(map(step$data_table$rows, \(row) fill(row$cells)))
-      },
-      docstring = if (!is.null(step$docstring)) {
-        new_docstring(
-          fill(step$docstring$content),
-          if (!is.null(step$docstring$media_type)) fill(step$docstring$media_type)
-        )
-      },
-      argument_order = as.character(names(sort(arguments)))
+      text = message$text,
+      data_table = if (!is.null(table)) parse_table(rows),
+      docstring = if (!is.null(docstring)) new_docstring(docstring_lines(content), media_type),
+      argument_order = argument_order,
+      id = message$id,
+      message = message
     )
   })
+}
+
+#' The lines of a doc string's content
+#' @keywords internal
+#' @noRd
+docstring_lines <- function(content) {
+  if (content == "") character() else strsplit(paste0(content, "\n"), "\n", fixed = TRUE)[[1]]
 }
 
 #' Replace `<name>` placeholders with the values of an Examples row

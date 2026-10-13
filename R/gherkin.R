@@ -6,9 +6,13 @@
 #' Like the official parser, it collects every syntax error with its
 #' `(line:column)` and fails after reading the whole document.
 #'
+#' The document has the shape of the official GherkinDocument message, with
+#' an id from `new_id()` for each node, assigned in the official order.
+#'
 #' @param lines Lines of a feature file.
 #' @param uri Path of the feature file, used in error messages.
-#' @return A list with the `feature`, or a NULL `feature` for an empty document.
+#' @return A GherkinDocument: the `feature`, NULL for an empty document, its
+#'   `comments` and its `uri`.
 #' @keywords internal
 #' @noRd
 parse_gherkin <- function(lines, uri = NULL) {
@@ -19,7 +23,9 @@ parse_gherkin <- function(lines, uri = NULL) {
   p$queue <- list()
   p$docstring_separator <- NULL
   p$indent_to_remove <- 0L
-  p$dialect <- GHERKIN_DIALECTS$en
+  # Like the official parser, a file without a `# language:` line is in English
+  p$language <- "en"
+  p$comments <- list()
   p$errors <- character()
   p$stack <- list(new_ast_node("None"))
 
@@ -35,7 +41,9 @@ parse_gherkin <- function(lines, uri = NULL) {
   if (length(p$errors) > 0) {
     abort_gherkin(p)
   }
-  get_single(p$stack[[1]], "GherkinDocument")
+  document <- get_single(p$stack[[1]], "GherkinDocument")
+  document$uri <- uri
+  document
 }
 
 # GHERKIN_DIALECTS in R/sysdata.rda has the keywords of every language from the
@@ -134,7 +142,7 @@ matched <- function(
   text = NULL,
   keyword = NULL,
   keyword_type = NULL,
-  items = character(),
+  items = list(),
   indent = token$indent %||% 0L
 ) {
   token$type <- type
@@ -156,7 +164,7 @@ rest_trimmed <- function(token, n) {
 }
 
 match_title_line <- function(p, token, type) {
-  for (keyword in p$dialect$titles[[type]]) {
+  for (keyword in GHERKIN_DIALECTS[[p$language]]$titles[[type]]) {
     if (starts_with(token, paste0(keyword, ":"))) {
       return(matched(token, type, rest_trimmed(token, nchar(keyword) + 1L), keyword))
     }
@@ -181,7 +189,7 @@ TOKEN_MATCHERS <- list(
     if (is.null(GHERKIN_DIALECTS[[language]])) {
       gherkin_error(paste0("Language not supported: ", language), token$line, token$indent + 1L)
     }
-    p$dialect <- GHERKIN_DIALECTS[[language]]
+    p$language <- language
     matched(token, "Language", language)
   },
   TagLine = function(p, token) {
@@ -193,7 +201,7 @@ TOKEN_MATCHERS <- list(
   ScenarioLine = function(p, token) match_title_line(p, token, "ScenarioLine"),
   ExamplesLine = function(p, token) match_title_line(p, token, "ExamplesLine"),
   StepLine = function(p, token) {
-    steps <- p$dialect$steps
+    steps <- GHERKIN_DIALECTS[[p$language]]$steps
     for (keyword in names(steps)) {
       if (starts_with(token, keyword)) {
         return(matched(
@@ -208,7 +216,7 @@ TOKEN_MATCHERS <- list(
     NULL
   },
   TableRow = function(p, token) {
-    if (starts_with(token, "|")) matched(token, "TableRow", items = table_cells(token$trimmed))
+    if (starts_with(token, "|")) matched(token, "TableRow", items = table_cells(token$trimmed, token$indent))
   },
   DocStringSeparator = function(p, token) {
     # A Doc String is closed only by the separator that opened it
@@ -244,11 +252,13 @@ TOKEN_MATCHERS <- list(
   }
 )
 
+#' The tags of a tag line, each with its `column` and `text`
 #' @importFrom stringr str_trim str_detect
+#' @noRd
 tag_items <- function(token) {
   uncommented <- strsplit(token$trimmed, "\\s#", perl = TRUE)[[1]][[1]]
   column <- token$indent + 1L
-  tags <- character()
+  tags <- list()
   for (item in strsplit(uncommented, "@", fixed = TRUE)[[1]]) {
     tag <- str_trim(item, side = "right")
     if (tag == "") {
@@ -257,21 +267,24 @@ tag_items <- function(token) {
     if (str_detect(tag, "\\s")) {
       gherkin_error("A tag may not contain whitespace", token$line, column)
     }
-    tags <- c(tags, paste0("@", tag))
+    tags <- c(tags, list(list(column = column, text = paste0("@", tag))))
     column <- column + nchar(item) + 1L
   }
   tags
 }
 
-#' Split a table row into cells. Text before the first and after the last `|`
-#' is not a cell. `\|`, `\\` and `\n` are unescaped.
-#' @importFrom stringr str_remove_all
+#' Split a table row into cells, each with its `column` and `text`. Text
+#' before the first and after the last `|` is not a cell. `\|`, `\\` and `\n`
+#' are unescaped.
+#' @param indent The indent of the row, to count the columns from
+#' @importFrom stringr str_remove
 #' @noRd
-table_cells <- function(row) {
+table_cells <- function(row, indent = 0L) {
   chars <- strsplit(row, "")[[1]]
-  cells <- character()
+  cells <- list()
   cell <- ""
   first <- TRUE
+  start <- 1L
   i <- 1L
   while (i <= length(chars)) {
     chr <- chars[[i]]
@@ -281,9 +294,15 @@ table_cells <- function(row) {
         first <- FALSE
       } else {
         # Cells keep their newlines
-        cells <- c(cells, str_remove_all(cell, "^[ \\t\\x0B\\f\\r\\u0085\\u00A0]+|[ \\t\\x0B\\f\\r\\u0085\\u00A0]+$"))
+        space <- "[ \\t\\x0B\\f\\r\\u0085\\u00A0]"
+        trimmed_left <- str_remove(cell, paste0("^", space, "+"))
+        cells <- c(cells, list(list(
+          column = indent + start + nchar(cell) - nchar(trimmed_left),
+          text = str_remove(trimmed_left, paste0(space, "+$"))
+        )))
       }
       cell <- ""
+      start <- i
     } else if (chr == "\\") {
       chr <- if (i <= length(chars)) chars[[i]] else ""
       i <- i + 1L
@@ -330,77 +349,119 @@ end_rule <- function(p) {
   n <- length(p$stack)
   node <- p$stack[[n]]
   p$stack <- p$stack[-n]
-  catch_gherkin_error(p, ast_add(p, node$rule, transform_node(node)))
+  catch_gherkin_error(p, ast_add(p, node$rule, transform_node(p, node)))
 }
 
 build <- function(p, token) {
-  if (token$type != "Comment") {
+  if (token$type == "Comment") {
+    p$comments <- c(p$comments, list(list(location = token_location(token), text = token$matched_text)))
+  } else {
     ast_add(p, token$type, token)
   }
 }
 
-#' @importFrom purrr map
-transform_node <- function(node) {
+#' Turn a node into its message, like AstBuilder.ts. Ids are assigned in the
+#' official order: a node gets its id when it ends, after its children and
+#' its tags.
+#' @noRd
+transform_node <- function(p, node) {
   switch(
     node$rule,
     Step = {
       line <- get_single(node, "StepLine")
-      list(
+      drop_null(list(
+        id = new_id(),
+        location = token_location(line),
         keyword = line$keyword,
-        keyword_type = line$keyword_type,
+        keywordType = line$keyword_type,
         text = line$matched_text,
-        line = line$line,
-        data_table = get_single(node, "DataTable"),
-        docstring = get_single(node, "DocString")
-      )
+        dataTable = get_single(node, "DataTable"),
+        docString = get_single(node, "DocString")
+      ))
     },
     DocString = {
       separator <- get_single(node, "DocStringSeparator")
-      list(
-        content = vapply(get_items(node, "Other"), \(token) token$matched_text, character(1)),
-        media_type = if (nzchar(separator$matched_text)) separator$matched_text,
-        line = separator$line
-      )
+      lines <- vapply(get_items(node, "Other"), \(token) token$matched_text, character(1))
+      drop_null(list(
+        location = token_location(separator),
+        content = paste(lines, collapse = "\n"),
+        delimiter = separator$keyword,
+        mediaType = if (nzchar(separator$matched_text)) separator$matched_text
+      ))
     },
     DataTable = {
       rows <- table_rows(node)
-      list(rows = rows, line = rows[[1]]$line)
+      list(location = rows[[1]]$location, rows = rows)
     },
     ExamplesTable = table_rows(node),
-    Background = list(steps = get_items(node, "Step")),
+    Description = {
+      tokens <- get_items(node, "Other")
+      # Trailing empty lines aren't part of the description
+      while (length(tokens) > 0 && tokens[[length(tokens)]]$trimmed == "") {
+        tokens <- tokens[-length(tokens)]
+      }
+      paste(vapply(tokens, \(token) token$matched_text, character(1)), collapse = "\n")
+    },
+    Background = {
+      line <- get_single(node, "BackgroundLine")
+      list(
+        id = new_id(),
+        location = token_location(line),
+        keyword = line$keyword,
+        name = line$matched_text,
+        description = description(node),
+        steps = get_items(node, "Step")
+      )
+    },
     ScenarioDefinition = {
+      tags <- node_tags(node)
       scenario <- get_single(node, "Scenario")
       line <- get_single(scenario, "ScenarioLine")
       list(
-        tags = node_tags(node),
+        id = new_id(),
+        tags = tags,
+        location = token_location(line),
         keyword = line$keyword,
         name = line$matched_text,
-        line = line$line,
+        description = description(scenario),
         steps = get_items(scenario, "Step"),
         examples = get_items(scenario, "ExamplesDefinition")
       )
     },
     ExamplesDefinition = {
-      table <- get_single(get_single(node, "Examples"), "ExamplesTable")
-      list(
-        tags = node_tags(node),
-        header = if (length(table) > 0) table[[1]],
-        body = table[-1]
-      )
+      tags <- node_tags(node)
+      examples <- get_single(node, "Examples")
+      line <- get_single(examples, "ExamplesLine")
+      table <- get_single(examples, "ExamplesTable")
+      drop_null(list(
+        id = new_id(),
+        tags = tags,
+        location = token_location(line),
+        keyword = line$keyword,
+        name = line$matched_text,
+        description = description(examples),
+        tableHeader = if (length(table) > 0) table[[1]],
+        tableBody = as.list(table[-1])
+      ))
     },
     Feature = {
       header <- get_single(node, "FeatureHeader")
+      if (is.null(header)) {
+        return(NULL)
+      }
+      tags <- node_tags(header)
       line <- get_single(header, "FeatureLine")
       if (is.null(line)) {
         return(NULL)
       }
       list(
-        tags = node_tags(header),
+        tags = tags,
+        location = token_location(line),
+        language = p$language,
         keyword = line$keyword,
         name = line$matched_text,
-        background = get_single(node, "Background"),
-        scenarios = get_items(node, "ScenarioDefinition"),
-        rules = get_items(node, "Rule")
+        description = description(header),
+        children = children(node)
       )
     },
     Rule = {
@@ -409,33 +470,73 @@ transform_node <- function(node) {
       if (is.null(line)) {
         return(NULL)
       }
+      tags <- node_tags(header)
       list(
-        tags = node_tags(header),
+        id = new_id(),
+        location = token_location(line),
+        keyword = line$keyword,
         name = line$matched_text,
-        background = get_single(node, "Background"),
-        scenarios = get_items(node, "ScenarioDefinition")
+        description = description(header),
+        children = children(node),
+        tags = tags
       )
     },
-    GherkinDocument = list(feature = get_single(node, "Feature")),
+    GherkinDocument = drop_null(list(feature = get_single(node, "Feature"), comments = p$comments)),
     node
   )
 }
 
+token_location <- function(token) {
+  list(line = token$line, column = token$column)
+}
+
+description <- function(node) {
+  get_single(node, "Description") %||% ""
+}
+
+#' A Feature's or Rule's Background, Scenarios and Rules, each in a list
+#' named by its kind
+#' @noRd
+children <- function(node) {
+  background <- get_single(node, "Background")
+  c(
+    if (!is.null(background)) list(list(background = background)),
+    lapply(get_items(node, "ScenarioDefinition"), \(scenario) list(scenario = scenario)),
+    lapply(get_items(node, "Rule"), \(rule) list(rule = rule))
+  )
+}
+
 node_tags <- function(node) {
-  tags <- get_items(get_single(node, "Tags"), "TagLine") |>
-    map(\(token) token$items)
-  as.character(unlist(tags))
+  tags <- list()
+  for (token in get_items(get_single(node, "Tags"), "TagLine")) {
+    for (item in token$items) {
+      location <- list(line = token$line, column = item$column)
+      tags <- c(tags, list(list(location = location, name = item$text, id = new_id())))
+    }
+  }
+  tags
 }
 
 table_rows <- function(node) {
-  rows <- get_items(node, "TableRow") |>
-    map(\(token) list(line = token$line, column = token$column, cells = token$items))
+  rows <- lapply(get_items(node, "TableRow"), \(token) {
+    list(
+      id = new_id(),
+      location = token_location(token),
+      cells = lapply(token$items, \(cell) {
+        list(location = list(line = token$line, column = cell$column), value = cell$text)
+      })
+    )
+  })
   for (row in rows) {
     if (length(row$cells) != length(rows[[1]]$cells)) {
-      gherkin_error("inconsistent cell count within the table", row$line, row$column)
+      gherkin_error("inconsistent cell count within the table", row$location$line, row$location$column)
     }
   }
   rows
+}
+
+drop_null <- function(x) {
+  x[!vapply(x, is.null, logical(1))]
 }
 
 # Errors ------------------------------------------------------------------

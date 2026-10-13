@@ -135,8 +135,8 @@
 # 2. Regenerates R/gherkin_states.R from javascript/src/Parser.ts, with the
 #    commit in its header.
 # 3. Replaces the official test data in tests/testthat/gherkin: the good
-#    *.feature files with their .pickles.ndjson and the bad ones with their
-#    .errors.ndjson. The .feature.md files are left out, and
+#    *.feature files with their .ast.ndjson, .pickles.ndjson and
+#    .source.ndjson, and the bad ones with their .errors.ndjson. The .feature.md files are left out, and
 #    scenario_outline_with_value_with_* are renamed to outline_value_with_*,
 #    because R CMD check flags paths over 100 bytes. It stops if another path
 #    is too long.
@@ -145,7 +145,7 @@
 # 5. Writes the changes to the hand-ported files since the commit the states
 #    were generated from to a patch file, and returns its path.
 # 6. Runs the corpus tests, testthat::test_local(filter = "gherkin"). They compare
-#    pickles and exact error messages for every file.
+#    sources, documents, pickles and exact error messages for every file.
 #
 # Then port what the patch shows. A new token type needs an entry in
 # TOKEN_MATCHERS, a new rule type a case in transform_node() (unless keeping
@@ -217,7 +217,10 @@ run_git <- function(...) {
 }
 
 copy_test_data <- function(repo, to) {
-  expected <- c(good = ".pickles.ndjson", bad = ".errors.ndjson")
+  expected <- list(
+    good = c(".ast.ndjson", ".pickles.ndjson", ".source.ndjson"),
+    bad = ".errors.ndjson"
+  )
   for (kind in names(expected)) {
     from <- file.path(repo, "testdata", kind)
     features <- list.files(from, pattern = "\\.feature$")
@@ -231,7 +234,7 @@ copy_test_data <- function(repo, to) {
       "cucumber/tests/testthat/gherkin/",
       kind,
       "/",
-      names,
+      rep(names, each = length(expected[[kind]])),
       expected[[kind]]
     )
     long <- long[nchar(long, type = "bytes") > 100]
@@ -246,8 +249,8 @@ copy_test_data <- function(repo, to) {
     unlink(out, recursive = TRUE)
     dir.create(out, recursive = TRUE)
     copied <- file.copy(
-      file.path(from, c(features, paste0(features, expected[[kind]]))),
-      file.path(out, c(names, paste0(names, expected[[kind]])))
+      file.path(from, c(features, outer(features, expected[[kind]], paste0))),
+      file.path(out, c(names, outer(names, expected[[kind]], paste0)))
     )
     if (!all(copied)) {
       stop("Missing official ", kind, " test data files")

@@ -21,6 +21,7 @@ Imports:
     purrr,
     R6,
     rlang,
+    stringi,
     stringr,
     testthat (>= 3.0.0),
     tibble,

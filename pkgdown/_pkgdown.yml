@@ -61,6 +61,8 @@ reference:
     contents:
       - CucumberReporter
       - CucumberProgressReporter
+      - CucumberMessagesReporter
+      - CucumberMultiReporter
   - title: Optional
     contents:
       - define_parameter_type

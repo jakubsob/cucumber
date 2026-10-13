@@ -38,6 +38,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ `test()` and `run()` find feature files in subdirectories of `path` too, like Cucumber's default `features/**/*.feature`. Previously only the files directly in `path` ran. Symbolic links to feature files are run too.
 - ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped.
 - ⚠️ Undefined and ambiguous steps no longer stop the run. They fail their scenario, and the other scenarios still run, so every missing step's snippet is shown.
+- ⚠️ Undefined and ambiguous steps after a step or a `before()` hook that skipped the scenario are skipped, like in cucumber-js, so they no longer fail it.
 - ⚠️ `pending()` gives the step a `pending` status and fails the scenario. Previously the scenario was skipped. Run with `strict = FALSE` to skip scenarios with pending or undefined steps instead.
 - ⚠️ Tag expressions are parsed like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions). A tag is everything up to whitespace or a parenthesis, so tags like `@team:payments` or `@and-more` can be used, and a backslash escapes a parenthesis: `"@wip\\(x\\)"`. Tags must be written with their `@`: `"smoke"` no longer matches `@smoke`. `and`, `or` and `not` must be lowercase. An invalid expression fails with the official error, e.g. `Tag expression "@a @b" could not be parsed because of syntax error: Expected operator.`
 - ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks. Like in cucumber-js, undefined and ambiguous steps don't fail a dry run: their scenarios are skipped.
@@ -56,6 +57,8 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ A `before()` hook skips its scenario by calling `skip_scenario()`, like returning `'skipped'` in cucumber-js. The rest of the before hooks and the scenario's steps are skipped, and `after()` hooks get `"skipped"` as the scenario's `status`.
 - ✨ A step can call `skip_scenario()` too, like returning `'skipped'` from a cucumber-js step. The step and the steps after it are skipped, the scenario is reported as skipped, and `after()` hooks still run.
 - ✨ A failing `before()` hook reports the scenario's steps as skipped and fails the scenario.
+- ⚠️ `skip_scenario()` or `testthat::skip()` in an `after()` hook skips that hook, like returning `'skipped'` from a cucumber-js After hook. The next `after()` hooks still run, and the scenario is reported as skipped if it didn't fail. Previously it was an error.
+- ⚠️ Every `before_all()` hook runs even when one of them fails, like in cucumber-js. No scenario runs, and the run fails with the first error. Previously the hooks after the failing one didn't run.
 
 ## Reporters
 
@@ -63,6 +66,8 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ A step keeps the keyword it's written with, so `step$keyword` can be `And`, `But` or `*`. The new `step$type` is `"Context"`, `"Action"`, `"Outcome"` or `"Unknown"`.
 - ⚠️ `CucumberProgressReporter` prints the keyword as written and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
 - ✨ `CucumberProgressReporter` prints a failed or pending hook's error, or the reason a hook skipped the scenario, where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
+- ✨ `CucumberMessagesReporter` writes the run as [Cucumber Messages](https://github.com/cucumber/messages), one JSON message per line, like the `message` formatter of other Cucumber implementations: `test(reporter = CucumberMessagesReporter$new("cucumber.ndjson"))`. Official tools read it, like the HTML, JUnit and JSON formatters. It passes the samples of the Cucumber Compatibility Kit that cover what cucumber supports. `CucumberReporter` gets an `add_message()` method, called with each message.
+- ✨ `CucumberMultiReporter` combines reporters, like `testthat::MultiReporter`, and passes the step, hook, scenario and message calls to each `CucumberReporter` among them, e.g. to print the progress of a run and write its messages.
 
 ## Snippets
 
