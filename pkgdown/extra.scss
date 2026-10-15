@@ -1,20 +1,262 @@
-nav {
-  .nav-text {
-    color: var(--bs-navbar-brand-color) !important;
+// The Run Log: the site reads like a cucumber run.
+// Status colours come from Cucumber's result states; the logo green is a fill only.
+
+:root,
+[data-bs-theme="light"] {
+  --rl-ink: #0f2a13;
+  --rl-muted: #4a5d4e;
+  --rl-rule: #d0e1cc;
+  --rl-code-bg: #edf4ea;
+  --rl-link: #1C2541;
+  --rl-brand: #59cf64;
+  --rl-passed: #1a6b2e;
+  --rl-failed: #b42318;
+  --rl-undefined: #8a5a00;
+  --rl-skipped: #0e6e80;
+  --rl-focus: #1C2541;
+}
+
+[data-bs-theme="dark"] {
+  --rl-ink: #e6efe7;
+  --rl-muted: #9fb3a3;
+  --rl-rule: #24402b;
+  --rl-code-bg: #142519;
+  --rl-link: #a9b8ff;
+  --rl-passed: #7ee08a;
+  --rl-failed: #ff8a7a;
+  --rl-undefined: #f2c14e;
+  --rl-skipped: #6fd3e3;
+  --rl-focus: #59cf64;
+  --bs-body-bg: #0d1a10;
+  --bs-body-bg-rgb: 13, 26, 16;
+  --bs-body-color: #e6efe7;
+  --bs-body-color-rgb: 230, 239, 231;
+  --bs-link-color: #a9b8ff;
+  --bs-link-color-rgb: 169, 184, 255;
+  --bs-link-hover-color: #7ee08a;
+  --bs-link-hover-color-rgb: 126, 224, 138;
+  --bs-border-color: #24402b;
+}
+
+// Browser surfaces ----------------------------------------------------------
+
+::selection {
+  background: rgba(89, 207, 100, 0.35);
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--rl-focus);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--rl-passed);
+}
+
+.form-check-input:checked {
+  background-color: var(--rl-passed);
+  border-color: var(--rl-passed);
+}
+
+// Type ----------------------------------------------------------------------
+
+h1, h2, h3, h4 {
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+main {
+  h2 {
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rl-rule);
   }
+
+  p, li, dd, blockquote {
+    max-width: 72ch;
+  }
+}
+
+a {
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+
+  &:hover {
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--rl-passed);
+  }
+}
+
+// Navbar: quiet ground, a tinted pill marks where you are ------------------------
+
+.navbar {
+  background: var(--bs-body-bg) !important;
+  border-bottom: 1px solid var(--rl-rule);
+  --bs-navbar-color: var(--rl-ink);
+  --bs-navbar-hover-color: var(--rl-passed);
+  --bs-navbar-active-color: var(--rl-ink);
+  --bs-navbar-brand-color: var(--rl-ink);
+  --bs-navbar-brand-hover-color: var(--rl-passed);
+  --bs-nav-link-color: var(--rl-ink);
+
+  .navbar-brand {
+    font-weight: 700;
+  }
+
+  .nav-text {
+    font-family: var(--bs-font-monospace);
+    font-size: 0.8rem;
+    color: var(--rl-muted) !important;
+  }
+
+  .nav-link {
+    hyphens: manual;
+  }
+
+  .nav-item .nav-link:hover {
+    background: transparent;
+  }
+
+  .nav-item.active .nav-link {
+    background: var(--rl-code-bg);
+  }
+
   // Search input
   .form-control {
-    border-color: var(--bs-nav-link-color);
-    background-color: transparent;
-    color: var(--bs-navbar-brand-color);
+    border: 1px solid var(--rl-rule);
+    background-color: var(--rl-code-bg);
+    color: var(--rl-ink);
 
     &::placeholder {
-      color: var(--bs-nav-link-color);
+      color: var(--rl-muted);
     }
 
     &:focus {
-      background-color: transparent;
-      outline: solid 2px var(--bs-body-bg);
+      border-color: var(--rl-focus);
+      box-shadow: none;
+      outline: 3px solid var(--rl-focus);
+      outline-offset: 2px;
     }
   }
+}
+
+// Page TOC: the active entry carries a status mark --------------------------
+
+#toc > .nav a.nav-link {
+  color: var(--rl-muted);
+
+  &.active {
+    background: transparent;
+    color: var(--rl-ink);
+    font-weight: 700;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 0.5em;
+      height: 0.5em;
+      margin-right: 0.5em;
+      vertical-align: 0.1em;
+      background: var(--rl-brand);
+      border: 1px solid var(--rl-passed);
+      border-radius: 2px;
+    }
+  }
+}
+
+// Lists: bullets share the TOC's rounded status mark ------------------------
+
+main ul:not([class]) {
+  padding-left: 1.25rem;
+
+  > li {
+    list-style: none;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: -1.1rem;
+      top: 0.62em;
+      width: 0.45em;
+      height: 0.45em;
+      background: var(--rl-brand);
+      border: 1px solid var(--rl-passed);
+      border-radius: 2px;
+    }
+  }
+
+  // Nested levels drop to an outlined mark
+  ul:not([class]) > li::before {
+    background: transparent;
+  }
+}
+
+main ol > li::marker {
+  color: var(--rl-passed);
+  font-weight: 700;
+}
+
+// Code ----------------------------------------------------------------------
+
+html:root code {
+  color: var(--rl-ink);
+  background: var(--rl-code-bg);
+  border: 1px solid var(--rl-rule);
+  border-radius: 4px;
+  padding: 0.05em 0.3em;
+  font-size: 0.875em;
+}
+
+html:root pre {
+  background: var(--rl-code-bg);
+  border: 1px solid var(--rl-rule);
+  border-radius: 6px;
+  padding: 1rem 1.125rem;
+
+  code {
+    border: 0;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+}
+
+// R syntax mapped onto the run palette
+html:root pre code span {
+  &.kw, &.cf { color: var(--rl-link); font-weight: 700; }
+  &.fu { color: var(--rl-passed); }
+  &.st, &.ch, &.ss { color: var(--rl-skipped); }
+  &.dv, &.fl, &.bn, &.cn { color: var(--rl-undefined); }
+  &.co, &.do, &.cv { color: var(--rl-muted); font-style: italic; }
+  &.op, &.ot { color: var(--rl-muted); }
+  &.va, &.at, &.im { color: var(--rl-ink); }
+  &.al, &.er { color: var(--rl-failed); font-weight: 700; }
+}
+
+// Gherkin, tokenised by extra.js like the pretty reporter
+pre.gherkin {
+  .gk-feature { color: var(--rl-ink); font-weight: 700; }
+  .gk-step { color: var(--rl-passed); font-weight: 700; }
+  .gk-tag, .gk-string { color: var(--rl-skipped); }
+  .gk-param { color: var(--rl-undefined); }
+  .gk-comment, .gk-pipe { color: var(--rl-muted); }
+  .gk-comment { font-style: italic; }
+}
+
+
+// Home ----------------------------------------------------------------------
+
+img.logo {
+  @include media-breakpoint-down(sm) {
+    width: 72px !important;
+  }
+}
+
+.dev-status ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }

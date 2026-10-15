@@ -3,14 +3,19 @@ home:
   title: Behavior-Driven Development in R
 template:
   bootstrap: 5
-  bootswatch: flatly
+  light-switch: true
+  theme: a11y-light
+  theme-dark: a11y-dark
   bslib:
-    bg: "#FFFFFF"
+    bg: "#fdfefc"
     fg: "#0f2a13"
-    primary: "#59cf64"
-    secondary: "#1C2541"
-    green: "#1C2541"
-    success: "#1C2541"
+    primary: "#1a6b2e"
+    secondary: "#4a5d4e"
+    link-color: "#1C2541"
+    font-size-base: "1.0625rem"
+    base_font: {google: {family: "Atkinson Hyperlegible Next", wght: [400, 700]}}
+    heading_font: {google: {family: "Atkinson Hyperlegible Next", wght: [400, 700]}}
+    code_font: {google: {family: "Atkinson Hyperlegible Mono", wght: [400, 700]}}
   includes:
     in_header: |
       <!-- Google tag (gtag.js) -->
@@ -24,7 +29,6 @@ template:
       </script>
 
 navbar:
-  type: light
   structure:
     left: [reference, gherkin-reference, articles, news]
     right: [search, github]
