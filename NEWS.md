@@ -71,7 +71,8 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `CucumberSummaryReporter` prints only the summary of the run, like the `summary` formatter of cucumber-js.
 - ✨ `CucumberPrettyReporter` prints a failed or pending hook's error, or the reason a hook skipped the scenario, where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
 - ✨ `CucumberMessagesReporter` writes the run as [Cucumber Messages](https://github.com/cucumber/messages), one JSON message per line, like the `message` formatter of other Cucumber implementations: `test(reporter = CucumberMessagesReporter$new("cucumber.ndjson"))`. Official tools read it, like the HTML, JUnit and JSON formatters. It passes the samples of the Cucumber Compatibility Kit that cover what cucumber supports. `CucumberReporter` gets an `add_message()` method, called with each message.
-- ✨ `CucumberMultiReporter` combines reporters, like `testthat::MultiReporter`, and passes the step, hook, scenario and message calls to each `CucumberReporter` among them, e.g. to print the progress of a run and write its messages.
+- ✨ `CucumberMultiReporter` combines reporters and passes every event to each of them, e.g. to print the progress of a run and write its messages.
+- ⚠️ Cucumber reporters are no longer testthat reporters, and testthat reporters, like `testthat::JunitReporter`, can't be passed to `test()` or `run()`: they get an error. A `CucumberReporter` gets only cucumber's events: `start_run()`, `end_run(error)` with the error that stopped the run, `start_scenario()` and `add_warning()` replace testthat's `start_reporter()`, `end_reporter()`, `start_test()`, `end_test()` and `add_result()`. Use `reporter = NULL` to report nothing. With `run()` in a testthat test file, the cucumber reporter prints its summary at the end of the run.
 
 ## Reports
 

@@ -1,6 +1,7 @@
 Feature: Custom reporter
-  Extend `CucumberReporter` to report features, steps, hooks and scenarios your way.
-  Pass the reporter to `test()` or `run()` with `reporter`.
+  Extend `CucumberReporter` to report the run, features, scenarios, steps, hooks and warnings your way.
+  Pass the reporter to `test()` or `run()` with `reporter`. Only cucumber reporters can report a run,
+  testthat reporters can't.
 
   Background:
     Given a package
@@ -10,6 +11,12 @@ Feature: Custom reporter
         "EventReporter",
         inherit = cucumber::CucumberReporter,
         public = list(
+          start_run = function() cat("start run\n"),
+          end_run = function(error) {
+            cat("end run:", if (is.null(error)) "passed" else conditionMessage(error), "\n")
+          },
+          start_scenario = function(scenario_name) cat("start scenario:", scenario_name, "\n"),
+          add_warning = function(warning) cat("warning:", conditionMessage(warning), "\n"),
           start_feature = function(feature_name) {
             super$start_feature(feature_name)
             cat("start feature:", feature_name, "\n")
@@ -64,7 +71,9 @@ Feature: Custom reporter
       """
     Then the output includes
       """
+      start run
       start feature: Feature: Basket
+      start scenario: Scenario: Add an item
       start step: Given an empty basket
       end step: Given Context an empty basket passed
       start step: And a cucumber
@@ -79,6 +88,7 @@ Feature: Custom reporter
       end step: * Unknown the basket is light passed
       end scenario: passed
       end feature
+      end run: passed
       """
 
   Scenario: A reporter gets the hooks that failed or are pending
@@ -102,6 +112,7 @@ Feature: Custom reporter
     Then the output includes
       """
       start feature: Feature: Basket
+      start scenario: Scenario: Add an item
       end hook: pending Hook is pending: no database yet
       start step: Given an empty basket
       end step: Given Context an empty basket skipped
@@ -134,3 +145,69 @@ Feature: Custom reporter
       end step: Given Context an empty basket skipped
       end scenario: skipped
       """
+
+  Scenario: A reporter gets the warnings raised in steps and hooks
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) warning("the database is slow"))
+      given("an empty basket", function(context) warning("the basket is dusty"))
+      """
+    When I run
+      """
+      source("event-reporter.R")
+      test("features", reporter = EventReporter$new())
+      """
+    Then the output includes
+      """
+      start scenario: Scenario: Add an item
+      warning: the database is slow
+      start step: Given an empty basket
+      warning: the basket is dusty
+      end step: Given Context an empty basket passed
+      """
+
+  Scenario: A reporter gets the error that stopped the run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_all(function() stop("the server didn't start"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      source("event-reporter.R")
+      test("features", reporter = EventReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      start run
+      end run: the server didn't start
+      """
+
+  Scenario: A testthat reporter can't report a run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {})
+      """
+    When I run it and it fails
+      """
+      test("features", reporter = testthat::ProgressReporter$new())
+      """
+    Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."

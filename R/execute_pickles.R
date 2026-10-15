@@ -6,7 +6,7 @@
 #'
 #' @param pickles List of pickle objects (must have matched steps)
 #' @param hooks List of before/after hooks
-#' @param reporter Optional reporter instance (testthat::Reporter or CucumberReporter)
+#' @param reporter A CucumberReporter, or NULL
 #' @param feature_name The feature's name, like "Feature: Basket", for the reporter
 #' @param strict Whether pending and undefined steps fail the scenario
 #' @param dry_run Whether to skip hooks and step bodies
@@ -91,7 +91,9 @@ execute_single_pickle <- function(
   dry_run = FALSE
 ) {
   failed <- FALSE
-  test_that(glue("Scenario: {test_name}"), {
+  # The reporter gets the warnings before testthat, which keeps them as its results
+  test_that(glue("Scenario: {test_name}"), withCallingHandlers({
+    cucumber_event(reporter, "start_scenario", glue("Scenario: {test_name}"))
     .context <- new.env()
     scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
     test_case_started <- list(
@@ -180,7 +182,7 @@ execute_single_pickle <- function(
     if (skip_steps && !dry_run && result$status == "skipped") {
       testthat::skip("A previous scenario failed and `fail_fast = TRUE`.")
     }
-  })
+  }, warning = \(w) cucumber_event(reporter, "add_warning", w)))
 
   invisible(failed)
 }

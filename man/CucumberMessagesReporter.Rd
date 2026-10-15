@@ -29,8 +29,8 @@ cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
 }
 
 }
-\section{Super classes}{
-\code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberMessagesReporter}
+\section{Super class}{
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberMessagesReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -50,28 +50,15 @@ cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id=".start_context"><a href='../../testthat/html/Reporter.html#method-Reporter-.start_context'><code>testthat::Reporter$.start_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="add_result"><a href='../../testthat/html/Reporter.html#method-Reporter-add_result'><code>testthat::Reporter$add_result()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_line"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_line'><code>testthat::Reporter$cat_line()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_tight"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_tight'><code>testthat::Reporter$cat_tight()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context'><code>testthat::Reporter$end_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context_if_started"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context_if_started'><code>testthat::Reporter$end_context_if_started()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_file"><a href='../../testthat/html/Reporter.html#method-Reporter-end_file'><code>testthat::Reporter$end_file()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_reporter"><a href='../../testthat/html/Reporter.html#method-Reporter-end_reporter'><code>testthat::Reporter$end_reporter()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_test"><a href='../../testthat/html/Reporter.html#method-Reporter-end_test'><code>testthat::Reporter$end_test()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="is_full"><a href='../../testthat/html/Reporter.html#method-Reporter-is_full'><code>testthat::Reporter$is_full()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="local_user_output"><a href='../../testthat/html/Reporter.html#method-Reporter-local_user_output'><code>testthat::Reporter$local_user_output()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="rule"><a href='../../testthat/html/Reporter.html#method-Reporter-rule'><code>testthat::Reporter$rule()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_context"><a href='../../testthat/html/Reporter.html#method-Reporter-start_context'><code>testthat::Reporter$start_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_file"><a href='../../testthat/html/Reporter.html#method-Reporter-start_file'><code>testthat::Reporter$start_file()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_reporter"><a href='../../testthat/html/Reporter.html#method-Reporter-start_reporter'><code>testthat::Reporter$start_reporter()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_test"><a href='../../testthat/html/Reporter.html#method-Reporter-start_test'><code>testthat::Reporter$start_test()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_warning'><code>cucumber::CucumberReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_feature'><code>cucumber::CucumberReporter$end_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_hook"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_hook'><code>cucumber::CucumberReporter$end_hook()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_run'><code>cucumber::CucumberReporter$end_run()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_scenario"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_scenario'><code>cucumber::CucumberReporter$end_scenario()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_step'><code>cucumber::CucumberReporter$end_step()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_feature'><code>cucumber::CucumberReporter$start_feature()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_scenario"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_scenario'><code>cucumber::CucumberReporter$start_scenario()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_step'><code>cucumber::CucumberReporter$start_step()</code></a></span></li>
 </ul>
 </details>

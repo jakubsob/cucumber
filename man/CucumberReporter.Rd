@@ -4,29 +4,26 @@
 \alias{CucumberReporter}
 \title{Cucumber Reporter Base Class}
 \description{
-Base class for cucumber reporters that extends testthat::Reporter.
-Adds step-level and feature-level reporting hooks while maintaining
-full compatibility with testthat reporters.
-}
-\details{
-CucumberReporter extends testthat's Reporter class to add:
-- Feature-level hooks: `start_feature()`, `end_feature()`
-- Step-level hooks: `start_step()`, `end_step()`
-- Every [Cucumber Message](https://github.com/cucumber/messages) of the run: `add_message()`
+Base class for cucumber reporters. A reporter gets the events of a run: the
+run, each feature, scenario, step and hook, and every
+[Cucumber Message](https://github.com/cucumber/messages).
 
-These additional hooks are called during cucumber test execution to provide
-visibility into individual step execution. Standard testthat reporters will
-continue to work unchanged, reporting only at the scenario (test) level.
+Extend it to report a run your way, overriding the methods of the events
+you need. Each does nothing by default.
 }
 \section{Methods}{
 
 \describe{
+  \item{`start_run()`}{Called when a run starts}
+  \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a failing `before_all()` hook, or `NULL`}
   \item{`start_feature(feature_name)`}{Called before executing a feature's scenarios}
   \item{`end_feature()`}{Called after all scenarios in a feature complete}
+  \item{`start_scenario(scenario_name)`}{Called before a scenario's hooks and steps, with its name, like `"Scenario: Add an item"`}
+  \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
   \item{`start_step(step)`}{Called before executing a step}
   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
-  \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
+  \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
   \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
 }
 
@@ -34,9 +31,6 @@ Combine reporters with [CucumberMultiReporter].
 }
 
 \keyword{internal}
-\section{Super class}{
-\code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{CucumberReporter}
-}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -49,40 +43,47 @@ Combine reporters with [CucumberMultiReporter].
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-CucumberReporter-start_run}{\code{CucumberReporter$start_run()}}
+\item \href{#method-CucumberReporter-end_run}{\code{CucumberReporter$end_run()}}
 \item \href{#method-CucumberReporter-start_feature}{\code{CucumberReporter$start_feature()}}
 \item \href{#method-CucumberReporter-end_feature}{\code{CucumberReporter$end_feature()}}
+\item \href{#method-CucumberReporter-start_scenario}{\code{CucumberReporter$start_scenario()}}
+\item \href{#method-CucumberReporter-end_scenario}{\code{CucumberReporter$end_scenario()}}
 \item \href{#method-CucumberReporter-start_step}{\code{CucumberReporter$start_step()}}
 \item \href{#method-CucumberReporter-end_step}{\code{CucumberReporter$end_step()}}
 \item \href{#method-CucumberReporter-end_hook}{\code{CucumberReporter$end_hook()}}
-\item \href{#method-CucumberReporter-end_scenario}{\code{CucumberReporter$end_scenario()}}
+\item \href{#method-CucumberReporter-add_warning}{\code{CucumberReporter$add_warning()}}
 \item \href{#method-CucumberReporter-add_message}{\code{CucumberReporter$add_message()}}
 \item \href{#method-CucumberReporter-clone}{\code{CucumberReporter$clone()}}
 }
 }
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
-<ul>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id=".start_context"><a href='../../testthat/html/Reporter.html#method-Reporter-.start_context'><code>testthat::Reporter$.start_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="add_result"><a href='../../testthat/html/Reporter.html#method-Reporter-add_result'><code>testthat::Reporter$add_result()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_line"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_line'><code>testthat::Reporter$cat_line()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="cat_tight"><a href='../../testthat/html/Reporter.html#method-Reporter-cat_tight'><code>testthat::Reporter$cat_tight()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context'><code>testthat::Reporter$end_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_context_if_started"><a href='../../testthat/html/Reporter.html#method-Reporter-end_context_if_started'><code>testthat::Reporter$end_context_if_started()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_file"><a href='../../testthat/html/Reporter.html#method-Reporter-end_file'><code>testthat::Reporter$end_file()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_reporter"><a href='../../testthat/html/Reporter.html#method-Reporter-end_reporter'><code>testthat::Reporter$end_reporter()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="end_test"><a href='../../testthat/html/Reporter.html#method-Reporter-end_test'><code>testthat::Reporter$end_test()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="initialize"><a href='../../testthat/html/Reporter.html#method-Reporter-initialize'><code>testthat::Reporter$initialize()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="is_full"><a href='../../testthat/html/Reporter.html#method-Reporter-is_full'><code>testthat::Reporter$is_full()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="local_user_output"><a href='../../testthat/html/Reporter.html#method-Reporter-local_user_output'><code>testthat::Reporter$local_user_output()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="rule"><a href='../../testthat/html/Reporter.html#method-Reporter-rule'><code>testthat::Reporter$rule()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_context"><a href='../../testthat/html/Reporter.html#method-Reporter-start_context'><code>testthat::Reporter$start_context()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_file"><a href='../../testthat/html/Reporter.html#method-Reporter-start_file'><code>testthat::Reporter$start_file()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_reporter"><a href='../../testthat/html/Reporter.html#method-Reporter-start_reporter'><code>testthat::Reporter$start_reporter()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_test"><a href='../../testthat/html/Reporter.html#method-Reporter-start_test'><code>testthat::Reporter$start_test()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
-</ul>
-</details>
-}}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberReporter-start_run"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-start_run}{}}}
+\subsection{Method \code{start_run()}}{
+Start a run
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$start_run()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberReporter-end_run"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-end_run}{}}}
+\subsection{Method \code{end_run()}}{
+End a run
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_run(error = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{error}}{The error that stopped the run, or `NULL`}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CucumberReporter-start_feature"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberReporter-start_feature}{}}}
@@ -109,6 +110,40 @@ End the current feature
 \if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_feature()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberReporter-start_scenario"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-start_scenario}{}}}
+\subsection{Method \code{start_scenario()}}{
+Start a scenario
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$start_scenario(scenario_name)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{scenario_name}}{Name of the scenario, like `"Scenario: Add an item"`}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberReporter-end_scenario"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-end_scenario}{}}}
+\subsection{Method \code{end_scenario()}}{
+Called after a scenario's steps and hooks, with the worst of their statuses
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_scenario(status)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{status}}{The scenario's status}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CucumberReporter-start_step"></a>}}
@@ -164,18 +199,18 @@ Called after a scenario's `before` or `after` hook that failed, is pending or sk
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-end_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-end_scenario}{}}}
-\subsection{Method \code{end_scenario()}}{
-Called after a scenario's steps and hooks, with the worst of their statuses
+\if{html}{\out{<a id="method-CucumberReporter-add_warning"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-add_warning}{}}}
+\subsection{Method \code{add_warning()}}{
+Called with each warning raised in a step, a hook or elsewhere in the run
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_scenario(status)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$add_warning(warning)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{status}}{The scenario's status}
+\item{\code{warning}}{The warning}
 }
 \if{html}{\out{</div>}}
 }

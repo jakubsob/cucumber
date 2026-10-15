@@ -84,7 +84,7 @@ describe("test", {
       cucumber::test(
         "tests/acceptance",
         stop_on_failure = FALSE,
-        reporter = testthat::SilentReporter$new()
+        reporter = NULL
       )
     })
     df <- as.data.frame(result)

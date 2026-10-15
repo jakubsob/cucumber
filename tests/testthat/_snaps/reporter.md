@@ -7,6 +7,7 @@
     Output
       
       Feature: Addition
+        Scenario: Add two numbers
           v Given I have entered 50 into the calculator
           v And I have entered 70 into the calculator
           v When I press add
@@ -22,6 +23,7 @@
     Output
       
       Feature: Failing test
+        Scenario: This will fail
           v Given I have a value
           v When I make it wrong
           x Then it should fail
@@ -42,6 +44,7 @@
     Output
       
       Feature: Step arguments
+        Scenario: Steps with a docstring and a table
           v Given a message
             """
             line one
@@ -62,6 +65,7 @@
     Output
       
       Feature: Step arguments
+        Scenario: Long docstring
           v Given a long message
             """
             line one

@@ -1,28 +1,25 @@
 #' Cucumber Reporter Base Class
 #'
 #' @description
-#' Base class for cucumber reporters that extends testthat::Reporter.
-#' Adds step-level and feature-level reporting hooks while maintaining
-#' full compatibility with testthat reporters.
+#' Base class for cucumber reporters. A reporter gets the events of a run: the
+#' run, each feature, scenario, step and hook, and every
+#' [Cucumber Message](https://github.com/cucumber/messages).
 #'
-#' @details
-#' CucumberReporter extends testthat's Reporter class to add:
-#' - Feature-level hooks: `start_feature()`, `end_feature()`
-#' - Step-level hooks: `start_step()`, `end_step()`
-#' - Every [Cucumber Message](https://github.com/cucumber/messages) of the run: `add_message()`
-#'
-#' These additional hooks are called during cucumber test execution to provide
-#' visibility into individual step execution. Standard testthat reporters will
-#' continue to work unchanged, reporting only at the scenario (test) level.
+#' Extend it to report a run your way, overriding the methods of the events
+#' you need. Each does nothing by default.
 #'
 #' @section Methods:
 #' \describe{
+#'   \item{`start_run()`}{Called when a run starts}
+#'   \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a failing `before_all()` hook, or `NULL`}
 #'   \item{`start_feature(feature_name)`}{Called before executing a feature's scenarios}
 #'   \item{`end_feature()`}{Called after all scenarios in a feature complete}
+#'   \item{`start_scenario(scenario_name)`}{Called before a scenario's hooks and steps, with its name, like `"Scenario: Add an item"`}
+#'   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
 #'   \item{`start_step(step)`}{Called before executing a step}
 #'   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
 #'   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
-#'   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
+#'   \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
 #'   \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
 #' }
 #'
@@ -35,13 +32,25 @@
 #' @export
 CucumberReporter <- R6::R6Class(
   "CucumberReporter",
-  inherit = testthat::Reporter,
   public = list(
     #' @field current_feature Current feature name being executed
     current_feature = NULL,
 
     #' @field current_pickle Current pickle (scenario) being executed
     current_pickle = NULL,
+
+    #' @description
+    #' Start a run
+    start_run = function() {
+      invisible(self)
+    },
+
+    #' @description
+    #' End a run
+    #' @param error The error that stopped the run, or `NULL`
+    end_run = function(error = NULL) {
+      invisible(self)
+    },
 
     #' @description
     #' Start a feature
@@ -55,6 +64,20 @@ CucumberReporter <- R6::R6Class(
     #' End the current feature
     end_feature = function() {
       self$current_feature <- NULL
+      invisible(self)
+    },
+
+    #' @description
+    #' Start a scenario
+    #' @param scenario_name Name of the scenario, like `"Scenario: Add an item"`
+    start_scenario = function(scenario_name) {
+      invisible(self)
+    },
+
+    #' @description
+    #' Called after a scenario's steps and hooks, with the worst of their statuses
+    #' @param status The scenario's status
+    end_scenario = function(status) {
       invisible(self)
     },
 
@@ -81,9 +104,9 @@ CucumberReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Called after a scenario's steps and hooks, with the worst of their statuses
-    #' @param status The scenario's status
-    end_scenario = function(status) {
+    #' Called with each warning raised in a step, a hook or elsewhere in the run
+    #' @param warning The warning
+    add_warning = function(warning) {
       invisible(self)
     },
 
@@ -97,25 +120,37 @@ CucumberReporter <- R6::R6Class(
   )
 )
 
-#' Call a cucumber event on a reporter. Reporters that aren't a
-#' CucumberReporter don't get cucumber events.
+#' Call a cucumber event on a reporter, if there is one
 #' @keywords internal
 #' @noRd
 cucumber_event <- function(reporter, method, ...) {
-  if (inherits(reporter, "CucumberReporter")) {
+  if (!is.null(reporter)) {
     reporter[[method]](...)
   }
   invisible()
 }
 
+#' Check that a reporter is a CucumberReporter, or NULL for no reporter
+#' @keywords internal
+#' @noRd
+check_reporter <- function(reporter, call = rlang::caller_env()) {
+  if (!is.null(reporter) && !inherits(reporter, "CucumberReporter")) {
+    rlang::abort(
+      c(
+        "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing.",
+        i = "testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`."
+      ),
+      call = call
+    )
+  }
+  invisible(reporter)
+}
+
 #' Combine reporters
 #'
 #' @description
-#' Passes every call to each of its reporters, like [testthat::MultiReporter],
-#' and is a [CucumberReporter] itself: its reporters that are
-#' `CucumberReporter`s also get the step, hook, scenario and message calls.
-#' Use it, for example, to print the progress of a run and write its
-#' messages.
+#' Passes every event to each of its reporters. Use it, for example, to print
+#' the progress of a run and write its messages.
 #'
 #' @examples
 #' \dontrun{
@@ -130,82 +165,54 @@ CucumberMultiReporter <- R6::R6Class(
   "CucumberMultiReporter",
   inherit = CucumberReporter,
   public = list(
-    #' @field reporters The reporters to pass the calls to
+    #' @field reporters The reporters to pass the events to
     reporters = list(),
 
     #' @description
     #' Combine reporters
-    #' @param reporters A list of reporters, testthat ones or `CucumberReporter`s
+    #' @param reporters A list of `CucumberReporter`s
     initialize = function(reporters = list()) {
-      super$initialize()
+      lapply(reporters, check_reporter)
       self$reporters <- reporters
     },
 
     #' @description Pass to each reporter
-    start_reporter = function() private$each("start_reporter"),
+    start_run = function() private$each("start_run"),
     #' @description Pass to each reporter
-    #' @param filename Test file name
-    start_file = function(filename) private$each("start_file", filename),
+    #' @param error The error that stopped the run, or `NULL`
+    end_run = function(error = NULL) private$each("end_run", error),
     #' @description Pass to each reporter
-    #' @param context Context name
-    start_context = function(context) private$each("start_context", context),
-    #' @description Pass to each reporter
-    #' @param context Context name
-    #' @param test Test name
-    start_test = function(context, test) private$each("start_test", context, test),
-    #' @description Pass to each reporter
-    #' @param context Context name
-    #' @param test Test name
-    #' @param result The expectation
-    add_result = function(context, test, result) {
-      private$each("add_result", context = context, test = test, result = result)
-    },
-    #' @description Pass to each reporter
-    #' @param context Context name
-    #' @param test Test name
-    end_test = function(context, test) private$each("end_test", context, test),
-    #' @description Pass to each reporter
-    #' @param context Context name
-    end_context = function(context) private$each("end_context", context),
-    #' @description Pass to each reporter
-    end_reporter = function() private$each("end_reporter"),
-    #' @description Pass to each reporter
-    end_file = function() private$each("end_file"),
-    #' @description Pass to each reporter
-    update = function() private$each("update"),
-
-    #' @description Pass to each `CucumberReporter`
     #' @param feature_name Name of the feature
-    start_feature = function(feature_name) private$each_cucumber("start_feature", feature_name),
-    #' @description Pass to each `CucumberReporter`
-    end_feature = function() private$each_cucumber("end_feature"),
-    #' @description Pass to each `CucumberReporter`
+    start_feature = function(feature_name) private$each("start_feature", feature_name),
+    #' @description Pass to each reporter
+    end_feature = function() private$each("end_feature"),
+    #' @description Pass to each reporter
+    #' @param scenario_name Name of the scenario
+    start_scenario = function(scenario_name) private$each("start_scenario", scenario_name),
+    #' @description Pass to each reporter
+    #' @param status The scenario's status
+    end_scenario = function(status) private$each("end_scenario", status),
+    #' @description Pass to each reporter
     #' @param step Pickle step object
-    start_step = function(step) private$each_cucumber("start_step", step),
-    #' @description Pass to each `CucumberReporter`
+    start_step = function(step) private$each("start_step", step),
+    #' @description Pass to each reporter
     #' @param step Pickle step object with execution results
-    end_step = function(step) private$each_cucumber("end_step", step),
-    #' @description Pass to each `CucumberReporter`
+    end_step = function(step) private$each("end_step", step),
+    #' @description Pass to each reporter
     #' @param status The hook's status
     #' @param error The hook's error
-    end_hook = function(status, error) private$each_cucumber("end_hook", status, error),
-    #' @description Pass to each `CucumberReporter`
-    #' @param status The scenario's status
-    end_scenario = function(status) private$each_cucumber("end_scenario", status),
-    #' @description Pass to each `CucumberReporter`
+    end_hook = function(status, error) private$each("end_hook", status, error),
+    #' @description Pass to each reporter
+    #' @param warning The warning
+    add_warning = function(warning) private$each("add_warning", warning),
+    #' @description Pass to each reporter
     #' @param envelope A list with one element, named by the message's type
-    add_message = function(envelope) private$each_cucumber("add_message", envelope)
+    add_message = function(envelope) private$each("add_message", envelope)
   ),
   private = list(
     each = function(method, ...) {
       for (reporter in self$reporters) {
         reporter[[method]](...)
-      }
-      invisible(self)
-    },
-    each_cucumber = function(method, ...) {
-      for (reporter in self$reporters) {
-        cucumber_event(reporter, method, ...)
       }
       invisible(self)
     }
@@ -254,7 +261,6 @@ CucumberMessagesReporter <- R6::R6Class(
     #'   working directory when the reporter is created.
     initialize = function(file = "cucumber.ndjson") {
       rlang::check_installed("jsonlite", "to write Cucumber Messages.")
-      super$initialize()
       self$file <- if (is.character(file)) as.character(fs::path_abs(file)) else file
     },
 
@@ -467,12 +473,6 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field scenario_statuses Statuses of the finished scenarios
     scenario_statuses = NULL,
 
-    #' @field scenario_failed Whether testthat reported a failure or an error for the current test
-    scenario_failed = FALSE,
-
-    #' @field scenario_status Status of the current scenario, once its steps and hooks ran
-    scenario_status = NULL,
-
     #' @field current_scenario Name of the scenario currently executing
     current_scenario = NULL,
 
@@ -481,10 +481,6 @@ CucumberSummaryReporter <- R6::R6Class(
 
     #' @field current_hooks Results of the current scenario's hooks that failed or are pending
     current_hooks = NULL,
-
-    #' @field step_warnings Warnings of the step currently executing, collected
-    #'   when not `NULL`, printed as they happen otherwise
-    step_warnings = NULL,
 
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
@@ -506,9 +502,7 @@ CucumberSummaryReporter <- R6::R6Class(
 
     #' @description
     #' Initialize the reporter
-    #' @param ... Additional arguments passed to parent
-    initialize = function(...) {
-      super$initialize(...)
+    initialize = function() {
       self$step_statuses <- character()
       self$scenario_statuses <- character()
       self$current_steps <- list()
@@ -571,33 +565,13 @@ CucumberSummaryReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Start a test (called by testthat for each scenario)
-    #' @param context Test context
-    #' @param test Test name (will be "Scenario: `<name>`")
-    start_test = function(context, test) {
-      if (!is.null(super$start_test)) {
-        super$start_test(context, test)
-      }
-      self$current_scenario <- test
+    #' Start a scenario
+    #' @param scenario_name Name of the scenario
+    start_scenario = function(scenario_name) {
+      super$start_scenario(scenario_name)
+      self$current_scenario <- scenario_name
       self$current_steps <- list()
       self$current_hooks <- list()
-      self$scenario_status <- NULL
-      self$scenario_failed <- FALSE
-      invisible(self)
-    },
-
-    #' @description
-    #' End a test (called by testthat for each scenario). A scenario has the
-    #' status given to end_scenario(). A test that isn't a scenario, or one that
-    #' stopped before its end, fails if testthat reported a failure or an error.
-    #' @param context Test context
-    #' @param test Test name
-    end_test = function(context, test) {
-      if (!is.null(super$end_test)) {
-        super$end_test(context, test)
-      }
-      status <- self$scenario_status %||% (if (self$scenario_failed) "failed" else "passed")
-      self$scenario_statuses <- c(self$scenario_statuses, status)
       invisible(self)
     },
 
@@ -606,7 +580,7 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @param status The scenario's status
     end_scenario = function(status) {
       super$end_scenario(status)
-      self$scenario_status <- status
+      self$scenario_statuses <- c(self$scenario_statuses, status)
       if (!status %in% c("passed", "skipped")) {
         self$failures <- c(
           self$failures,
@@ -618,40 +592,6 @@ CucumberSummaryReporter <- R6::R6Class(
           ))
         )
       }
-      invisible(self)
-    },
-
-    #' @description
-    #' Add a result (warning, skip, failure, etc.)
-    #' @param context Test context
-    #' @param test Test object
-    #' @param result Test result object
-    add_result = function(context, test, result) {
-      if (!is.null(super$add_result)) {
-        super$add_result(context, test, result)
-      }
-
-      if (inherits(result, c("expectation_error", "expectation_failure"))) {
-        self$scenario_failed <- TRUE
-      }
-
-      if (inherits(result, "expectation_warning")) {
-        if (is.null(self$step_warnings)) {
-          self$print_above(print_warning(conditionMessage(result)))
-        } else {
-          self$step_warnings <- c(self$step_warnings, conditionMessage(result))
-        }
-      }
-
-      # Display errors that occur outside of a scenario's steps and hooks, e.g.
-      # during setup. A scenario's errors are in its summary.
-      if (
-        is.null(self$scenario_status) &&
-          inherits(result, c("expectation_error", "expectation_failure"))
-      ) {
-        self$print_above(print_error(conditionMessage(result)))
-      }
-
       invisible(self)
     },
 
@@ -672,6 +612,25 @@ CucumberSummaryReporter <- R6::R6Class(
       super$end_step(step)
       self$current_steps <- c(self$current_steps, list(step))
       self$step_statuses <- c(self$step_statuses, step$status %||% "passed")
+      invisible(self)
+    },
+
+    #' @description
+    #' Print a warning as it's raised
+    #' @param warning The warning
+    add_warning = function(warning) {
+      super$add_warning(warning)
+      self$print_above(print_warning(conditionMessage(warning)))
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the error that stopped the run
+    #' @param error The error, or `NULL`
+    print_run_error = function(error) {
+      if (!is.null(error)) {
+        self$print_above(print_error(conditionMessage(error)))
+      }
       invisible(self)
     },
 
@@ -702,11 +661,11 @@ CucumberSummaryReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Print summary at the end (called by testthat)
-    end_reporter = function() {
-      if (!is.null(super$end_reporter)) {
-        super$end_reporter()
-      }
+    #' Print the error that stopped the run, if any, and the summary
+    #' @param error The error that stopped the run, or `NULL`
+    end_run = function(error = NULL) {
+      super$end_run(error)
+      self$print_run_error(error)
       self$print_counts()
       self$print_failures()
       invisible(self)
@@ -773,9 +732,10 @@ CucumberDotsReporter <- R6::R6Class(
 
     #' @description
     #' End the line of characters and print the summary
-    end_reporter = function() {
+    #' @param error The error that stopped the run, or `NULL`
+    end_run = function(error = NULL) {
       cat("\n")
-      super$end_reporter()
+      super$end_run(error)
     }
   )
 )
@@ -862,9 +822,8 @@ CucumberProgressReporter <- R6::R6Class(
 
     #' @description
     #' Initialize the reporter
-    #' @param ... Additional arguments passed to parent
-    initialize = function(...) {
-      super$initialize(...)
+    initialize = function() {
+      super$initialize()
       self$frames <- cli::get_spinner()$frames
       invisible(self)
     },
@@ -895,22 +854,13 @@ CucumberProgressReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Count the scenario in the feature's line
-    #' @param context Test context
-    #' @param test Test name
-    end_test = function(context, test) {
-      super$end_test(context, test)
-      if (!is.null(self$live)) self$draw_feature()
-      invisible(self)
-    },
-
-    #' @description
-    #' Print the scenario if it didn't pass
+    #' Count the scenario in the feature's line, and print it if it didn't pass
     #' @param status The scenario's status
     end_scenario = function(status) {
       n <- length(self$failures)
       super$end_scenario(status)
       self$print_failures_since(n)
+      self$draw_feature()
     },
 
     #' @description
@@ -1027,11 +977,14 @@ CucumberProgressBarReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Clear the bar and print the scenarios and steps counted by status. The
-    #' scenarios that didn't pass were printed when they finished.
-    end_reporter = function() {
+    #' Clear the bar and print the error that stopped the run, if any, and the
+    #' scenarios and steps counted by status. The scenarios that didn't pass
+    #' were printed when they finished.
+    #' @param error The error that stopped the run, or `NULL`
+    end_run = function(error = NULL) {
       self$clear()
       self$live <- NULL
+      self$print_run_error(error)
       self$print_counts()
       invisible(self)
     }
@@ -1076,11 +1029,8 @@ CucumberProgressBarReporter <- R6::R6Class(
 #' # Step-level detail
 #' cucumber::test("tests/acceptance", reporter = cucumber::CucumberPrettyReporter$new())
 #'
-#' # testthat reporters still work, reporting at the scenario level only
-#' cucumber::test("tests/acceptance", reporter = testthat::ProgressReporter$new())
-#'
 #' # Silent mode
-#' cucumber::test("tests/acceptance", reporter = testthat::SilentReporter$new())
+#' cucumber::test("tests/acceptance", reporter = NULL)
 #'
 #' # From within a test file
 #' cucumber::run(reporter = cucumber::CucumberPrettyReporter$new())
@@ -1108,8 +1058,7 @@ CucumberProgressBarReporter <- R6::R6Class(
 #'         sprintf('<div class="step %s">%s %s</div>', status_class, step$keyword, step$text)
 #'       )
 #'     },
-#'     end_reporter = function() {
-#'       if (!is.null(super$end_reporter)) super$end_reporter()
+#'     end_run = function(error = NULL) {
 #'       writeLines(self$html_output, "test-report.html")
 #'     }
 #'   )
@@ -1155,6 +1104,9 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @field reporter_max_table_lines Max data table rows to print per step
     reporter_max_table_lines = Inf,
 
+    #' @field step_warnings Warnings of the step currently executing, printed under it
+    step_warnings = NULL,
+
     #' @description
     #' Initialize the reporter
     #' @param show_praise Whether to show praise (default TRUE)
@@ -1164,17 +1116,15 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @param reporter_max_table_lines Max data table rows to print for a step before
     #'   truncating. Defaults to the `cucumber.reporter_max_table_lines` option, or `Inf`
     #'   (print in full) if unset.
-    #' @param ... Additional arguments passed to parent
     initialize = function(
       show_praise = TRUE,
       reporter_max_docstring_lines = getOption(
         "cucumber.reporter_max_docstring_lines",
         Inf
       ),
-      reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
-      ...
+      reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf)
     ) {
-      super$initialize(...)
+      super$initialize()
       self$show_praise <- show_praise
       self$reporter_max_docstring_lines <- reporter_max_docstring_lines
       self$reporter_max_table_lines <- reporter_max_table_lines
@@ -1200,13 +1150,21 @@ CucumberPrettyReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Start a test (called by testthat for each scenario)
-    #' @param context Test context
-    #' @param test Test name (will be "Scenario: `<name>`")
-    start_test = function(context, test) {
-      super$start_test(context, test)
+    #' Start a step, collecting its warnings
+    #' @param step Pickle step object
+    start_step = function(step) {
+      super$start_step(step)
+      self$step_warnings <- character()
+      invisible(self)
+    },
+
+    #' @description
+    #' Start a scenario and print its name
+    #' @param scenario_name Name of the scenario
+    start_scenario = function(scenario_name) {
+      super$start_scenario(scenario_name)
       withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      cat("  ", bold_label(test), "\n", sep = "")
+      cat("  ", bold_label(scenario_name), "\n", sep = "")
       invisible(self)
     },
 
@@ -1219,15 +1177,6 @@ CucumberPrettyReporter <- R6::R6Class(
       super$end_hook(status, error)
       withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
       print_error(conditionMessage(error), status)
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a step
-    #' @param step Pickle step object
-    start_step = function(step) {
-      super$start_step(step)
-      self$step_warnings <- character()
       invisible(self)
     },
 
@@ -1252,6 +1201,18 @@ CucumberPrettyReporter <- R6::R6Class(
 
       print_step_error(step)
 
+      invisible(self)
+    },
+
+    #' @description
+    #' Keep a step's warnings to print them under it, print the others as they're raised
+    #' @param warning The warning
+    add_warning = function(warning) {
+      if (is.null(self$step_warnings)) {
+        super$add_warning(warning)
+      } else {
+        self$step_warnings <- c(self$step_warnings, conditionMessage(warning))
+      }
       invisible(self)
     },
 

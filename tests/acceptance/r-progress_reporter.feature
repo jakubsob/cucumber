@@ -74,3 +74,23 @@ Feature: Progress reporter
       """
       4 scenarios (1 failed, 1 undefined, 2 passed)
       """
+
+  Scenario: The error that stopped the run is printed
+    Given a file named "features/setup-steps.R" with
+      """
+      before_all(function() stop("the server didn't start"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      Error:
+      the server didn't start
+      """
+    And the output includes
+      """
+      0 scenarios
+      """

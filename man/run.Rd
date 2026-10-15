@@ -32,8 +32,7 @@ Tag expressions support \code{and}, \code{or}, \code{not} operators and parenthe
 like the official \href{https://github.com/cucumber/tag-expressions}{cucumber/tag-expressions}.
 Tags are written with their \code{@}. Escape a parenthesis in a tag with a backslash, e.g. \code{"@wip\\\\(x\\\\)"}.}
 
-\item{reporter}{Optional reporter instance (testthat::Reporter or cucumber::CucumberReporter).
-If NULL, will use reporter from package options if available.}
+\item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing.}
 
 \item{strict}{If \code{TRUE}, pending and undefined steps fail the scenario.
 If \code{FALSE}, they skip it.}

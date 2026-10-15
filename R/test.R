@@ -36,8 +36,7 @@
 #' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
 #'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
 #'   undefined step counts as failed.
-#' @param reporter Optional reporter instance (testthat::Reporter or cucumber::CucumberReporter).
-#'   If NULL, will use reporter from package options if available.
+#' @param reporter A [CucumberReporter], or `NULL` to report nothing.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
@@ -57,6 +56,30 @@ run <- function(
   fail_fast = FALSE,
   ...
 ) {
+  check_reporter(reporter)
+  # The reporter gets the error that stopped the run, like a failing before all hook
+  cucumber_event(reporter, "start_run")
+  error <- NULL
+  on.exit(cucumber_event(reporter, "end_run", error))
+  tryCatch(
+    withCallingHandlers(
+      run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, ...),
+      # Warnings outside scenarios, like in a before all hook. testthat keeps a
+      # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
+      warning = \(w) cucumber_event(reporter, "add_warning", w)
+    ),
+    error = function(e) {
+      error <<- e
+      stop(e)
+    }
+  )
+  invisible(NULL)
+}
+
+#' Run the feature files, see `run()`
+#' @keywords internal
+#' @noRd
+run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, ...) {
   withr::defer(cleanup(), testthat::teardown_env())
   check_grepl_args(...)
 
@@ -305,6 +328,8 @@ test_cucumber_code <- function(path, ...) {
 #'   `testthat::test_dir("tests/acceptance")`.
 #'
 #' @inheritParams testthat::test_dir
+#' @param reporter A [CucumberReporter], or `NULL` to report nothing. Defaults to
+#'   [CucumberProgressReporter].
 #' @param path Path to the directory containing the `.feature` files. Its subdirectories are
 #'   searched too. Defaults to the `cucumber.path` option, or `"tests/acceptance"` if it's not set.
 #' @param filter If not NULL, only features with file names matching this regular expression
@@ -371,9 +396,8 @@ test <- function(
   fail_fast = FALSE,
   ...
 ) {
-  if (!is.null(reporter)) {
-    withr::local_options(.cucumber_reporter = reporter)
-  }
+  check_reporter(reporter)
+  withr::local_options(.cucumber_reporter = reporter)
 
   file <- fs::path(path, "test-__cucumber__.R")
   with_file(file, {
@@ -394,7 +418,8 @@ test <- function(
     result <- test_dir(
       path = path,
       filter = "^__cucumber__$",
-      reporter = reporter,
+      # Cucumber's reporter gets the run's events from run(), testthat reports nothing
+      reporter = testthat::SilentReporter$new(),
       env = env,
       load_helpers = load_helpers,
       stop_on_failure = stop_on_failure,

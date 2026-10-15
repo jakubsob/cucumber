@@ -41,7 +41,7 @@
       ...)
     Output
         Error: 
-          Error in `cucumber::run(".", filter = "this_feature_doesnt_exist", reporter = getOption(".cucumber_reporter"))`: No feature files found.
+          No feature files found.
           i Add `.feature` files describing your scenarios.
       
       --------------------------------------------------------------------------------
@@ -300,8 +300,7 @@
       ...)
     Output
         Error: 
-          <cucumber_parse_error/rlang_error/error/condition>
-          Error: Can't parse feature files
+          Can't parse feature files
           x Parse error in "broken.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Scenario: Missing Feature keyword'
           x Parse error in "broken.feature" (2:3): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Given something happens'
       

@@ -24,7 +24,7 @@ Feature: Passing steps
       """
     When I run
       """
-      test("features", reporter = testthat::ListReporter$new())
+      test("features", reporter = NULL)
       """
     Then it passes
     And it has 1 passed

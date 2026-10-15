@@ -34,11 +34,8 @@ Tag expressions support \code{and}, \code{or}, \code{not} operators and parenthe
 like the official \href{https://github.com/cucumber/tag-expressions}{cucumber/tag-expressions}.
 Tags are written with their \code{@}. Escape a parenthesis in a tag with a backslash, e.g. \code{"@wip\\\\(x\\\\)"}.}
 
-\item{reporter}{Reporter to use to summarise output. Can be supplied
-as a string (e.g. "summary") or as an R6 object
-(e.g. \code{SummaryReporter$new()}).
-
-See \link[testthat]{Reporter} for more details and a list of built-in reporters.}
+\item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing. Defaults to
+\link{CucumberProgressReporter}.}
 
 \item{env}{Environment in which to execute the tests. Expert use only.}
 
