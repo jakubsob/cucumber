@@ -195,6 +195,43 @@ Feature: Custom reporter
       end run: the server didn't start
       """
 
+  Scenario: A reporter that fails stops the run with its error
+    The scenarios after it don't run, and the error names the reporter and the event it failed in.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+
+        Scenario: Remove an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {})
+      """
+    And a file named "broken-reporter.R" with
+      """
+      BrokenReporter <- R6::R6Class(
+        "BrokenReporter",
+        inherit = EventReporter,
+        public = list(
+          end_step = function(step) stop("can't format the step")
+        )
+      )
+      """
+    When I run it and it fails
+      """
+      source("event-reporter.R")
+      source("broken-reporter.R")
+      test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
+      """
+    Then it fails with "Reporter `BrokenReporter` failed in `end_step()`."
+    And it fails with "can't format the step"
+    And the output includes "start scenario: Scenario: Add an item"
+    And the output doesn't include "Remove an item"
+
   Scenario: A testthat reporter can't report a run
     Given a file named "features/basket.feature" with
       """

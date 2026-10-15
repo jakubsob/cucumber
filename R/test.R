@@ -57,23 +57,70 @@ run <- function(
   ...
 ) {
   check_reporter(reporter)
-  # The reporter gets the error that stopped the run, like a failing before all hook
-  cucumber_event(reporter, "start_run")
   error <- NULL
-  on.exit(cucumber_event(reporter, "end_run", error))
-  tryCatch(
-    withCallingHandlers(
-      run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, ...),
-      # Warnings outside scenarios, like in a before all hook. testthat keeps a
-      # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
-      warning = \(w) cucumber_event(reporter, "add_warning", w)
+  # An error of a reporter or of cucumber itself stops the run, see abort_run()
+  broken <- FALSE
+  withRestarts(
+    tryCatch(
+      withCallingHandlers(
+        {
+          cucumber_event(reporter, "start_run")
+          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, ...)
+        },
+        # Warnings outside scenarios, like in a before all hook. testthat keeps a
+        # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
+        warning = \(w) cucumber_event(reporter, "add_warning", w)
+      ),
+      error = function(e) error <<- e
     ),
-    error = function(e) {
+    cucumber_abort_run = function(e) {
       error <<- e
-      stop(e)
+      broken <<- TRUE
     }
   )
+  # The reporter gets the error that stopped the run, like a failing before all
+  # hook, unless it's the reporter that failed
+  if (!inherits(error, "cucumber_reporter_error")) {
+    end_error <- tryCatch(
+      cucumber_event(reporter, "end_run", error),
+      cucumber_reporter_error = identity
+    )
+    if (inherits(end_error, "cucumber_reporter_error")) {
+      error <- end_error
+      broken <- TRUE
+    }
+  }
+  if (broken) fail_test(error)
+  if (!is.null(error)) stop(error)
   invisible(NULL)
+}
+
+#' Stop the run with an error of a reporter or of cucumber itself, from wherever
+#' it's raised: testthat would report it as the failure of a scenario and run
+#' the next one.
+#' @keywords internal
+#' @noRd
+abort_run <- function(error) {
+  if (has_restart("cucumber_abort_run")) {
+    invokeRestart("cucumber_abort_run", error)
+  }
+  stop(error)
+}
+
+has_restart <- function(name) {
+  !is.null(findRestart(name))
+}
+
+#' Stop `test()` with an error of a reporter or of cucumber itself: testthat
+#' would report it as the failure of the test file. Outside of `test()`, like
+#' with `run()` in a testthat file, it's an error of the test file.
+#' @keywords internal
+#' @noRd
+fail_test <- function(error) {
+  if (has_restart("cucumber_fail_test")) {
+    invokeRestart("cucumber_fail_test", error)
+  }
+  stop(error)
 }
 
 #' Run the feature files, see `run()`
@@ -415,15 +462,18 @@ test <- function(
       ),
       con = file
     )
-    result <- test_dir(
-      path = path,
-      filter = "^__cucumber__$",
-      # Cucumber's reporter gets the run's events from run(), testthat reports nothing
-      reporter = testthat::SilentReporter$new(),
-      env = env,
-      load_helpers = load_helpers,
-      stop_on_failure = stop_on_failure,
-      stop_on_warning = stop_on_warning
+    result <- withRestarts(
+      test_dir(
+        path = path,
+        filter = "^__cucumber__$",
+        # Cucumber's reporter gets the run's events from run(), testthat reports nothing
+        reporter = testthat::SilentReporter$new(),
+        env = env,
+        load_helpers = load_helpers,
+        stop_on_failure = stop_on_failure,
+        stop_on_warning = stop_on_warning
+      ),
+      cucumber_fail_test = function(error) stop(error)
     )
   })
   invisible(result)

@@ -93,85 +93,89 @@ execute_single_pickle <- function(
   failed <- FALSE
   # The reporter gets the warnings before testthat, which keeps them as its results
   test_that(glue("Scenario: {test_name}"), withCallingHandlers({
-    cucumber_event(reporter, "start_scenario", glue("Scenario: {test_name}"))
-    .context <- new.env()
-    scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
-    test_case_started <- list(
-      id = new_id(),
-      testCaseId = pickle$test_case$id,
-      timestamp = timestamp(),
-      attempt = 0L
-    )
-    emit(reporter, "testCaseStarted", test_case_started)
+    # Errors of the scenario's steps and hooks are caught where they run. An
+    # error that gets here is of cucumber itself, and stops the run.
+    withCallingHandlers({
+      cucumber_event(reporter, "start_scenario", glue("Scenario: {test_name}"))
+      .context <- new.env()
+      scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
+      test_case_started <- list(
+        id = new_id(),
+        testCaseId = pickle$test_case$id,
+        timestamp = timestamp(),
+        attempt = 0L
+      )
+      emit(reporter, "testCaseStarted", test_case_started)
 
-    # The result of every test step so far: hooks and steps
-    results <- list()
-    # A test step that didn't pass skips the steps after it. A hook or a step
-    # that skipped the scenario also skips undefined and ambiguous steps.
-    skipping <- \() skip_steps || any(vapply(results, \(result) result$status != "passed", logical(1)))
-    skipped <- \() any(vapply(results, \(result) result$status == "skipped" && !is.null(result$error), logical(1)))
+      # The result of every test step so far: hooks and steps
+      results <- list()
+      # A test step that didn't pass skips the steps after it. A hook or a step
+      # that skipped the scenario also skips undefined and ambiguous steps.
+      skipping <- \() skip_steps || any(vapply(results, \(result) result$status != "passed", logical(1)))
+      skipped <- \() any(vapply(results, \(result) result$status == "skipped" && !is.null(result$error), logical(1)))
 
-    # Run a test step: report it to the reporter and as messages, and keep its result
-    run_test_step <- function(test_step_id, run, step = NULL) {
-      if (!is.null(step)) cucumber_event(reporter, "start_step", step)
-      emit(reporter, "testStepStarted", list(
-        testCaseStartedId = test_case_started$id,
-        testStepId = test_step_id,
-        timestamp = timestamp()
-      ))
-      result <- run()
-      emit(reporter, "testStepFinished", list(
-        testCaseStartedId = test_case_started$id,
-        testStepId = test_step_id,
-        testStepResult = test_step_result(result),
-        timestamp = timestamp()
-      ))
-      if (!is.null(step)) {
-        cucumber_event(reporter, "end_step", result)
-      } else if (!is.null(result$error)) {
-        cucumber_event(reporter, "end_hook", result$status, result$error)
-      }
-      results <<- c(results, list(result))
-    }
-    run_hook <- function(test_step, skip, ...) {
-      run_test_step(test_step$id, \() {
-        if (skip) list(status = "skipped", duration = 0, hook = TRUE) else run_hook_step(test_step$hook, ...)
-      })
-    }
-
-    # A dry run matches the steps, but runs neither hooks nor step bodies
-    for (test_step in pickle$test_case$before) {
-      run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE)
-    }
-
-    expectations <- 0
-    withCallingHandlers(for (step in pickle$steps) {
-      run_test_step(step$test_step_id, \() {
-        # Undefined and ambiguous steps already have a status from matching
-        if (skipped()) {
-          new_step_result(step, "skipped")
-        } else if (!is.null(step$status)) {
-          if (step$status == "undefined") emit_suggestion(reporter, step)
-          step
-        } else if (skipping()) {
-          new_step_result(step, "skipped")
-        } else {
-          execute_step_with_hooks(step, .context, pickle, hooks)
+      # Run a test step: report it to the reporter and as messages, and keep its result
+      run_test_step <- function(test_step_id, run, step = NULL) {
+        if (!is.null(step)) cucumber_event(reporter, "start_step", step)
+        emit(reporter, "testStepStarted", list(
+          testCaseStartedId = test_case_started$id,
+          testStepId = test_step_id,
+          timestamp = timestamp()
+        ))
+        result <- run()
+        emit(reporter, "testStepFinished", list(
+          testCaseStartedId = test_case_started$id,
+          testStepId = test_step_id,
+          testStepResult = test_step_result(result),
+          timestamp = timestamp()
+        ))
+        if (!is.null(step)) {
+          cucumber_event(reporter, "end_step", result)
+        } else if (!is.null(result$error)) {
+          cucumber_event(reporter, "end_hook", result$status, result$error)
         }
-      }, step)
-    }, expectation = function(e) expectations <<- expectations + 1)
+        results <<- c(results, list(result))
+      }
+      run_hook <- function(test_step, skip, ...) {
+        run_test_step(test_step$id, \() {
+          if (skip) list(status = "skipped", duration = 0, hook = TRUE) else run_hook_step(test_step$hook, ...)
+        })
+      }
 
-    for (test_step in pickle$test_case$after) {
-      run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE)
-    }
+      # A dry run matches the steps, but runs neither hooks nor step bodies
+      for (test_step in pickle$test_case$before) {
+        run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE)
+      }
 
-    result <- worst_result(results)
-    cucumber_event(reporter, "end_scenario", result$status)
-    emit(reporter, "testCaseFinished", list(
-      testCaseStartedId = test_case_started$id,
-      timestamp = timestamp(),
-      willBeRetried = FALSE
-    ))
+      expectations <- 0
+      withCallingHandlers(for (step in pickle$steps) {
+        run_test_step(step$test_step_id, \() {
+          # Undefined and ambiguous steps already have a status from matching
+          if (skipped()) {
+            new_step_result(step, "skipped")
+          } else if (!is.null(step$status)) {
+            if (step$status == "undefined") emit_suggestion(reporter, step)
+            step
+          } else if (skipping()) {
+            new_step_result(step, "skipped")
+          } else {
+            execute_step_with_hooks(step, .context, pickle, hooks)
+          }
+        }, step)
+      }, expectation = function(e) expectations <<- expectations + 1)
+
+      for (test_step in pickle$test_case$after) {
+        run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE)
+      }
+
+      result <- worst_result(results)
+      cucumber_event(reporter, "end_scenario", result$status)
+      emit(reporter, "testCaseFinished", list(
+        testCaseStartedId = test_case_started$id,
+        timestamp = timestamp(),
+        willBeRetried = FALSE
+      ))
+    }, error = \(e) if (has_restart("cucumber_abort_run")) invokeRestart("cucumber_abort_run", e))
     failing <- failing_statuses(strict, dry_run)
     failed <<- result$status %in% failing
     signal_scenario_result(results, result, failing)

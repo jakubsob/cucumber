@@ -120,13 +120,31 @@ CucumberReporter <- R6::R6Class(
   )
 )
 
-#' Call a cucumber event on a reporter, if there is one
+#' Call a cucumber event on a reporter, if there is one. An error of the
+#' reporter stops the run, naming the reporter and the event.
 #' @keywords internal
 #' @noRd
 cucumber_event <- function(reporter, method, ...) {
-  if (!is.null(reporter)) {
-    reporter[[method]](...)
+  if (is.null(reporter)) {
+    return(invisible())
   }
+  tryCatch(
+    reporter[[method]](...),
+    error = function(e) {
+      # Of a reporter in a CucumberMultiReporter, already named
+      if (!inherits(e, "cucumber_reporter_error")) {
+        # The call would be cucumber's call of the method
+        e$call <- NULL
+        e <- rlang::error_cnd(
+          class = "cucumber_reporter_error",
+          message = glue::glue("Reporter `{class(reporter)[[1]]}` failed in `{method}()`."),
+          parent = e,
+          trace = empty_trace()
+        )
+      }
+      abort_run(e)
+    }
+  )
   invisible()
 }
 
@@ -212,7 +230,7 @@ CucumberMultiReporter <- R6::R6Class(
   private = list(
     each = function(method, ...) {
       for (reporter in self$reporters) {
-        reporter[[method]](...)
+        cucumber_event(reporter, method, ...)
       }
       invisible(self)
     }
