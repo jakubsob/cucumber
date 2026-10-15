@@ -4,18 +4,17 @@
 \alias{CucumberProgressReporter}
 \title{Progress Reporter for Cucumber}
 \description{
-The default reporter. Like testthat's `ProgressReporter`, it prints one line
-for each feature, with its scenarios counted by status: failed (`F`),
-pending (`P`), undefined (`U`), skipped (`S`) and passed (`OK`). An
+The default reporter. Like testthat's \code{ProgressReporter}, it prints one line
+for each feature, with its scenarios counted by status: failed (\code{F}),
+pending (\code{P}), undefined (\code{U}), skipped (\code{S}) and passed (\code{OK}). An
 ambiguous scenario counts as failed. While a feature runs, its line is
 redrawn with a spinner after each step.
 
 A scenario that didn't pass is printed as soon as it finishes, with its
-steps and errors. The summary of [CucumberSummaryReporter] is printed at
+steps and errors. The summary of \link{CucumberSummaryReporter} is printed at
 the end.
 
-```
-  |  F  P  U  S  OK | Feature
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  |  F  P  U  S  OK | Feature
 ✔ |              3 | Addition
 
 Feature: Basket
@@ -24,15 +23,123 @@ Feature: Basket
     ✖ When I remove 3 apples
       Error: Can't remove more apples than there are.
 ✖ |  1           2 | Basket [1.2s]
-```
+}\if{html}{\out{</div>}}
 
 A feature that took a second or more shows how long it took. The line is
 redrawn only in a terminal that can redraw a line, see
-[cli::is_dynamic_tty()]. Elsewhere, like in CI, each feature's line is
+\code{\link[cli:is_dynamic_tty]{cli::is_dynamic_tty()}}. Elsewhere, like in CI, each feature's line is
 printed once it finishes.
 
-To see each step, use [CucumberPrettyReporter].
+To see each step, use \link{CucumberPrettyReporter}.
 }
+\section{Specification}{
+
+\subsection{Progress reporter}{
+
+\code{CucumberProgressReporter} is the default reporter. Like testthat's \code{ProgressReporter}, it prints
+one line for each feature, with its scenarios counted by status: failed (F), pending (P),
+undefined (U), skipped (S) and passed (OK). A scenario that didn't pass is printed as soon as
+it finishes, and again in the summary at the end.
+
+\preformatted{Background:
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add 1 item
+
+      Scenario: Remove an item
+        Given an empty basket
+        When I remove 1 item
+
+      Scenario: Pay for the items
+        Given an empty basket
+        When I pay
+    """
+  And a file named "features/checkout.feature" with
+    """
+    Feature: Checkout
+      Scenario: Check out an empty basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add \{int\} item", function(n, context) \{\})
+    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
+    """
+}
+
+\preformatted{Scenario: Each feature is a line with its scenarios counted by status
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    |  F  P  U  S  OK | Feature
+    """
+  And the output includes
+    """
+    x |  1     1      1 | Basket
+    """
+  And the output includes
+    """
+    v |               1 | Checkout
+    """
+}
+
+\preformatted{Scenario: A scenario that didn't pass is printed when it finishes
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    Feature: Basket
+    Scenario: Remove an item
+    v Given an empty basket
+    x When I remove 1 item
+    """
+  And the output includes
+    """
+    Scenario: Pay for the items
+    v Given an empty basket
+    U When I pay
+    """
+  And the output includes
+    """
+    4 scenarios (1 failed, 1 undefined, 2 passed)
+    """
+}
+
+\preformatted{Scenario: The error that stopped the run is printed
+  Given a file named "features/setup-steps.R" with
+    """
+    before_all(function() stop("the server didn't start"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    Error:
+    the server didn't start
+    """
+  And the output includes
+    """
+    0 scenarios
+    """
+}
+
+Source: \code{tests/acceptance/r-progress_reporter.feature}
+}
+}
+
 \examples{
 \dontrun{
 cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
@@ -47,7 +154,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter
 \describe{
 \item{\code{header_printed}}{Whether the header of the columns was printed}
 
-\item{\code{feature_first}}{Index of the current feature's first scenario in `scenario_statuses`}
+\item{\code{feature_first}}{Index of the current feature's first scenario in \code{scenario_statuses}}
 
 \item{\code{feature_start}}{When the current feature started}
 

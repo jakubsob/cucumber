@@ -1,3 +1,4 @@
+@rd
 Feature: Messages reporter
   `CucumberMessagesReporter` writes a run as Cucumber Messages, one JSON message per line (NDJSON),
   like the `message` formatter of other Cucumber implementations. Official tools read it,

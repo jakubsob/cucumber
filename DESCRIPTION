@@ -36,6 +36,7 @@ Suggests:
     jsonlite,
     knitr,
     rmarkdown,
+    roxygen2,
     quarto,
     pkgdown,
     pkgload,
@@ -45,3 +46,4 @@ RoxygenNote: 7.3.3
 VignetteBuilder:
   quarto
 Config/Needs/website: rmarkdown
+Roxygen: list(markdown = TRUE)

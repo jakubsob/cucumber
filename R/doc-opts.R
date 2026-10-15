@@ -34,6 +34,12 @@
 #'
 #'   default: `Inf`
 #'
+#' - `cucumber.rd_tags`
+#'
+#'   Tag expression of the scenarios [features_rd()] puts in help pages.
+#'
+#'   default: `"@rd"`
+#'
 #' See [base::options()] and [base::getOption()] on how to work with options.
 #'
 #' @md

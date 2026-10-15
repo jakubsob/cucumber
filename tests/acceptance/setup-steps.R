@@ -312,3 +312,35 @@ after(function(context, scenario_name) {
   })
   fs::dir_delete(context$tempdir)
 })
+
+# The help page of a topic of the package, as text, like `?topic` shows it
+help_page <- function(topic, context) {
+  rd <- fs::path(context$tempdir, "man", paste0(topic, ".Rd"))
+  text <- withr::with_options(list(useFancyQuotes = FALSE), utils::capture.output(tools::Rd2txt(rd, options = list(underline_titles = FALSE))))
+  paste(text, collapse = "\n")
+}
+
+then("the help page {string} includes", function(topic, text, context) {
+  # Compare line by line, ignoring indentation
+  needle <- paste(trimws(strsplit(text, "\n")[[1]]), collapse = "\n")
+  page <- paste(trimws(strsplit(help_page(topic, context), "\n")[[1]]), collapse = "\n")
+  expect_true(grepl(needle, page, fixed = TRUE), info = paste0("Expected:\n", needle, "\n\nIn help page:\n", page))
+})
+
+then("the help page {string} includes {string}", function(topic, text, context) {
+  page <- help_page(topic, context)
+  expect_true(grepl(text, page, fixed = TRUE), info = page)
+})
+
+then("the help page {string} doesn't include {string}", function(topic, text, context) {
+  page <- help_page(topic, context)
+  expect_false(grepl(text, page, fixed = TRUE), info = page)
+})
+
+then("the reference page {string} includes", function(topic, text, context) {
+  # Compare line by line, ignoring indentation
+  html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
+  needle <- paste(trimws(strsplit(text, "\n")[[1]]), collapse = "\n")
+  page <- paste(trimws(strsplit(xml2::xml_text(html), "\n")[[1]]), collapse = "\n")
+  expect_true(grepl(needle, page, fixed = TRUE), info = paste0("Expected:\n", needle, "\n\nIn reference page:\n", page))
+})

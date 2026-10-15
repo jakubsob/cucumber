@@ -10,18 +10,18 @@ skip_scenario(message = "Skipped")
 \item{message}{A message explaining why the scenario is skipped.}
 }
 \description{
-Call `skip_scenario()` in a [before()] hook or in a step to skip the scenario,
-e.g. when a service it needs isn't available. In a `before` hook, the rest of
-the `before` hooks and all the scenario's steps are skipped. In a step, that
+Call \code{skip_scenario()} in a \code{\link[=before]{before()}} hook or in a step to skip the scenario,
+e.g. when a service it needs isn't available. In a \code{before} hook, the rest of
+the \code{before} hooks and all the scenario's steps are skipped. In a step, that
 step and the steps after it are skipped. The scenario is reported as skipped.
-`after` hooks still run and get `"skipped"` as the scenario's `status`.
-In an [after()] hook, only that hook is skipped, and the scenario is reported
+\code{after} hooks still run and get \code{"skipped"} as the scenario's \code{status}.
+In an \code{\link[=after]{after()}} hook, only that hook is skipped, and the scenario is reported
 as skipped if it didn't fail.
-[testthat::skip()] does the same.
+\code{\link[testthat:skip]{testthat::skip()}} does the same.
 }
 \details{
 Calling it in any other hook is an error. Outside of a Cucumber run
-`skip_scenario()` skips the test like [testthat::skip()].
+\code{skip_scenario()} skips the test like \code{\link[testthat:skip]{testthat::skip()}}.
 }
 \examples{
 before(function(context, scenario) {

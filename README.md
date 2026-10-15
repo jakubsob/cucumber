@@ -288,7 +288,7 @@ types.
 - [x] Free-format text
 - [x] Localization (`# language:`)
 
-# Installation
+## Installation
 
 To install the stable version from CRAN:
 

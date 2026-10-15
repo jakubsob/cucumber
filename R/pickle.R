@@ -290,6 +290,16 @@ interpolate <- function(x, header, values) {
   x
 }
 
+#' Keep the pickles selected by `tags`, `name` and `lines`, see `test()`
+#' @keywords internal
+#' @noRd
+filter_pickles <- function(pickles, tags = NULL, name = NULL, lines = integer()) {
+  pickles |>
+    filter_pickles_by_tags(tags) |>
+    filter_pickles_by_name(name) |>
+    filter_pickles_by_lines(lines)
+}
+
 #' Filter pickles by tag expression
 #'
 #' @param pickles List of pickle objects

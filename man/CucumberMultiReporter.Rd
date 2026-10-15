@@ -56,7 +56,7 @@ Combine reporters
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{reporters}}{A list of `CucumberReporter`s}
+\item{\code{reporters}}{A list of \code{CucumberReporter}s}
 }
 \if{html}{\out{</div>}}
 }
@@ -83,7 +83,7 @@ Pass to each reporter
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{error}}{The error that stopped the run, or `NULL`}
+\item{\code{error}}{The error that stopped the run, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }

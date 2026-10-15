@@ -33,6 +33,11 @@ Max data table rows \link{CucumberPrettyReporter} prints per step before
 truncating.
 
 default: \code{Inf}
+\item \code{cucumber.rd_tags}
+
+Tag expression of the scenarios \code{\link[=features_rd]{features_rd()}} puts in help pages.
+
+default: \code{"@rd"}
 }
 
 See \code{\link[base:options]{base::options()}} and \code{\link[base:options]{base::getOption()}} on how to work with options.

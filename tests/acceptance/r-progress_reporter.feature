@@ -1,3 +1,4 @@
+@rd
 Feature: Progress reporter
   `CucumberProgressReporter` is the default reporter. Like testthat's `ProgressReporter`, it prints
   one line for each feature, with its scenarios counted by status: failed (F), pending (P),

@@ -131,18 +131,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
   check_grepl_args(...)
 
   lines <- feature_lines(features, path)
-  features <- (if (is.null(features)) find_features(path) else names(lines)) |>
-    filter_features(filter, ...)
-
-  if (length(features) == 0) {
-    abort(
-      "No feature files found.",
-      body = c(
-        i = "Add `.feature` files describing your scenarios."
-      ),
-      trace = empty_trace()
-    )
-  }
+  features <- select_features(path, filter, lines, ...)
 
   # A run nested in another one, like in a step that tests cucumber, has ids of
   # its own, and the outer run's ids continue after it
@@ -221,6 +210,26 @@ run_test_run_hooks <- function(hooks, reporter, test_run_started_id) {
     first_error <- first_error %||% result$error
   }
   first_error
+}
+
+#' The feature files selected by `features` and `filter`, see `test()`
+#' @param lines Lines of the `features`, from `feature_lines()`
+#' @keywords internal
+#' @noRd
+select_features <- function(path, filter, lines, ...) {
+  features <- (if (length(lines) == 0) find_features(path) else names(lines)) |>
+    filter_features(filter, ...)
+
+  if (length(features) == 0) {
+    abort(
+      "No feature files found.",
+      body = c(
+        i = "Add `.feature` files describing your scenarios."
+      ),
+      trace = empty_trace()
+    )
+  }
+  features
 }
 
 #' @importFrom fs dir_ls is_file

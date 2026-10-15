@@ -1,3 +1,4 @@
+@rd
 Feature: Pretty reporter
   `CucumberPrettyReporter` prints each step as it runs, with its Doc String or Data Table
   and the warnings it raised. Long Doc Strings and Data Tables can be cut short

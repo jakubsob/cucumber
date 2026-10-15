@@ -1,3 +1,4 @@
+@rd
 Feature: Summary reporter
   `CucumberSummaryReporter` prints only the summary of the run, like the `summary` formatter
   of cucumber-js: the scenarios and steps counted by status, and the scenarios that didn't pass.

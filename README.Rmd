@@ -181,7 +181,7 @@ See `cucumber::define_parameter_type()` how to define your own parameter types.
 - [x] Free-format text
 - [x] Localization (`# language:`)
 
-# Installation
+## Installation
 
 To install the stable version from CRAN:
 

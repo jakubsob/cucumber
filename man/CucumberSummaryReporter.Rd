@@ -4,16 +4,15 @@
 \alias{CucumberSummaryReporter}
 \title{Summary Reporter for Cucumber}
 \description{
-A reporter that prints only the summary of the run, like the `summary`
+A reporter that prints only the summary of the run, like the \code{summary}
 formatter of cucumber-js: the scenarios and steps counted by status, and the
 scenarios that didn't pass, with their steps and errors.
 
 The other cucumber reporters print the same summary at the end of the run:
-[CucumberProgressReporter], [CucumberProgressBarReporter] and
-[CucumberPrettyReporter].
+\link{CucumberProgressReporter}, \link{CucumberProgressBarReporter} and
+\link{CucumberPrettyReporter}.
 
-```
-────────────────────────────────────────────────────────────────────────
+\if{html}{\out{<div class="sourceCode">}}\preformatted{────────────────────────────────────────────────────────────────────────
 Summary
   2 scenarios (1 failed, 1 passed)
   6 steps (1 failed, 5 passed)
@@ -26,8 +25,61 @@ Feature: Basket
     ✔ Given a basket with 2 apples
     ✖ When I remove 3 apples
       Error: Can't remove more apples than there are.
-```
+}\if{html}{\out{</div>}}
 }
+\section{Specification}{
+
+\subsection{Summary reporter}{
+
+\code{CucumberSummaryReporter} prints only the summary of the run, like the \code{summary} formatter
+of cucumber-js: the scenarios and steps counted by status, and the scenarios that didn't pass.
+
+\preformatted{Scenario: Only the summary is printed
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add 1 item
+
+      Scenario: Remove an item
+        Given an empty basket
+        When I remove 1 item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add \{int\} item", function(n, context) \{\})
+    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
+    """
+  When I run
+    """
+    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    Summary
+    2 scenarios (1 failed, 1 passed)
+    4 steps (1 failed, 3 passed)
+    """
+  And the output includes
+    """
+    Failures
+
+    Feature: Basket
+    Scenario: Remove an item
+    v Given an empty basket
+    x When I remove 1 item
+    """
+  And the output doesn't include "Scenario: Add an item"
+  And the output doesn't include "...."
+}
+
+Source: \code{tests/acceptance/r-summary_reporter.feature}
+}
+}
+
 \examples{
 \dontrun{
 cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$new())
@@ -60,7 +112,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 
 \item{\code{width}}{Width of the terminal, captured at construction}
 
-\item{\code{live}}{The line drawn by `draw()`, redrawn after printing above it}
+\item{\code{live}}{The line drawn by \code{draw()}, redrawn after printing above it}
 }
 \if{html}{\out{</div>}}
 }
@@ -127,7 +179,7 @@ that can redraw a line
 \if{html}{\out{<a id="method-CucumberSummaryReporter-clear"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-clear}{}}}
 \subsection{Method \code{clear()}}{
-Clear the line drawn by `draw()`, to print below it what would be printed over it
+Clear the line drawn by \code{draw()}, to print below it what would be printed over it
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$clear()}\if{html}{\out{</div>}}
 }
@@ -137,7 +189,7 @@ Clear the line drawn by `draw()`, to print below it what would be printed over i
 \if{html}{\out{<a id="method-CucumberSummaryReporter-print_above"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-print_above}{}}}
 \subsection{Method \code{print_above()}}{
-Print above the line drawn by `draw()`, then draw it again
+Print above the line drawn by \code{draw()}, then draw it again
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$print_above(code)}\if{html}{\out{</div>}}
 }
@@ -154,8 +206,8 @@ Print above the line drawn by `draw()`, then draw it again
 \if{html}{\out{<a id="method-CucumberSummaryReporter-print_failures_since"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-print_failures_since}{}}}
 \subsection{Method \code{print_failures_since()}}{
-Print the scenarios that didn't pass after the first `n` above the line
-drawn by `draw()`
+Print the scenarios that didn't pass after the first \code{n} above the line
+drawn by \code{draw()}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$print_failures_since(n)}\if{html}{\out{</div>}}
 }
@@ -214,7 +266,7 @@ Record a scenario's hook that failed, is pending or skipped the scenario
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{status}}{`"failed"`, `"pending"` or `"skipped"`}
+\item{\code{status}}{\code{"failed"}, \code{"pending"} or \code{"skipped"}}
 
 \item{\code{error}}{The hook's error}
 }
@@ -267,7 +319,7 @@ Print the error that stopped the run
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{error}}{The error, or `NULL`}
+\item{\code{error}}{The error, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }
@@ -304,7 +356,7 @@ Print the error that stopped the run, if any, and the summary
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{error}}{The error that stopped the run, or `NULL`}
+\item{\code{error}}{The error that stopped the run, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }

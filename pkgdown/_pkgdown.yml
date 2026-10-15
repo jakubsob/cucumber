@@ -70,6 +70,9 @@ reference:
   - title: Reports
     contents:
       - has_concept("reports")
+  - title: Documentation
+    contents:
+      - features_rd
   - title: Optional
     contents:
       - define_parameter_type

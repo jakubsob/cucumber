@@ -264,6 +264,8 @@ CucumberMultiReporter <- R6::R6Class(
 #' )))
 #' }
 #'
+#' @eval features_rd(features = "r-messages_reporter.feature")
+#'
 #' @export
 CucumberMessagesReporter <- R6::R6Class(
   "CucumberMessagesReporter",
@@ -479,6 +481,8 @@ print_failure <- function(failure) {
 #' \dontrun{
 #' cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$new())
 #' }
+#'
+#' @eval features_rd(features = "r-summary_reporter.feature")
 #'
 #' @export
 CucumberSummaryReporter <- R6::R6Class(
@@ -729,6 +733,8 @@ DOTS_CHARACTERS <- c(
 #' cucumber::test("tests/acceptance", reporter = cucumber::CucumberDotsReporter$new())
 #' }
 #'
+#' @eval features_rd(features = "r-dots_reporter.feature")
+#'
 #' @export
 CucumberDotsReporter <- R6::R6Class(
   "CucumberDotsReporter",
@@ -817,6 +823,8 @@ progress_cells <- function(statuses) {
 #' \dontrun{
 #' cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
 #' }
+#'
+#' @eval features_rd(features = "r-progress_reporter.feature")
 #'
 #' @export
 CucumberProgressReporter <- R6::R6Class(
@@ -949,6 +957,8 @@ CucumberProgressReporter <- R6::R6Class(
 #' \dontrun{
 #' cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarReporter$new())
 #' }
+#'
+#' @eval features_rd(features = "r-progress_bar_reporter.feature")
 #'
 #' @export
 CucumberProgressBarReporter <- R6::R6Class(
@@ -1107,6 +1117,8 @@ CucumberProgressBarReporter <- R6::R6Class(
 #'   reporter = cucumber::CucumberPrettyReporter$new()
 #' )
 #' }
+#'
+#' @eval features_rd(features = "r-pretty_reporter.feature")
 #'
 #' @export
 CucumberPrettyReporter <- R6::R6Class(

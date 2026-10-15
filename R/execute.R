@@ -57,9 +57,7 @@ prepare_pickles <- function(
   test_run_started_id = NULL
 ) {
   pickles <- pickles |>
-    filter_pickles_by_tags(tags) |>
-    filter_pickles_by_name(name) |>
-    filter_pickles_by_lines(lines) |>
+    filter_pickles(tags, name, lines) |>
     match_steps(steps, parameters) |>
     map(\(pickle) new_test_case(pickle, hooks))
   walk(pickles, \(pickle) emit(reporter, "testCase", test_case_message(pickle, test_run_started_id)))

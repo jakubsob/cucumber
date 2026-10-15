@@ -6,7 +6,7 @@
 \description{
 Base class for cucumber reporters. A reporter gets the events of a run: the
 run, each feature, scenario, step and hook, and every
-[Cucumber Message](https://github.com/cucumber/messages).
+\href{https://github.com/cucumber/messages}{Cucumber Message}.
 
 Extend it to report a run your way, overriding the methods of the events
 you need. Each does nothing by default.
@@ -14,20 +14,20 @@ you need. Each does nothing by default.
 \section{Methods}{
 
 \describe{
-  \item{`start_run()`}{Called when a run starts}
-  \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a failing `before_all()` hook, or `NULL`}
-  \item{`start_feature(feature_name)`}{Called before executing a feature's scenarios}
-  \item{`end_feature()`}{Called after all scenarios in a feature complete}
-  \item{`start_scenario(scenario_name)`}{Called before a scenario's hooks and steps, with its name, like `"Scenario: Add an item"`}
-  \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
-  \item{`start_step(step)`}{Called before executing a step}
-  \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
-  \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
-  \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
-  \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
+\item{\code{start_run()}}{Called when a run starts}
+\item{\code{end_run(error)}}{Called when a run ends, with the error that stopped it, like a failing \code{before_all()} hook, or \code{NULL}}
+\item{\code{start_feature(feature_name)}}{Called before executing a feature's scenarios}
+\item{\code{end_feature()}}{Called after all scenarios in a feature complete}
+\item{\code{start_scenario(scenario_name)}}{Called before a scenario's hooks and steps, with its name, like \code{"Scenario: Add an item"}}
+\item{\code{end_scenario(status)}}{Called after a scenario's steps and hooks, with the worst of their statuses}
+\item{\code{start_step(step)}}{Called before executing a step}
+\item{\code{end_step(step)}}{Called after a step completes, with status/error/duration populated}
+\item{\code{end_hook(status, error)}}{Called after a scenario's \code{before} or \code{after} hook that failed, is pending or skipped the scenario}
+\item{\code{add_warning(warning)}}{Called with each warning raised in a step, a hook or elsewhere in the run}
+\item{\code{add_message(envelope)}}{Called with each Cucumber Message of the run, see \link{CucumberMessagesReporter}}
 }
 
-Combine reporters with [CucumberMultiReporter].
+Combine reporters with \link{CucumberMultiReporter}.
 }
 
 \keyword{internal}
@@ -79,7 +79,7 @@ End a run
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{error}}{The error that stopped the run, or `NULL`}
+\item{\code{error}}{The error that stopped the run, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }
@@ -123,7 +123,7 @@ Start a scenario
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scenario_name}}{Name of the scenario, like `"Scenario: Add an item"`}
+\item{\code{scenario_name}}{Name of the scenario, like \code{"Scenario: Add an item"}}
 }
 \if{html}{\out{</div>}}
 }
@@ -183,7 +183,7 @@ End a step (called after execution with status/error/duration populated)
 \if{html}{\out{<a id="method-CucumberReporter-end_hook"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberReporter-end_hook}{}}}
 \subsection{Method \code{end_hook()}}{
-Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario
+Called after a scenario's \code{before} or \code{after} hook that failed, is pending or skipped the scenario
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_hook(status, error)}\if{html}{\out{</div>}}
 }
@@ -191,7 +191,7 @@ Called after a scenario's `before` or `after` hook that failed, is pending or sk
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{status}}{`"failed"`, `"pending"` or `"skipped"`}
+\item{\code{status}}{\code{"failed"}, \code{"pending"} or \code{"skipped"}}
 
 \item{\code{error}}{The hook's error}
 }
@@ -228,7 +228,7 @@ Called with each Cucumber Message of the run
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{envelope}}{A list with one element, named by the message's type,
-like `list(testCaseStarted = list(...))`}
+like \code{list(testCaseStarted = list(...))}}
 }
 \if{html}{\out{</div>}}
 }

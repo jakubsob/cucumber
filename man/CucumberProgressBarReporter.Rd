@@ -4,24 +4,88 @@
 \alias{CucumberProgressBarReporter}
 \title{Progress Bar Reporter for Cucumber}
 \description{
-Like the `progress-bar` formatter of cucumber-js, it shows a bar of the
+Like the \code{progress-bar} formatter of cucumber-js, it shows a bar of the
 steps and hooks run so far, redrawn in place. A scenario that didn't pass is
 printed above the bar as soon as it finishes, with its steps and errors. The
 scenarios and steps counted by status are printed at the end.
 
-```
-Feature: Basket
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Basket
   Scenario: Remove an item
     ✔ Given a basket with 2 apples
     ✖ When I remove 3 apples
       Error: Can't remove more apples than there are.
 12/40 steps [==============                                         ]
-```
+}\if{html}{\out{</div>}}
 
 The bar is drawn only in a terminal that can redraw a line, see
-[cli::is_dynamic_tty()]. Elsewhere, like in CI, only the scenarios that
+\code{\link[cli:is_dynamic_tty]{cli::is_dynamic_tty()}}. Elsewhere, like in CI, only the scenarios that
 didn't pass and the summary are printed.
 }
+\section{Specification}{
+
+\subsection{Progress bar reporter}{
+
+\code{CucumberProgressBarReporter} shows a bar of the steps and hooks run so far, like the
+\code{progress-bar} formatter of cucumber-js. A scenario that didn't pass is printed as soon
+as it finishes. The bar is drawn only in a terminal that can redraw a line.
+
+\preformatted{Background:
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Remove an item
+        Given an empty basket
+        When I remove 1 item
+
+      Scenario: Add an item
+        Given an empty basket
+        When I add 1 item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add \{int\} item", function(n, context) \{\})
+    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
+    """
+}
+
+\preformatted{Scenario: The bar counts the steps run
+  When I run
+    """
+    reporter <- withr::with_options(list(cli.dynamic = TRUE), CucumberProgressBarReporter$new())
+    test("features", reporter = reporter, stop_on_failure = FALSE)
+    """
+  Then the output includes "1/4 steps ["
+  And the output includes "4/4 steps ["
+}
+
+\preformatted{Scenario: A scenario that didn't pass is printed when it finishes
+  When I run
+    """
+    test("features", reporter = CucumberProgressBarReporter$new(), stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    Feature: Basket
+    Scenario: Remove an item
+    v Given an empty basket
+    x When I remove 1 item
+    """
+  And the output includes "The basket is empty"
+  And the output doesn't include "Scenario: Add an item"
+  And the output doesn't include "steps ["
+  And the output includes
+    """
+    2 scenarios (1 failed, 1 passed)
+    4 steps (1 failed, 3 passed)
+    """
+}
+
+Source: \code{tests/acceptance/r-progress_bar_reporter.feature}
+}
+}
+
 \examples{
 \dontrun{
 cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarReporter$new())
@@ -130,7 +194,7 @@ were printed when they finished.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{error}}{The error that stopped the run, or `NULL`}
+\item{\code{error}}{The error that stopped the run, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }

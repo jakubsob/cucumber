@@ -4,27 +4,101 @@
 \alias{CucumberDotsReporter}
 \title{Dots Reporter for Cucumber}
 \description{
-Like the `progress` formatter of cucumber-js, it prints one character for
+Like the \code{progress} formatter of cucumber-js, it prints one character for
 each step and hook as it finishes, then the summary of
-[CucumberSummaryReporter]:
+\link{CucumberSummaryReporter}:
+\itemize{
+\item \code{.} passed (green)
+\item \code{F} failed (red)
+\item \code{-} skipped (cyan)
+\item \code{P} pending (yellow)
+\item \code{U} undefined (yellow)
+\item \code{A} ambiguous (red)
+}
 
-- `.` passed (green)
-- `F` failed (red)
-- `-` skipped (cyan)
-- `P` pending (yellow)
-- `U` undefined (yellow)
-- `A` ambiguous (red)
-
-```
-......F--
+\if{html}{\out{<div class="sourceCode">}}\preformatted{......F--
 
 ────────────────────────────────────────────────────────────────────────
 Summary
   3 scenarios (1 failed, 2 passed)
   9 steps (1 failed, 2 skipped, 6 passed)
 ────────────────────────────────────────────────────────────────────────
-```
+}\if{html}{\out{</div>}}
 }
+\section{Specification}{
+
+\subsection{Dots reporter}{
+
+Like the \code{progress} formatter of cucumber-js, \code{CucumberDotsReporter} prints one character
+for each step and hook as it finishes: \code{.} passed, \code{F} failed, \code{-} skipped, \code{P} pending,
+\code{U} undefined and \code{A} ambiguous. At the end it prints the summary of the run with the
+scenarios that didn't pass.
+
+\preformatted{Background:
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add 1 item
+        Then the basket has 1 item
+
+      Scenario: Remove an item
+        Given an empty basket
+        When I remove 1 item
+        Then the basket has 0 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) context$items <- 0)
+    when("I add \{int\} item", function(n, context) context$items <- context$items + n)
+    when("I remove \{int\} item", function(n, context) \{
+      if (context$items < n) stop("The basket is empty")
+      context$items <- context$items - n
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
+    """
+}
+
+\preformatted{Scenario: Each step is printed as a character
+  When I run
+    """
+    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    ....F-
+    """
+  And the output includes
+    """
+    2 scenarios (1 failed, 1 passed)
+    6 steps (1 failed, 1 skipped, 4 passed)
+    """
+}
+
+\preformatted{Scenario: The scenarios that didn't pass are printed at the end
+  When I run
+    """
+    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
+    """
+  Then the output includes
+    """
+    Failures
+
+    Feature: Basket
+    Scenario: Remove an item
+    v Given an empty basket
+    x When I remove 1 item
+    """
+  And the output includes "The basket is empty"
+  And the output doesn't include "Scenario: Add an item"
+}
+
+Source: \code{tests/acceptance/r-dots_reporter.feature}
+}
+}
+
 \examples{
 \dontrun{
 cucumber::test("tests/acceptance", reporter = cucumber::CucumberDotsReporter$new())
@@ -94,7 +168,7 @@ End the line of characters and print the summary
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{error}}{The error that stopped the run, or `NULL`}
+\item{\code{error}}{The error that stopped the run, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }

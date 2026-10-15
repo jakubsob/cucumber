@@ -80,6 +80,10 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles of its features, scenarios (each example of an outline being one) and steps and hooks, with their status, duration and error, to write a report of your own. It prints how many features and scenarios ran, by status.
 - ✨ `write_html_report()` writes a run's Cucumber Messages, from their file, the `CucumberMessagesReporter` that wrote them or `read_messages()`, into the official Cucumber HTML report, the page cucumber-js writes with `--format html`: one file that works offline, with every feature's results, searchable and filterable by status, text and tags.
 
+## Features as documentation
+
+- ✨ `features_rd()` puts scenarios of feature files in the help page of a function, in a "Specification" section. Call it with `@eval` in the function's roxygen block, like `#' @eval cucumber::features_rd(features = "basket.feature")`. It selects scenarios like `test()`, by `features` and their lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected, set the `cucumber.rd_tags` option to use another tag expression.
+
 ## Snippets
 
 - ⚠️ Snippets for undefined steps are generated like cucumber-js: parameters in the order they appear in the step, one suggestion per matching parameter type, custom parameter types used, `data_table` and `doc_string` arguments, and repeated parameter names `string`, `string2`.

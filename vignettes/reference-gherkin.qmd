@@ -442,7 +442,7 @@ Given the following users exist:
 
 Just like `Doc Strings`, `Data Tables` will be passed to the step definition as the last argument. See `?step` for details.
 
-#### Table Cell Escaping
+## Table Cell Escaping
 
 If you want to use a newline character in a table cell, you can write this as `\n`. If you need a `|` as part of the cell, you can escape it as `\|`.
 

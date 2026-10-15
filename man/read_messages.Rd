@@ -8,26 +8,26 @@ read_messages(x)
 }
 \arguments{
 \item{x}{Path of a Cucumber Messages file, its lines, or the
-[CucumberMessagesReporter] that wrote it.}
+\link{CucumberMessagesReporter} that wrote it.}
 }
 \value{
-A `cucumber_messages` object, a list with:
-  \describe{
-    \item{`features`}{A tibble with a row per feature: its `uri`, `name`,
-      `description` and `tags`.}
-    \item{`scenarios`}{A tibble with a row per scenario that ran, each
-      example of an outline being one: its `id`, the `uri`, `feature` and
-      `rule` it's in, its `name`, `line`, `tags`, `status` (the worst of its
-      steps' and hooks') and `duration` in seconds.}
-    \item{`steps`}{A tibble with a row per step and hook that ran: the
-      `scenario_id` and `scenario` it ran in, its `keyword` (`Before` or
-      `After` for a hook), `text` (a hook's name), `status`, `duration` in
-      seconds and the `error` of a step that didn't pass.}
-    \item{`envelopes`}{The messages, as lists.}
-  }
+A \code{cucumber_messages} object, a list with:
+\describe{
+\item{\code{features}}{A tibble with a row per feature: its \code{uri}, \code{name},
+\code{description} and \code{tags}.}
+\item{\code{scenarios}}{A tibble with a row per scenario that ran, each
+example of an outline being one: its \code{id}, the \code{uri}, \code{feature} and
+\code{rule} it's in, its \code{name}, \code{line}, \code{tags}, \code{status} (the worst of its
+steps' and hooks') and \code{duration} in seconds.}
+\item{\code{steps}}{A tibble with a row per step and hook that ran: the
+\code{scenario_id} and \code{scenario} it ran in, its \code{keyword} (\code{Before} or
+\code{After} for a hook), \code{text} (a hook's name), \code{status}, \code{duration} in
+seconds and the \code{error} of a step that didn't pass.}
+\item{\code{envelopes}}{The messages, as lists.}
+}
 }
 \description{
-Reads the messages a [CucumberMessagesReporter] wrote, as tibbles of a run's
+Reads the messages a \link{CucumberMessagesReporter} wrote, as tibbles of a run's
 features, scenarios and steps, to write a report of your own or query the
 results. The reports listed below read their run with it.
 }

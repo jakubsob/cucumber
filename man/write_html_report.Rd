@@ -8,8 +8,8 @@ write_html_report(messages, output = "cucumber-report.html")
 }
 \arguments{
 \item{messages}{A run: the path of a Cucumber Messages file, written by
-[CucumberMessagesReporter], the reporter itself, or what
-[read_messages()] returns.}
+\link{CucumberMessagesReporter}, the reporter itself, or what
+\code{\link[=read_messages]{read_messages()}} returns.}
 
 \item{output}{Path of the HTML file to write.}
 }
@@ -18,8 +18,8 @@ The path of the report, invisibly.
 }
 \description{
 Writes the messages of a run into the page of the official Cucumber HTML
-report (<https://github.com/cucumber/html-formatter>), the one cucumber-js
-writes with `--format html`. The page is one file that works offline: it
+report (\url{https://github.com/cucumber/html-formatter}), the one cucumber-js
+writes with \verb{--format html}. The page is one file that works offline: it
 shows every feature with its results, and can be searched and filtered by
 status, text and tags.
 }
