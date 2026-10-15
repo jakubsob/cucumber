@@ -377,15 +377,677 @@ format_status_counts <- function(statuses, noun) {
   paste0(label, " (", paste(parts, collapse = ", "), ")")
 }
 
+#' Print a step: its status symbol, keyword and text
+#'
+#' @keywords internal
+#' @noRd
+print_step <- function(step) {
+  cat(
+    "    ",
+    status_symbol(step$status %||% "passed"),
+    " ",
+    cli::style_bold(step$keyword),
+    " ",
+    step$text,
+    "\n",
+    sep = ""
+  )
+}
+
+#' Print why a step didn't pass, if it has an error
+#'
+#' @keywords internal
+#' @noRd
+print_step_error <- function(step) {
+  if (is.null(step$error)) {
+    return(invisible())
+  }
+  color <- status_color(step$status %||% "passed")
+  for (line in strsplit(conditionMessage(step$error), "\n")[[1]]) {
+    cat("      ", color(line), "\n", sep = "")
+  }
+}
+
+#' Print a scenario that didn't pass, with its steps and the hooks that didn't pass
+#'
+#' @keywords internal
+#' @noRd
+print_failure <- function(failure) {
+  cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
+  cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
+  for (step in failure$steps) {
+    print_step(step)
+    print_step_error(step)
+  }
+  for (hook in failure$hooks) {
+    print_error(conditionMessage(hook$error), hook$status)
+  }
+}
+
+#' Summary Reporter for Cucumber
+#'
+#' @description
+#' A reporter that prints only the summary of the run, like the `summary`
+#' formatter of cucumber-js: the scenarios and steps counted by status, and the
+#' scenarios that didn't pass, with their steps and errors.
+#'
+#' The other cucumber reporters print the same summary at the end of the run:
+#' [CucumberProgressReporter], [CucumberProgressBarReporter] and
+#' [CucumberPrettyReporter].
+#'
+#' ```
+#' ────────────────────────────────────────────────────────────────────────
+#' Summary
+#'   2 scenarios (1 failed, 1 passed)
+#'   6 steps (1 failed, 5 passed)
+#' ────────────────────────────────────────────────────────────────────────
+#'
+#' Failures
+#'
+#' Feature: Basket
+#'   Scenario: Remove an item
+#'     ✔ Given a basket with 2 apples
+#'     ✖ When I remove 3 apples
+#'       Error: Can't remove more apples than there are.
+#' ```
+#'
+#' @examples
+#' \dontrun{
+#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$new())
+#' }
+#'
+#' @export
+CucumberSummaryReporter <- R6::R6Class(
+  "CucumberSummaryReporter",
+  inherit = CucumberReporter,
+  public = list(
+    #' @field step_statuses Statuses of the reported steps
+    step_statuses = NULL,
+
+    #' @field scenario_statuses Statuses of the finished scenarios
+    scenario_statuses = NULL,
+
+    #' @field scenario_failed Whether testthat reported a failure or an error for the current test
+    scenario_failed = FALSE,
+
+    #' @field scenario_status Status of the current scenario, once its steps and hooks ran
+    scenario_status = NULL,
+
+    #' @field current_scenario Name of the scenario currently executing
+    current_scenario = NULL,
+
+    #' @field current_steps Steps executed so far in the current scenario
+    current_steps = NULL,
+
+    #' @field current_hooks Results of the current scenario's hooks that failed or are pending
+    current_hooks = NULL,
+
+    #' @field step_warnings Warnings of the step currently executing, collected
+    #'   when not `NULL`, printed as they happen otherwise
+    step_warnings = NULL,
+
+    #' @field failures Recorded failures for the end-of-run summary
+    failures = NULL,
+
+    #' @field num_colors Terminal color support captured at construction
+    num_colors = 1L,
+
+    #' @field unicode Whether the terminal shows Unicode symbols, captured at construction
+    unicode = FALSE,
+
+    #' @field dynamic Whether the terminal can redraw a line, captured at construction
+    dynamic = FALSE,
+
+    #' @field width Width of the terminal, captured at construction
+    width = 80L,
+
+    #' @field live The line drawn by `draw()`, redrawn after printing above it
+    live = NULL,
+
+    #' @description
+    #' Initialize the reporter
+    #' @param ... Additional arguments passed to parent
+    initialize = function(...) {
+      super$initialize(...)
+      self$step_statuses <- character()
+      self$scenario_statuses <- character()
+      self$current_steps <- list()
+      self$failures <- list()
+      # ponytail: capture real color support now, before testthat runs. During a
+      # test, output is sunk and cli auto-detects 0 colors; forcing this captured
+      # value at each print site re-enables color live while snapshots (built
+      # non-interactively -> num_colors = 1) stay plain.
+      self$num_colors <- cli::num_ansi_colors()
+      # Captured now too: testthat turns them off while it runs a test
+      self$unicode <- cli::is_utf8_output()
+      self$dynamic <- cli::is_dynamic_tty()
+      self$width <- cli::console_width()
+      invisible(self)
+    },
+
+    #' @description
+    #' Draw a line that is redrawn in place, like a progress bar, in a terminal
+    #' that can redraw a line
+    #' @param text The line
+    draw = function(text) {
+      self$live <- text
+      if (self$dynamic) {
+        withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+        text <- cli::ansi_strtrim(text, self$width - 1L)
+        cat("\r", text, strrep(" ", max(self$width - 1L - cli::ansi_nchar(text), 0L)), sep = "")
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Clear the line drawn by `draw()`, to print below it what would be printed over it
+    clear = function() {
+      if (self$dynamic && !is.null(self$live)) {
+        cat("\r", strrep(" ", self$width - 1L), "\r", sep = "")
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Print above the line drawn by `draw()`, then draw it again
+    #' @param code Code that prints
+    print_above = function(code) {
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      self$clear()
+      force(code)
+      if (!is.null(self$live)) self$draw(self$live)
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the scenarios that didn't pass after the first `n` above the line
+    #' drawn by `draw()`
+    #' @param n Number of failures already printed
+    print_failures_since = function(n) {
+      for (failure in self$failures[seq_along(self$failures) > n]) {
+        self$print_above(print_failure(failure))
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Start a test (called by testthat for each scenario)
+    #' @param context Test context
+    #' @param test Test name (will be "Scenario: `<name>`")
+    start_test = function(context, test) {
+      if (!is.null(super$start_test)) {
+        super$start_test(context, test)
+      }
+      self$current_scenario <- test
+      self$current_steps <- list()
+      self$current_hooks <- list()
+      self$scenario_status <- NULL
+      self$scenario_failed <- FALSE
+      invisible(self)
+    },
+
+    #' @description
+    #' End a test (called by testthat for each scenario). A scenario has the
+    #' status given to end_scenario(). A test that isn't a scenario, or one that
+    #' stopped before its end, fails if testthat reported a failure or an error.
+    #' @param context Test context
+    #' @param test Test name
+    end_test = function(context, test) {
+      if (!is.null(super$end_test)) {
+        super$end_test(context, test)
+      }
+      status <- self$scenario_status %||% (if (self$scenario_failed) "failed" else "passed")
+      self$scenario_statuses <- c(self$scenario_statuses, status)
+      invisible(self)
+    },
+
+    #' @description
+    #' Record a scenario's status, and the scenario for the summary if it didn't pass
+    #' @param status The scenario's status
+    end_scenario = function(status) {
+      super$end_scenario(status)
+      self$scenario_status <- status
+      if (!status %in% c("passed", "skipped")) {
+        self$failures <- c(
+          self$failures,
+          list(list(
+            feature = self$current_feature,
+            scenario = self$current_scenario,
+            steps = self$current_steps,
+            hooks = self$current_hooks
+          ))
+        )
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Add a result (warning, skip, failure, etc.)
+    #' @param context Test context
+    #' @param test Test object
+    #' @param result Test result object
+    add_result = function(context, test, result) {
+      if (!is.null(super$add_result)) {
+        super$add_result(context, test, result)
+      }
+
+      if (inherits(result, c("expectation_error", "expectation_failure"))) {
+        self$scenario_failed <- TRUE
+      }
+
+      if (inherits(result, "expectation_warning")) {
+        if (is.null(self$step_warnings)) {
+          self$print_above(print_warning(conditionMessage(result)))
+        } else {
+          self$step_warnings <- c(self$step_warnings, conditionMessage(result))
+        }
+      }
+
+      # Display errors that occur outside of a scenario's steps and hooks, e.g.
+      # during setup. A scenario's errors are in its summary.
+      if (
+        is.null(self$scenario_status) &&
+          inherits(result, c("expectation_error", "expectation_failure"))
+      ) {
+        self$print_above(print_error(conditionMessage(result)))
+      }
+
+      invisible(self)
+    },
+
+    #' @description
+    #' Record a scenario's hook that failed, is pending or skipped the scenario
+    #' @param status `"failed"`, `"pending"` or `"skipped"`
+    #' @param error The hook's error
+    end_hook = function(status, error) {
+      super$end_hook(status, error)
+      self$current_hooks <- c(self$current_hooks, list(list(status = status, error = error)))
+      invisible(self)
+    },
+
+    #' @description
+    #' Record a step's result
+    #' @param step Pickle step object with execution results
+    end_step = function(step) {
+      super$end_step(step)
+      self$current_steps <- c(self$current_steps, list(step))
+      self$step_statuses <- c(self$step_statuses, step$status %||% "passed")
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the scenarios and steps counted by status
+    print_counts = function() {
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      cat("\n")
+      cat(cli::rule(), "\n", sep = "")
+      cat(cli::style_bold("Summary"), "\n", sep = "")
+      cat("  ", format_status_counts(self$scenario_statuses, "scenario"), "\n", sep = "")
+      cat("  ", format_status_counts(self$step_statuses, "step"), "\n", sep = "")
+      cat(cli::rule(), "\n", sep = "")
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the scenarios that didn't pass
+    print_failures = function() {
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      if (length(self$failures) > 0) {
+        cat("\n", cli::style_bold("Failures"), "\n", sep = "")
+        for (failure in self$failures) {
+          print_failure(failure)
+        }
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Print summary at the end (called by testthat)
+    end_reporter = function() {
+      if (!is.null(super$end_reporter)) {
+        super$end_reporter()
+      }
+      self$print_counts()
+      self$print_failures()
+      invisible(self)
+    }
+  )
+)
+
+DOTS_CHARACTERS <- c(
+  passed = ".",
+  failed = "F",
+  skipped = "-",
+  pending = "P",
+  undefined = "U",
+  ambiguous = "A"
+)
+
+#' Dots Reporter for Cucumber
+#'
+#' @description
+#' Like the `progress` formatter of cucumber-js, it prints one character for
+#' each step and hook as it finishes, then the summary of
+#' [CucumberSummaryReporter]:
+#'
+#' - `.` passed (green)
+#' - `F` failed (red)
+#' - `-` skipped (cyan)
+#' - `P` pending (yellow)
+#' - `U` undefined (yellow)
+#' - `A` ambiguous (red)
+#'
+#' ```
+#' ......F--
+#'
+#' ────────────────────────────────────────────────────────────────────────
+#' Summary
+#'   3 scenarios (1 failed, 2 passed)
+#'   9 steps (1 failed, 2 skipped, 6 passed)
+#' ────────────────────────────────────────────────────────────────────────
+#' ```
+#'
+#' @examples
+#' \dontrun{
+#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberDotsReporter$new())
+#' }
+#'
+#' @export
+CucumberDotsReporter <- R6::R6Class(
+  "CucumberDotsReporter",
+  inherit = CucumberSummaryReporter,
+  public = list(
+    #' @description
+    #' Print a character for each step and hook that finished
+    #' @param envelope A list with one element, named by the message's type
+    add_message = function(envelope) {
+      super$add_message(envelope)
+      finished <- envelope$testStepFinished
+      if (!is.null(finished)) {
+        withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+        status <- tolower(finished$testStepResult$status)
+        cat(status_color(status)(DOTS_CHARACTERS[[status]]))
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' End the line of characters and print the summary
+    end_reporter = function() {
+      cat("\n")
+      super$end_reporter()
+    }
+  )
+)
+
+#' A line of the progress reporter: a status, the scenarios counted by status
+#' and a name. The header uses the same columns.
+#'
+#' @keywords internal
+#' @noRd
+format_progress_line <- function(symbol, cells, name) {
+  paste0(symbol, " | ", paste(cells, collapse = " "), " | ", name)
+}
+
+#' The cells of a feature's scenarios counted by status. An ambiguous scenario
+#' counts as failed, as both are errors.
+#'
+#' @keywords internal
+#' @noRd
+progress_cells <- function(statuses) {
+  statuses[statuses == "ambiguous"] <- "failed"
+  counts <- table(factor(statuses, c("failed", "pending", "undefined", "skipped", "passed")))
+  cells <- map2_chr(names(counts), counts, \(status, n) {
+    if (status == "passed") sprintf("%3d", n) else if (n == 0) "  " else status_color(status)(sprintf("%2d", n))
+  })
+  cells
+}
+
 #' Progress Reporter for Cucumber
 #'
 #' @description
-#' A reporter that prints step-by-step progress to the console, mimicking
-#' testthat::ProgressReporter but with visibility into individual Gherkin steps.
+#' The default reporter. Like testthat's `ProgressReporter`, it prints one line
+#' for each feature, with its scenarios counted by status: failed (`F`),
+#' pending (`P`), undefined (`U`), skipped (`S`) and passed (`OK`). An
+#' ambiguous scenario counts as failed. While a feature runs, its line is
+#' redrawn with a spinner after each step.
+#'
+#' A scenario that didn't pass is printed as soon as it finishes, with its
+#' steps and errors. The summary of [CucumberSummaryReporter] is printed at
+#' the end.
+#'
+#' ```
+#'   |  F  P  U  S  OK | Feature
+#' ✔ |              3 | Addition
+#'
+#' Feature: Basket
+#'   Scenario: Remove an item
+#'     ✔ Given a basket with 2 apples
+#'     ✖ When I remove 3 apples
+#'       Error: Can't remove more apples than there are.
+#' ✖ |  1           2 | Basket [1.2s]
+#' ```
+#'
+#' A feature that took a second or more shows how long it took. The line is
+#' redrawn only in a terminal that can redraw a line, see
+#' [cli::is_dynamic_tty()]. Elsewhere, like in CI, each feature's line is
+#' printed once it finishes.
+#'
+#' To see each step, use [CucumberPrettyReporter].
+#'
+#' @examples
+#' \dontrun{
+#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
+#' }
+#'
+#' @export
+CucumberProgressReporter <- R6::R6Class(
+  "CucumberProgressReporter",
+  inherit = CucumberSummaryReporter,
+  public = list(
+    #' @field header_printed Whether the header of the columns was printed
+    header_printed = FALSE,
+
+    #' @field feature_first Index of the current feature's first scenario in `scenario_statuses`
+    feature_first = 1L,
+
+    #' @field feature_start When the current feature started
+    feature_start = NULL,
+
+    #' @field frames Frames of the spinner, captured at construction
+    frames = NULL,
+
+    #' @field frame Number of steps of the current feature finished, to turn the spinner
+    frame = 0L,
+
+    #' @description
+    #' Initialize the reporter
+    #' @param ... Additional arguments passed to parent
+    initialize = function(...) {
+      super$initialize(...)
+      self$frames <- cli::get_spinner()$frames
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the header once, and start the feature's line
+    #' @param feature_name Name of the feature
+    start_feature = function(feature_name) {
+      super$start_feature(feature_name)
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      if (!self$header_printed) {
+        cat(format_progress_line(" ", sprintf(c("%2s", "%2s", "%2s", "%2s", "%3s"), c("F", "P", "U", "S", "OK")), "Feature"), "\n", sep = "")
+        self$header_printed <- TRUE
+      }
+      self$feature_first <- length(self$scenario_statuses) + 1L
+      self$feature_start <- Sys.time()
+      self$frame <- 0L
+      self$draw_feature()
+    },
+
+    #' @description
+    #' Turn the spinner after a step
+    #' @param step Pickle step object with execution results
+    end_step = function(step) {
+      super$end_step(step)
+      self$frame <- self$frame + 1L
+      self$draw_feature()
+    },
+
+    #' @description
+    #' Count the scenario in the feature's line
+    #' @param context Test context
+    #' @param test Test name
+    end_test = function(context, test) {
+      super$end_test(context, test)
+      if (!is.null(self$live)) self$draw_feature()
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the scenario if it didn't pass
+    #' @param status The scenario's status
+    end_scenario = function(status) {
+      n <- length(self$failures)
+      super$end_scenario(status)
+      self$print_failures_since(n)
+    },
+
+    #' @description
+    #' Print the feature's final line, with its status and how long it took
+    end_feature = function() {
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      statuses <- self$feature_statuses()
+      self$clear()
+      self$live <- NULL
+      if (length(statuses) > 0) {
+        worst <- STEP_STATUSES[min(match(statuses, STEP_STATUSES))]
+        line <- self$feature_line(status_symbol(worst))
+        time <- as.numeric(difftime(Sys.time(), self$feature_start, units = "secs"))
+        if (time >= 1) line <- paste0(line, cli::col_grey(sprintf(" [%.1fs]", time)))
+        cat(line, "\n", sep = "")
+      }
+      super$end_feature()
+    },
+
+    #' @description
+    #' Statuses of the current feature's finished scenarios
+    feature_statuses = function() {
+      self$scenario_statuses[seq_along(self$scenario_statuses) >= self$feature_first]
+    },
+
+    #' @description
+    #' The current feature's line
+    #' @param symbol The status column
+    feature_line = function(symbol) {
+      format_progress_line(
+        symbol,
+        progress_cells(self$feature_statuses()),
+        sub("^[^:]*:\\s*", "", self$current_feature %||% "")
+      )
+    },
+
+    #' @description
+    #' Draw the current feature's line with the spinner
+    draw_feature = function() {
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      self$draw(self$feature_line(self$frames[[self$frame %% length(self$frames) + 1L]]))
+    }
+  )
+)
+
+#' Progress Bar Reporter for Cucumber
+#'
+#' @description
+#' Like the `progress-bar` formatter of cucumber-js, it shows a bar of the
+#' steps and hooks run so far, redrawn in place. A scenario that didn't pass is
+#' printed above the bar as soon as it finishes, with its steps and errors. The
+#' scenarios and steps counted by status are printed at the end.
+#'
+#' ```
+#' Feature: Basket
+#'   Scenario: Remove an item
+#'     ✔ Given a basket with 2 apples
+#'     ✖ When I remove 3 apples
+#'       Error: Can't remove more apples than there are.
+#' 12/40 steps [==============                                         ]
+#' ```
+#'
+#' The bar is drawn only in a terminal that can redraw a line, see
+#' [cli::is_dynamic_tty()]. Elsewhere, like in CI, only the scenarios that
+#' didn't pass and the summary are printed.
+#'
+#' @examples
+#' \dontrun{
+#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarReporter$new())
+#' }
+#'
+#' @export
+CucumberProgressBarReporter <- R6::R6Class(
+  "CucumberProgressBarReporter",
+  inherit = CucumberSummaryReporter,
+  public = list(
+    #' @field total Number of steps and hooks of the scenarios to run
+    total = 0L,
+
+    #' @field current Number of steps and hooks that finished
+    current = 0L,
+
+    #' @description
+    #' Count the steps and hooks of each scenario, and advance the bar when one finishes
+    #' @param envelope A list with one element, named by the message's type
+    add_message = function(envelope) {
+      super$add_message(envelope)
+      if (!is.null(envelope$testCase)) {
+        self$total <- self$total + length(envelope$testCase$testSteps)
+      }
+      if (!is.null(envelope$testStepFinished)) {
+        self$current <- self$current + 1L
+        self$draw_bar()
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Print a scenario that didn't pass above the bar
+    #' @param status The scenario's status
+    end_scenario = function(status) {
+      n <- length(self$failures)
+      super$end_scenario(status)
+      self$print_failures_since(n)
+    },
+
+    #' @description
+    #' Draw the bar
+    draw_bar = function() {
+      label <- sprintf("%d/%d steps ", self$current, self$total)
+      size <- max(self$width - nchar(label) - 3L, 10L)
+      done <- round(size * min(self$current / max(self$total, 1L), 1))
+      self$draw(paste0(label, "[", strrep("=", done), strrep(" ", size - done), "]"))
+    },
+
+    #' @description
+    #' Clear the bar and print the scenarios and steps counted by status. The
+    #' scenarios that didn't pass were printed when they finished.
+    end_reporter = function() {
+      self$clear()
+      self$live <- NULL
+      self$print_counts()
+      invisible(self)
+    }
+  )
+)
+
+#' Pretty Reporter for Cucumber
+#'
+#' @description
+#' A reporter that prints each feature, scenario and step as it runs, like the
+#' `pretty` formatter of cucumber-js, then the summary of
+#' [CucumberSummaryReporter].
 #'
 #' @details
 #' Prints each step as it executes with a status indicator, grouped under
-#' scenario and feature headers similar to testthat's output:
+#' scenario and feature headers:
 #'
 #' - \ifelse{latex}{[x]}{✓} for passed steps (green)
 #' - \ifelse{latex}{[ ]}{✗} for failed steps (red)
@@ -394,7 +1056,8 @@ format_status_counts <- function(statuses, noun) {
 #' - `U` for undefined steps (yellow)
 #' - `A` for ambiguous steps (red)
 #'
-#' The summary counts scenarios and steps by status, like Cucumber does.
+#' A step's Doc String or Data Table and the warnings it raised are printed
+#' under it.
 #'
 #' ```
 #' Feature: Addition
@@ -411,7 +1074,7 @@ format_status_counts <- function(statuses, noun) {
 #'
 #' ```r
 #' # Step-level detail
-#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
+#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberPrettyReporter$new())
 #'
 #' # testthat reporters still work, reporting at the scenario level only
 #' cucumber::test("tests/acceptance", reporter = testthat::ProgressReporter$new())
@@ -420,7 +1083,7 @@ format_status_counts <- function(statuses, noun) {
 #' cucumber::test("tests/acceptance", reporter = testthat::SilentReporter$new())
 #'
 #' # From within a test file
-#' cucumber::run(reporter = cucumber::CucumberProgressReporter$new())
+#' cucumber::run(reporter = cucumber::CucumberPrettyReporter$new())
 #' ```
 #'
 #' ## Creating custom reporters
@@ -472,56 +1135,19 @@ format_status_counts <- function(statuses, noun) {
 #' @md
 #' @examples
 #' \dontrun{
-#' # Use with cucumber::test()
 #' cucumber::test(
 #'   "tests/acceptance",
-#'   reporter = cucumber::CucumberProgressReporter$new()
-#' )
-#'
-#' # Or without praise messages
-#' cucumber::test(
-#'   "tests/acceptance",
-#'   reporter = cucumber::CucumberProgressReporter$new(show_praise = FALSE)
+#'   reporter = cucumber::CucumberPrettyReporter$new()
 #' )
 #' }
 #'
 #' @export
-CucumberProgressReporter <- R6::R6Class(
-  "CucumberProgressReporter",
-  inherit = CucumberReporter,
+CucumberPrettyReporter <- R6::R6Class(
+  "CucumberPrettyReporter",
+  inherit = CucumberSummaryReporter,
   public = list(
     #' @field show_praise Whether to show praise messages
     show_praise = TRUE,
-
-    #' @field step_statuses Statuses of the reported steps
-    step_statuses = NULL,
-
-    #' @field scenario_statuses Statuses of the finished scenarios
-    scenario_statuses = NULL,
-
-    #' @field scenario_failed Whether testthat reported a failure or an error for the current test
-    scenario_failed = FALSE,
-
-    #' @field scenario_status Status of the current scenario, once its steps and hooks ran
-    scenario_status = NULL,
-
-    #' @field current_scenario Name of the scenario currently executing
-    current_scenario = NULL,
-
-    #' @field current_steps Steps executed so far in the current scenario
-    current_steps = NULL,
-
-    #' @field current_hooks Results of the current scenario's hooks that failed or are pending
-    current_hooks = NULL,
-
-    #' @field step_warnings Warnings of the step currently executing, printed when it ends
-    step_warnings = NULL,
-
-    #' @field failures Recorded failures for the end-of-run summary
-    failures = NULL,
-
-    #' @field num_colors Terminal color support captured at construction
-    num_colors = 1L,
 
     #' @field reporter_max_docstring_lines Max docstring lines to print per step
     reporter_max_docstring_lines = Inf,
@@ -552,15 +1178,6 @@ CucumberProgressReporter <- R6::R6Class(
       self$show_praise <- show_praise
       self$reporter_max_docstring_lines <- reporter_max_docstring_lines
       self$reporter_max_table_lines <- reporter_max_table_lines
-      self$step_statuses <- character()
-      self$scenario_statuses <- character()
-      self$current_steps <- list()
-      self$failures <- list()
-      # ponytail: capture real color support now, before testthat runs. During a
-      # test, output is sunk and cli auto-detects 0 colors; forcing this captured
-      # value at each print site re-enables color live while snapshots (built
-      # non-interactively -> num_colors = 1) stay plain.
-      self$num_colors <- cli::num_ansi_colors()
       invisible(self)
     },
 
@@ -569,7 +1186,7 @@ CucumberProgressReporter <- R6::R6Class(
     #' @param feature_name Name of the feature
     start_feature = function(feature_name) {
       super$start_feature(feature_name)
-      withr::local_options(cli.num_colors = self$num_colors)
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
       cat("\n", bold_label(feature_name), "\n", sep = "")
       invisible(self)
     },
@@ -587,88 +1204,9 @@ CucumberProgressReporter <- R6::R6Class(
     #' @param context Test context
     #' @param test Test name (will be "Scenario: `<name>`")
     start_test = function(context, test) {
-      if (!is.null(super$start_test)) {
-        super$start_test(context, test)
-      }
-      self$current_scenario <- test
-      self$current_steps <- list()
-      self$current_hooks <- list()
-      self$scenario_status <- NULL
-      self$scenario_failed <- FALSE
-      withr::local_options(cli.num_colors = self$num_colors)
+      super$start_test(context, test)
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
       cat("  ", bold_label(test), "\n", sep = "")
-      invisible(self)
-    },
-
-    #' @description
-    #' End a test (called by testthat for each scenario). A scenario has the
-    #' status given to end_scenario(). A test that isn't a scenario, or one that
-    #' stopped before its end, fails if testthat reported a failure or an error.
-    #' @param context Test context
-    #' @param test Test name
-    end_test = function(context, test) {
-      if (!is.null(super$end_test)) {
-        super$end_test(context, test)
-      }
-      status <- self$scenario_status %||% (if (self$scenario_failed) "failed" else "passed")
-      self$scenario_statuses <- c(self$scenario_statuses, status)
-      invisible(self)
-    },
-
-    #' @description
-    #' Record a scenario's status, and the scenario for the summary if it didn't pass
-    #' @param status The scenario's status
-    end_scenario = function(status) {
-      super$end_scenario(status)
-      self$scenario_status <- status
-      if (!status %in% c("passed", "skipped")) {
-        self$failures <- c(
-          self$failures,
-          list(list(
-            feature = self$current_feature,
-            scenario = self$current_scenario,
-            steps = self$current_steps,
-            hooks = self$current_hooks
-          ))
-        )
-      }
-      invisible(self)
-    },
-
-    #' @description
-    #' Add a result (warning, skip, failure, etc.)
-    #' @param context Test context
-    #' @param test Test object
-    #' @param result Test result object
-    add_result = function(context, test, result) {
-      if (!is.null(super$add_result)) {
-        super$add_result(context, test, result)
-      }
-
-      withr::local_options(cli.num_colors = self$num_colors)
-
-      if (inherits(result, c("expectation_error", "expectation_failure"))) {
-        self$scenario_failed <- TRUE
-      }
-
-      # A step's warnings are printed by end_step, under the step
-      if (inherits(result, "expectation_warning")) {
-        if (is.null(self$step_warnings)) {
-          print_warning(conditionMessage(result))
-        } else {
-          self$step_warnings <- c(self$step_warnings, conditionMessage(result))
-        }
-      }
-
-      # Display errors that occur outside of a scenario's steps and hooks, e.g.
-      # during setup. A scenario's errors were printed by end_step and end_hook.
-      if (
-        is.null(self$scenario_status) &&
-          inherits(result, c("expectation_error", "expectation_failure"))
-      ) {
-        print_error(conditionMessage(result))
-      }
-
       invisible(self)
     },
 
@@ -679,8 +1217,7 @@ CucumberProgressReporter <- R6::R6Class(
     #' @param error The hook's error
     end_hook = function(status, error) {
       super$end_hook(status, error)
-      self$current_hooks <- c(self$current_hooks, list(list(status = status, error = error)))
-      withr::local_options(cli.num_colors = self$num_colors)
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
       print_error(conditionMessage(error), status)
       invisible(self)
     },
@@ -700,26 +1237,11 @@ CucumberProgressReporter <- R6::R6Class(
     end_step = function(step) {
       super$end_step(step)
 
-      withr::local_options(cli.num_colors = self$num_colors)
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
 
-      self$current_steps <- c(self$current_steps, list(step))
-
-      status <- step$status %||% "passed"
-      self$step_statuses <- c(self$step_statuses, status)
-
-      # Format: "    ✓ Given I have 5 cucumbers"
       # ponytail: cat to stdout so expect_snapshot can capture step output; color
       # is re-enabled via the num_colors option forced above.
-      cat(
-        "    ",
-        status_symbol(status),
-        " ",
-        cli::style_bold(step$keyword),
-        " ",
-        step$text,
-        "\n",
-        sep = ""
-      )
+      print_step(step)
 
       self$print_step_args(step)
 
@@ -728,21 +1250,7 @@ CucumberProgressReporter <- R6::R6Class(
       }
       self$step_warnings <- NULL
 
-      # If the step didn't pass, show why
-      if (!is.null(step$error)) {
-        # Get error message - for rlang errors this includes full formatting
-        error_msg <- conditionMessage(step$error)
-        # Split multi-line error messages and indent each line
-        error_lines <- strsplit(error_msg, "\n")[[1]]
-        for (line in error_lines) {
-          cat(
-            "      ",
-            status_color(status)(line),
-            "\n",
-            sep = ""
-          )
-        }
-      }
+      print_step_error(step)
 
       invisible(self)
     },
@@ -766,55 +1274,6 @@ CucumberProgressReporter <- R6::R6Class(
           cat("      ", cli::style_dim(line), "\n", sep = "")
         }
       }
-      invisible(self)
-    },
-
-    #' @description
-    #' Print summary at the end (called by testthat)
-    end_reporter = function() {
-      if (!is.null(super$end_reporter)) {
-        super$end_reporter()
-      }
-
-      withr::local_options(cli.num_colors = self$num_colors)
-
-      cat("\n")
-      cat(cli::rule(), "\n", sep = "")
-      cat(cli::style_bold("Summary"), "\n", sep = "")
-      cat("  ", format_status_counts(self$scenario_statuses, "scenario"), "\n", sep = "")
-      cat("  ", format_status_counts(self$step_statuses, "step"), "\n", sep = "")
-      cat(cli::rule(), "\n", sep = "")
-
-      if (length(self$failures) > 0) {
-        cat("\n", cli::style_bold("Failures"), "\n", sep = "")
-        for (failure in self$failures) {
-          cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
-          cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
-          for (step in failure$steps) {
-            status <- step$status %||% "passed"
-            cat(
-              "    ",
-              status_symbol(status),
-              " ",
-              cli::style_bold(step$keyword),
-              " ",
-              step$text,
-              "\n",
-              sep = ""
-            )
-            if (!is.null(step$error)) {
-              error_lines <- strsplit(conditionMessage(step$error), "\n")[[1]]
-              for (line in error_lines) {
-                cat("      ", status_color(status)(line), "\n", sep = "")
-              }
-            }
-          }
-          for (hook in failure$hooks) {
-            print_error(conditionMessage(hook$error), hook$status)
-          }
-        }
-      }
-
       invisible(self)
     }
   )

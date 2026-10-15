@@ -29,15 +29,11 @@ Feature: Failing steps
       test("features", stop_on_failure = FALSE)
       """
     Then it has 1 failed
-    And the output includes
-      """
-      - Then the basket has 1 item
-      """
-    And the output includes
-      """
-      1 scenario (1 failed)
-      3 steps (1 failed, 1 skipped, 1 passed)
-      """
+    And the steps have these results:
+      | step                       | status  |
+      | Given an empty basket      | passed  |
+      | When I add an item         | failed  |
+      | Then the basket has 1 item | skipped |
 
   Scenario: A step that throws an error fails, and the other scenarios still run
     Given a file named "features/basket.feature" with
@@ -63,7 +59,7 @@ Feature: Failing steps
     Then it has 1 failed
     And it has 1 passed
     And the error message includes "basket is full"
-    And the output includes
-      """
-      2 scenarios (1 failed, 1 passed)
-      """
+    And the scenarios have these results:
+      | scenario             | status |
+      | Add an item          | failed |
+      | Look into the basket | passed |

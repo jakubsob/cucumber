@@ -4,145 +4,56 @@
 \alias{CucumberProgressReporter}
 \title{Progress Reporter for Cucumber}
 \description{
-A reporter that prints step-by-step progress to the console, mimicking
-testthat::ProgressReporter but with visibility into individual Gherkin steps.
-}
-\details{
-Prints each step as it executes with a status indicator, grouped under
-scenario and feature headers similar to testthat's output:
-\itemize{
-\item \ifelse{latex}{[x]}{✓} for passed steps (green)
-\item \ifelse{latex}{[ ]}{✗} for failed steps (red)
-\item \code{-} for skipped steps (cyan)
-\item \code{P} for pending steps (yellow)
-\item \code{U} for undefined steps (yellow)
-\item \code{A} for ambiguous steps (red)
-}
+The default reporter. Like testthat's `ProgressReporter`, it prints one line
+for each feature, with its scenarios counted by status: failed (`F`),
+pending (`P`), undefined (`U`), skipped (`S`) and passed (`OK`). An
+ambiguous scenario counts as failed. While a feature runs, its line is
+redrawn with a spinner after each step.
 
-The summary counts scenarios and steps by status, like Cucumber does.
+A scenario that didn't pass is printed as soon as it finishes, with its
+steps and errors. The summary of [CucumberSummaryReporter] is printed at
+the end.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Addition
-  Scenario: Add two numbers
-    [x] Given I have entered 50 into the calculator
-    [x] Given I have entered 70 into the calculator
-    [x] When I press add
-    [x] Then the result should be 120 on the screen
-}\if{html}{\out{</div>}}
-\subsection{Usage}{
+```
+  |  F  P  U  S  OK | Feature
+✔ |              3 | Addition
 
-Pass a reporter instance to \code{\link[=test]{test()}} or \code{\link[=run]{run()}}:
+Feature: Basket
+  Scenario: Remove an item
+    ✔ Given a basket with 2 apples
+    ✖ When I remove 3 apples
+      Error: Can't remove more apples than there are.
+✖ |  1           2 | Basket [1.2s]
+```
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Step-level detail
-cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
+A feature that took a second or more shows how long it took. The line is
+redrawn only in a terminal that can redraw a line, see
+[cli::is_dynamic_tty()]. Elsewhere, like in CI, each feature's line is
+printed once it finishes.
 
-# testthat reporters still work, reporting at the scenario level only
-cucumber::test("tests/acceptance", reporter = testthat::ProgressReporter$new())
-
-# Silent mode
-cucumber::test("tests/acceptance", reporter = testthat::SilentReporter$new())
-
-# From within a test file
-cucumber::run(reporter = cucumber::CucumberProgressReporter$new())
-}\if{html}{\out{</div>}}
-}
-
-\subsection{Creating custom reporters}{
-
-Extend \link{CucumberReporter} to build your own:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{HTMLReporter <- R6::R6Class(
-  "HTMLReporter",
-  inherit = cucumber::CucumberReporter,
-  public = list(
-    html_output = character(),
-    start_feature = function(feature_name) \{
-      super$start_feature(feature_name)
-      self$html_output <- c(self$html_output, sprintf("<h2>\%s</h2>", feature_name))
-    \},
-    end_step = function(step) \{
-      super$end_step(step)
-      status_class <- step$status \%||\% "passed"
-      self$html_output <- c(
-        self$html_output,
-        sprintf('<div class="step \%s">\%s \%s</div>', status_class, step$keyword, step$text)
-      )
-    \},
-    end_reporter = function() \{
-      if (!is.null(super$end_reporter)) super$end_reporter()
-      writeLines(self$html_output, "test-report.html")
-    \}
-  )
-)
-}\if{html}{\out{</div>}}
-}
-
-\subsection{Step metadata}{
-
-When \code{end_step()} is called, the step object contains:
-\itemize{
-\item \code{keyword} - The step keyword as written (Given, When, Then, And, But or *)
-\item \code{type} - "Context", "Action" or "Outcome" for Given, When and Then steps,
-And and But steps take the type of the previous step. "Unknown" for \code{*}
-and for And or But as the first step.
-\item \code{text} - The step text
-\item \code{status} - One of "passed", "failed", "skipped", "pending", "undefined" or "ambiguous"
-\item \code{error} - The error object if the step failed, is pending, undefined or ambiguous (NULL otherwise)
-\item \code{duration} - Execution time in seconds
-\item \code{data_table} - Data table if present (NULL otherwise)
-\item \code{docstring} - Docstring if present (NULL otherwise)
-}
-}
+To see each step, use [CucumberPrettyReporter].
 }
 \examples{
 \dontrun{
-# Use with cucumber::test()
-cucumber::test(
-  "tests/acceptance",
-  reporter = cucumber::CucumberProgressReporter$new()
-)
-
-# Or without praise messages
-cucumber::test(
-  "tests/acceptance",
-  reporter = cucumber::CucumberProgressReporter$new(show_praise = FALSE)
-)
+cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter$new())
 }
 
-}
-\seealso{
-\link{CucumberReporter}
 }
 \section{Super classes}{
-\code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberProgressReporter}
+\code{\link[testthat:Reporter]{testthat::Reporter}} -> \code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberSummaryReporter]{cucumber::CucumberSummaryReporter}} -> \code{CucumberProgressReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{show_praise}}{Whether to show praise messages}
+\item{\code{header_printed}}{Whether the header of the columns was printed}
 
-\item{\code{step_statuses}}{Statuses of the reported steps}
+\item{\code{feature_first}}{Index of the current feature's first scenario in `scenario_statuses`}
 
-\item{\code{scenario_statuses}}{Statuses of the finished scenarios}
+\item{\code{feature_start}}{When the current feature started}
 
-\item{\code{scenario_failed}}{Whether testthat reported a failure or an error for the current test}
+\item{\code{frames}}{Frames of the spinner, captured at construction}
 
-\item{\code{scenario_status}}{Status of the current scenario, once its steps and hooks ran}
-
-\item{\code{current_scenario}}{Name of the scenario currently executing}
-
-\item{\code{current_steps}}{Steps executed so far in the current scenario}
-
-\item{\code{current_hooks}}{Results of the current scenario's hooks that failed or are pending}
-
-\item{\code{step_warnings}}{Warnings of the step currently executing, printed when it ends}
-
-\item{\code{failures}}{Recorded failures for the end-of-run summary}
-
-\item{\code{num_colors}}{Terminal color support captured at construction}
-
-\item{\code{reporter_max_docstring_lines}}{Max docstring lines to print per step}
-
-\item{\code{reporter_max_table_lines}}{Max data table rows to print per step}
+\item{\code{frame}}{Number of steps of the current feature finished, to turn the spinner}
 }
 \if{html}{\out{</div>}}
 }
@@ -151,16 +62,13 @@ cucumber::test(
 \itemize{
 \item \href{#method-CucumberProgressReporter-new}{\code{CucumberProgressReporter$new()}}
 \item \href{#method-CucumberProgressReporter-start_feature}{\code{CucumberProgressReporter$start_feature()}}
-\item \href{#method-CucumberProgressReporter-end_feature}{\code{CucumberProgressReporter$end_feature()}}
-\item \href{#method-CucumberProgressReporter-start_test}{\code{CucumberProgressReporter$start_test()}}
+\item \href{#method-CucumberProgressReporter-end_step}{\code{CucumberProgressReporter$end_step()}}
 \item \href{#method-CucumberProgressReporter-end_test}{\code{CucumberProgressReporter$end_test()}}
 \item \href{#method-CucumberProgressReporter-end_scenario}{\code{CucumberProgressReporter$end_scenario()}}
-\item \href{#method-CucumberProgressReporter-add_result}{\code{CucumberProgressReporter$add_result()}}
-\item \href{#method-CucumberProgressReporter-end_hook}{\code{CucumberProgressReporter$end_hook()}}
-\item \href{#method-CucumberProgressReporter-start_step}{\code{CucumberProgressReporter$start_step()}}
-\item \href{#method-CucumberProgressReporter-end_step}{\code{CucumberProgressReporter$end_step()}}
-\item \href{#method-CucumberProgressReporter-print_step_args}{\code{CucumberProgressReporter$print_step_args()}}
-\item \href{#method-CucumberProgressReporter-end_reporter}{\code{CucumberProgressReporter$end_reporter()}}
+\item \href{#method-CucumberProgressReporter-end_feature}{\code{CucumberProgressReporter$end_feature()}}
+\item \href{#method-CucumberProgressReporter-feature_statuses}{\code{CucumberProgressReporter$feature_statuses()}}
+\item \href{#method-CucumberProgressReporter-feature_line}{\code{CucumberProgressReporter$feature_line()}}
+\item \href{#method-CucumberProgressReporter-draw_feature}{\code{CucumberProgressReporter$draw_feature()}}
 \item \href{#method-CucumberProgressReporter-clone}{\code{CucumberProgressReporter$clone()}}
 }
 }
@@ -181,6 +89,17 @@ cucumber::test(
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="start_reporter"><a href='../../testthat/html/Reporter.html#method-Reporter-start_reporter'><code>testthat::Reporter$start_reporter()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="testthat" data-topic="Reporter" data-id="update"><a href='../../testthat/html/Reporter.html#method-Reporter-update'><code>testthat::Reporter$update()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_message"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_message'><code>cucumber::CucumberReporter$add_message()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_step'><code>cucumber::CucumberReporter$start_step()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_result"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_result'><code>cucumber::CucumberSummaryReporter$add_result()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="draw"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-draw'><code>cucumber::CucumberSummaryReporter$draw()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="end_hook"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-end_hook'><code>cucumber::CucumberSummaryReporter$end_hook()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="end_reporter"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-end_reporter'><code>cucumber::CucumberSummaryReporter$end_reporter()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_above"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_above'><code>cucumber::CucumberSummaryReporter$print_above()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_counts"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_counts'><code>cucumber::CucumberSummaryReporter$print_counts()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures'><code>cucumber::CucumberSummaryReporter$print_failures()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures_since"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures_since'><code>cucumber::CucumberSummaryReporter$print_failures_since()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="start_test"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-start_test'><code>cucumber::CucumberSummaryReporter$start_test()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -190,27 +109,12 @@ cucumber::test(
 \subsection{Method \code{new()}}{
 Initialize the reporter
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new(
-  show_praise = TRUE,
-  reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines", Inf),
-  reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
-  ...
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new(...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{show_praise}}{Whether to show praise (default TRUE)}
-
-\item{\code{reporter_max_docstring_lines}}{Max docstring lines to print for a step before
-truncating. Defaults to the \code{cucumber.reporter_max_docstring_lines} option, or
-\code{Inf} (print in full) if unset.}
-
-\item{\code{reporter_max_table_lines}}{Max data table rows to print for a step before
-truncating. Defaults to the \code{cucumber.reporter_max_table_lines} option, or \code{Inf}
-(print in full) if unset.}
-
 \item{\code{...}}{Additional arguments passed to parent}
 }
 \if{html}{\out{</div>}}
@@ -220,7 +124,7 @@ truncating. Defaults to the \code{cucumber.reporter_max_table_lines} option, or 
 \if{html}{\out{<a id="method-CucumberProgressReporter-start_feature"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberProgressReporter-start_feature}{}}}
 \subsection{Method \code{start_feature()}}{
-Start a feature
+Print the header once, and start the feature's line
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$start_feature(feature_name)}\if{html}{\out{</div>}}
 }
@@ -234,30 +138,18 @@ Start a feature
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_feature}{}}}
-\subsection{Method \code{end_feature()}}{
-End the current feature
+\if{html}{\out{<a id="method-CucumberProgressReporter-end_step"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_step}{}}}
+\subsection{Method \code{end_step()}}{
+Turn the spinner after a step
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_feature()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-start_test"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-start_test}{}}}
-\subsection{Method \code{start_test()}}{
-Start a test (called by testthat for each scenario)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$start_test(context, test)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_step(step)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{context}}{Test context}
-
-\item{\code{test}}{Test name (will be "Scenario: \verb{<name>}")}
+\item{\code{step}}{Pickle step object with execution results}
 }
 \if{html}{\out{</div>}}
 }
@@ -266,9 +158,7 @@ Start a test (called by testthat for each scenario)
 \if{html}{\out{<a id="method-CucumberProgressReporter-end_test"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_test}{}}}
 \subsection{Method \code{end_test()}}{
-End a test (called by testthat for each scenario). A scenario has the
-status given to end_scenario(). A test that isn't a scenario, or one that
-stopped before its end, fails if testthat reported a failure or an error.
+Count the scenario in the feature's line
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_test(context, test)}\if{html}{\out{</div>}}
 }
@@ -287,7 +177,7 @@ stopped before its end, fails if testthat reported a failure or an error.
 \if{html}{\out{<a id="method-CucumberProgressReporter-end_scenario"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_scenario}{}}}
 \subsection{Method \code{end_scenario()}}{
-Record a scenario's status, and the scenario for the summary if it didn't pass
+Print the scenario if it didn't pass
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_scenario(status)}\if{html}{\out{</div>}}
 }
@@ -301,105 +191,49 @@ Record a scenario's status, and the scenario for the summary if it didn't pass
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-add_result"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-add_result}{}}}
-\subsection{Method \code{add_result()}}{
-Add a result (warning, skip, failure, etc.)
+\if{html}{\out{<a id="method-CucumberProgressReporter-end_feature"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_feature}{}}}
+\subsection{Method \code{end_feature()}}{
+Print the feature's final line, with its status and how long it took
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$add_result(context, test, result)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_feature()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberProgressReporter-feature_statuses"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-feature_statuses}{}}}
+\subsection{Method \code{feature_statuses()}}{
+Statuses of the current feature's finished scenarios
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$feature_statuses()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberProgressReporter-feature_line"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-feature_line}{}}}
+\subsection{Method \code{feature_line()}}{
+The current feature's line
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$feature_line(symbol)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{context}}{Test context}
-
-\item{\code{test}}{Test object}
-
-\item{\code{result}}{Test result object}
+\item{\code{symbol}}{The status column}
 }
 \if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_hook"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_hook}{}}}
-\subsection{Method \code{end_hook()}}{
-Print the error of a scenario's hook that failed or is pending, or the
-reason of one that skipped the scenario
+\if{html}{\out{<a id="method-CucumberProgressReporter-draw_feature"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-draw_feature}{}}}
+\subsection{Method \code{draw_feature()}}{
+Draw the current feature's line with the spinner
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_hook(status, error)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{\code{"failed"}, \code{"pending"} or \code{"skipped"}}
-
-\item{\code{error}}{The hook's error}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-start_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-start_step}{}}}
-\subsection{Method \code{start_step()}}{
-Start a step
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$start_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_step}{}}}
-\subsection{Method \code{end_step()}}{
-End a step and print its result
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object with execution results}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-print_step_args"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-print_step_args}{}}}
-\subsection{Method \code{print_step_args()}}{
-Print a step's docstring and/or data table arguments, indented and
-truncated to \code{reporter_max_docstring_lines} / \code{reporter_max_table_lines}
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$print_step_args(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_reporter"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_reporter}{}}}
-\subsection{Method \code{end_reporter()}}{
-Print summary at the end (called by testthat)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_reporter()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$draw_feature()}\if{html}{\out{</div>}}
 }
 
 }

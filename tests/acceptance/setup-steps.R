@@ -15,6 +15,14 @@ given("a package", function(context) {
 
 # With `catch_error`, an error of the code is kept in `context$error` instead of failing the step
 run_code <- function(code, context, catch_error = FALSE) {
+  # Each test() of the code also writes its run as Cucumber Messages, read into
+  # `context$run`, so the results of the run are checked whatever the reporter prints
+  test <- function(..., reporter = cucumber:::get_reporter()) {
+    messages <- tempfile(fileext = ".ndjson")
+    on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
+    recorder <- CucumberMessagesReporter$new(messages)
+    cucumber::test(..., reporter = CucumberMultiReporter$new(purrr::compact(list(reporter, recorder))))
+  }
   x <- as.character(runif(1))
   .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)
   .cucumber_steps_option <- paste0(".cucumber_steps_", x)
@@ -57,6 +65,36 @@ run_code <- function(code, context, catch_error = FALSE) {
 when("I run", function(code, context) run_code(code, context))
 
 when("I run it and it fails", function(code, context) run_code(code, context, catch_error = TRUE))
+
+# The steps of the last run's scenarios, and with `hooks` their hooks, in the
+# order they ran. A hook is its keyword, `Before` or `After`.
+run_steps <- function(context, hooks = FALSE) {
+  steps <- context$run$steps
+  if (!hooks) steps <- steps[!steps$keyword %in% c("Before", "After"), ]
+  tibble::tibble(
+    scenario = steps$scenario,
+    step = trimws(paste(steps$keyword, steps$text)),
+    status = steps$status
+  )
+}
+
+then("the steps have these results:", function(expected, context) {
+  expect_equal(as.data.frame(run_steps(context)[names(expected)]), as.data.frame(expected))
+})
+
+then("the steps and hooks have these results:", function(expected, context) {
+  expect_equal(as.data.frame(run_steps(context, hooks = TRUE)[names(expected)]), as.data.frame(expected))
+})
+
+then("the scenarios have these results:", function(expected, context) {
+  scenarios <- context$run$scenarios
+  actual <- tibble::tibble(scenario = scenarios$name, status = scenarios$status)
+  expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
+})
+
+then("no scenario ran", function(context) {
+  expect_equal(nrow(context$run$scenarios), 0)
+})
 
 then("it passes", function(context) {
   results <- as.data.frame(context$result)
@@ -179,6 +217,18 @@ then("the output includes", function(text, context) {
     grepl(needle, output, fixed = TRUE),
     info = paste0("Expected:\n", needle, "\n\nIn output:\n", output)
   )
+})
+
+# Each line is in the output after the line before it, with other lines in between
+then("the output includes these lines in order:", function(text, context) {
+  lines <- trimws(strsplit(text, "\n")[[1]])
+  output <- trimws(context$output)
+  at <- 0
+  for (line in lines) {
+    found <- which(output == line & seq_along(output) > at)
+    expect_true(length(found) > 0, info = paste0("Missing in order: ", line, "\n\nIn output:\n", paste(output, collapse = "\n")))
+    at <- found[1]
+  }
 })
 
 then("the output includes {string}", function(text, context) {

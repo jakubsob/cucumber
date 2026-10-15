@@ -72,10 +72,6 @@ Feature: Scenario Outlines
       """
     Then it has 1 failed
     And it has 2 passed
-    And the output includes
-      """
-      3 scenarios (1 failed, 2 passed)
-      """
 
   Scenario: Outline placeholders are replaced in the name, Doc Strings and Data Tables
     Given a file named "features/outline.feature" with

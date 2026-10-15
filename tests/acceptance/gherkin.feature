@@ -93,7 +93,7 @@ Feature: Gherkin
       test("features")
       """
     Then it passes
-    And the output includes "<keyword>: Eating"
+    And it ran "Scenario: Eat a cucumber"
 
     Examples:
       | keyword       |

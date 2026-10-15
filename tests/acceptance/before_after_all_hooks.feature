@@ -31,17 +31,11 @@ Feature: Before all and after all hooks
     Then it passes
     And the output includes "start the server" once
     And the output includes "stop the server" once
-    And the output includes
+    And the output includes these lines in order:
       """
       start the server
-
-      Feature: Basket
-      """
-    And the output includes
-      """
       scenario
-      v Given an empty basket
-
+      scenario
       stop the server
       """
 
@@ -104,10 +98,7 @@ Feature: Before all and after all hooks
       And it has 0 passed
       And the error message includes "the server didn't start"
       And the output includes "stop the server" once
-      And the output includes
-        """
-        0 scenarios
-        """
+      And no scenario ran
 
     Scenario: The before all hooks after a failing one still run
       Given a file named "features/setup-steps.R" with

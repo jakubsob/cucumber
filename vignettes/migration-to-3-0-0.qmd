@@ -447,7 +447,9 @@ after(function(context, scenario) {
 
 # Reporters
 
-- `CucumberProgressReporter` prints each step with the keyword it's written with, and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
+- The default reporter, `CucumberProgressReporter`, prints one line per feature with its scenarios counted by status, like testthat's `ProgressReporter`, and prints each scenario that didn't pass. The reporter that printed each step is now `CucumberPrettyReporter`.
+- `CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` print like the `progress`, `progress-bar` and `summary` formatters of cucumber-js.
+- `CucumberPrettyReporter` prints each step with the keyword it's written with, and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
 - A step's new `type` is `"Context"`, `"Action"` or `"Outcome"` for Given, When and Then steps, And and But taking the previous step's type, or `"Unknown"` for `*`, and for And or But as the first step.
 
 ## Migrating from 2.2.0
@@ -504,9 +506,11 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 
 - Replace checks for the `"error"` status with `"failed"`.
 - Use `step$type` instead of `step$keyword` to tell Given, When and Then steps apart. See [Reporters](#reporters).
+- Inherit from `CucumberPrettyReporter` instead of `CucumberProgressReporter` to extend the reporter that prints each step. See [Reporters](#reporters).
 
 ## In test runs
 
+- Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines`, `reporter_max_table_lines` or `show_praise`. See [Reporters](#reporters).
 - Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
 - Implement pending and undefined steps, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).
 - Write tags in `tags` arguments with their `@`, and `and`, `or` and `not` in lowercase, in `test()`, `run()` and hooks. See [Tag expressions](#tag-expressions).

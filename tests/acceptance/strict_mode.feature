@@ -71,7 +71,6 @@ Feature: Strict mode
       test("features", strict = FALSE, stop_on_failure = FALSE)
       """
     Then it has 1 failed
-    And the output includes
-      """
-      A When I add an item
-      """
+    And the steps have these results:
+      | step               | status    |
+      | When I add an item | ambiguous |

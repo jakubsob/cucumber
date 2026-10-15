@@ -1,4 +1,4 @@
-describe("CucumberProgressReporter", {
+describe("CucumberPrettyReporter", {
   it("prints step-by-step progress", {
     local_steps()
     feature <- c(
@@ -23,7 +23,7 @@ describe("CucumberProgressReporter", {
       expect_equal(context$result, n)
     })
 
-    reporter <- CucumberProgressReporter$new(show_praise = FALSE)
+    reporter <- CucumberPrettyReporter$new(show_praise = FALSE)
 
     # Run the scenario under its own testthat reporter, so the snapshot is
     # recorded under this test and not under the scenario's nested test
@@ -56,7 +56,7 @@ describe("CucumberProgressReporter", {
       expect_equal(context$value, 5)
     })
 
-    reporter <- CucumberProgressReporter$new(show_praise = FALSE)
+    reporter <- CucumberPrettyReporter$new(show_praise = FALSE)
 
     # The scenario fails on purpose, keep its failure out of this test's results
     .expect_snapshot({
@@ -85,7 +85,7 @@ describe("CucumberProgressReporter", {
     given("a message", function(message, context) {})
     given("these people", function(people, context) {})
 
-    reporter <- CucumberProgressReporter$new(show_praise = FALSE)
+    reporter <- CucumberPrettyReporter$new(show_praise = FALSE)
 
     # Run the scenario under its own testthat reporter, so the snapshot is
     # recorded under this test and not under the scenario's nested test
@@ -112,7 +112,7 @@ describe("CucumberProgressReporter", {
 
     given("a long message", function(message, context) {})
 
-    reporter <- CucumberProgressReporter$new(
+    reporter <- CucumberPrettyReporter$new(
       show_praise = FALSE,
       reporter_max_docstring_lines = 2
     )

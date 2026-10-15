@@ -1,7 +1,7 @@
 # test / should run one feature
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -24,7 +24,7 @@
 # test / should run multiple features
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -65,7 +65,7 @@
 # test / should run with box
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -93,7 +93,7 @@
 # test / should run with shinytest2
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -117,7 +117,7 @@
 # test / should run a Scenario with Given, When, Then, And, But keywords
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -162,7 +162,7 @@
 # test / should run a Scenario with a Table
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -188,7 +188,7 @@
 # test / should run a Scenario with a docstring
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -221,7 +221,7 @@
 # test / should run a Scenario with comments
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -244,7 +244,7 @@
 # test / should run before and after hooks
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -267,7 +267,7 @@
 # test / should run a Scenario with custom parameters
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -293,7 +293,7 @@
 # test / should run a Scenario with snapshot test
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -315,7 +315,7 @@
 # test / should work with an arbitrary test directory
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -338,7 +338,7 @@
 # test / should report success with `testthat::test_dir`
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -373,7 +373,7 @@
 # test / should work with loading steps from setup files
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -393,7 +393,7 @@
 # test / should work with Scenario Outline
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -431,7 +431,7 @@
 # test / shouldn't run testthat test files
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -454,7 +454,7 @@
 # test / should work with testthat filtering
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       

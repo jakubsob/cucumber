@@ -1,7 +1,7 @@
 # test / error handling / should throw an error if no steps are defined
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -37,7 +37,7 @@
 # test / error handling / should throw an error if no test files are found
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
         Error: 
@@ -53,7 +53,7 @@
 # test / error handling / should show clean trace when a step throws an error
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -93,7 +93,7 @@
 # test / error handling / should run after hook, even after error in step
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -133,7 +133,7 @@
 # test / error handling / should report failure with `testthat::test_dir`
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -222,7 +222,7 @@
 # test / error handling / should show a snippet when a step has no definition
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -260,7 +260,7 @@
 # test / error handling / should show an error when a step has duplicate definitions
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
       
@@ -296,7 +296,7 @@
 # test / error handling / should show an error when a feature file is invalid
 
     Code
-      test(tests_path, reporter = CucumberProgressReporter$new(), stop_on_failure = FALSE,
+      test(tests_path, reporter = CucumberPrettyReporter$new(), stop_on_failure = FALSE,
       ...)
     Output
         Error: 

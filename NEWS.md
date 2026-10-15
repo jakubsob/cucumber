@@ -64,8 +64,12 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 - ⚠️ A step's `status` is `"failed"` for both failed expectations and errors. The `"error"` status is removed.
 - ⚠️ A step keeps the keyword it's written with, so `step$keyword` can be `And`, `But` or `*`. The new `step$type` is `"Context"`, `"Action"`, `"Outcome"` or `"Unknown"`.
-- ⚠️ `CucumberProgressReporter` prints the keyword as written and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
-- ✨ `CucumberProgressReporter` prints a failed or pending hook's error, or the reason a hook skipped the scenario, where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
+- ⚠️ The reporter that prints each step as it runs is renamed from `CucumberProgressReporter` to `CucumberPrettyReporter`, like the `pretty` formatter of cucumber-js. It prints the keyword as written and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
+- ⚠️ `CucumberProgressReporter`, the default reporter, prints one line for each feature, like testthat's `ProgressReporter`, with its scenarios counted by status. The line is redrawn with a spinner while the feature runs. A scenario that didn't pass is printed as soon as it finishes, and again in the summary at the end. Use `CucumberPrettyReporter` to see every step.
+- ✨ `CucumberDotsReporter` prints one character for each step and hook as it finishes, like the `progress` formatter of cucumber-js: `.` passed, `F` failed, `-` skipped, `P` pending, `U` undefined and `A` ambiguous.
+- ✨ `CucumberProgressBarReporter` shows a bar of the steps run so far, redrawn in place, and prints each scenario that didn't pass as soon as it finishes, like the `progress-bar` formatter of cucumber-js.
+- ✨ `CucumberSummaryReporter` prints only the summary of the run, like the `summary` formatter of cucumber-js.
+- ✨ `CucumberPrettyReporter` prints a failed or pending hook's error, or the reason a hook skipped the scenario, where it happens, and lists it in the summary of failures. The summary shows each failed scenario once, with all its steps. `CucumberReporter` gets `end_hook()` and `end_scenario()` methods.
 - ✨ `CucumberMessagesReporter` writes the run as [Cucumber Messages](https://github.com/cucumber/messages), one JSON message per line, like the `message` formatter of other Cucumber implementations: `test(reporter = CucumberMessagesReporter$new("cucumber.ndjson"))`. Official tools read it, like the HTML, JUnit and JSON formatters. It passes the samples of the Cucumber Compatibility Kit that cover what cucumber supports. `CucumberReporter` gets an `add_message()` method, called with each message.
 - ✨ `CucumberMultiReporter` combines reporters, like `testthat::MultiReporter`, and passes the step, hook, scenario and message calls to each `CucumberReporter` among them, e.g. to print the progress of a run and write its messages.
 
@@ -85,7 +89,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - 🐛 A scenario whose steps pass without calling any `expect_*()` function is reported as passed. Previously testthat reported it as skipped ("empty test"), e.g. in `JunitReporter` output.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.
 - 🐛 Defining a step without `context` as its last argument is an error that says so and the function to use, e.g. `Use \`function(n, context)\``. Previously it was a checkmate assertion error, `Must be a subset of {'n'}`.
-- 🐛 `CucumberProgressReporter` prints a step's warnings under the step. Previously they were printed above it.
+- 🐛 `CucumberPrettyReporter` prints a step's warnings under the step. Previously they were printed above it.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
 - 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored. An argument that isn't an argument of `test()` or `grepl()`, like a misspelled `fail_fst = TRUE`, is an error.
 

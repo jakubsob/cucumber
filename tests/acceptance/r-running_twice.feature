@@ -29,32 +29,10 @@ Feature: Running tests more than once
       test("features")
       """
     Then it passes
-    And the output includes
-      """
-      Feature: Calculate
-        Scenario: Adding one
-          v Given I calculate 1
-          v Then the result is 2
-
-
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 passed)
-        2 steps (2 passed)
-      --------------------------------------------------------------------------------
-
-      Feature: Calculate
-        Scenario: Adding one
-          v Given I calculate 1
-          v Then the result is 2
-
-
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 passed)
-        2 steps (2 passed)
-      --------------------------------------------------------------------------------
-      """
+    And the steps have these results:
+      | step                 | status |
+      | Given I calculate 1  | passed |
+      | Then the result is 2 | passed |
 
   Scenario: Testthat tests with run() can be run twice in the same session
     Given a package
@@ -109,7 +87,6 @@ Feature: Running tests more than once
       test("features", stop_on_failure = FALSE)
       """
     Then it has 1 failed
-    And the output includes
-      """
-      U Given I calculate 1
-      """
+    And the steps have these results:
+      | step                | status    |
+      | Given I calculate 1 | undefined |

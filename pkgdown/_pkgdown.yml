@@ -61,6 +61,10 @@ reference:
     contents:
       - CucumberReporter
       - CucumberProgressReporter
+      - CucumberProgressBarReporter
+      - CucumberDotsReporter
+      - CucumberSummaryReporter
+      - CucumberPrettyReporter
       - CucumberMessagesReporter
       - CucumberMultiReporter
   - title: Reports

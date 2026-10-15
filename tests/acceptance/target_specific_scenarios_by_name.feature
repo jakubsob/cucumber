@@ -56,8 +56,8 @@ Feature: Running scenarios by name
       test("features", name = "big")
       """
     Then only "Addition" was run
-    And the output includes "Feature: Addition"
-    And the output doesn't include "Feature: Subtraction"
+    And the output includes "| Addition"
+    And the output doesn't include "Subtraction"
 
   Scenario: A scenario runs if its name matches any of the regular expressions
     When I run

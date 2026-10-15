@@ -26,7 +26,7 @@ test_example <- function(path, tests_path = "tests/acceptance", ...) {
     .expect_snapshot(
       test(
         tests_path,
-        reporter = CucumberProgressReporter$new(),
+        reporter = CucumberPrettyReporter$new(),
         stop_on_failure = FALSE,
         ...
       )

@@ -22,14 +22,14 @@
 #'
 #' - `cucumber.reporter_max_docstring_lines`
 #'
-#'   Max docstring lines [CucumberProgressReporter] prints per step before
+#'   Max docstring lines [CucumberPrettyReporter] prints per step before
 #'   truncating.
 #'
 #'   default: `Inf`
 #'
 #' - `cucumber.reporter_max_table_lines`
 #'
-#'   Max data table rows [CucumberProgressReporter] prints per step before
+#'   Max data table rows [CucumberPrettyReporter] prints per step before
 #'   truncating.
 #'
 #'   default: `Inf`

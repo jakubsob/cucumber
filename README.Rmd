@@ -66,7 +66,7 @@ The building blocks of the cucumber tests are Features and Scenarios.
 - Each Feature will be treated as a separate [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage) – their results will be reported as if they were `test-*.R` files, e.g. `'test-Feature: Addition.R'`.
 - Each Scenario is equivalent to a `testthat::test_that` or `testthat::it` case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.
 
-Run the tests with `cucumber::test()`. By default it uses the `CucumberProgressReporter`, which reports every Gherkin step as it runs:
+Run the tests with `cucumber::test()`. By default it uses the `CucumberProgressReporter`, which prints a line for each feature with its scenarios counted by status:
 
 ```{r run-pass}
 withr::with_dir(pass_dir, {
@@ -74,11 +74,19 @@ withr::with_dir(pass_dir, {
 })
 ```
 
-When a step fails, the reporter shows which step broke and why, and repeats the failing scenarios in a summary at the end:
+When a step fails, the reporter shows which step broke and why as soon as its scenario finishes, and again in the summary at the end:
 
 ```{r run-fail, error = TRUE}
 withr::with_dir(fail_dir, {
   cucumber::test(filter = "addition")
+})
+```
+
+To see every step as it runs, use `CucumberPrettyReporter`. `CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` print like the `progress`, `progress-bar` and `summary` formatters of cucumber-js:
+
+```{r run-pretty}
+withr::with_dir(pass_dir, {
+  cucumber::test(filter = "addition", reporter = cucumber::CucumberPrettyReporter$new())
 })
 ```
 

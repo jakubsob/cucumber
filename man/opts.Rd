@@ -23,13 +23,13 @@ like in cucumber 2.x, instead of one string.
 default: \code{FALSE}
 \item \code{cucumber.reporter_max_docstring_lines}
 
-Max docstring lines \link{CucumberProgressReporter} prints per step before
+Max docstring lines \link{CucumberPrettyReporter} prints per step before
 truncating.
 
 default: \code{Inf}
 \item \code{cucumber.reporter_max_table_lines}
 
-Max data table rows \link{CucumberProgressReporter} prints per step before
+Max data table rows \link{CucumberPrettyReporter} prints per step before
 truncating.
 
 default: \code{Inf}

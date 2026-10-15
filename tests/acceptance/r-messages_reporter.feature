@@ -77,7 +77,7 @@ Feature: Messages reporter
     When I run
       """
       test("features", reporter = CucumberMultiReporter$new(list(
-        CucumberProgressReporter$new(),
+        CucumberPrettyReporter$new(),
         CucumberMessagesReporter$new("messages.ndjson")
       )))
       messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)

@@ -1,4 +1,4 @@
-# CucumberProgressReporter / prints step-by-step progress
+# CucumberPrettyReporter / prints step-by-step progress
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
@@ -13,7 +13,7 @@
           v Then the result should be 120
       
 
-# CucumberProgressReporter / shows errors for failing steps
+# CucumberPrettyReporter / shows errors for failing steps
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
@@ -33,7 +33,7 @@
             Step at: test-reporter.R:55
       
 
-# CucumberProgressReporter / prints docstring and data table step arguments
+# CucumberPrettyReporter / prints docstring and data table step arguments
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {
@@ -53,7 +53,7 @@
             | Bob   | 7   |
       
 
-# CucumberProgressReporter / truncates long step arguments to max_lines
+# CucumberPrettyReporter / truncates long step arguments to max_lines
 
     Code
       testthat::with_reporter(testthat::SilentReporter$new(), {

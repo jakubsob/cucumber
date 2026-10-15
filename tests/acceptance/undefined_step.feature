@@ -33,20 +33,14 @@ Feature: Undefined steps
       """
     Then it ran "Scenario: Pay"
     And it has 2 failed
-    And the output includes
-      """
-      U When I add an item
-      """
-    And the output includes
-      """
-      U Then the basket has 1 item
-      """
+    And the steps have these results:
+      | scenario             | step                       | status    |
+      | Add an item          | Given an empty basket      | passed    |
+      | Add an item          | When I add an item         | undefined |
+      | Add an item          | Then the basket has 1 item | undefined |
+      | Look into the basket | Given an empty basket      | passed    |
+      | Pay                  | When I pay 5 euro          | undefined |
     And the output includes
       """
       when("I pay {int} euro", function(int, context) {
-      """
-    And the output includes
-      """
-      3 scenarios (2 undefined, 1 passed)
-      5 steps (3 undefined, 2 passed)
       """

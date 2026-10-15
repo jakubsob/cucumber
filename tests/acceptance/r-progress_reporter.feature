@@ -1,75 +1,76 @@
 Feature: Progress reporter
-  `CucumberProgressReporter` prints each step as it runs, with its Doc String or Data Table
-  and the warnings it raised. Long Doc Strings and Data Tables can be cut short
-  with `reporter_max_docstring_lines` and `reporter_max_table_lines`.
+  `CucumberProgressReporter` is the default reporter. Like testthat's `ProgressReporter`, it prints
+  one line for each feature, with its scenarios counted by status: failed (F), pending (P),
+  undefined (U), skipped (S) and passed (OK). A scenario that didn't pass is printed as soon as
+  it finishes, and again in the summary at the end.
 
   Background:
     Given a package
-
-  Scenario: A step's warnings are printed under it
-    Given a file named "features/basket.feature" with
+    And a file named "features/basket.feature" with
       """
       Feature: Basket
         Scenario: Add an item
           Given an empty basket
+          When I add 1 item
+
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove 1 item
+
+        Scenario: Pay for the items
+          Given an empty basket
+          When I pay
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+        Scenario: Check out an empty basket
+          Given an empty basket
       """
     And a file named "features/setup-steps.R" with
       """
-      given("an empty basket", function(context) warning("the basket is dusty"))
-      """
-    When I run
-      """
-      test("features")
-      """
-    Then the output includes
-      """
-      v Given an empty basket
-      Warning:
-      the basket is dusty
+      given("an empty basket", function(context) {})
+      when("I add {int} item", function(n, context) {})
+      when("I remove {int} item", function(n, context) stop("The basket is empty"))
       """
 
-  Scenario: Long Doc Strings and Data Tables are cut short
-    Given a file named "features/basket.feature" with
-      """
-      Feature: Basket
-        Scenario: Add items
-          Given a note
-            ```
-            line 1
-            line 2
-            line 3
-            ```
-          And these items
-            | item     |
-            | cucumber |
-            | tomato   |
-            | pepper   |
-      """
-    And a file named "features/setup-steps.R" with
-      """
-      given("a note", function(doc_string, context) {})
-      given("these items", function(data_table, context) {})
-      """
+  Scenario: Each feature is a line with its scenarios counted by status
     When I run
       """
-      test(
-        "features",
-        reporter = CucumberProgressReporter$new(
-          reporter_max_docstring_lines = 1,
-          reporter_max_table_lines = 2
-        )
-      )
+      test("features", stop_on_failure = FALSE)
       """
     Then the output includes
       """
-      v Given a note
-      \"\"\"
-      line 1
-      ... and 2 more line(s)
-      \"\"\"
-      v And these items
-      | item     |
-      | cucumber |
-      | tomato   |
-      ... and 1 more line(s)
+      |  F  P  U  S  OK | Feature
+      """
+    And the output includes
+      """
+      x |  1     1      1 | Basket
+      """
+    And the output includes
+      """
+      v |               1 | Checkout
+      """
+
+  Scenario: A scenario that didn't pass is printed when it finishes
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      Feature: Basket
+      Scenario: Remove an item
+      v Given an empty basket
+      x When I remove 1 item
+      """
+    And the output includes
+      """
+      Scenario: Pay for the items
+      v Given an empty basket
+      U When I pay
+      """
+    And the output includes
+      """
+      4 scenarios (1 failed, 1 undefined, 2 passed)
       """

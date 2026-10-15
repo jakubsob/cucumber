@@ -28,20 +28,12 @@ Feature: Skipped steps
       """
     Then it has 0 errors
     And the scenario "Sync the basket" is skipped with "Reason: the API is down"
-    And the output includes
-      """
-      Scenario: Sync the basket
-        v Given an empty basket
-        - When I sync the basket
-          Reason: the API is down
-        - Then the basket is synced
-      after: Sync the basket skipped
-      """
-    And the output includes
-      """
-      1 scenario (1 skipped)
-      3 steps (2 skipped, 1 passed)
-      """
+    And the output includes "after: Sync the basket skipped"
+    And the steps have these results:
+      | step                      | status  |
+      | Given an empty basket     | passed  |
+      | When I sync the basket    | skipped |
+      | Then the basket is synced | skipped |
 
   Scenario: A before hook skips the scenario with skip_scenario()
     Given a file named "features/basket.feature" with
@@ -71,21 +63,19 @@ Feature: Skipped steps
     And the scenario "Sync the basket" is skipped with "Reason: the API is down"
     And the output includes
       """
-      Scenario: Sync the basket
-        Reason: the API is down
-        - Given an empty basket
-        - When I sync the basket
       after: Sync the basket skipped
-      Scenario: Add an item
-        v Given an empty basket
       after: Add an item passed
       """
     And the output doesn't include "this hook must not run"
-    And the output includes
-      """
-      2 scenarios (1 skipped, 1 passed)
-      3 steps (2 skipped, 1 passed)
-      """
+    And the steps and hooks have these results:
+      | scenario        | step                   | status  |
+      | Sync the basket | Before                 | skipped |
+      | Sync the basket | Before                 | skipped |
+      | Sync the basket | Given an empty basket  | skipped |
+      | Sync the basket | When I sync the basket | skipped |
+      | Sync the basket | After                  | passed  |
+      | Add an item     | Given an empty basket  | passed  |
+      | Add an item     | After                  | passed  |
 
   Scenario: Undefined and ambiguous steps after a skipped step are skipped
     Given a file named "features/basket.feature" with
@@ -108,11 +98,11 @@ Feature: Skipped steps
       """
     Then it has 0 errors
     And the scenario "Sync the basket" is skipped with "Reason: the API is down"
-    And the output includes
-      """
-      1 scenario (1 skipped)
-      3 steps (3 skipped)
-      """
+    And the steps have these results:
+      | step                           | status  |
+      | When I sync the basket         | skipped |
+      | Then the basket is synced      | skipped |
+      | And the basket is synced twice | skipped |
 
   Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
     Given a file named "features/basket.feature" with
@@ -157,14 +147,11 @@ Feature: Skipped steps
         """
       Then it has 0 errors
       And the scenario "Sync the basket" is skipped with "Reason: the API is down"
-      And the output includes
-        """
-        Scenario: Sync the basket
-          - When I sync the basket
-            Reason: the API is down
-          - Then the basket is synced
-        after: Sync the basket skipped
-        """
+      And the output includes "after: Sync the basket skipped"
+      And the steps have these results:
+        | step                      | status  |
+        | When I sync the basket    | skipped |
+        | Then the basket is synced | skipped |
 
     Scenario: testthat::skip() in a before hook skips the scenario
       Given a file named "features/basket.feature" with
@@ -185,17 +172,12 @@ Feature: Skipped steps
         """
       Then it has 0 errors
       And the scenario "Sync the basket" is skipped with "Reason: the API is down"
-      And the output includes
-        """
-        Scenario: Sync the basket
-          Reason: the API is down
-          - When I sync the basket
-        after: Sync the basket skipped
-        """
-      And the output includes
-        """
-        1 scenario (1 skipped)
-        """
+      And the output includes "after: Sync the basket skipped"
+      And the steps and hooks have these results:
+        | step                   | status  |
+        | Before                 | skipped |
+        | When I sync the basket | skipped |
+        | After                  | passed  |
 
     Scenario: testthat::skip() in an after hook skips the hook
       Given a file named "features/basket.feature" with

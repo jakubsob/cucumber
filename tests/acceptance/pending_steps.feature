@@ -28,15 +28,9 @@ Feature: Pending steps
       """
       Step "a step that is pending" is pending: not yet implemented
       """
-    And the output includes
-      """
-      P Given a step that is pending
-      """
-    And the output includes
-      """
-      1 scenario (1 pending)
-      1 step (1 pending)
-      """
+    And the steps have these results:
+      | step                         | status  |
+      | Given a step that is pending | pending |
 
   Scenario: Steps after a pending step are skipped
     Given a file named "features/pending.feature" with
@@ -61,14 +55,10 @@ Feature: Pending steps
       """
     Then it has 1 failed
     And it has 0 errors
-    And the output includes
-      """
-      P Given a step that is pending
-      """
-    And the output includes
-      """
-      - Then this step should not run
-      """
+    And the steps have these results:
+      | step                          | status  |
+      | Given a step that is pending  | pending |
+      | Then this step should not run | skipped |
 
   Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
     A pending scenario fails the run only in strict mode, like a pending step.
@@ -90,19 +80,12 @@ Feature: Pending steps
       test("features", strict = <strict>, stop_on_failure = FALSE)
       """
     Then the scenario "Sync the basket" is <outcome> with "<message>"
-    And the output includes
-      """
-      Scenario: Sync the basket
-        Pending:
-          Hook is pending: the API client isn't written yet
-        - Given an empty basket
-      after: Sync the basket pending
-      """
-    And the output includes
-      """
-      1 scenario (1 pending)
-      1 step (1 skipped)
-      """
+    And the output includes "after: Sync the basket pending"
+    And the steps and hooks have these results:
+      | step                  | status  |
+      | Before                | pending |
+      | Given an empty basket | skipped |
+      | After                 | passed  |
 
     Examples:
       | strict | outcome | message                                                   |
@@ -130,17 +113,19 @@ Feature: Pending steps
       test("features", strict = <strict>, stop_on_failure = FALSE)
       """
     Then the scenario "Sync the basket" is <outcome> with "<message>"
-    And the output includes
-      """
-      1 scenario (1 pending)
-      <steps>
-      """
+    And the scenarios have these results:
+      | scenario        | status  |
+      | Sync the basket | pending |
+    And the steps have these results:
+      | step                      | status   |
+      | Given an empty basket     | <given>  |
+      | Then the basket is synced | <then>   |
 
     Examples:
-      | hook        | argument | strict | outcome | message                                                   | steps                          |
-      | before_step | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | 2 steps (1 pending, 1 skipped) |
-      | after_step  | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | 2 steps (1 pending, 1 skipped) |
-      | after       | scenario | TRUE   | failed  | Hook is pending: the API client isn't written yet         | 2 steps (2 passed)             |
-      | before_step | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | 2 steps (1 pending, 1 skipped) |
-      | after_step  | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | 2 steps (1 pending, 1 skipped) |
-      | after       | scenario | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | 2 steps (2 passed)             |
+      | hook        | argument | strict | outcome | message                                                   | given   | then    |
+      | before_step | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | pending | skipped |
+      | after_step  | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | pending | skipped |
+      | after       | scenario | TRUE   | failed  | Hook is pending: the API client isn't written yet         | passed  | passed  |
+      | before_step | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | pending | skipped |
+      | after_step  | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | pending | skipped |
+      | after       | scenario | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | passed  | passed  |

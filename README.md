@@ -63,7 +63,8 @@ The building blocks of the cucumber tests are Features and Scenarios.
   considered successful.
 
 Run the tests with `cucumber::test()`. By default it uses the
-`CucumberProgressReporter`, which reports every Gherkin step as it runs:
+`CucumberProgressReporter`, which prints a line for each feature with
+its scenarios counted by status:
 
 ``` r
 withr::with_dir(pass_dir, {
@@ -71,18 +72,8 @@ withr::with_dir(pass_dir, {
 })
 ```
 
-
-    Feature: Addition
-      Scenario: Adding 2 integers
-        v When I add 1 and 1
-        v Then the result is 2
-      Scenario: Adding integer and float
-        v When I add 1 and 1.1
-        v Then the result is 2.1
-      Scenario: Adding float and float
-        v When I add 1.1 and 1.1
-        v Then the result is 2.2
-
+      |  F  P  U  S  OK | Feature
+    v |               3 | Addition
 
     --------------------------------------------------------------------------------
     Summary
@@ -90,8 +81,8 @@ withr::with_dir(pass_dir, {
       6 steps (6 passed)
     --------------------------------------------------------------------------------
 
-When a step fails, the reporter shows which step broke and why, and
-repeats the failing scenarios in a summary at the end:
+When a step fails, the reporter shows which step broke and why as soon
+as its scenario finishes, and again in the summary at the end:
 
 ``` r
 withr::with_dir(fail_dir, {
@@ -99,11 +90,9 @@ withr::with_dir(fail_dir, {
 })
 ```
 
+      |  F  P  U  S  OK | Feature
 
     Feature: Addition
-      Scenario: Adding 2 integers
-        v When I add 1 and 1
-        v Then the result is 2
       Scenario: Adding integer and float
         v When I add 1 and 1.1
         x Then the result is 5
@@ -113,6 +102,8 @@ withr::with_dir(fail_dir, {
           `expected`: 5.0
           
           Step at: setup-steps-addition.R:5
+
+    Feature: Addition
       Scenario: Adding float and float
         v When I add 1.1 and 1.1
         x Then the result is 5
@@ -122,7 +113,7 @@ withr::with_dir(fail_dir, {
           `expected`: 5.0
           
           Step at: setup-steps-addition.R:5
-
+    x |  2            1 | Addition
 
     --------------------------------------------------------------------------------
     Summary
@@ -156,6 +147,36 @@ withr::with_dir(fail_dir, {
 
     Error:
     ! Test failures.
+
+To see every step as it runs, use `CucumberPrettyReporter`.
+`CucumberDotsReporter`, `CucumberProgressBarReporter` and
+`CucumberSummaryReporter` print like the `progress`, `progress-bar` and
+`summary` formatters of cucumber-js:
+
+``` r
+withr::with_dir(pass_dir, {
+  cucumber::test(filter = "addition", reporter = cucumber::CucumberPrettyReporter$new())
+})
+```
+
+
+    Feature: Addition
+      Scenario: Adding 2 integers
+        v When I add 1 and 1
+        v Then the result is 2
+      Scenario: Adding integer and float
+        v When I add 1 and 1.1
+        v Then the result is 2.1
+      Scenario: Adding float and float
+        v When I add 1.1 and 1.1
+        v Then the result is 2.2
+
+
+    --------------------------------------------------------------------------------
+    Summary
+      3 scenarios (3 passed)
+      6 steps (6 passed)
+    --------------------------------------------------------------------------------
 
 Put your acceptance tests in a directory separate to your unit tests:
 

@@ -31,16 +31,10 @@ Feature: Dry run
       """
     Then it has 0 errors
     And it has 0 failed
-    And the output includes
-      """
-      - Given an empty basket
-      - When I add an item
-      """
-    And the output includes
-      """
-      1 scenario (1 skipped)
-      2 steps (2 skipped)
-      """
+    And the steps and hooks have these results:
+      | step                  | status  |
+      | Given an empty basket | skipped |
+      | When I add an item    | skipped |
 
   Scenario: A dry run reports undefined steps without failing
     Given a package
@@ -63,19 +57,13 @@ Feature: Dry run
       """
     Then it has 0 failed
     And it has 1 skipped
-    And the output includes
-      """
-      - Given an empty basket
-      U When I add an item
-      """
+    And the steps have these results:
+      | step                  | status    |
+      | Given an empty basket | skipped   |
+      | When I add an item    | undefined |
     And the output includes
       """
       when("I add an item", function(context) {
-      """
-    And the output includes
-      """
-      1 scenario (1 undefined)
-      2 steps (1 undefined, 1 skipped)
       """
 
   Scenario: A dry run reports ambiguous steps without failing
@@ -97,14 +85,9 @@ Feature: Dry run
       """
     Then it has 0 failed
     And it has 1 skipped
-    And the output includes
-      """
-      A When I add an item
-      """
-    And the output includes
-      """
-      1 scenario (1 ambiguous)
-      """
+    And the steps have these results:
+      | step               | status    |
+      | When I add an item | ambiguous |
 
   Scenario: A step that would be pending is skipped in a dry run
     Given a package
@@ -124,12 +107,6 @@ Feature: Dry run
       """
     Then it has 0 failed
     And it has 1 skipped
-    And the output includes
-      """
-      - When I add an item
-      """
-    And the output includes
-      """
-      1 scenario (1 skipped)
-      1 step (1 skipped)
-      """
+    And the steps have these results:
+      | step               | status  |
+      | When I add an item | skipped |

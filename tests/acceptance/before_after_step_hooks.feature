@@ -31,11 +31,14 @@ Feature: Step hooks
       """
       before: Given an empty basket
       after: an empty basket passed
-      v Given an empty basket
       before: When I add an item
       after: I add an item failed
-      x When I add an item
       """
+    And the steps have these results:
+      | step                       | status  |
+      | Given an empty basket      | passed  |
+      | When I add an item         | failed  |
+      | Then the basket has 1 item | skipped |
     And the output doesn't include "before: Then the basket has 1 item"
     And the output doesn't include "after: the basket has 1 item"
 
@@ -59,11 +62,10 @@ Feature: Step hooks
       """
     Then it has 1 errors
     And the error message includes "step left a mess"
-    And the output includes
-      """
-      1 scenario (1 failed)
-      2 steps (1 failed, 1 skipped)
-      """
+    And the steps have these results:
+      | step                  | status  |
+      | Given an empty basket | failed  |
+      | When I add an item    | skipped |
 
   Scenario: A failing after step hook fails a pending step
     Given a file named "features/basket.feature" with
@@ -83,8 +85,6 @@ Feature: Step hooks
       """
     Then it has 1 failed
     And the error message includes "step left a mess"
-    And the output includes
-      """
-      1 scenario (1 failed)
-      1 step (1 failed)
-      """
+    And the steps have these results:
+      | step                  | status |
+      | Given an empty basket | failed |

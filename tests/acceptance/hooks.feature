@@ -31,7 +31,6 @@ Feature: Hooks
       before 1
       before 2
       step
-      v Given an empty basket
       after 2
       after 1
       """
@@ -111,15 +110,10 @@ Feature: Hooks
       """
     Then it has 1 failed
     And the error message includes "no database"
-    And the output includes
-      """
-      - Given an empty basket
-      """
-    And the output includes
-      """
-      1 scenario (1 failed)
-      1 step (1 skipped)
-      """
+    And the steps and hooks have these results:
+      | step                  | status  |
+      | Before                | failed  |
+      | Given an empty basket | skipped |
 
   Scenario: A failing after hook fails the scenario
     Given a file named "features/basket.feature" with
@@ -157,11 +151,10 @@ Feature: Hooks
       Error:
       can't close the database
       """
-    And the output includes
-      """
-      1 scenario (1 failed)
-      1 step (1 passed)
-      """
+    And the steps and hooks have these results:
+      | step                  | status |
+      | Given an empty basket | passed |
+      | After                 | failed |
 
   Scenario: A failing after hook is reported after a failing step
     Given a file named "features/basket.feature" with
@@ -224,18 +217,19 @@ Feature: Hooks
       """
     Then it has 1 failed
     And the error message includes "the hook failed"
-    And the output includes
-      """
-      1 scenario (1 failed)
-      <steps>
-      """
+    And the scenarios have these results:
+      | scenario    | status |
+      | Add an item | failed |
+    And the steps have these results:
+      | step                  | status   |
+      | Given an empty basket | <status> |
 
     Examples:
-      | hook        | argument | steps              |
-      | before      | scenario | 1 step (1 skipped) |
-      | after       | scenario | 1 step (1 passed)  |
-      | before_step | step     | 1 step (1 failed)  |
-      | after_step  | step     | 1 step (1 failed)  |
+      | hook        | argument | status  |
+      | before      | scenario | skipped |
+      | after       | scenario | passed  |
+      | before_step | step     | failed  |
+      | after_step  | step     | failed  |
 
   Scenario Outline: <hook>() with the wrong number of arguments is an error
     Given a file named "features/basket.feature" with
