@@ -69,6 +69,11 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `CucumberMessagesReporter` writes the run as [Cucumber Messages](https://github.com/cucumber/messages), one JSON message per line, like the `message` formatter of other Cucumber implementations: `test(reporter = CucumberMessagesReporter$new("cucumber.ndjson"))`. Official tools read it, like the HTML, JUnit and JSON formatters. It passes the samples of the Cucumber Compatibility Kit that cover what cucumber supports. `CucumberReporter` gets an `add_message()` method, called with each message.
 - ✨ `CucumberMultiReporter` combines reporters, like `testthat::MultiReporter`, and passes the step, hook, scenario and message calls to each `CucumberReporter` among them, e.g. to print the progress of a run and write its messages.
 
+## Reports
+
+- ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles of its features, scenarios (each example of an outline being one) and steps and hooks, with their status, duration and error, to write a report of your own. It prints how many features and scenarios ran, by status.
+- ✨ `write_html_report()` writes a run's Cucumber Messages, from their file, the `CucumberMessagesReporter` that wrote them or `read_messages()`, into the official Cucumber HTML report, the page cucumber-js writes with `--format html`: one file that works offline, with every feature's results, searchable and filterable by status, text and tags.
+
 ## Snippets
 
 - ⚠️ Snippets for undefined steps are generated like cucumber-js: parameters in the order they appear in the step, one suggestion per matching parameter type, custom parameter types used, `data_table` and `doc_string` arguments, and repeated parameter names `string`, `string2`.

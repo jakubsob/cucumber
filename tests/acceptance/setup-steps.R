@@ -196,6 +196,60 @@ then("the output doesn't include {string}", function(text, context) {
   expect_false(grepl(text, output, fixed = TRUE), info = output)
 })
 
+# Runs the package's features and writes their report with write_<format>_report()
+when("I write the {word} report", function(format, context) {
+  run_code(
+    paste0(
+      'test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)\n',
+      "write_", format, '_report("messages.ndjson", "report.html")'
+    ),
+    context
+  )
+  context$report_format <- format
+})
+
+# How each report shows a step: its text, its status and its error, as a list
+# of [step, status, error]. The official report renders its steps with
+# JavaScript, so the report is read as a browser shows it. It collapses
+# features whose scenarios passed, so they're opened first, as a reader would,
+# and the steps are read once none is collapsed.
+REPORT_STEPS_JS <- c(
+  html = "(() => {
+    const collapsed = document.querySelectorAll('button[aria-expanded=false]');
+    collapsed.forEach(button => button.click());
+    if (collapsed.length > 0) return [];
+    return [...document.querySelectorAll('li[data-status]')].map(li => [
+      li.querySelector('h3').textContent,
+      li.dataset.status.toLowerCase(),
+      li.querySelector('pre')?.textContent ?? ''
+    ]);
+  })()"
+)
+
+# Each step the report shows, with its status and the first line of its error
+then("the report shows these steps:", function(expected, context) {
+  session <- chromote::ChromoteSession$new()
+  on.exit(session$close())
+  session$go_to(paste0("file://", fs::path(context$tempdir, "report.html")))
+  js <- paste0("JSON.stringify(", REPORT_STEPS_JS[[context$report_format]], ")")
+  read_steps <- function() {
+    steps <- jsonlite::fromJSON(session$Runtime$evaluate(js, returnByValue = TRUE)$result$value, simplifyVector = FALSE)
+    if (length(steps) == 0) stop("The report shows no steps")
+    steps
+  }
+  # Wait for the official report to render and open
+  steps <- purrr::insistently(
+    read_steps,
+    purrr::rate_backoff(pause_base = 0.05, pause_min = 0, max_times = 8, jitter = FALSE)
+  )()
+  shown <- tibble::tibble(
+    step = trimws(gsub("\\s+", " ", vapply(steps, `[[`, character(1), 1))),
+    status = vapply(steps, `[[`, character(1), 2),
+    error = vapply(steps, \(step) sub("\n.*", "", step[[3]]), character(1))
+  )
+  expect_equal(as.data.frame(shown[names(expected)]), as.data.frame(expected))
+})
+
 after(function(context, scenario_name) {
   # Cleanup environment if package was loaded
   withr::with_dir(context$tempdir, {

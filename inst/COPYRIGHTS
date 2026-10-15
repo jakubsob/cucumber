@@ -1,0 +1,11 @@
+inst/html-formatter holds the official Cucumber HTML report
+(https://github.com/cucumber/html-formatter), copied from the npm package
+@cucumber/html-formatter by update_html_formatter() in
+R/tools-update_html_formatter.R.
+
+- Cucumber HTML report: Copyright (c) 2022 SmartBear Software and
+  contributors, MIT License (inst/html-formatter/LICENSE).
+- main.js bundles React (Copyright (c) Meta Platforms, Inc. and affiliates,
+  MIT License) and Font Awesome Free (Copyright Fonticons, Inc., icons
+  CC BY 4.0, fonts SIL OFL 1.1, code MIT License); see
+  inst/html-formatter/main.js.LICENSE.txt.

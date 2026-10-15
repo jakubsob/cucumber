@@ -1,0 +1,3 @@
+The official Cucumber HTML report (https://github.com/cucumber/html-formatter),
+npm package @cucumber/html-formatter 24.2.0, built for @cucumber/messages 34.2.1,
+copied by update_html_formatter() in R/tools-update_html_formatter.R.

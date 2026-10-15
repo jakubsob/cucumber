@@ -7,6 +7,7 @@ Description: Write executable specifications in a natural language that describe
     Write specifications in feature files using 'Gherkin' language and execute them using functions implemented in R.
     Use them as an extension to your 'testthat' tests to provide a high level description of how your code works.
 License: MIT + file LICENSE
+Copyright: The Cucumber HTML report in inst/html-formatter is copyright SmartBear Software and contributors, see inst/COPYRIGHTS.
 URL: https://github.com/jakubsob/cucumber
 BugReports: https://github.com/jakubsob/cucumber/issues
 Encoding: UTF-8
