@@ -30,7 +30,8 @@ the scenario's \code{name}, \code{tags}, \code{uri} (the feature file),
 and in \code{after()} hooks its \code{status} and \code{error}.
 \item \code{before_step()} and \code{after_step()} hooks get the \code{context} and the \code{step}: a list with
 the step's \code{keyword} and \code{text}, and in \code{after_step()} hooks its \code{status} and \code{error}.
-\item \code{before_all()} and \code{after_all()} hooks get no arguments.
+\item \code{before_all()} and \code{after_all()} hooks get no arguments, or a \code{context} to
+attach data to the report, see \link{attachments}. It isn't shared with scenarios.
 }}
 
 \item{tags}{A tag expression, e.g. \code{"@db and not @slow"}.

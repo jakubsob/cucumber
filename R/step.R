@@ -78,6 +78,7 @@ make_step <- function() {
 #'
 #' The implementation function must always have the last parameter named `context`.
 #' It holds the environment where test state can be stored to be passed to the next step.
+#' Its `attach()`, `log()` and `link()` attach data to the report, see [attachments].
 #'
 #' If a step has a description `"I have {int} cucumbers in my basket"` then the implementation
 #' function should be `function(n, context)`. The `{int}` value will be passed to

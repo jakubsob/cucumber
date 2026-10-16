@@ -92,6 +92,37 @@ then("the scenarios have these results:", function(expected, context) {
   expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
 })
 
+# The attachments of the last run: the step or hook each one is attached to,
+# like `When I open the page` or `Before`, its media type, body and file name
+run_attachments <- function(context) {
+  q <- cucumber:::new_query()
+  for (envelope in context$run$envelopes) q$update(envelope)
+  attachments <- Filter(Negate(is.null), lapply(context$run$envelopes, `[[`, "attachment"))
+  attached_to <- vapply(attachments, \(attachment) {
+    if (!is.null(attachment$testRunHookStartedId)) {
+      hook <- q$hooks[[q$test_run_hooks_started[[attachment$testRunHookStartedId]]$hookId]]
+      return(if (hook$type == "BEFORE_TEST_RUN") "BeforeAll" else "AfterAll")
+    }
+    test_step <- q$test_steps[[attachment$testStepId]]
+    if (is.null(test_step$pickleStepId)) {
+      return(if (startsWith(q$hooks[[test_step$hookId]]$type, "BEFORE")) "Before" else "After")
+    }
+    pickle_step <- q$pickle_steps[[test_step$pickleStepId]]
+    paste0(q$step_of(pickle_step)$keyword, pickle_step$text)
+  }, character(1))
+  tibble::tibble(
+    step = attached_to,
+    media_type = vapply(attachments, \(attachment) attachment$mediaType, character(1)),
+    body = vapply(attachments, \(attachment) attachment$body, character(1)),
+    encoding = vapply(attachments, \(attachment) attachment$contentEncoding, character(1)),
+    file_name = vapply(attachments, \(attachment) attachment$fileName %||% "", character(1))
+  )
+}
+
+then("the attachments are:", function(expected, context) {
+  expect_equal(as.data.frame(run_attachments(context)[names(expected)]), as.data.frame(expected))
+})
+
 then("no scenario ran", function(context) {
   expect_equal(nrow(context$run$scenarios), 0)
 })

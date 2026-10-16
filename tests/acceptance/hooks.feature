@@ -248,13 +248,13 @@ Feature: Hooks
       test("features")
       """
     Then it fails with "A `<hook>` hook must have <count> arguments."
-    And it fails with "Use `function(<arguments>)`."
+    And it fails with "<usage>"
 
     Examples:
-      | hook        | count | arguments         |
-      | before      | 2     | context, scenario |
-      | after       | 2     | context, scenario |
-      | before_step | 2     | context, step     |
-      | after_step  | 2     | context, step     |
-      | before_all  | 0     |                   |
-      | after_all   | 0     |                   |
+      | hook        | count  | usage                                      |
+      | before      | 2      | Use `function(context, scenario)`.         |
+      | after       | 2      | Use `function(context, scenario)`.         |
+      | before_step | 2      | Use `function(context, step)`.             |
+      | after_step  | 2      | Use `function(context, step)`.             |
+      | before_all  | 0 or 1 | Use `function()` or `function(context)`.   |
+      | after_all   | 0 or 1 | Use `function()` or `function(context)`.   |

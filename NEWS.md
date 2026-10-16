@@ -52,7 +52,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`. Replace `scenario_name` with `scenario$name`. Like in cucumber-js, the status is the worst result of the scenario's steps and of the hooks that ran before, including earlier `after()` hooks.
 - ✨ Define any number of `before()` and `after()` hooks. Before hooks run in the order they are defined, after hooks in the reverse order. Previously a second hook of the same kind failed with "Hook already registered".
 - ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword` and `text`, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
-- ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run.
+- ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run. They get no arguments, or a `context` to attach data to the report.
 - ✨ Hooks get a `tags` argument, a tag expression. The hook runs only for scenarios that match it, e.g. `before(connect_db, tags = "@db")`.
 - ✨ Hooks get a `name` argument. A named hook's errors start with its name, e.g. `Hook "Connect to the database" failed: connection refused`.
 - ✨ A `before()` hook skips its scenario by calling `skip_scenario()`, like returning `'skipped'` in cucumber-js. The rest of the before hooks and the scenario's steps are skipped, and `after()` hooks get `"skipped"` as the scenario's `status`.
@@ -79,6 +79,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 - ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles of its features, scenarios (each example of an outline being one) and steps and hooks, with their status, duration and error, to write a report of your own. It prints how many features and scenarios ran, by status.
 - ✨ `write_html_report()` writes a run's Cucumber Messages, from their file, the `CucumberMessagesReporter` that wrote them or `read_messages()`, into the official Cucumber HTML report, the page cucumber-js writes with `--format html`: one file that works offline, with every feature's results, searchable and filterable by status, text and tags.
+- ✨ Steps and hooks attach data to the report with their `context`: `context$attach(data, media_type, file_name)` attaches a string or a raw vector, like a screenshot, `context$log(text)` attaches text and `context$link(url)` a link. They're reported as `attachment` Cucumber Messages, which the HTML report shows, and `CucumberPrettyReporter` prints logs and links under their step.
 
 ## Features as documentation
 

@@ -57,6 +57,7 @@ reference:
       - step
       - pending
       - skip_scenario
+      - attachments
   - title: Run tests
     contents:
       - test

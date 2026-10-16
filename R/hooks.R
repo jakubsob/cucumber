@@ -3,21 +3,32 @@
 make_hook <- function(kind, arguments) {
   function(hook, tags = NULL, name = NULL) {
     assert_function(hook)
+    srcref <- attr(hook, "srcref")
+    # before_all and after_all hooks can leave out their context
+    optional <- identical(arguments, "context")
+    if (optional && length(formals(hook)) == 0) {
+      fn <- hook
+      hook <- function(context) fn()
+    }
     if (length(formals(hook)) != length(arguments)) {
       abort(
-        message = glue("A `{kind}` hook must have {length(arguments)} arguments."),
-        body = if (length(arguments) > 0) {
-          c(i = glue("Use `function({paste(arguments, collapse = ', ')})`."))
+        message = if (optional) {
+          glue("A `{kind}` hook must have 0 or 1 arguments.")
         } else {
-          c(i = "Use `function()`.")
-        }
+          glue("A `{kind}` hook must have {length(arguments)} arguments.")
+        },
+        body = c(i = if (optional) {
+          "Use `function()` or `function(context)`."
+        } else {
+          glue("Use `function({paste(arguments, collapse = ', ')})`.")
+        })
       )
     }
     assert_string(tags, null.ok = TRUE)
     assert_string(name, null.ok = TRUE)
     # Fail at registration on an invalid tag expression
     evaluate_tag_expression(tags, character())
-    register_hook(name_hook(hook, name), kind, tags, hook_name = name, srcref = attr(hook, "srcref"))
+    register_hook(name_hook(hook, name), kind, tags, hook_name = name, srcref = srcref)
     invisible(hook)
   }
 }
@@ -85,7 +96,8 @@ name_hook <- function(hook, name) {
 #'     and in `after()` hooks its `status` and `error`.
 #'   - `before_step()` and `after_step()` hooks get the `context` and the `step`: a list with
 #'     the step's `keyword` and `text`, and in `after_step()` hooks its `status` and `error`.
-#'   - `before_all()` and `after_all()` hooks get no arguments.
+#'   - `before_all()` and `after_all()` hooks get no arguments, or a `context` to
+#'     attach data to the report, see [attachments]. It isn't shared with scenarios.
 #'
 #' @param tags A tag expression, e.g. `"@db and not @slow"`.
 #'   The hook runs only for scenarios that match it. If `NULL`, it runs for every scenario.
@@ -175,13 +187,13 @@ after_step <- make_hook("after_step", c("context", "step"))
 #' @rdname hook
 #' @export
 before_all <- function(hook, name = NULL) {
-  make_hook("before_all", character())(hook, name = name)
+  make_hook("before_all", "context")(hook, name = name)
 }
 
 #' @rdname hook
 #' @export
 after_all <- function(hook, name = NULL) {
-  make_hook("after_all", character())(hook, name = name)
+  make_hook("after_all", "context")(hook, name = name)
 }
 
 #' @importFrom rlang list2

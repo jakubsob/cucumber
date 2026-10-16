@@ -201,7 +201,8 @@ run_test_run_hooks <- function(hooks, reporter, test_run_started_id) {
   for (hook in hooks) {
     started <- list(id = new_id(), testRunStartedId = test_run_started_id, hookId = hook$id, timestamp = timestamp())
     emit(reporter, "testRunHookStarted", started)
-    result <- run_hook_step(hook)
+    context <- new_context(\(attachment) emit(reporter, "attachment", c(list(testRunHookStartedId = started$id), attachment)))
+    result <- run_hook_step(hook, context)
     emit(reporter, "testRunHookFinished", list(
       testRunHookStartedId = started$id,
       result = test_step_result(result),

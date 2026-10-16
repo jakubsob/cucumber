@@ -59,6 +59,7 @@ If multiple steps definitions for a single step are found an error will be throw
 
 The implementation function must always have the last parameter named \code{context}.
 It holds the environment where test state can be stored to be passed to the next step.
+Its \code{attach()}, \code{log()} and \code{link()} attach data to the report, see \link{attachments}.
 
 If a step has a description \code{"I have {int} cucumbers in my basket"} then the implementation
 function should be \verb{function(n, context)}. The \code{{int}} value will be passed to

@@ -158,6 +158,8 @@ cucumber::test(
 \item{\code{reporter_max_table_lines}}{Max data table rows to print per step}
 
 \item{\code{step_warnings}}{Warnings of the step currently executing, printed under it}
+
+\item{\code{step_attachments}}{Lines of the attachments of the step currently executing, printed under it}
 }
 \if{html}{\out{</div>}}
 }

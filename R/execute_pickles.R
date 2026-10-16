@@ -90,7 +90,11 @@ execute_single_pickle <- function(
     # Errors of the scenario's steps and hooks are caught where they run. An
     # error that gets here is of cucumber itself, and stops the run.
     withCallingHandlers({
-      .context <- new.env()
+      # Attachments are of the test step that runs
+      test_step_id <- NULL
+      .context <- new_context(\(attachment) {
+        emit(reporter, "attachment", c(list(testCaseStartedId = test_case_started$id, testStepId = test_step_id), attachment))
+      })
       scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
       test_case_started <- list(
         id = new_id(),
@@ -108,16 +112,17 @@ execute_single_pickle <- function(
       skipped <- \() any(vapply(results, \(result) result$status == "skipped" && !is.null(result$error), logical(1)))
 
       # Run a test step: report it as messages, and keep its result
-      run_test_step <- function(test_step_id, run) {
+      run_test_step <- function(id, run) {
+        test_step_id <<- id
         emit(reporter, "testStepStarted", list(
           testCaseStartedId = test_case_started$id,
-          testStepId = test_step_id,
+          testStepId = id,
           timestamp = timestamp()
         ))
         result <- run()
         emit(reporter, "testStepFinished", list(
           testCaseStartedId = test_case_started$id,
-          testStepId = test_step_id,
+          testStepId = id,
           testStepResult = test_step_result(result),
           timestamp = timestamp()
         ))

@@ -7,7 +7,7 @@
 #   update_cck("v31.0.0")   # a tag or a commit
 #
 # Each sample is a directory with feature files and the messages a run of
-# them must give, as NDJSON. The CCK writes its step definitions in
+# them must give, as NDJSON, and the files its steps attach. The CCK writes its step definitions in
 # TypeScript (devkit/samples/<sample>/<sample>.ts); the R ones are ported by
 # hand into tests/testthat/cck/<sample>/setup-steps.R, which this script
 # keeps. test-cck.R runs each sample with CucumberMessagesReporter and compares the
@@ -16,8 +16,6 @@
 # A new sample is copied only once it's added to CCK_SAMPLES, with its R
 # step definitions. Samples are left out for what cucumber doesn't do yet:
 #
-# - attachments, examples-tables-attachment, global-hooks-attachments,
-#   hooks-attachment: attach(), log() and link()
 # - markdown: Markdown with Gherkin
 # - multiple-features-reversed: running features in reverse order
 # - retry, retry-ambiguous, retry-pending, retry-undefined: retrying
@@ -28,6 +26,7 @@ CCK_REPO <- "https://github.com/cucumber/compatibility-kit.git"
 
 CCK_SAMPLES <- c(
   "ambiguous",
+  "attachments",
   "backgrounds",
   "cdata",
   "data-tables",
@@ -37,13 +36,16 @@ CCK_SAMPLES <- c(
   "doc-strings-with-expression",
   "empty",
   "examples-tables",
+  "examples-tables-attachment",
   "examples-tables-undefined",
   "examples-tables-undefined-multiple",
   "failedish-combinations",
   "global-hooks",
   "global-hooks-afterall-error",
+  "global-hooks-attachments",
   "global-hooks-beforeall-error",
   "hooks",
+  "hooks-attachment",
   "hooks-conditional",
   "hooks-named",
   "hooks-skipped",
@@ -87,7 +89,8 @@ update_cck <- function(ref = "main", pkg = ".") {
   to <- file.path(pkg, "tests", "testthat", "cck")
   for (sample in CCK_SAMPLES) {
     from <- file.path(repo, "devkit", "samples", sample)
-    files <- list.files(from, pattern = "\\.(feature|ndjson)$")
+    # The TypeScript step definitions are ported by hand
+    files <- setdiff(list.files(from), list.files(from, pattern = "\\.ts$"))
     directory <- if (sample %in% names(CCK_DIRECTORIES)) CCK_DIRECTORIES[[sample]] else sample
     long <- paste0("cucumber/tests/testthat/cck/", directory, "/", files)
     long <- long[nchar(long, type = "bytes") > 100]
@@ -97,7 +100,7 @@ update_cck <- function(ref = "main", pkg = ".") {
 
     out <- file.path(to, directory)
     dir.create(out, recursive = TRUE, showWarnings = FALSE)
-    unlink(list.files(out, pattern = "\\.(feature|ndjson)$", full.names = TRUE))
+    unlink(setdiff(list.files(out, full.names = TRUE), file.path(out, "setup-steps.R")))
     if (!all(file.copy(file.path(from, files), file.path(out, files)))) {
       stop("Can't copy the files of the sample ", sample)
     }

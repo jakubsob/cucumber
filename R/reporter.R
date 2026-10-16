@@ -407,6 +407,25 @@ print_failure <- function(failure) {
   }
 }
 
+#' The lines an attachment is printed as: the text of a log or the links,
+#' or the media type and file name of other data
+#'
+#' @keywords internal
+#' @noRd
+format_attachment <- function(attachment) {
+  if (
+    attachment$mediaType %in% c("text/x.cucumber.log+plain", "text/uri-list")
+  ) {
+    return(strsplit(attachment$body, "\n", fixed = TRUE)[[1]])
+  }
+  paste0(
+    "Attachment (",
+    attachment$mediaType,
+    ")",
+    if (!is.null(attachment$fileName)) paste0(": ", attachment$fileName)
+  )
+}
+
 #' A pickle step and its result, as the reporters print it: its keyword as
 #' written, text, status, error message, and the lines of its Doc String or
 #' the rows of its Data Table
@@ -600,6 +619,7 @@ CucumberSummaryReporter <- R6::R6Class(
         undefinedParameterType = self$undefined_parameter_types[[
           message$name
         ]] <- message$expression,
+        attachment = private$on_attachment(message),
         testCaseStarted = {
           pickle <- q$pickle_of(message)
           lineage <- q$lineage_of(pickle)
@@ -774,7 +794,8 @@ CucumberSummaryReporter <- R6::R6Class(
     on_scenario_end = function(status) NULL,
     on_step_start = function() NULL,
     on_step_end = function(step) NULL,
-    on_hook_end = function(hook) NULL
+    on_hook_end = function(hook) NULL,
+    on_attachment = function(attachment) NULL
   )
 )
 
@@ -1202,6 +1223,9 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @field step_warnings Warnings of the step currently executing, printed under it
     step_warnings = NULL,
 
+    #' @field step_attachments Lines of the attachments of the step currently executing, printed under it
+    step_attachments = NULL,
+
     #' @description
     #' Initialize the reporter
     #' @param show_praise Whether to show praise (default TRUE)
@@ -1290,9 +1314,26 @@ CucumberPrettyReporter <- R6::R6Class(
       cat("  ", bold_label(self$current_scenario), "\n", sep = "")
     },
 
-    # Collect the step's warnings, to print them under it
+    # Collect the step's warnings and attachments, to print them under it
     on_step_start = function() {
       self$step_warnings <- character()
+      self$step_attachments <- character()
+    },
+
+    # Print an attachment under its step, or as it comes, of a hook
+    on_attachment = function(attachment) {
+      lines <- format_attachment(attachment)
+      if (is.null(self$step_attachments)) {
+        withr::local_options(
+          cli.num_colors = self$num_colors,
+          cli.unicode = self$unicode
+        )
+        for (line in lines) {
+          cat("    ", cli::style_dim(line), "\n", sep = "")
+        }
+      } else {
+        self$step_attachments <- c(self$step_attachments, lines)
+      }
     },
 
     # Print the step, its arguments, warnings and error
@@ -1305,6 +1346,10 @@ CucumberPrettyReporter <- R6::R6Class(
       # is re-enabled via the num_colors option forced above.
       print_step(step)
       self$print_step_args(step)
+      for (line in self$step_attachments) {
+        cat("      ", cli::style_dim(line), "\n", sep = "")
+      }
+      self$step_attachments <- NULL
       for (warning in self$step_warnings) {
         print_warning(warning)
       }
