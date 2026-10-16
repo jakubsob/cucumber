@@ -30,6 +30,9 @@ cucumber::write_html_report("cucumber.ndjson", "cucumber-report.html")
 }
 }
 \seealso{
+Steps and hooks attach screenshots and logs to the report, see
+\link{attachments} and \code{vignette("reporting", package = "cucumber")}.
+
 Other reports: 
 \code{\link{read_messages}()}
 }

@@ -12,6 +12,8 @@
 #' @param output Path of the HTML file to write.
 #' @return The path of the report, invisibly.
 #'
+#' @seealso Steps and hooks attach screenshots and logs to the report, see
+#'   [attachments] and `vignette("reporting", package = "cucumber")`.
 #' @family reports
 #' @examples
 #' \dontrun{

@@ -19,6 +19,9 @@
 #' `before_all()` and `after_all()` hooks get a `context` to attach to the
 #' report too, when they take one argument.
 #'
+#' @seealso The [Reports article](https://jakubsob.github.io/cucumber/articles/reporting.html),
+#'   `vignette("reporting", package = "cucumber")`, attaches screenshots and logs of a
+#'   failing shinytest2 scenario to the HTML report.
 #' @name attachments
 #' @examples
 #' \dontrun{

@@ -22,6 +22,26 @@ describe("test", {
     test_example("shinytest2")
   })
 
+  it("should attach a screenshot and the logs of a failing shinytest2 scenario", {
+    skip_on_ci()
+    skip_if(R.version$status == "Under development (unstable)")
+    cucumber:::clear_steps()
+    messages <- withr::local_tempfile(fileext = ".ndjson")
+
+    .with_example_dir("shinytest2_report", {
+      test("tests/acceptance", reporter = CucumberMessagesReporter$new(messages), stop_on_failure = FALSE)
+    })
+
+    run <- read_messages(messages)
+    attachments <- Filter(Negate(is.null), lapply(run$envelopes, `[[`, "attachment"))
+    expect_equal(run$scenarios$status, c("passed", "failed"))
+    expect_equal(
+      vapply(attachments, \(attachment) attachment$mediaType, character(1)),
+      c("image/png", "text/x.cucumber.log+plain")
+    )
+    expect_match(attachments[[2]]$body, "Can't split a loan into 0 months", fixed = TRUE)
+  })
+
   it("should run a Scenario with Given, When, Then, And, But keywords", {
     test_example("long_scenario")
   })

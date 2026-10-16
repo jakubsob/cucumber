@@ -148,3 +148,8 @@ after(function(context, scenario) {
 })
 }
 }
+\seealso{
+The \href{https://jakubsob.github.io/cucumber/articles/reporting.html}{Reports article},
+\code{vignette("reporting", package = "cucumber")}, attaches screenshots and logs of a
+failing shinytest2 scenario to the HTML report.
+}

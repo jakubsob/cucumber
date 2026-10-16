@@ -1,0 +1,114 @@
+---
+title: "Reports"
+vignette: >
+  %\VignetteIndexEntry{Reports}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+A run of `cucumber::test()` prints its progress to the console. To keep its results, write it as [Cucumber Messages](https://github.com/cucumber/messages) and turn them into a report: a page with every feature, scenario and step, and what the steps attached, like screenshots and logs.
+
+# Write the messages of a run
+
+`CucumberMessagesReporter` writes each event of a run as one line of JSON. Combine it with a reporter that prints, to see the progress of the run too:
+
+```r
+cucumber::test(
+  reporter = cucumber::CucumberMultiReporter$new(list(
+    cucumber::CucumberProgressReporter$new(),
+    cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
+  ))
+)
+```
+
+# The HTML report
+
+`write_html_report()` writes the messages as the official Cucumber HTML report: one file that works offline, where features can be searched and filtered by status, text and tags.
+
+```r
+cucumber::write_html_report("cucumber.ndjson", "cucumber-report.html")
+```
+
+# Attach screenshots and logs
+
+A step or a hook attaches data to the report with its `context`:
+
+- `context$attach(data, media_type, file_name)` attaches a string or a raw vector, like an image read with `readBin()`.
+- `context$log(text)` attaches text to read.
+- `context$link(url)` attaches a link.
+
+The report shows each attachment under the step it's attached to. See `?attachments`.
+
+# Screenshots and logs of a failing shinytest2 scenario
+
+When a scenario of a Shiny app fails, seeing the app is often the fastest way to know why. This example attaches a screenshot of the app and its logs to the step that failed. Its files are in [`inst/examples/shinytest2_report`](https://github.com/jakubsob/cucumber/tree/main/inst/examples/shinytest2_report).
+
+The app splits a loan into monthly payments. It has a bug: for 0 months it fails instead of asking for at least 1 month.
+
+```{embed, file = "../inst/examples/shinytest2_report/app.R"}
+```
+
+The specification describes what the app should do:
+
+```{embed, file = "../inst/examples/shinytest2_report/tests/acceptance/loan.feature"}
+```
+
+The steps drive the app with `shinytest2::AppDriver`, kept in the `context`:
+
+```{embed, file = "../inst/examples/shinytest2_report/tests/acceptance/setup-steps.R"}
+```
+
+An `after_step()` hook attaches the screenshot and the logs when a step fails, and an `after()` hook stops the app:
+
+```{embed, file = "../inst/examples/shinytest2_report/tests/acceptance/setup-hooks.R"}
+```
+
+The hook attaches them in `after_step()`, so they're attached to the step that failed and shown under it. Attachments of an `after()` hook are shown under the hook, which the report folds away when the hook passes.
+
+Run the scenarios, writing their messages, then write the report:
+
+```{embed, file = "../inst/examples/shinytest2_report/report.R"}
+```
+
+shinytest2 skips its apps on CRAN, and it takes any run for a CRAN run unless the `NOT_CRAN` environment variable is `"true"`. `devtools::test()` sets it, a script has to set it itself.
+
+The report shows the failed step with its error, the screenshot of the app with the error it shows, and the app's logs, with the R error and where it was raised:
+
+![The failed step in the HTML report, with the screenshot of the app and its logs](shinytest2-report.png)
+
+[Open the report](https://jakubsob.github.io/cucumber/shinytest2-report.html) to see it as it's written.
+
+# Keep the report of a CI run
+
+In CI, write the report even when the run fails, and keep it as an artifact of the job. With GitHub Actions:
+
+```yaml
+- name: Run the scenarios
+  run: |
+    cucumber::test(
+      reporter = cucumber::CucumberMultiReporter$new(list(
+        cucumber::CucumberProgressReporter$new(),
+        cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
+      ))
+    )
+  shell: Rscript {0}
+
+- name: Write the report
+  if: always()
+  run: cucumber::write_html_report("cucumber.ndjson", "cucumber-report.html")
+  shell: Rscript {0}
+
+- uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: cucumber-report
+    path: cucumber-report.html
+```
+
+# Reports of your own
+
+`read_messages()` reads the messages as tibbles of the run's features, scenarios and steps, with their status, duration and error. Use it to write a report of your own, like a summary of the failed steps for a CI job.

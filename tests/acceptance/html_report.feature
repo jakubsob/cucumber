@@ -43,3 +43,31 @@ Feature: HTML report
     Then the report shows these steps:
       | step                  | status |
       | Given an empty basket | passed |
+
+  Scenario: The attachments of a step are shown under it
+    A screenshot and the logs attached when a step fails are shown under the step that failed.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) stop("The basket is full"))
+      after_step(function(context, step) {
+        if (step$status == "failed") {
+          png("basket.png")
+          plot(1:3)
+          dev.off()
+          context$attach(readBin("basket.png", "raw", file.size("basket.png")), "image/png", file_name = "basket.png")
+          context$log("Opened the basket")
+        }
+      })
+      """
+    When I write the html report
+    Then the report shows these attachments:
+      | step               | kind  | content           |
+      | When I add an item | image | basket.png        |
+      | When I add an item | text  | Opened the basket |

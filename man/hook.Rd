@@ -98,6 +98,15 @@ after(function(context, scenario) {
   selenider::close_session(context$session)
 })
 
+# Attach a screenshot to the step that failed, see vignette("reporting")
+after_step(function(context, step) {
+  if (step$status == "failed") {
+    file <- tempfile(fileext = ".png")
+    context$app$get_screenshot(file)
+    context$attach(readBin(file, "raw", file.size(file)), "image/png")
+  }
+})
+
 before(function(context, scenario) {
   context$db <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 }, tags = "@db", name = "Connect to the database")

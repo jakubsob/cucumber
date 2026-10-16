@@ -307,26 +307,60 @@ REPORT_STEPS_JS <- c(
   })()"
 )
 
-# Each step the report shows, with its status and the first line of its error
-then("the report shows these steps:", function(expected, context) {
+# What the HTML report shows, as a browser shows it: `js` returns a list of
+# what it reads, or an empty one until the report is rendered and open
+read_report <- function(context, js) {
   session <- chromote::ChromoteSession$new()
   on.exit(session$close())
   session$go_to(paste0("file://", fs::path(context$tempdir, "report.html")))
-  js <- paste0("JSON.stringify(", REPORT_STEPS_JS[[context$report_format]], ")")
-  read_steps <- function() {
-    steps <- jsonlite::fromJSON(session$Runtime$evaluate(js, returnByValue = TRUE)$result$value, simplifyVector = FALSE)
-    if (length(steps) == 0) stop("The report shows no steps")
-    steps
+  js <- paste0("JSON.stringify(", js, ")")
+  read <- function() {
+    shown <- jsonlite::fromJSON(session$Runtime$evaluate(js, returnByValue = TRUE)$result$value, simplifyVector = FALSE)
+    if (length(shown) == 0) stop("The report shows nothing yet")
+    shown
   }
   # Wait for the official report to render and open
-  steps <- purrr::insistently(
-    read_steps,
+  purrr::insistently(
+    read,
     purrr::rate_backoff(pause_base = 0.05, pause_min = 0, max_times = 8, jitter = FALSE)
   )()
+}
+
+# Each step the report shows, with its status and the first line of its error
+then("the report shows these steps:", function(expected, context) {
+  steps <- read_report(context, REPORT_STEPS_JS[[context$report_format]])
   shown <- tibble::tibble(
     step = trimws(gsub("\\s+", " ", vapply(steps, `[[`, character(1), 1))),
     status = vapply(steps, `[[`, character(1), 2),
     error = vapply(steps, \(step) sub("\n.*", "", step[[3]]), character(1))
+  )
+  expect_equal(as.data.frame(shown[names(expected)]), as.data.frame(expected))
+})
+
+# Each attachment the HTML report shows under a step: an image, with its file
+# name, or text, with its first line
+REPORT_ATTACHMENTS_JS <- "(() => {
+  const collapsed = document.querySelectorAll('button[aria-expanded=false]');
+  collapsed.forEach(button => button.click());
+  if (collapsed.length > 0) return [];
+  return [...document.querySelectorAll('li[data-status]')].flatMap(li =>
+    [...li.querySelectorAll(':scope > div > ol > li')].map(attachment => {
+      const image = attachment.querySelector('img');
+      return [
+        li.querySelector('h3').textContent,
+        image ? 'image' : 'text',
+        image ? attachment.querySelector('summary').textContent : attachment.querySelector('pre').textContent
+      ];
+    })
+  );
+})()"
+
+then("the report shows these attachments:", function(expected, context) {
+  attachments <- read_report(context, REPORT_ATTACHMENTS_JS)
+  shown <- tibble::tibble(
+    step = trimws(gsub("\\s+", " ", vapply(attachments, `[[`, character(1), 1))),
+    kind = vapply(attachments, `[[`, character(1), 2),
+    content = vapply(attachments, \(attachment) sub("\n.*", "", attachment[[3]]), character(1))
   )
   expect_equal(as.data.frame(shown[names(expected)]), as.data.frame(expected))
 })
