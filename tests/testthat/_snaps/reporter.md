@@ -12,7 +12,6 @@
           v And I have entered 70 into the calculator
           v When I press add
           v Then the result should be 120
-      
 
 # CucumberPrettyReporter / shows errors for failing steps
 
@@ -33,7 +32,6 @@
             `expected`:  5.0
             
             Step at: test-reporter.R:55
-      
 
 # CucumberPrettyReporter / prints docstring and data table step arguments
 
@@ -54,7 +52,6 @@
             | name  | age |
             | Alice | 30  |
             | Bob   | 7   |
-      
 
 # CucumberPrettyReporter / truncates long step arguments to max_lines
 
@@ -72,5 +69,4 @@
             line two
             ... and 2 more line(s)
             """
-      
 

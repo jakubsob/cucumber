@@ -122,7 +122,7 @@
     Output
       
       Feature: Addition
-        Scenario: Addition should work for 3 numbers
+        Example: Addition should work for 3 numbers
           v Given I have 1
           v And I have 2
           v And I have 3
@@ -130,7 +130,7 @@
           v But I do nothing more
           v Then I get 6
           v And it's over
-        Scenario: Addition should work for 5 numbers
+        Example: Addition should work for 5 numbers
           v Given I have 1
           v And I have 2
           v And I have 3
@@ -138,7 +138,7 @@
           v And I have 5
           v When I add them
           v Then I get 15
-        Scenario: Addition should work for 10 numbers
+        Example: Addition should work for 10 numbers
           v Given I have 1
           v * I have 1
           v * I have 1
@@ -398,26 +398,26 @@
     Output
       
       Feature: Eating
-        Scenario: eating (1)
+        Scenario Outline: eating
           v Given there are 12 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 7 cucumbers
-        Scenario: eating (2)
+        Scenario Outline: eating
           v Given there are 20 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 15 cucumbers
-        Scenario: eating (3)
+        Scenario Template: eating
           v Given there are 12 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 7 cucumbers
-        Scenario: eating (4)
+        Scenario Template: eating
           v Given there are 20 cucumbers
           v When I eat 5 cucumbers
           v Then I should have 15 cucumbers
-        Scenario: eating (5)
+        Scenario Template: eating
           v Given there are '5.6' cucumbers
           v Then I should have 5.6 cucumbers
-        Scenario: eating (6)
+        Scenario Template: eating
           v Given there are "12" cucumbers
           v Then I should have 12 cucumbers
       

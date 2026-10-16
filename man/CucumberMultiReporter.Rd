@@ -32,13 +32,6 @@ cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
 \item \href{#method-CucumberMultiReporter-new}{\code{CucumberMultiReporter$new()}}
 \item \href{#method-CucumberMultiReporter-start_run}{\code{CucumberMultiReporter$start_run()}}
 \item \href{#method-CucumberMultiReporter-end_run}{\code{CucumberMultiReporter$end_run()}}
-\item \href{#method-CucumberMultiReporter-start_feature}{\code{CucumberMultiReporter$start_feature()}}
-\item \href{#method-CucumberMultiReporter-end_feature}{\code{CucumberMultiReporter$end_feature()}}
-\item \href{#method-CucumberMultiReporter-start_scenario}{\code{CucumberMultiReporter$start_scenario()}}
-\item \href{#method-CucumberMultiReporter-end_scenario}{\code{CucumberMultiReporter$end_scenario()}}
-\item \href{#method-CucumberMultiReporter-start_step}{\code{CucumberMultiReporter$start_step()}}
-\item \href{#method-CucumberMultiReporter-end_step}{\code{CucumberMultiReporter$end_step()}}
-\item \href{#method-CucumberMultiReporter-end_hook}{\code{CucumberMultiReporter$end_hook()}}
 \item \href{#method-CucumberMultiReporter-add_warning}{\code{CucumberMultiReporter$add_warning()}}
 \item \href{#method-CucumberMultiReporter-add_message}{\code{CucumberMultiReporter$add_message()}}
 \item \href{#method-CucumberMultiReporter-clone}{\code{CucumberMultiReporter$clone()}}
@@ -84,120 +77,6 @@ Pass to each reporter
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{error}}{The error that stopped the run, or \code{NULL}}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-start_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-start_feature}{}}}
-\subsection{Method \code{start_feature()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$start_feature(feature_name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{feature_name}}{Name of the feature}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-end_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-end_feature}{}}}
-\subsection{Method \code{end_feature()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$end_feature()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-start_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-start_scenario}{}}}
-\subsection{Method \code{start_scenario()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$start_scenario(scenario_name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{scenario_name}}{Name of the scenario}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-end_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-end_scenario}{}}}
-\subsection{Method \code{end_scenario()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$end_scenario(status)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{The scenario's status}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-start_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-start_step}{}}}
-\subsection{Method \code{start_step()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$start_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-end_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-end_step}{}}}
-\subsection{Method \code{end_step()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$end_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object with execution results}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberMultiReporter-end_hook"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberMultiReporter-end_hook}{}}}
-\subsection{Method \code{end_hook()}}{
-Pass to each reporter
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberMultiReporter$end_hook(status, error)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{The hook's status}
-
-\item{\code{error}}{The hook's error}
 }
 \if{html}{\out{</div>}}
 }

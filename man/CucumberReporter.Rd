@@ -4,54 +4,247 @@
 \alias{CucumberReporter}
 \title{Cucumber Reporter Base Class}
 \description{
-Base class for cucumber reporters. A reporter gets the events of a run: the
-run, each feature, scenario, step and hook, and every
-\href{https://github.com/cucumber/messages}{Cucumber Message}.
+Base class for cucumber reporters. A reporter gets the run as
+\href{https://github.com/cucumber/messages}{Cucumber Messages}, like the
+formatters of cucumber-js: each feature, scenario, step and hook and their
+results. It also gets the start and the end of the run, and the warnings
+raised in it.
 
-Extend it to report a run your way, overriding the methods of the events
-you need. Each does nothing by default.
+Extend it to report a run your way, overriding the methods you need. Each
+does nothing by default.
 }
 \section{Methods}{
 
 \describe{
 \item{\code{start_run()}}{Called when a run starts}
 \item{\code{end_run(error)}}{Called when a run ends, with the error that stopped it, like a failing \code{before_all()} hook, or \code{NULL}}
-\item{\code{start_feature(feature_name)}}{Called before executing a feature's scenarios}
-\item{\code{end_feature()}}{Called after all scenarios in a feature complete}
-\item{\code{start_scenario(scenario_name)}}{Called before a scenario's hooks and steps, with its name, like \code{"Scenario: Add an item"}}
-\item{\code{end_scenario(status)}}{Called after a scenario's steps and hooks, with the worst of their statuses}
-\item{\code{start_step(step)}}{Called before executing a step}
-\item{\code{end_step(step)}}{Called after a step completes, with status/error/duration populated}
-\item{\code{end_hook(status, error)}}{Called after a scenario's \code{before} or \code{after} hook that failed, is pending or skipped the scenario}
-\item{\code{add_warning(warning)}}{Called with each warning raised in a step, a hook or elsewhere in the run}
 \item{\code{add_message(envelope)}}{Called with each Cucumber Message of the run, see \link{CucumberMessagesReporter}}
+\item{\code{add_warning(warning)}}{Called with each warning raised in a step, a hook or elsewhere in the run}
+}
+
+An envelope is a list with one element, named by the message's type. The
+messages of a scenario are, in order:
+\itemize{
+\item \code{testCaseStarted}, with the \code{id} its other messages refer to and the
+\code{testCaseId} of its \code{testCase}, sent before the run starts, whose
+\code{pickleId} is the id of its \code{pickle}: the scenario's name, tags and steps.
+\item \code{testStepStarted} and \code{testStepFinished} of each hook and step, with the
+\code{testStepResult}: its \code{status}, like \code{"PASSED"}, \code{duration} and the
+\code{message} of its error.
+\item \code{testCaseFinished}.
 }
 
 Combine reporters with \link{CucumberMultiReporter}.
 }
 
-\keyword{internal}
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{current_feature}}{Current feature name being executed}
+\section{Specification}{
 
-\item{\code{current_pickle}}{Current pickle (scenario) being executed}
+\subsection{Custom reporter}{
+
+Extend \code{CucumberReporter} to report the run your way. A reporter gets the start and the end of the
+run, each of its Cucumber Messages and the warnings raised in it.
+Pass the reporter to \code{test()} or \code{run()} with \code{reporter}. Only cucumber reporters can report a run,
+testthat reporters can't.
+
+\preformatted{Background:
+  Given a package
+  And a file named "event-reporter.R" with
+    """
+    EventReporter <- R6::R6Class(
+      "EventReporter",
+      inherit = cucumber::CucumberReporter,
+      public = list(
+        start_run = function() cat("start run\\n"),
+        end_run = function(error) \{
+          cat("end run:", if (is.null(error)) "passed" else conditionMessage(error), "\\n")
+        \},
+        add_message = function(envelope) cat("message:", names(envelope), "\\n"),
+        add_warning = function(warning) cat("warning:", conditionMessage(warning), "\\n")
+      )
+    )
+    """
 }
-\if{html}{\out{</div>}}
+
+\preformatted{Scenario: A reporter gets the run as Cucumber Messages
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    source("event-reporter.R")
+    test("features", reporter = EventReporter$new())
+    """
+  Then the output includes
+    """
+    start run
+    message: meta
+    message: source
+    message: gherkinDocument
+    message: pickle
+    message: stepDefinition
+    message: testRunStarted
+    message: testCase
+    message: testCaseStarted
+    message: testStepStarted
+    message: testStepFinished
+    message: testCaseFinished
+    message: testRunFinished
+    end run: passed
+    """
 }
+
+\preformatted{Scenario: A reporter gets the warnings raised in steps and hooks
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) warning("the database is slow"))
+    given("an empty basket", function(context) warning("the basket is dusty"))
+    """
+  When I run
+    """
+    source("event-reporter.R")
+    test("features", reporter = EventReporter$new())
+    """
+  Then the output includes
+    """
+    message: testCaseStarted
+    message: testStepStarted
+    warning: the database is slow
+    message: testStepFinished
+    message: testStepStarted
+    warning: the basket is dusty
+    message: testStepFinished
+    message: testCaseFinished
+    """
+}
+
+\preformatted{Scenario: A reporter gets the error that stopped the run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before_all(function() stop("the server didn't start"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    source("event-reporter.R")
+    test("features", reporter = EventReporter$new(), stop_on_failure = FALSE)
+    """
+  Then the output includes these lines in order:
+    """
+    start run
+    end run: the server didn't start
+    """
+}
+
+\preformatted{Scenario: A reporter that fails stops the run with its error
+  The scenarios after it don't run, and the error names the reporter and the event it failed in.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+
+      Scenario: Remove an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    """
+  And a file named "broken-reporter.R" with
+    """
+    BrokenReporter <- R6::R6Class(
+      "BrokenReporter",
+      inherit = EventReporter,
+      public = list(
+        add_message = function(envelope) \{
+          if (!is.null(envelope$testStepFinished)) stop("can't format the step")
+          super$add_message(envelope)
+        \}
+      )
+    )
+    """
+  When I run it and it fails
+    """
+    source("event-reporter.R")
+    source("broken-reporter.R")
+    test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
+    """
+  Then it fails with "Reporter `BrokenReporter` failed in `add_message()`."
+  And it fails with "can't format the step"
+  And the output includes "message: testCaseStarted" once
+}
+
+\preformatted{Scenario: A testthat reporter can't report a run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    """
+  When I run it and it fails
+    """
+    test("features", reporter = testthat::ProgressReporter$new())
+    """
+  Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."
+}
+
+Source: \code{tests/acceptance/r-custom_reporter.feature}
+}
+}
+
+\examples{
+\dontrun{
+# Count the steps and hooks by status
+StatusReporter <- R6::R6Class(
+  "StatusReporter",
+  inherit = cucumber::CucumberReporter,
+  public = list(
+    statuses = character(),
+    add_message = function(envelope) {
+      finished <- envelope$testStepFinished
+      if (!is.null(finished)) {
+        self$statuses <- c(self$statuses, finished$testStepResult$status)
+      }
+    },
+    end_run = function(error = NULL) {
+      print(table(self$statuses))
+    }
+  )
+)
+cucumber::test("tests/acceptance", reporter = StatusReporter$new())
+}
+
+}
+\keyword{internal}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-CucumberReporter-start_run}{\code{CucumberReporter$start_run()}}
 \item \href{#method-CucumberReporter-end_run}{\code{CucumberReporter$end_run()}}
-\item \href{#method-CucumberReporter-start_feature}{\code{CucumberReporter$start_feature()}}
-\item \href{#method-CucumberReporter-end_feature}{\code{CucumberReporter$end_feature()}}
-\item \href{#method-CucumberReporter-start_scenario}{\code{CucumberReporter$start_scenario()}}
-\item \href{#method-CucumberReporter-end_scenario}{\code{CucumberReporter$end_scenario()}}
-\item \href{#method-CucumberReporter-start_step}{\code{CucumberReporter$start_step()}}
-\item \href{#method-CucumberReporter-end_step}{\code{CucumberReporter$end_step()}}
-\item \href{#method-CucumberReporter-end_hook}{\code{CucumberReporter$end_hook()}}
 \item \href{#method-CucumberReporter-add_warning}{\code{CucumberReporter$add_warning()}}
 \item \href{#method-CucumberReporter-add_message}{\code{CucumberReporter$add_message()}}
 \item \href{#method-CucumberReporter-clone}{\code{CucumberReporter$clone()}}
@@ -80,120 +273,6 @@ End a run
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{error}}{The error that stopped the run, or \code{NULL}}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-start_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-start_feature}{}}}
-\subsection{Method \code{start_feature()}}{
-Start a feature
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$start_feature(feature_name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{feature_name}}{Name of the feature}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-end_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-end_feature}{}}}
-\subsection{Method \code{end_feature()}}{
-End the current feature
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_feature()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-start_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-start_scenario}{}}}
-\subsection{Method \code{start_scenario()}}{
-Start a scenario
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$start_scenario(scenario_name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{scenario_name}}{Name of the scenario, like \code{"Scenario: Add an item"}}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-end_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-end_scenario}{}}}
-\subsection{Method \code{end_scenario()}}{
-Called after a scenario's steps and hooks, with the worst of their statuses
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_scenario(status)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{The scenario's status}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-start_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-start_step}{}}}
-\subsection{Method \code{start_step()}}{
-Start a step
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$start_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-end_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-end_step}{}}}
-\subsection{Method \code{end_step()}}{
-End a step (called after execution with status/error/duration populated)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object with execution results}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberReporter-end_hook"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberReporter-end_hook}{}}}
-\subsection{Method \code{end_hook()}}{
-Called after a scenario's \code{before} or \code{after} hook that failed, is pending or skipped the scenario
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$end_hook(status, error)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{\code{"failed"}, \code{"pending"} or \code{"skipped"}}
-
-\item{\code{error}}{The hook's error}
 }
 \if{html}{\out{</div>}}
 }

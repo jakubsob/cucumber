@@ -168,10 +168,6 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-CucumberProgressReporter-new}{\code{CucumberProgressReporter$new()}}
-\item \href{#method-CucumberProgressReporter-start_feature}{\code{CucumberProgressReporter$start_feature()}}
-\item \href{#method-CucumberProgressReporter-end_step}{\code{CucumberProgressReporter$end_step()}}
-\item \href{#method-CucumberProgressReporter-end_scenario}{\code{CucumberProgressReporter$end_scenario()}}
-\item \href{#method-CucumberProgressReporter-end_feature}{\code{CucumberProgressReporter$end_feature()}}
 \item \href{#method-CucumberProgressReporter-feature_statuses}{\code{CucumberProgressReporter$feature_statuses()}}
 \item \href{#method-CucumberProgressReporter-feature_line}{\code{CucumberProgressReporter$feature_line()}}
 \item \href{#method-CucumberProgressReporter-draw_feature}{\code{CucumberProgressReporter$draw_feature()}}
@@ -181,20 +177,17 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_message"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_message'><code>cucumber::CucumberReporter$add_message()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_step'><code>cucumber::CucumberReporter$start_step()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_message"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_message'><code>cucumber::CucumberSummaryReporter$add_message()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_warning'><code>cucumber::CucumberSummaryReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="draw"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-draw'><code>cucumber::CucumberSummaryReporter$draw()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="end_hook"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-end_hook'><code>cucumber::CucumberSummaryReporter$end_hook()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="end_run"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-end_run'><code>cucumber::CucumberSummaryReporter$end_run()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_above"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_above'><code>cucumber::CucumberSummaryReporter$print_above()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_counts"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_counts'><code>cucumber::CucumberSummaryReporter$print_counts()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures'><code>cucumber::CucumberSummaryReporter$print_failures()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures_since"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures_since'><code>cucumber::CucumberSummaryReporter$print_failures_since()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_run_error"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_run_error'><code>cucumber::CucumberSummaryReporter$print_run_error()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="start_scenario"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-start_scenario'><code>cucumber::CucumberSummaryReporter$start_scenario()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -205,67 +198,6 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter
 Initialize the reporter
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-start_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-start_feature}{}}}
-\subsection{Method \code{start_feature()}}{
-Print the header once, and start the feature's line
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$start_feature(feature_name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{feature_name}}{Name of the feature}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_step}{}}}
-\subsection{Method \code{end_step()}}{
-Turn the spinner after a step
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object with execution results}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_scenario}{}}}
-\subsection{Method \code{end_scenario()}}{
-Count the scenario in the feature's line, and print it if it didn't pass
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_scenario(status)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{The scenario's status}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressReporter-end_feature"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressReporter-end_feature}{}}}
-\subsection{Method \code{end_feature()}}{
-Print the feature's final line, with its status and how long it took
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$end_feature()}\if{html}{\out{</div>}}
 }
 
 }

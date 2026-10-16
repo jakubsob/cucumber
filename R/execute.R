@@ -1,6 +1,7 @@
-#' Run a feature's scenarios
+#' Run a feature's scenarios, reporting its document and pickles
 #'
 #' @param pickles The document's pickles
+#' @importFrom purrr walk
 #' @return Whether a scenario failed, invisibly
 #' @keywords internal
 #' @noRd
@@ -24,6 +25,8 @@ execute <- function(
   checkmate::assert_list(parameters, min.len = 1)
   checkmate::assert_list(hooks)
 
+  emit(reporter, "gherkinDocument", document)
+  walk(pickles, \(pickle) emit(reporter, "pickle", pickle$message))
   pickles <- prepare_pickles(pickles, steps, parameters, hooks, tags, name, lines, reporter)
   execute_feature(
     document,
@@ -86,13 +89,11 @@ execute_feature <- function(
     return(invisible(failed))
   }
 
-  feature_name <- glue("{document$feature$keyword}: {document$feature$name}")
   # Set feature context for testthat
-  context_start_file(feature_name)
+  context_start_file(glue("{document$feature$keyword}: {document$feature$name}"))
 
   execute_pickles(
     pickles,
-    feature_name,
     hooks,
     reporter = reporter,
     strict = strict,

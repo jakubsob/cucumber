@@ -1,29 +1,59 @@
 #' Cucumber Reporter Base Class
 #'
 #' @description
-#' Base class for cucumber reporters. A reporter gets the events of a run: the
-#' run, each feature, scenario, step and hook, and every
-#' [Cucumber Message](https://github.com/cucumber/messages).
+#' Base class for cucumber reporters. A reporter gets the run as
+#' [Cucumber Messages](https://github.com/cucumber/messages), like the
+#' formatters of cucumber-js: each feature, scenario, step and hook and their
+#' results. It also gets the start and the end of the run, and the warnings
+#' raised in it.
 #'
-#' Extend it to report a run your way, overriding the methods of the events
-#' you need. Each does nothing by default.
+#' Extend it to report a run your way, overriding the methods you need. Each
+#' does nothing by default.
 #'
 #' @section Methods:
 #' \describe{
 #'   \item{`start_run()`}{Called when a run starts}
 #'   \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a failing `before_all()` hook, or `NULL`}
-#'   \item{`start_feature(feature_name)`}{Called before executing a feature's scenarios}
-#'   \item{`end_feature()`}{Called after all scenarios in a feature complete}
-#'   \item{`start_scenario(scenario_name)`}{Called before a scenario's hooks and steps, with its name, like `"Scenario: Add an item"`}
-#'   \item{`end_scenario(status)`}{Called after a scenario's steps and hooks, with the worst of their statuses}
-#'   \item{`start_step(step)`}{Called before executing a step}
-#'   \item{`end_step(step)`}{Called after a step completes, with status/error/duration populated}
-#'   \item{`end_hook(status, error)`}{Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario}
-#'   \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
 #'   \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
+#'   \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
 #' }
 #'
+#' An envelope is a list with one element, named by the message's type. The
+#' messages of a scenario are, in order:
+#'
+#' - `testCaseStarted`, with the `id` its other messages refer to and the
+#'   `testCaseId` of its `testCase`, sent before the run starts, whose
+#'   `pickleId` is the id of its `pickle`: the scenario's name, tags and steps.
+#' - `testStepStarted` and `testStepFinished` of each hook and step, with the
+#'   `testStepResult`: its `status`, like `"PASSED"`, `duration` and the
+#'   `message` of its error.
+#' - `testCaseFinished`.
+#'
 #' Combine reporters with [CucumberMultiReporter].
+#'
+#' @examples
+#' \dontrun{
+#' # Count the steps and hooks by status
+#' StatusReporter <- R6::R6Class(
+#'   "StatusReporter",
+#'   inherit = cucumber::CucumberReporter,
+#'   public = list(
+#'     statuses = character(),
+#'     add_message = function(envelope) {
+#'       finished <- envelope$testStepFinished
+#'       if (!is.null(finished)) {
+#'         self$statuses <- c(self$statuses, finished$testStepResult$status)
+#'       }
+#'     },
+#'     end_run = function(error = NULL) {
+#'       print(table(self$statuses))
+#'     }
+#'   )
+#' )
+#' cucumber::test("tests/acceptance", reporter = StatusReporter$new())
+#' }
+#'
+#' @eval features_rd(features = "r-custom_reporter.feature")
 #'
 #' @importFrom R6 R6Class
 #' @importFrom rlang %||%
@@ -33,12 +63,6 @@
 CucumberReporter <- R6::R6Class(
   "CucumberReporter",
   public = list(
-    #' @field current_feature Current feature name being executed
-    current_feature = NULL,
-
-    #' @field current_pickle Current pickle (scenario) being executed
-    current_pickle = NULL,
-
     #' @description
     #' Start a run
     start_run = function() {
@@ -49,57 +73,6 @@ CucumberReporter <- R6::R6Class(
     #' End a run
     #' @param error The error that stopped the run, or `NULL`
     end_run = function(error = NULL) {
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a feature
-    #' @param feature_name Name of the feature
-    start_feature = function(feature_name) {
-      self$current_feature <- feature_name
-      invisible(self)
-    },
-
-    #' @description
-    #' End the current feature
-    end_feature = function() {
-      self$current_feature <- NULL
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a scenario
-    #' @param scenario_name Name of the scenario, like `"Scenario: Add an item"`
-    start_scenario = function(scenario_name) {
-      invisible(self)
-    },
-
-    #' @description
-    #' Called after a scenario's steps and hooks, with the worst of their statuses
-    #' @param status The scenario's status
-    end_scenario = function(status) {
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a step
-    #' @param step Pickle step object
-    start_step = function(step) {
-      invisible(self)
-    },
-
-    #' @description
-    #' End a step (called after execution with status/error/duration populated)
-    #' @param step Pickle step object with execution results
-    end_step = function(step) {
-      invisible(self)
-    },
-
-    #' @description
-    #' Called after a scenario's `before` or `after` hook that failed, is pending or skipped the scenario
-    #' @param status `"failed"`, `"pending"` or `"skipped"`
-    #' @param error The hook's error
-    end_hook = function(status, error) {
       invisible(self)
     },
 
@@ -200,27 +173,6 @@ CucumberMultiReporter <- R6::R6Class(
     #' @param error The error that stopped the run, or `NULL`
     end_run = function(error = NULL) private$each("end_run", error),
     #' @description Pass to each reporter
-    #' @param feature_name Name of the feature
-    start_feature = function(feature_name) private$each("start_feature", feature_name),
-    #' @description Pass to each reporter
-    end_feature = function() private$each("end_feature"),
-    #' @description Pass to each reporter
-    #' @param scenario_name Name of the scenario
-    start_scenario = function(scenario_name) private$each("start_scenario", scenario_name),
-    #' @description Pass to each reporter
-    #' @param status The scenario's status
-    end_scenario = function(status) private$each("end_scenario", status),
-    #' @description Pass to each reporter
-    #' @param step Pickle step object
-    start_step = function(step) private$each("start_step", step),
-    #' @description Pass to each reporter
-    #' @param step Pickle step object with execution results
-    end_step = function(step) private$each("end_step", step),
-    #' @description Pass to each reporter
-    #' @param status The hook's status
-    #' @param error The hook's error
-    end_hook = function(status, error) private$each("end_hook", status, error),
-    #' @description Pass to each reporter
     #' @param warning The warning
     add_warning = function(warning) private$each("add_warning", warning),
     #' @description Pass to each reporter
@@ -314,15 +266,20 @@ bold_label <- function(x) {
   paste0(cli::style_bold(substr(x, 1, colon)), substr(x, colon + 1, nchar(x)))
 }
 
-#' Render a data table (tibble) as aligned Gherkin pipe rows
+#' Render a data table's rows as aligned Gherkin pipe rows
 #'
+#' @param rows List of character vectors, one per row, the first one being the header
 #' @keywords internal
 #' @noRd
-format_data_table <- function(tbl) {
-  cells <- rbind(names(tbl), as.matrix(tbl))
+format_data_table <- function(rows) {
+  cells <- do.call(rbind, rows)
   widths <- apply(cells, 2, \(col) max(nchar(col)))
   apply(cells, 1, \(row) {
-    padded <- mapply(\(cell, w) formatC(cell, width = w, flag = "-"), row, widths)
+    padded <- mapply(
+      \(cell, w) formatC(cell, width = w, flag = "-"),
+      row,
+      widths
+    )
     paste0("| ", paste(padded, collapse = " | "), " |")
   })
 }
@@ -429,7 +386,7 @@ print_step_error <- function(step) {
     return(invisible())
   }
   color <- status_color(step$status %||% "passed")
-  for (line in strsplit(conditionMessage(step$error), "\n")[[1]]) {
+  for (line in strsplit(step$error, "\n")[[1]]) {
     cat("      ", color(line), "\n", sep = "")
   }
 }
@@ -446,8 +403,32 @@ print_failure <- function(failure) {
     print_step_error(step)
   }
   for (hook in failure$hooks) {
-    print_error(conditionMessage(hook$error), hook$status)
+    print_error(hook$error, hook$status)
   }
+}
+
+#' A pickle step and its result, as the reporters print it: its keyword as
+#' written, text, status, error message, and the lines of its Doc String or
+#' the rows of its Data Table
+#'
+#' @keywords internal
+#' @noRd
+reported_step <- function(q, pickle_step, result) {
+  argument <- pickle_step$argument
+  list(
+    keyword = trimws(q$step_of(pickle_step)$keyword),
+    text = pickle_step$text,
+    status = tolower(result$status),
+    error = result$message,
+    docstring = if (!is.null(argument$docString)) {
+      strsplit(argument$docString$content, "\n", fixed = TRUE)[[1]]
+    },
+    data_table = if (!is.null(argument$dataTable)) {
+      lapply(argument$dataTable$rows, \(row) {
+        vapply(row$cells, \(cell) cell$value, character(1))
+      })
+    }
+  )
 }
 
 #' Summary Reporter for Cucumber
@@ -495,13 +476,16 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field scenario_statuses Statuses of the finished scenarios
     scenario_statuses = NULL,
 
-    #' @field current_scenario Name of the scenario currently executing
+    #' @field current_feature Name of the feature currently executing, like `"Feature: Basket"`
+    current_feature = NULL,
+
+    #' @field current_scenario Name of the scenario currently executing, like `"Scenario: Add an item"`
     current_scenario = NULL,
 
     #' @field current_steps Steps executed so far in the current scenario
     current_steps = NULL,
 
-    #' @field current_hooks Results of the current scenario's hooks that failed or are pending
+    #' @field current_hooks Results of the current scenario's hooks that failed, are pending or skipped it
     current_hooks = NULL,
 
     #' @field failures Recorded failures for the end-of-run summary
@@ -532,6 +516,7 @@ CucumberSummaryReporter <- R6::R6Class(
       self$scenario_statuses <- character()
       self$current_steps <- list()
       self$failures <- list()
+      private$query <- new_query()
       # ponytail: capture real color support now, before testthat runs. During a
       # test, output is sunk and cli auto-detects 0 colors; forcing this captured
       # value at each print site re-enables color live while snapshots (built
@@ -551,9 +536,17 @@ CucumberSummaryReporter <- R6::R6Class(
     draw = function(text) {
       self$live <- text
       if (self$dynamic) {
-        withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+        withr::local_options(
+          cli.num_colors = self$num_colors,
+          cli.unicode = self$unicode
+        )
         text <- cli::ansi_strtrim(text, self$width - 1L)
-        cat("\r", text, strrep(" ", max(self$width - 1L - cli::ansi_nchar(text), 0L)), sep = "")
+        cat(
+          "\r",
+          text,
+          strrep(" ", max(self$width - 1L - cli::ansi_nchar(text), 0L)),
+          sep = ""
+        )
       }
       invisible(self)
     },
@@ -571,10 +564,15 @@ CucumberSummaryReporter <- R6::R6Class(
     #' Print above the line drawn by `draw()`, then draw it again
     #' @param code Code that prints
     print_above = function(code) {
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
       self$clear()
       force(code)
-      if (!is.null(self$live)) self$draw(self$live)
+      if (!is.null(self$live)) {
+        self$draw(self$live)
+      }
       invisible(self)
     },
 
@@ -590,65 +588,90 @@ CucumberSummaryReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Start a scenario
-    #' @param scenario_name Name of the scenario
-    start_scenario = function(scenario_name) {
-      super$start_scenario(scenario_name)
-      self$current_scenario <- scenario_name
-      self$current_steps <- list()
-      self$current_hooks <- list()
-      invisible(self)
-    },
-
-    #' @description
-    #' Record a scenario's status, and the scenario for the summary if it didn't pass
-    #' @param status The scenario's status
-    end_scenario = function(status) {
-      super$end_scenario(status)
-      self$scenario_statuses <- c(self$scenario_statuses, status)
-      if (!status %in% c("passed", "skipped")) {
-        self$failures <- c(
-          self$failures,
-          list(list(
-            feature = self$current_feature,
-            scenario = self$current_scenario,
-            steps = self$current_steps,
-            hooks = self$current_hooks
-          ))
-        )
-      }
-      invisible(self)
-    },
-
-    #' @description
-    #' Record a scenario's hook that failed, is pending or skipped the scenario
-    #' @param status `"failed"`, `"pending"` or `"skipped"`
-    #' @param error The hook's error
-    end_hook = function(status, error) {
-      super$end_hook(status, error)
-      self$current_hooks <- c(self$current_hooks, list(list(status = status, error = error)))
-      invisible(self)
-    },
-
-    #' @description
-    #' Record a step's result
-    #' @param step Pickle step object with execution results
-    end_step = function(step) {
-      super$end_step(step)
-      self$current_steps <- c(self$current_steps, list(step))
-      self$step_statuses <- c(self$step_statuses, step$status %||% "passed")
-      invisible(self)
-    },
-
-    #' @description
-    #' Record the undefined parameter types
+    #' Follow the run's features, scenarios, steps and hooks in its messages
     #' @param envelope A list with one element, named by the message's type
     add_message = function(envelope) {
       super$add_message(envelope)
-      type <- envelope$undefinedParameterType
-      if (!is.null(type)) {
-        self$undefined_parameter_types[[type$name]] <- type$expression
-      }
+      q <- private$query
+      q$update(envelope)
+      message <- envelope[[1]]
+      switch(
+        names(envelope),
+        undefinedParameterType = self$undefined_parameter_types[[
+          message$name
+        ]] <- message$expression,
+        testCaseStarted = {
+          pickle <- q$pickle_of(message)
+          lineage <- q$lineage_of(pickle)
+          if (
+            is.null(private$feature_uri) ||
+              !identical(pickle$uri %||% "", private$feature_uri)
+          ) {
+            private$finish_feature()
+            private$feature_uri <- pickle$uri %||% ""
+            self$current_feature <- paste0(
+              lineage$feature$keyword,
+              ": ",
+              lineage$feature$name
+            )
+            private$on_feature_start()
+          }
+          self$current_scenario <- paste0(
+            lineage$scenario$keyword,
+            ": ",
+            pickle$name
+          )
+          self$current_steps <- list()
+          self$current_hooks <- list()
+          private$on_scenario_start()
+        },
+        testStepStarted = {
+          if (!is.null(q$test_steps[[message$testStepId]]$pickleStepId)) {
+            private$on_step_start()
+          }
+        },
+        testStepFinished = {
+          test_step <- q$test_steps[[message$testStepId]]
+          result <- message$testStepResult
+          if (!is.null(test_step$pickleStepId)) {
+            step <- reported_step(
+              q,
+              q$pickle_steps[[test_step$pickleStepId]],
+              result
+            )
+            self$current_steps <- c(self$current_steps, list(step))
+            self$step_statuses <- c(self$step_statuses, step$status)
+            private$on_step_end(step)
+          } else if (!is.null(result$message)) {
+            hook <- list(
+              status = tolower(result$status),
+              error = result$message
+            )
+            self$current_hooks <- c(self$current_hooks, list(hook))
+            private$on_hook_end(hook)
+          }
+        },
+        testCaseFinished = {
+          started <- q$test_cases_started[[message$testCaseStartedId]]
+          status <- tolower(
+            q$most_severe_result_of(started)$status %||% "PASSED"
+          )
+          self$scenario_statuses <- c(self$scenario_statuses, status)
+          if (!status %in% c("passed", "skipped")) {
+            self$failures <- c(
+              self$failures,
+              list(list(
+                feature = self$current_feature,
+                scenario = self$current_scenario,
+                steps = self$current_steps,
+                hooks = self$current_hooks
+              ))
+            )
+          }
+          private$on_scenario_end(status)
+        },
+        testRunFinished = private$finish_feature()
+      )
       invisible(self)
     },
 
@@ -674,7 +697,10 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @description
     #' Print the scenarios and steps counted by status
     print_counts = function() {
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
       # Like cucumber-js, the last step definition that used each one
       types <- self$undefined_parameter_types
       if (length(types) > 0) {
@@ -684,8 +710,18 @@ CucumberSummaryReporter <- R6::R6Class(
       cat("\n")
       cat(cli::rule(), "\n", sep = "")
       cat(cli::style_bold("Summary"), "\n", sep = "")
-      cat("  ", format_status_counts(self$scenario_statuses, "scenario"), "\n", sep = "")
-      cat("  ", format_status_counts(self$step_statuses, "step"), "\n", sep = "")
+      cat(
+        "  ",
+        format_status_counts(self$scenario_statuses, "scenario"),
+        "\n",
+        sep = ""
+      )
+      cat(
+        "  ",
+        format_status_counts(self$step_statuses, "step"),
+        "\n",
+        sep = ""
+      )
       cat(cli::rule(), "\n", sep = "")
       invisible(self)
     },
@@ -693,7 +729,10 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @description
     #' Print the scenarios that didn't pass
     print_failures = function() {
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
       if (length(self$failures) > 0) {
         cat("\n", cli::style_bold("Failures"), "\n", sep = "")
         for (failure in self$failures) {
@@ -708,11 +747,34 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @param error The error that stopped the run, or `NULL`
     end_run = function(error = NULL) {
       super$end_run(error)
+      # A run stopped by an error of a reporter has no testRunFinished
+      private$finish_feature()
       self$print_run_error(error)
       self$print_counts()
       self$print_failures()
       invisible(self)
     }
+  ),
+  private = list(
+    query = NULL,
+    feature_uri = NULL,
+
+    finish_feature = function() {
+      if (!is.null(private$feature_uri)) {
+        private$on_feature_end()
+        private$feature_uri <- NULL
+        self$current_feature <- NULL
+      }
+    },
+
+    # What the reporters print as the run goes: each does nothing here
+    on_feature_start = function() NULL,
+    on_feature_end = function() NULL,
+    on_scenario_start = function() NULL,
+    on_scenario_end = function(status) NULL,
+    on_step_start = function() NULL,
+    on_step_end = function(step) NULL,
+    on_hook_end = function(hook) NULL
   )
 )
 
@@ -876,61 +938,11 @@ CucumberProgressReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Print the header once, and start the feature's line
-    #' @param feature_name Name of the feature
-    start_feature = function(feature_name) {
-      super$start_feature(feature_name)
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      if (!self$header_printed) {
-        cat(format_progress_line(" ", sprintf(c("%2s", "%2s", "%2s", "%2s", "%3s"), c("F", "P", "U", "S", "OK")), "Feature"), "\n", sep = "")
-        self$header_printed <- TRUE
-      }
-      self$feature_first <- length(self$scenario_statuses) + 1L
-      self$feature_start <- Sys.time()
-      self$frame <- 0L
-      self$draw_feature()
-    },
-
-    #' @description
-    #' Turn the spinner after a step
-    #' @param step Pickle step object with execution results
-    end_step = function(step) {
-      super$end_step(step)
-      self$frame <- self$frame + 1L
-      self$draw_feature()
-    },
-
-    #' @description
-    #' Count the scenario in the feature's line, and print it if it didn't pass
-    #' @param status The scenario's status
-    end_scenario = function(status) {
-      n <- length(self$failures)
-      super$end_scenario(status)
-      self$print_failures_since(n)
-      self$draw_feature()
-    },
-
-    #' @description
-    #' Print the feature's final line, with its status and how long it took
-    end_feature = function() {
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      statuses <- self$feature_statuses()
-      self$clear()
-      self$live <- NULL
-      if (length(statuses) > 0) {
-        worst <- STEP_STATUSES[min(match(statuses, STEP_STATUSES))]
-        line <- self$feature_line(status_symbol(worst))
-        time <- as.numeric(difftime(Sys.time(), self$feature_start, units = "secs"))
-        if (time >= 1) line <- paste0(line, cli::col_grey(sprintf(" [%.1fs]", time)))
-        cat(line, "\n", sep = "")
-      }
-      super$end_feature()
-    },
-
-    #' @description
     #' Statuses of the current feature's finished scenarios
     feature_statuses = function() {
-      self$scenario_statuses[seq_along(self$scenario_statuses) >= self$feature_first]
+      self$scenario_statuses[
+        seq_along(self$scenario_statuses) >= self$feature_first
+      ]
     },
 
     #' @description
@@ -947,8 +959,78 @@ CucumberProgressReporter <- R6::R6Class(
     #' @description
     #' Draw the current feature's line with the spinner
     draw_feature = function() {
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      self$draw(self$feature_line(self$frames[[self$frame %% length(self$frames) + 1L]]))
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      self$draw(self$feature_line(self$frames[[
+        self$frame %% length(self$frames) + 1L
+      ]]))
+    }
+  ),
+  private = list(
+    # Print the header once, and start the feature's line
+    on_feature_start = function() {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      if (!self$header_printed) {
+        cat(
+          format_progress_line(
+            " ",
+            sprintf(
+              c("%2s", "%2s", "%2s", "%2s", "%3s"),
+              c("F", "P", "U", "S", "OK")
+            ),
+            "Feature"
+          ),
+          "\n",
+          sep = ""
+        )
+        self$header_printed <- TRUE
+      }
+      self$feature_first <- length(self$scenario_statuses) + 1L
+      self$feature_start <- Sys.time()
+      self$frame <- 0L
+      self$draw_feature()
+    },
+
+    # Turn the spinner after a step
+    on_step_end = function(step) {
+      self$frame <- self$frame + 1L
+      self$draw_feature()
+    },
+
+    # Count the scenario in the feature's line, and print it if it didn't pass
+    on_scenario_end = function(status) {
+      failed <- !status %in% c("passed", "skipped")
+      self$print_failures_since(length(self$failures) - failed)
+      self$draw_feature()
+    },
+
+    # Print the feature's final line, with its status and how long it took
+    on_feature_end = function() {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      statuses <- self$feature_statuses()
+      self$clear()
+      self$live <- NULL
+      if (length(statuses) > 0) {
+        worst <- STEP_STATUSES[min(match(statuses, STEP_STATUSES))]
+        line <- self$feature_line(status_symbol(worst))
+        time <- as.numeric(difftime(
+          Sys.time(),
+          self$feature_start,
+          units = "secs"
+        ))
+        if (time >= 1) {
+          line <- paste0(line, cli::col_grey(sprintf(" [%.1fs]", time)))
+        }
+        cat(line, "\n", sep = "")
+      }
     }
   )
 )
@@ -1008,21 +1090,18 @@ CucumberProgressBarReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Print a scenario that didn't pass above the bar
-    #' @param status The scenario's status
-    end_scenario = function(status) {
-      n <- length(self$failures)
-      super$end_scenario(status)
-      self$print_failures_since(n)
-    },
-
-    #' @description
     #' Draw the bar
     draw_bar = function() {
       label <- sprintf("%d/%d steps ", self$current, self$total)
       size <- max(self$width - nchar(label) - 3L, 10L)
       done <- round(size * min(self$current / max(self$total, 1L), 1))
-      self$draw(paste0(label, "[", strrep("=", done), strrep(" ", size - done), "]"))
+      self$draw(paste0(
+        label,
+        "[",
+        strrep("=", done),
+        strrep(" ", size - done),
+        "]"
+      ))
     },
 
     #' @description
@@ -1036,6 +1115,13 @@ CucumberProgressBarReporter <- R6::R6Class(
       self$print_run_error(error)
       self$print_counts()
       invisible(self)
+    }
+  ),
+  private = list(
+    # Print a scenario that didn't pass above the bar
+    on_scenario_end = function(status) {
+      failed <- !status %in% c("passed", "skipped")
+      self$print_failures_since(length(self$failures) - failed)
     }
   )
 )
@@ -1085,49 +1171,7 @@ CucumberProgressBarReporter <- R6::R6Class(
 #' cucumber::run(reporter = cucumber::CucumberPrettyReporter$new())
 #' ```
 #'
-#' ## Creating custom reporters
-#'
-#' Extend [CucumberReporter] to build your own:
-#'
-#' ```r
-#' HTMLReporter <- R6::R6Class(
-#'   "HTMLReporter",
-#'   inherit = cucumber::CucumberReporter,
-#'   public = list(
-#'     html_output = character(),
-#'     start_feature = function(feature_name) {
-#'       super$start_feature(feature_name)
-#'       self$html_output <- c(self$html_output, sprintf("<h2>%s</h2>", feature_name))
-#'     },
-#'     end_step = function(step) {
-#'       super$end_step(step)
-#'       status_class <- step$status %||% "passed"
-#'       self$html_output <- c(
-#'         self$html_output,
-#'         sprintf('<div class="step %s">%s %s</div>', status_class, step$keyword, step$text)
-#'       )
-#'     },
-#'     end_run = function(error = NULL) {
-#'       writeLines(self$html_output, "test-report.html")
-#'     }
-#'   )
-#' )
-#' ```
-#'
-#' ## Step metadata
-#'
-#' When `end_step()` is called, the step object contains:
-#'
-#' - `keyword` - The step keyword as written (Given, When, Then, And, But or *)
-#' - `type` - "Context", "Action" or "Outcome" for Given, When and Then steps,
-#'   And and But steps take the type of the previous step. "Unknown" for `*`
-#'   and for And or But as the first step.
-#' - `text` - The step text
-#' - `status` - One of "passed", "failed", "skipped", "pending", "undefined" or "ambiguous"
-#' - `error` - The error object if the step failed, is pending, undefined or ambiguous (NULL otherwise)
-#' - `duration` - Execution time in seconds
-#' - `data_table` - Data table if present (NULL otherwise)
-#' - `docstring` - Docstring if present (NULL otherwise)
+#' To report a run your way, extend [CucumberReporter].
 #'
 #' @seealso [CucumberReporter]
 #' @md
@@ -1173,85 +1217,15 @@ CucumberPrettyReporter <- R6::R6Class(
         "cucumber.reporter_max_docstring_lines",
         Inf
       ),
-      reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf)
+      reporter_max_table_lines = getOption(
+        "cucumber.reporter_max_table_lines",
+        Inf
+      )
     ) {
       super$initialize()
       self$show_praise <- show_praise
       self$reporter_max_docstring_lines <- reporter_max_docstring_lines
       self$reporter_max_table_lines <- reporter_max_table_lines
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a feature
-    #' @param feature_name Name of the feature
-    start_feature = function(feature_name) {
-      super$start_feature(feature_name)
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      cat("\n", bold_label(feature_name), "\n", sep = "")
-      invisible(self)
-    },
-
-    #' @description
-    #' End the current feature
-    end_feature = function() {
-      super$end_feature()
-      cat("\n")
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a step, collecting its warnings
-    #' @param step Pickle step object
-    start_step = function(step) {
-      super$start_step(step)
-      self$step_warnings <- character()
-      invisible(self)
-    },
-
-    #' @description
-    #' Start a scenario and print its name
-    #' @param scenario_name Name of the scenario
-    start_scenario = function(scenario_name) {
-      super$start_scenario(scenario_name)
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      cat("  ", bold_label(scenario_name), "\n", sep = "")
-      invisible(self)
-    },
-
-    #' @description
-    #' Print the error of a scenario's hook that failed or is pending, or the
-    #' reason of one that skipped the scenario
-    #' @param status `"failed"`, `"pending"` or `"skipped"`
-    #' @param error The hook's error
-    end_hook = function(status, error) {
-      super$end_hook(status, error)
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-      print_error(conditionMessage(error), status)
-      invisible(self)
-    },
-
-    #' @description
-    #' End a step and print its result
-    #' @param step Pickle step object with execution results
-    end_step = function(step) {
-      super$end_step(step)
-
-      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
-
-      # ponytail: cat to stdout so expect_snapshot can capture step output; color
-      # is re-enabled via the num_colors option forced above.
-      print_step(step)
-
-      self$print_step_args(step)
-
-      for (warning in self$step_warnings) {
-        print_warning(warning)
-      }
-      self$step_warnings <- NULL
-
-      print_step_error(step)
-
       invisible(self)
     },
 
@@ -1270,10 +1244,13 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @description
     #' Print a step's docstring and/or data table arguments, indented and
     #' truncated to `reporter_max_docstring_lines` / `reporter_max_table_lines`
-    #' @param step Pickle step object
+    #' @param step The step, with its `docstring` lines or `data_table` rows
     print_step_args = function(step) {
       if (!is.null(step$docstring)) {
-        body <- truncate_lines(step$docstring, self$reporter_max_docstring_lines)
+        body <- truncate_lines(
+          step$docstring,
+          self$reporter_max_docstring_lines
+        )
         for (line in c('"""', body, '"""')) {
           cat("      ", cli::style_dim(line), "\n", sep = "")
         }
@@ -1281,12 +1258,68 @@ CucumberPrettyReporter <- R6::R6Class(
       if (!is.null(step$data_table)) {
         rows <- format_data_table(step$data_table)
         # Keep the header, truncate only the body rows
-        rows <- c(rows[1], truncate_lines(rows[-1], self$reporter_max_table_lines))
+        rows <- c(
+          rows[1],
+          truncate_lines(rows[-1], self$reporter_max_table_lines)
+        )
         for (line in rows) {
           cat("      ", cli::style_dim(line), "\n", sep = "")
         }
       }
       invisible(self)
+    }
+  ),
+  private = list(
+    on_feature_start = function() {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      cat("\n", bold_label(self$current_feature), "\n", sep = "")
+    },
+
+    on_feature_end = function() {
+      cat("\n")
+    },
+
+    on_scenario_start = function() {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      cat("  ", bold_label(self$current_scenario), "\n", sep = "")
+    },
+
+    # Collect the step's warnings, to print them under it
+    on_step_start = function() {
+      self$step_warnings <- character()
+    },
+
+    # Print the step, its arguments, warnings and error
+    on_step_end = function(step) {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      # ponytail: cat to stdout so expect_snapshot can capture step output; color
+      # is re-enabled via the num_colors option forced above.
+      print_step(step)
+      self$print_step_args(step)
+      for (warning in self$step_warnings) {
+        print_warning(warning)
+      }
+      self$step_warnings <- NULL
+      print_step_error(step)
+    },
+
+    # Print the error of a hook that failed or is pending, or the reason of
+    # one that skipped the scenario
+    on_hook_end = function(hook) {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      print_error(hook$error, hook$status)
     }
   )
 )

@@ -449,16 +449,37 @@ after(function(context, scenario) {
 
 - The default reporter, `CucumberProgressReporter`, prints one line per feature with its scenarios counted by status, like testthat's `ProgressReporter`, and prints each scenario that didn't pass. The reporter that printed each step is now `CucumberPrettyReporter`.
 - `CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` print like the `progress`, `progress-bar` and `summary` formatters of cucumber-js.
-- Cucumber reporters aren't testthat reporters anymore, and testthat reporters can't report a cucumber run. A `CucumberReporter` gets cucumber's events only: the run, each feature, scenario, step, hook and warning, and each Cucumber Message.
-- `CucumberPrettyReporter` prints each step with the keyword it's written with, and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
-- A step's new `type` is `"Context"`, `"Action"` or `"Outcome"` for Given, When and Then steps, And and But taking the previous step's type, or `"Unknown"` for `*`, and for And or But as the first step.
+- Cucumber reporters aren't testthat reporters anymore, and testthat reporters can't report a cucumber run. A `CucumberReporter` gets the start and the end of the run, its warnings, and the run as [Cucumber Messages](https://github.com/cucumber/messages), like the formatters of cucumber-js: each feature, scenario, step and hook, and their results.
+- `CucumberPrettyReporter` prints each step with the keyword it's written with, each scenario with its keyword, like `Example:` or `Scenario Outline:`, and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
 
 ## Migrating from 2.2.0
 
-This matters only for custom reporters:
+This matters only for custom reporters. `start_feature()`, `end_feature()`, `start_step()` and `end_step()` are removed: read the run from the messages in `add_message()` instead. A step's result is in its `testStepFinished` message, whose `testStepId` is the id of a test step of the scenario's `testCase`. That test step's `pickleStepId` is the id of a step of the scenario's `pickle`, with the step's text.
 
-- A step's `status` is `"failed"` for both failed expectations and errors. The `"error"` status is removed.
-- `step$keyword` is the keyword as written, so it can be `And`, `But` or `*`. Before, it was the keyword of the previous step. Use `step$type` to know whether a step is a Given, When or Then.
+```r
+# Before
+StatusReporter <- R6::R6Class(
+  "StatusReporter",
+  inherit = cucumber::CucumberReporter,
+  public = list(
+    end_step = function(step) message(step$text, ": ", step$status)
+  )
+)
+
+# Now
+StatusReporter <- R6::R6Class(
+  "StatusReporter",
+  inherit = cucumber::CucumberReporter,
+  public = list(
+    add_message = function(envelope) {
+      finished <- envelope$testStepFinished
+      if (!is.null(finished)) message(finished$testStepId, ": ", finished$testStepResult$status)
+    }
+  )
+)
+```
+
+A step's status is `"FAILED"` for both failed expectations and errors. The `"error"` status is removed.
 
 # Snippets
 
@@ -505,10 +526,9 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 
 ## In custom reporters
 
-- Replace checks for the `"error"` status with `"failed"`.
-- Use `step$type` instead of `step$keyword` to tell Given, When and Then steps apart. See [Reporters](#reporters).
+- Replace `start_feature()`, `end_feature()`, `start_step()` and `end_step()` with `add_message()`, reading the run from its Cucumber Messages. See [Reporters](#reporters).
 - Inherit from `CucumberPrettyReporter` instead of `CucumberProgressReporter` to extend the reporter that prints each step. See [Reporters](#reporters).
-- Replace testthat's reporter methods with cucumber's events: `start_reporter()` with `start_run()`, `end_reporter()` with `end_run(error)`, `start_test()` with `start_scenario()`, `end_test()` with `end_scenario()`, and warnings from `add_result()` with `add_warning()`. See [Reporters](#reporters).
+- Replace testthat's reporter methods with cucumber's events: `start_reporter()` with `start_run()`, `end_reporter()` with `end_run(error)`, `start_test()` and `end_test()` with the `testCaseStarted` and `testCaseFinished` messages in `add_message()`, and warnings from `add_result()` with `add_warning()`. See [Reporters](#reporters).
 
 ## In test runs
 

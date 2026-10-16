@@ -108,7 +108,6 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarRepor
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-CucumberProgressBarReporter-add_message}{\code{CucumberProgressBarReporter$add_message()}}
-\item \href{#method-CucumberProgressBarReporter-end_scenario}{\code{CucumberProgressBarReporter$end_scenario()}}
 \item \href{#method-CucumberProgressBarReporter-draw_bar}{\code{CucumberProgressBarReporter$draw_bar()}}
 \item \href{#method-CucumberProgressBarReporter-end_run}{\code{CucumberProgressBarReporter$end_run()}}
 \item \href{#method-CucumberProgressBarReporter-clone}{\code{CucumberProgressBarReporter$clone()}}
@@ -117,22 +116,16 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarRepor
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_feature'><code>cucumber::CucumberReporter$end_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_feature'><code>cucumber::CucumberReporter$start_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_step'><code>cucumber::CucumberReporter$start_step()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_warning'><code>cucumber::CucumberSummaryReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="draw"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-draw'><code>cucumber::CucumberSummaryReporter$draw()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="end_hook"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-end_hook'><code>cucumber::CucumberSummaryReporter$end_hook()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="end_step"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-end_step'><code>cucumber::CucumberSummaryReporter$end_step()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="initialize"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-initialize'><code>cucumber::CucumberSummaryReporter$initialize()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_above"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_above'><code>cucumber::CucumberSummaryReporter$print_above()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_counts"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_counts'><code>cucumber::CucumberSummaryReporter$print_counts()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures'><code>cucumber::CucumberSummaryReporter$print_failures()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures_since"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures_since'><code>cucumber::CucumberSummaryReporter$print_failures_since()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_run_error"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_run_error'><code>cucumber::CucumberSummaryReporter$print_run_error()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="start_scenario"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-start_scenario'><code>cucumber::CucumberSummaryReporter$start_scenario()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -149,23 +142,6 @@ Count the steps and hooks of each scenario, and advance the bar when one finishe
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{envelope}}{A list with one element, named by the message's type}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberProgressBarReporter-end_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberProgressBarReporter-end_scenario}{}}}
-\subsection{Method \code{end_scenario()}}{
-Print a scenario that didn't pass above the bar
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressBarReporter$end_scenario(status)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{The scenario's status}
 }
 \if{html}{\out{</div>}}
 }

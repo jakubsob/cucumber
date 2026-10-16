@@ -153,18 +153,11 @@ cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
 }
 }
 \if{html}{\out{
-<details><summary>Inherited methods</summary>
+<details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_warning'><code>cucumber::CucumberReporter$add_warning()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_feature'><code>cucumber::CucumberReporter$end_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_hook"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_hook'><code>cucumber::CucumberReporter$end_hook()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_run'><code>cucumber::CucumberReporter$end_run()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_scenario"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_scenario'><code>cucumber::CucumberReporter$end_scenario()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_step'><code>cucumber::CucumberReporter$end_step()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_feature'><code>cucumber::CucumberReporter$start_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_scenario"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_scenario'><code>cucumber::CucumberReporter$start_scenario()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_step'><code>cucumber::CucumberReporter$start_step()</code></a></span></li>
 </ul>
 </details>
 }}

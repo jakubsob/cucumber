@@ -96,13 +96,17 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 
 \item{\code{scenario_statuses}}{Statuses of the finished scenarios}
 
-\item{\code{current_scenario}}{Name of the scenario currently executing}
+\item{\code{current_feature}}{Name of the feature currently executing, like \code{"Feature: Basket"}}
+
+\item{\code{current_scenario}}{Name of the scenario currently executing, like \code{"Scenario: Add an item"}}
 
 \item{\code{current_steps}}{Steps executed so far in the current scenario}
 
-\item{\code{current_hooks}}{Results of the current scenario's hooks that failed or are pending}
+\item{\code{current_hooks}}{Results of the current scenario's hooks that failed, are pending or skipped it}
 
 \item{\code{failures}}{Recorded failures for the end-of-run summary}
+
+\item{\code{undefined_parameter_types}}{Parameter types used by step definitions but not defined}
 
 \item{\code{num_colors}}{Terminal color support captured at construction}
 
@@ -124,10 +128,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 \item \href{#method-CucumberSummaryReporter-clear}{\code{CucumberSummaryReporter$clear()}}
 \item \href{#method-CucumberSummaryReporter-print_above}{\code{CucumberSummaryReporter$print_above()}}
 \item \href{#method-CucumberSummaryReporter-print_failures_since}{\code{CucumberSummaryReporter$print_failures_since()}}
-\item \href{#method-CucumberSummaryReporter-start_scenario}{\code{CucumberSummaryReporter$start_scenario()}}
-\item \href{#method-CucumberSummaryReporter-end_scenario}{\code{CucumberSummaryReporter$end_scenario()}}
-\item \href{#method-CucumberSummaryReporter-end_hook}{\code{CucumberSummaryReporter$end_hook()}}
-\item \href{#method-CucumberSummaryReporter-end_step}{\code{CucumberSummaryReporter$end_step()}}
+\item \href{#method-CucumberSummaryReporter-add_message}{\code{CucumberSummaryReporter$add_message()}}
 \item \href{#method-CucumberSummaryReporter-add_warning}{\code{CucumberSummaryReporter$add_warning()}}
 \item \href{#method-CucumberSummaryReporter-print_run_error}{\code{CucumberSummaryReporter$print_run_error()}}
 \item \href{#method-CucumberSummaryReporter-print_counts}{\code{CucumberSummaryReporter$print_counts()}}
@@ -139,11 +140,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_message"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_message'><code>cucumber::CucumberReporter$add_message()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_feature'><code>cucumber::CucumberReporter$end_feature()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_feature"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_feature'><code>cucumber::CucumberReporter$start_feature()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_step"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_step'><code>cucumber::CucumberReporter$start_step()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -221,71 +218,18 @@ drawn by \code{draw()}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberSummaryReporter-start_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-start_scenario}{}}}
-\subsection{Method \code{start_scenario()}}{
-Start a scenario
+\if{html}{\out{<a id="method-CucumberSummaryReporter-add_message"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-add_message}{}}}
+\subsection{Method \code{add_message()}}{
+Follow the run's features, scenarios, steps and hooks in its messages
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$start_scenario(scenario_name)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$add_message(envelope)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{scenario_name}}{Name of the scenario}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberSummaryReporter-end_scenario"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-end_scenario}{}}}
-\subsection{Method \code{end_scenario()}}{
-Record a scenario's status, and the scenario for the summary if it didn't pass
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$end_scenario(status)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{The scenario's status}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberSummaryReporter-end_hook"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-end_hook}{}}}
-\subsection{Method \code{end_hook()}}{
-Record a scenario's hook that failed, is pending or skipped the scenario
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$end_hook(status, error)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{status}}{\code{"failed"}, \code{"pending"} or \code{"skipped"}}
-
-\item{\code{error}}{The hook's error}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberSummaryReporter-end_step"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-end_step}{}}}
-\subsection{Method \code{end_step()}}{
-Record a step's result
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$end_step(step)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{step}}{Pickle step object with execution results}
+\item{\code{envelope}}{A list with one element, named by the message's type}
 }
 \if{html}{\out{</div>}}
 }
