@@ -21,8 +21,6 @@
 # - markdown: Markdown with Gherkin
 # - multiple-features-reversed: running features in reverse order
 # - retry, retry-ambiguous, retry-pending, retry-undefined: retrying
-# - unknown-parameter-type: a step definition with an undefined parameter
-#   type fails the run instead of making its steps undefined
 #
 # all-statuses and test-run-exception aren't test samples.
 
@@ -64,6 +62,7 @@ CCK_SAMPLES <- c(
   "stack-traces",
   "undefined",
   "undefined-multiple",
+  "unknown-parameter-type",
   "unused-steps"
 )
 

@@ -193,7 +193,6 @@ Feature: Cucumber Expressions
       | optional in an optional         | I have ((very) big)  | 9      | An optional may not contain an other optional.                                     |
       | alternative of only optionals   | I have (big)/(small) | 8      | An alternative may not exclusively contain optionals.                              |
       | alternation in an optional      | I have (big/small)   | 12     | An alternation can not be used inside an optional.                                 |
-      | undefined parameter type        | I have {colour}      | 8      | Undefined parameter type 'colour'.                                                 |
       | unmatched (                     | I have (big          | 8      | The '(' does not have a matching ')'.                                              |
       | unmatched {                     | I have {int          | 8      | The '{' does not have a matching '}'.                                              |
       | parameter name with parenthesis | I have {i(n)t}       | 10     | Parameter names may not contain '{', '}', '(', ')', '\\' or '/'.                   |

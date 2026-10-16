@@ -507,6 +507,9 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field failures Recorded failures for the end-of-run summary
     failures = NULL,
 
+    #' @field undefined_parameter_types Parameter types used by step definitions but not defined
+    undefined_parameter_types = NULL,
+
     #' @field num_colors Terminal color support captured at construction
     num_colors = 1L,
 
@@ -638,6 +641,18 @@ CucumberSummaryReporter <- R6::R6Class(
     },
 
     #' @description
+    #' Record the undefined parameter types
+    #' @param envelope A list with one element, named by the message's type
+    add_message = function(envelope) {
+      super$add_message(envelope)
+      type <- envelope$undefinedParameterType
+      if (!is.null(type)) {
+        self$undefined_parameter_types[[type$name]] <- type$expression
+      }
+      invisible(self)
+    },
+
+    #' @description
     #' Print a warning as it's raised
     #' @param warning The warning
     add_warning = function(warning) {
@@ -660,6 +675,12 @@ CucumberSummaryReporter <- R6::R6Class(
     #' Print the scenarios and steps counted by status
     print_counts = function() {
       withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+      # Like cucumber-js, the last step definition that used each one
+      types <- self$undefined_parameter_types
+      if (length(types) > 0) {
+        cat("\n", cli::col_yellow("Undefined parameter types:"), "\n", sep = "")
+        cat(sprintf("- \"%s\" e.g. `%s`\n", names(types), types), sep = "")
+      }
       cat("\n")
       cat(cli::rule(), "\n", sep = "")
       cat(cli::style_bold("Summary"), "\n", sep = "")

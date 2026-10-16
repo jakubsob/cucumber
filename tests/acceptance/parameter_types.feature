@@ -352,3 +352,36 @@ Feature: Parameter types
         define_parameter_type("count", "-?\\d+", as.integer, prefer_for_regexp_match = TRUE)
         """
       Then it fails with "There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}"
+
+  Rule: A step definition with an undefined parameter type defines no step
+    Like in cucumber-js, the run goes on: the steps it would match are undefined, and the
+    summary lists the undefined parameter types.
+
+    Scenario: Steps of a step definition with an undefined parameter type are undefined
+      Given a file named "features/airports.feature" with
+        """
+        Feature: Airports
+          Scenario: Strike
+            Given CDG is closed because of a strike
+
+          Scenario: Open
+            Given LHR is open
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("{airport} is closed because of a strike", function(airport, context) {})
+        given("LHR is open", function(context) {})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the steps have these results:
+        | scenario | step                                    | status    |
+        | Strike   | Given CDG is closed because of a strike | undefined |
+        | Open     | Given LHR is open                       | passed    |
+      And the output includes
+        """
+        Undefined parameter types:
+        - "airport" e.g. `{airport} is closed because of a strike`
+        """

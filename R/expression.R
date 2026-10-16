@@ -144,7 +144,7 @@ parameter_for_regexp <- function(source, pattern, parameters) {
 #'
 #' @keywords internal
 #' @noRd
-expression_error <- function(expression, start, end, problem, solution) {
+expression_error <- function(expression, start, end, problem, solution, class = NULL, ...) {
   pointer <- paste0(strrep(" ", start), "^")
   if (end - start > 1) {
     pointer <- paste0(pointer, strrep("-", end - start - 2), "^")
@@ -164,7 +164,8 @@ expression_error <- function(expression, start, end, problem, solution) {
       problem, ".\n",
       solution
     ),
-    class = "cucumber_expression_error",
+    class = c(class, "cucumber_expression_error"),
+    ...,
     call = NULL,
     trace = empty_trace()
   )
@@ -448,8 +449,8 @@ parse_expression <- function(expression) {
 cucumber_expression_to_regex <- function(expression, parameters) {
   used <- list()
   types_of <- function(node) vapply(node$nodes, \(n) n$type, character(1))
-  fail <- function(node, problem, solution) {
-    expression_error(expression, node$start, node$end, problem, solution)
+  fail <- function(node, problem, solution, ...) {
+    expression_error(expression, node$start, node$end, problem, solution, ...)
   }
   rewrite_all <- function(nodes, collapse = "") {
     paste(vapply(nodes, rewrite, character(1)), collapse = collapse)
@@ -514,7 +515,9 @@ cucumber_expression_to_regex <- function(expression, parameters) {
           fail(
             node,
             paste0("Undefined parameter type '", name, "'"),
-            paste0("Please register a ParameterType for '", name, "'")
+            paste0("Please register a ParameterType for '", name, "'"),
+            class = "cucumber_undefined_parameter_type",
+            parameter_type = name
           )
         }
         used <<- c(used, list(parameter))

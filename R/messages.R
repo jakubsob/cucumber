@@ -108,13 +108,18 @@ parse_error_message <- function(uri, error) {
 #' them, in the order they are defined. Built-in parameter types aren't
 #' reported.
 #'
+#' A step definition whose expression uses an undefined
+#' parameter type is reported as an undefinedParameterType and left out, so
+#' its steps are undefined.
+#'
 #' @return The steps and hooks, each with its `id`
 #' @noRd
 #' @importFrom purrr map map_dbl
 emit_glue <- function(reporter, steps, hooks, parameters) {
-  parameters <- Filter(\(parameter) !isTRUE(parameter$builtin), parameters)
+  undefined <- integer()
+  defined <- Filter(\(parameter) !isTRUE(parameter$builtin), parameters)
   glue <- c(
-    map(parameters, \(parameter) list(kind = "parameter", order = parameter$order, item = parameter)),
+    map(defined, \(parameter) list(kind = "parameter", order = parameter$order, item = parameter)),
     map(seq_along(steps), \(i) list(kind = "step", order = attr(steps[[i]], "order"), index = i)),
     map(seq_along(hooks), \(i) list(kind = "hook", order = hooks[[i]]$order, index = i))
   )
@@ -124,6 +129,13 @@ emit_glue <- function(reporter, steps, hooks, parameters) {
     if (item$kind == "parameter") {
       emit(reporter, "parameterType", parameter_type_message(id, item$item))
     } else if (item$kind == "step") {
+      expression <- attr(steps[[item$index]], "description")
+      type <- undefined_parameter_type(expression, parameters)
+      if (!is.null(type)) {
+        undefined <- c(undefined, item$index)
+        emit(reporter, "undefinedParameterType", list(name = type, expression = expression))
+        next
+      }
       attr(steps[[item$index]], "id") <- id
       emit(reporter, "stepDefinition", step_definition_message(id, steps[[item$index]]))
     } else {
@@ -131,7 +143,22 @@ emit_glue <- function(reporter, steps, hooks, parameters) {
       emit(reporter, "hook", hook_message(id, hooks[[item$index]]))
     }
   }
+  if (length(undefined) > 0) steps <- .steps(!!!steps[-undefined])
   list(steps = steps, hooks = hooks)
+}
+
+#' The name of the undefined parameter type an expression uses, or NULL. Other
+#' problems of the expression are reported when steps are matched with it.
+#' @noRd
+undefined_parameter_type <- function(expression, parameters) {
+  tryCatch(
+    {
+      expression_to_pattern(expression, parameters)
+      NULL
+    },
+    cucumber_undefined_parameter_type = \(e) e$parameter_type,
+    cucumber_expression_error = \(e) NULL
+  )
 }
 
 source_reference <- function(srcref) {

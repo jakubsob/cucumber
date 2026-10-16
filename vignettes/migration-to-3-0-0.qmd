@@ -222,7 +222,7 @@ A description that starts with `^`, ends with `$` or is surrounded by `/` is a r
 given("^I have (\\d+) cucumbers$", function(n, context) { ... })
 ```
 
-Invalid Cucumber Expressions are an error that points at the problem: an empty optional `()`, an optional inside an optional, a parameter inside an optional, an alternation inside an optional, an empty alternative (`/about`, `a//b`, `{int}/{int}`), an alternative made of optionals only, a missing `)` or `}`, an illegal character in a parameter name, escaping a character that can't be escaped, and an undefined parameter type. When the message suggests an escape, it also shows how to write it in an R string.
+Invalid Cucumber Expressions are an error that points at the problem: an empty optional `()`, an optional inside an optional, a parameter inside an optional, an alternation inside an optional, an empty alternative (`/about`, `a//b`, `{int}/{int}`), an alternative made of optionals only, a missing `)` or `}`, an illegal character in a parameter name, and escaping a character that can't be escaped. When the message suggests an escape, it also shows how to write it in an R string.
 
 A step that matches more than one step definition fails with an error listing every matching definition and where it's defined.
 
@@ -260,7 +260,7 @@ given("I have {int} cucumbers", function(n, context) { ... })
 
 ### Undefined parameter types
 
-A parameter type that isn't defined, like `{colour}` without `define_parameter_type("colour", ...)`, is an error. Define it, or remove the braces.
+A step definition that uses a parameter type that isn't defined, like `{colour}` without `define_parameter_type("colour", ...)`, defines no step, like in cucumber-js. The steps it would match are undefined, and the summary of the run lists the undefined parameter types. Define it, or remove the braces.
 
 ### Ambiguous steps
 
