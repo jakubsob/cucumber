@@ -2,7 +2,7 @@ Feature: Attachments
   A step or a hook attaches data to the report with its `context`: `context$attach()` attaches
   a string or a raw vector with its media type, `context$log()` attaches text and
   `context$link()` a URL. The attachments are reported as Cucumber Messages, and the reports
-  show them, like the HTML report.
+  show them, like the HTML report. The pretty reporter prints them under their step.
 
   Background:
     Given a package

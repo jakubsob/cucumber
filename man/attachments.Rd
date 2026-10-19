@@ -4,11 +4,8 @@
 \alias{attachments}
 \title{Attach data, logs and links to the report}
 \description{
-The \code{context} of a step or a hook attaches data to the step or the hook
-that runs, e.g. a screenshot or what the page showed. The attachments are
-reported as Cucumber Messages, and the reports show them, like the
-HTML report of \link{CucumberHtmlReporter}. \link{CucumberPrettyReporter} prints them
-under their step.
+The \code{context} of a step or a hook attaches data to the report, e.g. a
+screenshot or what the page showed:
 \itemize{
 \item \code{context$attach(data, media_type, file_name)} attaches a string, or a
 raw vector, like a file read with \code{\link[=readBin]{readBin()}}. \code{media_type} is its
@@ -19,9 +16,6 @@ of the file the reports offer to download it as.
 \item \code{context$log(text)} attaches text to read, like a log line.
 \item \code{context$link(...)} attaches links, each one a URL.
 }
-
-\code{before_all()} and \code{after_all()} hooks get a \code{context} to attach to the
-report too, when they take one argument.
 }
 \section{Specification}{
 
@@ -30,7 +24,7 @@ report too, when they take one argument.
 A step or a hook attaches data to the report with its \code{context}: \code{context$attach()} attaches
 a string or a raw vector with its media type, \code{context$log()} attaches text and
 \code{context$link()} a URL. The attachments are reported as Cucumber Messages, and the reports
-show them, like the HTML report.
+show them, like the HTML report. The pretty reporter prints them under their step.
 
 \if{html}{\out{<pre class="gherkin"><code>Background:
   Given a package</code></pre>}}

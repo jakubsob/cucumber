@@ -1,11 +1,8 @@
 #' Attach data, logs and links to the report
 #'
 #' @description
-#' The `context` of a step or a hook attaches data to the step or the hook
-#' that runs, e.g. a screenshot or what the page showed. The attachments are
-#' reported as Cucumber Messages, and the reports show them, like the
-#' HTML report of [CucumberHtmlReporter]. [CucumberPrettyReporter] prints them
-#' under their step.
+#' The `context` of a step or a hook attaches data to the report, e.g. a
+#' screenshot or what the page showed:
 #'
 #' - `context$attach(data, media_type, file_name)` attaches a string, or a
 #'   raw vector, like a file read with [readBin()]. `media_type` is its
@@ -15,9 +12,6 @@
 #'   of the file the reports offer to download it as.
 #' - `context$log(text)` attaches text to read, like a log line.
 #' - `context$link(...)` attaches links, each one a URL.
-#'
-#' `before_all()` and `after_all()` hooks get a `context` to attach to the
-#' report too, when they take one argument.
 #'
 #' @seealso The [Reports article](https://jakubsob.github.io/cucumber/articles/reporting.html),
 #'   `vignette("reporting", package = "cucumber")`, attaches screenshots and logs of a
