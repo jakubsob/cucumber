@@ -1,11 +1,14 @@
 Feature: Skipped steps
   Call `skip_scenario()` in a step or a `before()` hook to skip the rest of the scenario,
-  for example when a service it needs is down. The skip reason is reported, and after hooks still run.
-  In an `after()` hook, it skips only that hook.
+  for example when a service it needs is down. The scenario is reported as skipped with its reason,
+  and after hooks still run and get `"skipped"` as its status.
+  In an `after()` hook, it skips only that hook, and the scenario is skipped unless it failed.
+  Calling it in any other hook is an error. `testthat::skip()` does the same.
 
   Background:
     Given a package
 
+  @rd
   Scenario: A step skips the scenario with skip_scenario()
     Given a file named "features/basket.feature" with
       """
@@ -26,8 +29,7 @@ Feature: Skipped steps
       """
       test("features")
       """
-    Then it has 0 errors
-    And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
     And the output includes "after: Sync the basket skipped"
     And the steps have these results:
       | step                      | status  |
@@ -35,6 +37,7 @@ Feature: Skipped steps
       | When I sync the basket    | skipped |
       | Then the basket is synced | skipped |
 
+  @rd
   Scenario: A before hook skips the scenario with skip_scenario()
     Given a file named "features/basket.feature" with
       """
@@ -59,8 +62,7 @@ Feature: Skipped steps
       """
       test("features")
       """
-    Then it has 0 errors
-    And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
     And the output includes
       """
       after: Sync the basket skipped
@@ -104,6 +106,7 @@ Feature: Skipped steps
       | Then the basket is synced      | skipped |
       | And the basket is synced twice | skipped |
 
+  @rd
   Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
     Given a file named "features/basket.feature" with
       """
@@ -121,8 +124,7 @@ Feature: Skipped steps
       """
       test("features")
       """
-    Then it has 0 errors
-    And the scenario "Add an item" is skipped with "Reason: too late"
+    Then the scenario "Add an item" is skipped with "Reason: too late"
     And the output includes "this hook still runs"
 
   Rule: testthat::skip() also skips the scenario

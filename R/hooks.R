@@ -35,16 +35,8 @@ make_hook <- function(kind, arguments) {
 
 #' Skip a scenario
 #'
-#' Call `skip_scenario()` in a [before()] hook or in a step to skip the scenario,
-#' e.g. when a service it needs isn't available. In a `before` hook, the rest of
-#' the `before` hooks and all the scenario's steps are skipped. In a step, that
-#' step and the steps after it are skipped. The scenario is reported as skipped.
-#' `after` hooks still run and get `"skipped"` as the scenario's `status`.
-#' In an [after()] hook, only that hook is skipped, and the scenario is reported
-#' as skipped if it didn't fail.
-#' [testthat::skip()] does the same.
-#'
-#' Calling it in any other hook is an error. Outside of a Cucumber run
+#' Call `skip_scenario()` in a step or in a [before()] or [after()] hook to skip the
+#' scenario, e.g. when a service it needs isn't available. Outside of a Cucumber run
 #' `skip_scenario()` skips the test like [testthat::skip()].
 #'
 #' @param message A message explaining why the scenario is skipped.
@@ -55,6 +47,8 @@ make_hook <- function(kind, arguments) {
 #'     skip_scenario("API_KEY is not set")
 #'   }
 #' }, tags = "@api")
+#'
+#' @eval features_rd(features = "skipped_steps.feature")
 #'
 #' @export
 skip_scenario <- function(message = "Skipped") {

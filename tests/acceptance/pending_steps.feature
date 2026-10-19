@@ -2,10 +2,13 @@ Feature: Pending steps
   Call `pending()` in a step to mark it as not implemented yet.
   The step is reported as pending, and the steps after it are skipped.
   A pending scenario fails the run, unless it's run with `strict = FALSE`.
+  Use it to write the feature files first and implement the steps later.
+  Hooks can call `pending()` too.
 
   Background:
     Given a package
 
+  @rd
   Scenario: A pending step fails the scenario
     Given a file named "features/pending.feature" with
       """
@@ -32,6 +35,7 @@ Feature: Pending steps
       | step                         | status  |
       | Given a step that is pending | pending |
 
+  @rd
   Scenario: Steps after a pending step are skipped
     Given a file named "features/pending.feature" with
       """
@@ -60,6 +64,7 @@ Feature: Pending steps
       | Given a step that is pending  | pending |
       | Then this step should not run | skipped |
 
+  @rd
   Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
     A pending scenario fails the run only in strict mode, like a pending step.
 

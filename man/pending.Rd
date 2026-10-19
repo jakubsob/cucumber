@@ -10,18 +10,201 @@ pending(message = "TODO")
 \item{message}{A message explaining why the step is pending.}
 }
 \description{
-Call \code{pending()} inside a step implementation to signal that the step is not
-yet implemented. The step is reported as pending and the rest of the
-scenario's steps are skipped.
+Call \code{pending()} in a step or a hook that isn't implemented yet. Outside of a
+Cucumber run \code{pending()} skips the test like \code{\link[testthat:skip]{testthat::skip()}}.
 }
-\details{
-A pending step fails the run, unless it's run with \code{strict = FALSE}, then
-the scenario is reported as skipped. Outside of a Cucumber run \code{pending()}
-skips the test like \code{\link[testthat:skip]{testthat::skip()}}.
+\section{Specification}{
 
-This is useful when you want to write your feature files first and implement the steps later,
-or when you want to temporarily disable a step without deleting its implementation.
+\subsection{Pending steps}{
+
+Call \code{pending()} in a step to mark it as not implemented yet.
+The step is reported as pending, and the steps after it are skipped.
+A pending scenario fails the run, unless it's run with \code{strict = FALSE}.
+Use it to write the feature files first and implement the steps later.
+Hooks can call \code{pending()} too.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A pending step fails the scenario
+  Given a file named "features/pending.feature" with
+    """
+    Feature: Pending
+      Scenario: Not yet implemented
+        Given a step that is pending
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a step that is pending", function(context) \{
+      pending("not yet implemented")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    Step "a step that is pending" is pending: not yet implemented
+    """
+  And the steps have these results:
+    | step                         | status  |
+    | Given a step that is pending | pending |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A pending step fails the scenario
+  Given a file named "features/pending.feature" with
+    """
+    Feature: Pending
+      Scenario: Not yet implemented
+        Given a step that is pending
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a step that is pending", function(context) \{
+      pending("not yet implemented")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    Step "a step that is pending" is pending: not yet implemented
+    """
+  And the steps have these results:
+    | step                         | status  |
+    | Given a step that is pending | pending |
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Steps after a pending step are skipped
+  Given a file named "features/pending.feature" with
+    """
+    Feature: Pending
+      Scenario: Skips the rest
+        Given a step that is pending
+        Then this step should not run
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a step that is pending", function(context) \{
+      pending()
+    \})
+    then("this step should not run", function(context) \{
+      stop("this step must not execute")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And it has 0 errors
+  And the steps have these results:
+    | step                          | status  |
+    | Given a step that is pending  | pending |
+    | Then this step should not run | skipped |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Steps after a pending step are skipped
+  Given a file named "features/pending.feature" with
+    """
+    Feature: Pending
+      Scenario: Skips the rest
+        Given a step that is pending
+        Then this step should not run
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a step that is pending", function(context) \{
+      pending()
+    \})
+    then("this step should not run", function(context) \{
+      stop("this step must not execute")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And it has 0 errors
+  And the steps have these results:
+    | step                          | status  |
+    | Given a step that is pending  | pending |
+    | Then this step should not run | skipped |
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario Outline: A before hook makes the scenario pending with pending(), strict = &lt;strict&gt;
+  A pending scenario fails the run only in strict mode, like a pending step.
+<span></span>
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Sync the basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) pending("the API client isn't written yet"))
+    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
+    given("an empty basket", function(context) stop("this step must not execute"))
+    """
+  When I run
+    """
+    test("features", strict = &lt;strict&gt;, stop_on_failure = FALSE)
+    """
+  Then the scenario "Sync the basket" is &lt;outcome&gt; with "&lt;message&gt;"
+  And the output includes "after: Sync the basket pending"
+  And the steps and hooks have these results:
+    | step                  | status  |
+    | Before                | pending |
+    | Given an empty basket | skipped |
+    | After                 | passed  |
+<span></span>
+  Examples:
+    | strict | outcome | message                                                   |
+    | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
+    | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
+  A pending scenario fails the run only in strict mode, like a pending step.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Sync the basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) pending("the API client isn't written yet"))
+    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
+    given("an empty basket", function(context) stop("this step must not execute"))
+    """
+  When I run
+    """
+    test("features", strict = <strict>, stop_on_failure = FALSE)
+    """
+  Then the scenario "Sync the basket" is <outcome> with "<message>"
+  And the output includes "after: Sync the basket pending"
+  And the steps and hooks have these results:
+    | step                  | status  |
+    | Before                | pending |
+    | Given an empty basket | skipped |
+    | After                 | passed  |
+
+  Examples:
+    | strict | outcome | message                                                   |
+    | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
+    | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |
+}}
+
+Source: \code{tests/acceptance/pending_steps.feature}
 }
+}
+
 \examples{
 given("I have {int} cucumbers in my basket", function(n, context) {
   pending("not yet implemented")
