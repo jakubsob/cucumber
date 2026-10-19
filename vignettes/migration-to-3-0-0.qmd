@@ -533,6 +533,7 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 ## In test runs
 
 - Replace testthat reporters passed to `test()` or `run()` with cucumber's, like `CucumberSummaryReporter$new()`, or with `NULL` for no output. See [Reporters](#reporters).
+- Replace `testthat::JunitReporter` with `CucumberJunitReporter`: `test(reporter = CucumberJunitReporter$new("cucumber-junit.xml"))`.
 - Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines`, `reporter_max_table_lines` or `show_praise`. See [Reporters](#reporters).
 - Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
 - Implement pending and undefined steps, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).

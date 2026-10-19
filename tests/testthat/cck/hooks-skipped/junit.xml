@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.041" tests="3" skipped="3" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Hooks and skipped" name="Skip from a step" time="0.011">
+<skipped/>
+<system-out><![CDATA[
+Given a step that skips.....................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Hooks and skipped" name="Skip from a Before hook" time="0.013">
+<skipped/>
+<system-out><![CDATA[
+Given a normal step.........................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Hooks and skipped" name="Skip from an After hook" time="0.013">
+<skipped/>
+<system-out><![CDATA[
+Given a normal step.........................................................passed
+]]></system-out>
+</testcase>
+</testsuite>

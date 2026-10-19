@@ -1,0 +1,3 @@
+The junit.xml of each sample is the test data of the official JUnit XML formatter
+(https://github.com/cucumber/junit-xml-formatter),
+commit 645a1cc, copied by update_junit_xml() in R/tools-update_junit_xml.R.

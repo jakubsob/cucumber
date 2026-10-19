@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.033" tests="2" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Rules with Backgrounds" name="one scenario" time="0.015">
+<system-out><![CDATA[
+Given an order for "eggs"...................................................passed
+And an order for "milk".....................................................passed
+And an order for "bread"....................................................passed
+Given an order for "batteries"..............................................passed
+And an order for "light bulbs"..............................................passed
+When an action..............................................................passed
+Then an outcome.............................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Rules with Backgrounds" name="another scenario" time="0.015">
+<system-out><![CDATA[
+Given an order for "eggs"...................................................passed
+And an order for "milk".....................................................passed
+And an order for "bread"....................................................passed
+Given an order for "batteries"..............................................passed
+And an order for "light bulbs"..............................................passed
+When an action..............................................................passed
+Then an outcome.............................................................passed
+]]></system-out>
+</testcase>
+</testsuite>

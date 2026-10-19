@@ -10,7 +10,7 @@
 # them must give, as NDJSON, and the files its steps attach. The CCK writes its step definitions in
 # TypeScript (devkit/samples/<sample>/<sample>.ts); the R ones are ported by
 # hand into tests/testthat/cck/<sample>/setup-steps.R, which this script
-# keeps. test-cck.R runs each sample with CucumberMessagesReporter and compares the
+# keeps, like the sample's junit.xml, copied by update_junit_xml(). test-cck.R runs each sample with CucumberMessagesReporter and compares the
 # messages with the CCK's.
 #
 # A new sample is copied only once it's added to CCK_SAMPLES, with its R
@@ -100,7 +100,7 @@ update_cck <- function(ref = "main", pkg = ".") {
 
     out <- file.path(to, directory)
     dir.create(out, recursive = TRUE, showWarnings = FALSE)
-    unlink(setdiff(list.files(out, full.names = TRUE), file.path(out, "setup-steps.R")))
+    unlink(setdiff(list.files(out, full.names = TRUE), file.path(out, c("setup-steps.R", "junit.xml"))))
     if (!all(file.copy(file.path(from, files), file.path(out, files)))) {
       stop("Can't copy the files of the sample ", sample)
     }

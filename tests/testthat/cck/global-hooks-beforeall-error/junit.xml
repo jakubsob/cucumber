@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.011" tests="0" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase name="samples/global-hooks-beforeall-error/global-hooks-beforeall-error.ts:7" time="0.001">
+<failure type="Error" message="BeforeAll hook went wrong">
+<![CDATA[Error: BeforeAll hook went wrong
+samples/global-hooks-beforeall-error/global-hooks-beforeall-error.ts:7]]>
+</failure>
+</testcase>
+</testsuite>

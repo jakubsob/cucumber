@@ -73,10 +73,12 @@ reference:
       - CucumberSummaryReporter
       - CucumberPrettyReporter
       - CucumberMessagesReporter
+      - CucumberHtmlReporter
+      - CucumberJunitReporter
       - CucumberMultiReporter
   - title: Reports
     contents:
-      - has_concept("reports")
+      - read_messages
   - title: Documentation
     contents:
       - features_rd

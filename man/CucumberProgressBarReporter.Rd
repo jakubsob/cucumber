@@ -4,8 +4,7 @@
 \alias{CucumberProgressBarReporter}
 \title{Progress Bar Reporter for Cucumber}
 \description{
-Like the \code{progress-bar} formatter of cucumber-js, it shows a bar of the
-steps and hooks run so far, redrawn in place. A scenario that didn't pass is
+Shows a bar of the steps and hooks run so far, redrawn in place. A scenario that didn't pass is
 printed above the bar as soon as it finishes, with its steps and errors. The
 scenarios and steps counted by status are printed at the end.
 
@@ -25,8 +24,7 @@ didn't pass and the summary are printed.
 
 \subsection{Progress bar reporter}{
 
-\code{CucumberProgressBarReporter} shows a bar of the steps and hooks run so far, like the
-\code{progress-bar} formatter of cucumber-js. A scenario that didn't pass is printed as soon
+\code{CucumberProgressBarReporter} shows a bar of the steps and hooks run so far. A scenario that didn't pass is printed as soon
 as it finishes. The bar is drawn only in a terminal that can redraw a line.
 
 \preformatted{Background:
@@ -116,6 +114,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarRepor
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_warning'><code>cucumber::CucumberSummaryReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>

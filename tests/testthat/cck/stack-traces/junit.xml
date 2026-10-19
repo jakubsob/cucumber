@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.005" tests="1" skipped="0" failures="1" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Stack traces" name="A failing step" time="0.003">
+<failure type="Error" message="BOOM">
+<![CDATA[Error: BOOM
+samples/stack-traces/stack-traces.feature:10]]>
+</failure>
+<system-out><![CDATA[
+When a step throws an exception.............................................failed
+]]></system-out>
+</testcase>
+</testsuite>

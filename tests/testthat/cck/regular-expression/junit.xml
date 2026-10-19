@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.009" tests="1" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="regular expression" name="regular expression" time="0.007">
+<system-out><![CDATA[
+Given a cucumber............................................................passed
+Given a cucumber and a zucchini.............................................passed
+Given a cucumber and a zucchini and a gourd.................................passed
+]]></system-out>
+</testcase>
+</testsuite>

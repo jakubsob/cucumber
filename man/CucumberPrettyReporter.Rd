@@ -4,8 +4,8 @@
 \alias{CucumberPrettyReporter}
 \title{Pretty Reporter for Cucumber}
 \description{
-A reporter that prints each feature, scenario and step as it runs, like the
-\code{pretty} formatter of cucumber-js, then the summary of
+A reporter that prints each feature, scenario and step as it runs, then the
+summary of
 \link{CucumberSummaryReporter}.
 }
 \details{
@@ -175,6 +175,7 @@ cucumber::test(
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_message"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_message'><code>cucumber::CucumberSummaryReporter$add_message()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>

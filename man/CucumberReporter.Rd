@@ -5,10 +5,9 @@
 \title{Cucumber Reporter Base Class}
 \description{
 Base class for cucumber reporters. A reporter gets the run as
-\href{https://github.com/cucumber/messages}{Cucumber Messages}, like the
-formatters of cucumber-js: each feature, scenario, step and hook and their
-results. It also gets the start and the end of the run, and the warnings
-raised in it.
+\href{https://github.com/cucumber/messages}{Cucumber Messages}: each feature,
+scenario, step and hook and their results. It also gets the start and the end of the run,
+and the warnings raised in it.
 
 Extend it to report a run your way, overriding the methods you need. Each
 does nothing by default.
@@ -20,6 +19,7 @@ does nothing by default.
 \item{\code{end_run(error)}}{Called when a run ends, with the error that stopped it, like a failing \code{before_all()} hook, or \code{NULL}}
 \item{\code{add_message(envelope)}}{Called with each Cucumber Message of the run, see \link{CucumberMessagesReporter}}
 \item{\code{add_warning(warning)}}{Called with each warning raised in a step, a hook or elsewhere in the run}
+\item{\code{report(file)}}{Reports a run after it ran, from the Cucumber Messages \link{CucumberMessagesReporter} stored in \code{file}}
 }
 
 An envelope is a list with one element, named by the message's type. The
@@ -247,6 +247,7 @@ cucumber::test("tests/acceptance", reporter = StatusReporter$new())
 \item \href{#method-CucumberReporter-end_run}{\code{CucumberReporter$end_run()}}
 \item \href{#method-CucumberReporter-add_warning}{\code{CucumberReporter$add_warning()}}
 \item \href{#method-CucumberReporter-add_message}{\code{CucumberReporter$add_message()}}
+\item \href{#method-CucumberReporter-report}{\code{CucumberReporter$report()}}
 \item \href{#method-CucumberReporter-clone}{\code{CucumberReporter$clone()}}
 }
 }
@@ -308,6 +309,24 @@ Called with each Cucumber Message of the run
 \describe{
 \item{\code{envelope}}{A list with one element, named by the message's type,
 like \code{list(testCaseStarted = list(...))}}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberReporter-report"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberReporter-report}{}}}
+\subsection{Method \code{report()}}{
+Report a run after it ran: send this reporter the Cucumber Messages
+stored in a file, like a run reports them
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberReporter$report(file)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{Path of the NDJSON file a \link{CucumberMessagesReporter} wrote}
 }
 \if{html}{\out{</div>}}
 }

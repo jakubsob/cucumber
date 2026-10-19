@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.015" tests="1" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase name="samples/global-hooks-afterall-error/global-hooks-afterall-error.ts:19" time="0.001">
+<failure type="Error" message="AfterAll hook went wrong">
+<![CDATA[Error: AfterAll hook went wrong
+samples/global-hooks-afterall-error/global-hooks-afterall-error.ts:19]]>
+</failure>
+</testcase>
+<testcase classname="Global hooks - AfterAll error" name="A passing scenario" time="0.003">
+<system-out><![CDATA[
+When a step passes..........................................................passed
+]]></system-out>
+</testcase>
+</testsuite>

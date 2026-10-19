@@ -157,6 +157,7 @@ cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
 <ul>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_warning'><code>cucumber::CucumberReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="end_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-end_run'><code>cucumber::CucumberReporter$end_run()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
 </ul>
 </details>

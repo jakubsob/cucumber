@@ -4,8 +4,8 @@
 \alias{CucumberSummaryReporter}
 \title{Summary Reporter for Cucumber}
 \description{
-A reporter that prints only the summary of the run, like the \code{summary}
-formatter of cucumber-js: the scenarios and steps counted by status, and the
+A reporter that prints only the summary of the run: the scenarios and steps
+counted by status, and the
 scenarios that didn't pass, with their steps and errors.
 
 The other cucumber reporters print the same summary at the end of the run:
@@ -31,8 +31,7 @@ Feature: Basket
 
 \subsection{Summary reporter}{
 
-\code{CucumberSummaryReporter} prints only the summary of the run, like the \code{summary} formatter
-of cucumber-js: the scenarios and steps counted by status, and the scenarios that didn't pass.
+\code{CucumberSummaryReporter} prints only the summary of the run: the scenarios and steps counted by status, and the scenarios that didn't pass.
 
 \preformatted{Scenario: Only the summary is printed
   Given a package
@@ -140,6 +139,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 \if{html}{\out{
 <details open><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
 </ul>
 </details>

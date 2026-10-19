@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.007" tests="1" skipped="0" failures="1" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Skipped followed by failing hook" name="Failure in an After hook" time="0.005">
+<failure type="Error" message="whoops">
+<![CDATA[Error: whoops
+samples/skipped-failing-hook/skipped-failing-hook.feature:6]]>
+</failure>
+<system-out><![CDATA[
+Given a step that skips.....................................................skipped
+]]></system-out>
+</testcase>
+</testsuite>

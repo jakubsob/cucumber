@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.037" tests="9" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="First feature" name="First scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "eggs"...................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="First feature" name="Second scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "milk"...................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="First feature" name="Third scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "bread"..................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Second feature" name="First scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "batteries"..............................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Second feature" name="Second scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "light bulbs"............................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Second feature" name="Third scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "fuses"..................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Third feature" name="First scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "pencils"................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Third feature" name="Second scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "rulers".................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Third feature" name="Third scenario" time="0.003">
+<system-out><![CDATA[
+Given an order for "paperclips".............................................passed
+]]></system-out>
+</testcase>
+</testsuite>

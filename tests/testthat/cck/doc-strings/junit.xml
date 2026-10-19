@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.013" tests="3" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Doc strings" name="a doc string with standard delimiter" time="0.003">
+<system-out><![CDATA[
+Given a doc string:.........................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Doc strings" name="a doc string with backticks delimiter" time="0.003">
+<system-out><![CDATA[
+Given a doc string:.........................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Doc strings" name="a doc string with media type" time="0.003">
+<system-out><![CDATA[
+Given a doc string:.........................................................passed
+]]></system-out>
+</testcase>
+</testsuite>

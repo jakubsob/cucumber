@@ -4,7 +4,7 @@
 #' The `context` of a step or a hook attaches data to the step or the hook
 #' that runs, e.g. a screenshot or what the page showed. The attachments are
 #' reported as Cucumber Messages, and the reports show them, like the
-#' HTML report of [write_html_report()]. [CucumberPrettyReporter] prints them
+#' HTML report of [CucumberHtmlReporter]. [CucumberPrettyReporter] prints them
 #' under their step.
 #'
 #' - `context$attach(data, media_type, file_name)` attaches a string, or a

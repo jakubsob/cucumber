@@ -1,7 +1,6 @@
 @rd
 Feature: Progress bar reporter
-  `CucumberProgressBarReporter` shows a bar of the steps and hooks run so far, like the
-  `progress-bar` formatter of cucumber-js. A scenario that didn't pass is printed as soon
+  `CucumberProgressBarReporter` shows a bar of the steps and hooks run so far. A scenario that didn't pass is printed as soon
   as it finishes. The bar is drawn only in a terminal that can redraw a line.
 
   Background:

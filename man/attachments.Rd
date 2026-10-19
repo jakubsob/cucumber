@@ -7,7 +7,7 @@
 The \code{context} of a step or a hook attaches data to the step or the hook
 that runs, e.g. a screenshot or what the page showed. The attachments are
 reported as Cucumber Messages, and the reports show them, like the
-HTML report of \code{\link[=write_html_report]{write_html_report()}}. \link{CucumberPrettyReporter} prints them
+HTML report of \link{CucumberHtmlReporter}. \link{CucumberPrettyReporter} prints them
 under their step.
 \itemize{
 \item \code{context$attach(data, media_type, file_name)} attaches a string, or a

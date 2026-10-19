@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.059" tests="7" skipped="0" failures="7" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Undefined steps" name="An undefined step causes a failure" time="0.003">
+<failure/>
+<system-out><![CDATA[
+Given a step that is yet to be defined......................................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="All steps are executed before a single undefined step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given an implemented step...................................................passed
+And an implemented step.....................................................passed
+And a step that is yet to be defined........................................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Multiple undefined steps will all remain as undefined" time="0.011">
+<failure/>
+<system-out><![CDATA[
+Given an implemented step...................................................passed
+And an implemented step.....................................................passed
+And a step that is yet to be defined........................................undefined
+And another step that is also yet to be defined.............................undefined
+And a third step that is yet to be defined..................................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Multiple defined steps after undefined steps are all skipped" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given a step that is yet to be defined......................................undefined
+And a step that will be skipped.............................................skipped
+And a step that will be skipped.............................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Multiple undefined steps after skipped steps will also remain as undefined" time="0.011">
+<failure/>
+<system-out><![CDATA[
+Given a step that is yet to be defined......................................undefined
+And a step that will be skipped.............................................skipped
+And a step that will be skipped.............................................skipped
+And a step that is yet to be defined........................................undefined
+And another step that is also yet to be defined.............................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Multiple missing snippets reflect parameter types" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given a list of 8 things....................................................undefined
+And a list of 3.14 things...................................................undefined
+And a list of "many" things.................................................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Multiple undefined steps also cause a failure" time="0.005">
+<failure/>
+<system-out><![CDATA[
+Given a step that is yet to be defined......................................undefined
+And another step that is also yet to be defined.............................undefined
+]]></system-out>
+</testcase>
+</testsuite>

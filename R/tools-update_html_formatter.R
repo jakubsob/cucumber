@@ -1,6 +1,6 @@
 # Updates the official Cucumber HTML report
 # (https://github.com/cucumber/html-formatter) in inst/html-formatter, which
-# write_html_report() fills with the messages of a run. It's internal, call it
+# CucumberHtmlReporter fills with the messages of a run. It's internal, call it
 # from the package root:
 #
 #   devtools::load_all()

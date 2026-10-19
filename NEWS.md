@@ -78,7 +78,9 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 ## Reports
 
 - ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles of its features, scenarios (each example of an outline being one) and steps and hooks, with their status, duration and error, to write a report of your own. It prints how many features and scenarios ran, by status.
-- ✨ `write_html_report()` writes a run's Cucumber Messages, from their file, the `CucumberMessagesReporter` that wrote them or `read_messages()`, into the official Cucumber HTML report, the page cucumber-js writes with `--format html`: one file that works offline, with every feature's results, searchable and filterable by status, text and tags.
+- ✨ `CucumberHtmlReporter` writes the official Cucumber HTML report of a run, the page cucumber-js writes with `--format html`: one file that works offline, with every feature's results, searchable and filterable by status, text and tags.
+- ✨ `CucumberJunitReporter` writes the JUnit XML report of a run, like the official JUnit XML formatter of cucumber-js, `--format junit`, for CI services to show the results of the run. Each scenario is a test case, and its steps and their results are the test case's output. It replaces `testthat::JunitReporter`, which can't report a run since 3.0.0.
+- ✨ `report(file)` of every reporter reports a run after it ran, from the Cucumber Messages a `CucumberMessagesReporter` stored, e.g. `CucumberHtmlReporter$new()$report("cucumber.ndjson")`.
 - ✨ Steps and hooks attach data to the report with their `context`: `context$attach(data, media_type, file_name)` attaches a string or a raw vector, like a screenshot, `context$log(text)` attaches text and `context$link(url)` a link. They're reported as `attachment` Cucumber Messages, which the HTML report shows, and `CucumberPrettyReporter` prints logs and links under their step.
 - 📝 The new Reports article, `vignette("reporting")`, shows how to write the HTML report of a run, attach a screenshot and the logs of a failing shinytest2 scenario to it, and keep the report of a CI run.
 

@@ -2,10 +2,9 @@
 #'
 #' @description
 #' Base class for cucumber reporters. A reporter gets the run as
-#' [Cucumber Messages](https://github.com/cucumber/messages), like the
-#' formatters of cucumber-js: each feature, scenario, step and hook and their
-#' results. It also gets the start and the end of the run, and the warnings
-#' raised in it.
+#' [Cucumber Messages](https://github.com/cucumber/messages): each feature,
+#' scenario, step and hook and their results. It also gets the start and the end of the run,
+#' and the warnings raised in it.
 #'
 #' Extend it to report a run your way, overriding the methods you need. Each
 #' does nothing by default.
@@ -16,6 +15,7 @@
 #'   \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a failing `before_all()` hook, or `NULL`}
 #'   \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
 #'   \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
+#'   \item{`report(file)`}{Reports a run after it ran, from the Cucumber Messages [CucumberMessagesReporter] stored in `file`}
 #' }
 #'
 #' An envelope is a list with one element, named by the message's type. The
@@ -89,6 +89,21 @@ CucumberReporter <- R6::R6Class(
     #'   like `list(testCaseStarted = list(...))`
     add_message = function(envelope) {
       invisible(self)
+    },
+
+    #' @description
+    #' Report a run after it ran: send this reporter the Cucumber Messages
+    #' stored in a file, like a run reports them
+    #' @param file Path of the NDJSON file a [CucumberMessagesReporter] wrote
+    report = function(file) {
+      rlang::check_installed("jsonlite", "to read Cucumber Messages.")
+      lines <- readLines(file, warn = FALSE, encoding = "UTF-8")
+      self$start_run()
+      for (line in lines[nzchar(lines)]) {
+        self$add_message(jsonlite::fromJSON(line, simplifyVector = FALSE))
+      }
+      self$end_run()
+      invisible(self)
     }
   )
 )
@@ -150,6 +165,8 @@ check_reporter <- function(reporter, call = rlang::caller_env()) {
 #'   cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
 #' )))
 #' }
+#'
+#' @eval features_rd(features = "r-reporters.feature")
 #'
 #' @export
 CucumberMultiReporter <- R6::R6Class(
@@ -453,8 +470,8 @@ reported_step <- function(q, pickle_step, result) {
 #' Summary Reporter for Cucumber
 #'
 #' @description
-#' A reporter that prints only the summary of the run, like the `summary`
-#' formatter of cucumber-js: the scenarios and steps counted by status, and the
+#' A reporter that prints only the summary of the run: the scenarios and steps
+#' counted by status, and the
 #' scenarios that didn't pass, with their steps and errors.
 #'
 #' The other cucumber reporters print the same summary at the end of the run:
@@ -811,8 +828,7 @@ DOTS_CHARACTERS <- c(
 #' Dots Reporter for Cucumber
 #'
 #' @description
-#' Like the `progress` formatter of cucumber-js, it prints one character for
-#' each step and hook as it finishes, then the summary of
+#' Prints one character for each step and hook as it finishes, then the summary of
 #' [CucumberSummaryReporter]:
 #'
 #' - `.` passed (green)
@@ -1059,8 +1075,7 @@ CucumberProgressReporter <- R6::R6Class(
 #' Progress Bar Reporter for Cucumber
 #'
 #' @description
-#' Like the `progress-bar` formatter of cucumber-js, it shows a bar of the
-#' steps and hooks run so far, redrawn in place. A scenario that didn't pass is
+#' Shows a bar of the steps and hooks run so far, redrawn in place. A scenario that didn't pass is
 #' printed above the bar as soon as it finishes, with its steps and errors. The
 #' scenarios and steps counted by status are printed at the end.
 #'
@@ -1150,8 +1165,8 @@ CucumberProgressBarReporter <- R6::R6Class(
 #' Pretty Reporter for Cucumber
 #'
 #' @description
-#' A reporter that prints each feature, scenario and step as it runs, like the
-#' `pretty` formatter of cucumber-js, then the summary of
+#' A reporter that prints each feature, scenario and step as it runs, then the
+#' summary of
 #' [CucumberSummaryReporter].
 #'
 #' @details

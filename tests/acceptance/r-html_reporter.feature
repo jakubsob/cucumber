@@ -1,7 +1,8 @@
-Feature: HTML report
-  `write_html_report()` writes the messages of a run into the official Cucumber HTML report,
-  the page cucumber-js writes with `--format html`. The page is one file, with the report's
-  script and styles and the messages of the run, so it works offline.
+@rd
+Feature: HTML reporter
+  `CucumberHtmlReporter` writes the official Cucumber HTML report of a run when the run ends,
+  even when it fails. The page is one file, with the report's script and styles and the
+  messages of the run, so it works offline.
 
   Background:
     Given a package
@@ -21,12 +22,34 @@ Feature: HTML report
       when("I add an item", function(context) context$items <- context$items + 1)
       then("the basket has {int} item(s)", function(int, context) expect_equal(context$items, 2))
       """
-    When I write the html report
-    Then the report shows these steps:
-      | step                       | status | error                                                   |
-      | Given an empty basket      | passed |                                                         |
-      | When I add an item         | passed |                                                         |
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)
+      """
+    Then the HTML report "report.html" shows these steps:
+      | step                       | status | error                                                    |
+      | Given an empty basket      | passed |                                                          |
+      | When I add an item         | passed |                                                          |
       | Then the basket has 1 item | failed | expectation_failure Expected `context$items` to equal 2. |
+
+  Scenario: The report is written to cucumber-report.html by default
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$items <- 0)
+      """
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new())
+      """
+    Then the HTML report "cucumber-report.html" shows these steps:
+      | step                  | status |
+      | Given an empty basket | passed |
 
   Scenario: Text of the messages can't end the report's script
     Given a file named "features/basket.feature" with
@@ -39,8 +62,11 @@ Feature: HTML report
       """
       given("an empty basket", function(context) context$items <- 0)
       """
-    When I write the html report
-    Then the report shows these steps:
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new("report.html"))
+      """
+    Then the HTML report "report.html" shows these steps:
       | step                  | status |
       | Given an empty basket | passed |
 
@@ -66,8 +92,11 @@ Feature: HTML report
         }
       })
       """
-    When I write the html report
-    Then the report shows these attachments:
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)
+      """
+    Then the HTML report "report.html" shows these attachments:
       | step               | kind  | content           |
       | When I add an item | image | basket.png        |
       | When I add an item | text  | Opened the basket |

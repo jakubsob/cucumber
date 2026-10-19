@@ -2,7 +2,7 @@
 #'
 #' Reads the messages a [CucumberMessagesReporter] wrote, as tibbles of a run's
 #' features, scenarios and steps, to write a report of your own or query the
-#' results. The reports listed below read their run with it.
+#' results.
 #'
 #' @param x Path of a Cucumber Messages file, its lines, or the
 #'   [CucumberMessagesReporter] that wrote it.
@@ -29,7 +29,6 @@
 #' failed <- run$steps[run$steps$status == "failed", ]
 #' writeLines(paste0("- ", failed$scenario, ": ", failed$keyword, " ", failed$text), "summary.md")
 #' }
-#' @family reports
 #' @export
 read_messages <- function(x) {
   if (inherits(x, "cucumber_messages")) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.021" tests="4" skipped="0" failures="4" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Undefined steps" name="An undefined step causes a failure" time="0.003">
+<failure/>
+<system-out><![CDATA[
+Given a step that is yet to be defined......................................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Steps before undefined steps are executed" time="0.005">
+<failure/>
+<system-out><![CDATA[
+Given an implemented step...................................................passed
+And a step that is yet to be defined........................................undefined
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Steps after undefined steps are skipped" time="0.005">
+<failure/>
+<system-out><![CDATA[
+Given a step that is yet to be defined......................................undefined
+And a step that will be skipped.............................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Undefined steps" name="Snippets reflect parameter types" time="0.003">
+<failure/>
+<system-out><![CDATA[
+Given a list of 8 things....................................................undefined
+]]></system-out>
+</testcase>
+</testsuite>

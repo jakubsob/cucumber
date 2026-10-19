@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.073" tests="9" skipped="1" failures="8" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Failed-ish combinations" name="Undefined and ambiguous steps can follow a failed-ish step - Pending as the first failed-ish step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given a pending step........................................................pending
+And an undefined step.......................................................undefined
+And an ambiguous step.......................................................ambiguous
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Undefined and ambiguous steps can follow a failed-ish step - Undefined as the first failed-ish step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given an undefined step.....................................................undefined
+And an undefined step.......................................................undefined
+And an ambiguous step.......................................................ambiguous
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Undefined and ambiguous steps can follow a failed-ish step - Ambiguous as the first failed-ish step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given an ambiguous step.....................................................ambiguous
+And an undefined step.......................................................undefined
+And an ambiguous step.......................................................ambiguous
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Undefined and ambiguous steps can follow a failed-ish step - Failed as the first failed-ish step" time="0.007">
+<failure type="Error" message="whoops">
+<![CDATA[Error: whoops
+samples/failedish-combinations/failedish-combinations.feature:23]]>
+</failure>
+<system-out><![CDATA[
+Given a failing step........................................................failed
+And an undefined step.......................................................undefined
+And an ambiguous step.......................................................ambiguous
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Failed and pending steps do not follow a failed-ish step - Pending as the first failed-ish step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given a pending step........................................................pending
+And a pending step..........................................................skipped
+And a failing step..........................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Failed and pending steps do not follow a failed-ish step - Undefined as the first failed-ish step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given an undefined step.....................................................undefined
+And a pending step..........................................................skipped
+And a failing step..........................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Failed and pending steps do not follow a failed-ish step - Ambiguous as the first failed-ish step" time="0.007">
+<failure/>
+<system-out><![CDATA[
+Given an ambiguous step.....................................................ambiguous
+And a pending step..........................................................skipped
+And a failing step..........................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="Failed and pending steps do not follow a failed-ish step - Failed as the first failed-ish step" time="0.007">
+<failure type="Error" message="whoops">
+<![CDATA[Error: whoops
+samples/failedish-combinations/failedish-combinations.feature:45]]>
+</failure>
+<system-out><![CDATA[
+Given a failing step........................................................failed
+And a pending step..........................................................skipped
+And a failing step..........................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Failed-ish combinations" name="No pickle steps follow a skipped step - Step marks itself skipped" time="0.007">
+<skipped/>
+<system-out><![CDATA[
+Given a skipped step........................................................skipped
+And an undefined step.......................................................skipped
+And an ambiguous step.......................................................skipped
+]]></system-out>
+</testcase>
+</testsuite>

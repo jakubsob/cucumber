@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.041" tests="8" skipped="0" failures="1" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Attachments" name="Strings can be attached with a media type" time="0.004">
+<system-out><![CDATA[
+When the string "hello" is attached as "application/octet-stream"...........passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Log text" time="0.004">
+<system-out><![CDATA[
+When the string "hello" is logged...........................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Log ANSI coloured text" time="0.004">
+<system-out><![CDATA[
+When text with ANSI escapes is logged.......................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Log JSON" time="0.004">
+<system-out><![CDATA[
+When the following string is attached as "application/json":................passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Byte arrays are base64-encoded regardless of media type" time="0.004">
+<system-out><![CDATA[
+When an array with 10 bytes is attached as "text/plain".....................passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Attaching PDFs with a different filename" time="0.004">
+<system-out><![CDATA[
+When a PDF document is attached and renamed.................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Attaching URIs" time="0.004">
+<system-out><![CDATA[
+When a link to "https://cucumber.io" is attached............................passed
+]]></system-out>
+</testcase>
+<testcase classname="Attachments" name="Attaching during a failed step" time="0.004">
+<failure type="Error" message="whoops">
+<![CDATA[Error: whoops
+samples/attachments/attachments.feature:39]]>
+</failure>
+<system-out><![CDATA[
+When the string "hello" is attached as "application/octet-stream" before a failure..failed
+]]></system-out>
+</testcase>
+</testsuite>

@@ -214,9 +214,9 @@ to help you get started.
 
 ## Reports
 
-Write a run as Cucumber Messages with `CucumberMessagesReporter`, and
-turn it into the official Cucumber HTML report with
-`write_html_report()`. Steps and hooks attach screenshots and logs to
+Write the official Cucumber HTML report of a run with
+`CucumberHtmlReporter`, and its JUnit XML report with
+`CucumberJunitReporter`. Steps and hooks attach screenshots and logs to
 it, like those of a failing
 [shinytest2](https://rstudio.github.io/shinytest2/) scenario: see the
 [Reports

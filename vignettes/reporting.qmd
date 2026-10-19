@@ -10,27 +10,32 @@ knitr:
     comment: '#>'
 ---
 
-A run of `cucumber::test()` prints its progress to the console. To keep its results, write it as [Cucumber Messages](https://github.com/cucumber/messages) and turn them into a report: a page with every feature, scenario and step, and what the steps attached, like screenshots and logs.
+A run of `cucumber::test()` prints its progress to the console. To keep its results, write its report: a page with every feature, scenario and step, and what the steps attached, like screenshots and logs.
 
-# Write the messages of a run
+# The HTML report
 
-`CucumberMessagesReporter` writes each event of a run as one line of JSON. Combine it with a reporter that prints, to see the progress of the run too:
+`CucumberHtmlReporter` writes the official Cucumber HTML report when the run ends, even when it fails: one file that works offline, where features can be searched and filtered by status, text and tags. Combine it with a reporter that prints, to see the progress of the run too:
 
 ```r
 cucumber::test(
   reporter = cucumber::CucumberMultiReporter$new(list(
     cucumber::CucumberProgressReporter$new(),
-    cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
+    cucumber::CucumberHtmlReporter$new("cucumber-report.html")
   ))
 )
 ```
 
-# The HTML report
+`CucumberJunitReporter` writes the JUnit XML report the same way, for CI services to show the results of the run.
 
-`write_html_report()` writes the messages as the official Cucumber HTML report: one file that works offline, where features can be searched and filtered by status, text and tags.
+# Report a run after it ran
+
+A reporter gets the run as [Cucumber Messages](https://github.com/cucumber/messages). `CucumberMessagesReporter` stores them, one line of JSON each, and the `report()` method of any reporter reports the run from them later:
 
 ```r
-cucumber::write_html_report("cucumber.ndjson", "cucumber-report.html")
+cucumber::test(reporter = cucumber::CucumberMessagesReporter$new("cucumber.ndjson"))
+
+cucumber::CucumberHtmlReporter$new("cucumber-report.html")$report("cucumber.ndjson")
+cucumber::CucumberJunitReporter$new("cucumber-junit.xml")$report("cucumber.ndjson")
 ```
 
 # Attach screenshots and logs
@@ -69,7 +74,7 @@ An `after_step()` hook attaches the screenshot and the logs when a step fails, a
 
 The hook attaches them in `after_step()`, so they're attached to the step that failed and shown under it. Attachments of an `after()` hook are shown under the hook, which the report folds away when the hook passes.
 
-Run the scenarios, writing their messages, then write the report:
+Run the scenarios, showing their progress and writing the report:
 
 ```{embed, file = "../inst/examples/shinytest2_report/report.R"}
 ```
@@ -84,7 +89,7 @@ The report shows the failed step with its error, the screenshot of the app with 
 
 # Keep the report of a CI run
 
-In CI, write the report even when the run fails, and keep it as an artifact of the job. With GitHub Actions:
+In CI, keep the report as an artifact of the job, even when the run fails. With GitHub Actions:
 
 ```yaml
 - name: Run the scenarios
@@ -92,21 +97,19 @@ In CI, write the report even when the run fails, and keep it as an artifact of t
     cucumber::test(
       reporter = cucumber::CucumberMultiReporter$new(list(
         cucumber::CucumberProgressReporter$new(),
-        cucumber::CucumberMessagesReporter$new("cucumber.ndjson")
+        cucumber::CucumberHtmlReporter$new("cucumber-report.html"),
+        cucumber::CucumberJunitReporter$new("cucumber-junit.xml")
       ))
     )
-  shell: Rscript {0}
-
-- name: Write the report
-  if: always()
-  run: cucumber::write_html_report("cucumber.ndjson", "cucumber-report.html")
   shell: Rscript {0}
 
 - uses: actions/upload-artifact@v4
   if: always()
   with:
     name: cucumber-report
-    path: cucumber-report.html
+    path: |
+      cucumber-report.html
+      cucumber-junit.xml
 ```
 
 # Reports of your own

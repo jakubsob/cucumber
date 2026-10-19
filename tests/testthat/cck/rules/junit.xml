@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.031" tests="3" skipped="0" failures="0" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Usage of a `Rule`" name="A sale cannot happen if the customer does not have enough money - Not enough money" time="0.009">
+<system-out><![CDATA[
+Given the customer has 100 cents............................................passed
+And there are chocolate bars in stock.......................................passed
+When the customer tries to buy a 125 cent chocolate bar.....................passed
+Then the sale should not happen.............................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Usage of a `Rule`" name="A sale cannot happen if the customer does not have enough money - Enough money" time="0.009">
+<system-out><![CDATA[
+Given the customer has 100 cents............................................passed
+And there are chocolate bars in stock.......................................passed
+When the customer tries to buy a 75 cent chocolate bar......................passed
+Then the sale should happen.................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Usage of a `Rule`" name="a sale cannot happen if there is no stock - No chocolates left" time="0.009">
+<system-out><![CDATA[
+Given the customer has 100 cents............................................passed
+And there are no chocolate bars in stock....................................passed
+When the customer tries to buy a 1 cent chocolate bar.......................passed
+Then the sale should not happen.............................................passed
+]]></system-out>
+</testcase>
+</testsuite>

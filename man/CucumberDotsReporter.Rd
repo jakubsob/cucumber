@@ -4,8 +4,7 @@
 \alias{CucumberDotsReporter}
 \title{Dots Reporter for Cucumber}
 \description{
-Like the \code{progress} formatter of cucumber-js, it prints one character for
-each step and hook as it finishes, then the summary of
+Prints one character for each step and hook as it finishes, then the summary of
 \link{CucumberSummaryReporter}:
 \itemize{
 \item \code{.} passed (green)
@@ -29,8 +28,7 @@ Summary
 
 \subsection{Dots reporter}{
 
-Like the \code{progress} formatter of cucumber-js, \code{CucumberDotsReporter} prints one character
-for each step and hook as it finishes: \code{.} passed, \code{F} failed, \code{-} skipped, \code{P} pending,
+\code{CucumberDotsReporter} prints one character for each step and hook as it finishes: \code{.} passed, \code{F} failed, \code{-} skipped, \code{P} pending,
 \code{U} undefined and \code{A} ambiguous. At the end it prints the summary of the run with the
 scenarios that didn't pass.
 
@@ -119,6 +117,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberDotsReporter$new
 \if{html}{\out{
 <details><summary>Inherited methods</summary>
 <ul>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_warning'><code>cucumber::CucumberSummaryReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>

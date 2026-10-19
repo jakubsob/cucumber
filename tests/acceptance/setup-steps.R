@@ -277,42 +277,54 @@ then("the output doesn't include {string}", function(text, context) {
   expect_false(grepl(text, output, fixed = TRUE), info = output)
 })
 
-# Runs the package's features and writes their report with write_<format>_report()
-when("I write the {word} report", function(format, context) {
-  run_code(
-    paste0(
-      'test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)\n',
-      "write_", format, '_report("messages.ndjson", "report.html")'
-    ),
-    context
+# The test cases of a JUnit report: their class name, name, result (passed,
+# failure or skipped) and the message of a failure
+junit_test_cases <- function(file, context) {
+  xml <- xml2::read_xml(fs::path(context$tempdir, file))
+  cases <- xml2::xml_find_all(xml, "//testcase")
+  outcome <- lapply(cases, \(case) xml2::xml_find_first(case, "failure|skipped"))
+  tibble::tibble(
+    classname = xml2::xml_attr(cases, "classname"),
+    name = xml2::xml_attr(cases, "name"),
+    result = vapply(outcome, \(node) if (inherits(node, "xml_missing")) "passed" else xml2::xml_name(node), character(1)),
+    message = vapply(outcome, \(node) rlang::`%|%`(xml2::xml_attr(node, "message"), ""), character(1)),
+    output = xml2::xml_text(xml2::xml_find_first(cases, "system-out"))
   )
-  context$report_format <- format
+}
+
+then("the JUnit report {string} has these test cases:", function(file, expected, context) {
+  actual <- junit_test_cases(file, context)
+  actual$message <- sub("\n.*", "", actual$message)
+  expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
 })
 
-# How each report shows a step: its text, its status and its error, as a list
-# of [step, status, error]. The official report renders its steps with
+then("the output of the test case {string} in the JUnit report {string} is", function(name, file, output, context) {
+  cases <- junit_test_cases(file, context)
+  expect_equal(trimws(cases$output[cases$name == name]), output)
+})
+
+# How the HTML report shows a step: its text, its status and its error, as a
+# list of [step, status, error]. The official report renders its steps with
 # JavaScript, so the report is read as a browser shows it. It collapses
 # features whose scenarios passed, so they're opened first, as a reader would,
 # and the steps are read once none is collapsed.
-REPORT_STEPS_JS <- c(
-  html = "(() => {
-    const collapsed = document.querySelectorAll('button[aria-expanded=false]');
-    collapsed.forEach(button => button.click());
-    if (collapsed.length > 0) return [];
-    return [...document.querySelectorAll('li[data-status]')].map(li => [
-      li.querySelector('h3').textContent,
-      li.dataset.status.toLowerCase(),
-      li.querySelector('pre')?.textContent ?? ''
-    ]);
-  })()"
-)
+REPORT_STEPS_JS <- "(() => {
+  const collapsed = document.querySelectorAll('button[aria-expanded=false]');
+  collapsed.forEach(button => button.click());
+  if (collapsed.length > 0) return [];
+  return [...document.querySelectorAll('li[data-status]')].map(li => [
+    li.querySelector('h3').textContent,
+    li.dataset.status.toLowerCase(),
+    li.querySelector('pre')?.textContent ?? ''
+  ]);
+})()"
 
 # What the HTML report shows, as a browser shows it: `js` returns a list of
 # what it reads, or an empty one until the report is rendered and open
-read_report <- function(context, js) {
+read_report <- function(file, js, context) {
   session <- chromote::ChromoteSession$new()
   on.exit(session$close())
-  session$go_to(paste0("file://", fs::path(context$tempdir, "report.html")))
+  session$go_to(paste0("file://", fs::path(context$tempdir, file)))
   js <- paste0("JSON.stringify(", js, ")")
   read <- function() {
     shown <- jsonlite::fromJSON(session$Runtime$evaluate(js, returnByValue = TRUE)$result$value, simplifyVector = FALSE)
@@ -327,8 +339,8 @@ read_report <- function(context, js) {
 }
 
 # Each step the report shows, with its status and the first line of its error
-then("the report shows these steps:", function(expected, context) {
-  steps <- read_report(context, REPORT_STEPS_JS[[context$report_format]])
+then("the HTML report {string} shows these steps:", function(file, expected, context) {
+  steps <- read_report(file, REPORT_STEPS_JS, context)
   shown <- tibble::tibble(
     step = trimws(gsub("\\s+", " ", vapply(steps, `[[`, character(1), 1))),
     status = vapply(steps, `[[`, character(1), 2),
@@ -355,14 +367,18 @@ REPORT_ATTACHMENTS_JS <- "(() => {
   );
 })()"
 
-then("the report shows these attachments:", function(expected, context) {
-  attachments <- read_report(context, REPORT_ATTACHMENTS_JS)
+then("the HTML report {string} shows these attachments:", function(file, expected, context) {
+  attachments <- read_report(file, REPORT_ATTACHMENTS_JS, context)
   shown <- tibble::tibble(
     step = trimws(gsub("\\s+", " ", vapply(attachments, `[[`, character(1), 1))),
     kind = vapply(attachments, `[[`, character(1), 2),
     content = vapply(attachments, \(attachment) sub("\n.*", "", attachment[[3]]), character(1))
   )
   expect_equal(as.data.frame(shown[names(expected)]), as.data.frame(expected))
+})
+
+then("there is no file {string}", function(file, context) {
+  expect_false(fs::file_exists(fs::path(context$tempdir, file)))
 })
 
 after(function(context, scenario_name) {

@@ -1,7 +1,6 @@
 @rd
 Feature: Dots reporter
-  Like the `progress` formatter of cucumber-js, `CucumberDotsReporter` prints one character
-  for each step and hook as it finishes: `.` passed, `F` failed, `-` skipped, `P` pending,
+  `CucumberDotsReporter` prints one character for each step and hook as it finishes: `.` passed, `F` failed, `-` skipped, `P` pending,
   `U` undefined and `A` ambiguous. At the end it prints the summary of the run with the
   scenarios that didn't pass.
 

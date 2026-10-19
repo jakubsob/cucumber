@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.021" tests="3" skipped="0" failures="2" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Hooks - Conditional execution" name="A failure in the before hook and a skipped step" time="0.005">
+<failure type="Error" message="Exception in conditional hook">
+<![CDATA[Error: Exception in conditional hook
+samples/hooks-conditional/hooks-conditional.feature:7]]>
+</failure>
+<system-out><![CDATA[
+When a step passes..........................................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Hooks - Conditional execution" name="A failure in the after hook and a passed step" time="0.005">
+<failure type="Error" message="Exception in conditional hook">
+<![CDATA[Error: Exception in conditional hook
+samples/hooks-conditional/hooks-conditional.feature:11]]>
+</failure>
+<system-out><![CDATA[
+When a step passes..........................................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Hooks - Conditional execution" name="With an tag, a passed step and hook" time="0.007">
+<system-out><![CDATA[
+When a step passes..........................................................passed
+]]></system-out>
+</testcase>
+</testsuite>
