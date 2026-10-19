@@ -163,28 +163,6 @@ The following parameter types are available by default:
 
 See `cucumber::define_parameter_type()` how to define your own parameter types.
 
-## Supported Gherkin syntax:
-
-- [x] Feature
-- [x] Scenario
-- [x] Example
-- [x] Given
-- [x] When
-- [x] Then
-- [x] And
-- [x] But
-- [x] *
-- [x] Background
-- [x] Scenario Outline (or Scenario Template)
-- [x] Examples (or Scenarios)
-- [x] Rule
-- [x] `"""` (Doc Strings)
-- [x] `|` (Data Tables)
-- [x] `@` (Tags)
-- [x] `#` (Comments)
-- [x] Free-format text
-- [x] Localization (`# language:`)
-
 ## Installation
 
 To install the stable version from CRAN:
