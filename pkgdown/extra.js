@@ -23,7 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if ((m = l.match(step))) return m[1] + span("gk-step", m[2]) + inline(l.slice(m[1].length + m[2].length));
     return inline(l);
   };
-  document.querySelectorAll("pre.gherkin > code").forEach(function (code) {
+  // knitr embeds a .feature file as a "feature" block
+  document.querySelectorAll("pre.gherkin > code, pre.feature > code").forEach(function (code) {
     code.innerHTML = code.textContent.split("\n").map(line).join("\n");
   });
 });

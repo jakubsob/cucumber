@@ -237,7 +237,8 @@ html:root pre code span {
 }
 
 // Gherkin, tokenised by extra.js like the pretty reporter
-pre.gherkin {
+pre.gherkin,
+pre.feature {
   .gk-feature { color: var(--rl-ink); font-weight: 700; }
   .gk-step { color: var(--rl-passed); font-weight: 700; }
   .gk-tag, .gk-string { color: var(--rl-skipped); }
