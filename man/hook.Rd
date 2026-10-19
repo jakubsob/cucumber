@@ -40,49 +40,539 @@ The hook runs only for scenarios that match it. If \code{NULL}, it runs for ever
 \item{name}{A name for the hook, shown in its error messages, e.g. \verb{Hook "Connect to the database" failed: ...}.}
 }
 \description{
-Hooks are blocks of code that can run at various points in the Cucumber execution cycle. They are typically used for setup and teardown of the environment before and after each scenario.
-
-Where a hook is defined has no impact on what scenarios it is run for.
-
-You can define any number of hooks of each kind. Before hooks run in the order they are defined, after hooks in the reverse order.
-}
-\section{Before}{
-
-
-Whatever happens in a \code{before} hook is invisible to people who only read the features.
-You should consider using a background as a more explicit alternative, especially if the setup should be readable by non-technical people.
-Only use a \code{before} hook for low-level logic such as starting a browser or deleting data from a database.
-
-If a \code{before} hook fails, the rest of the \code{before} hooks and all the scenario's steps are skipped, and the scenario fails.
-
-If a \code{before} hook calls \code{\link[=skip_scenario]{skip_scenario()}}, the rest of the \code{before} hooks and all the scenario's steps are skipped,
-and the scenario is skipped. \code{after} hooks still run and get \code{"skipped"} as the scenario's \code{status}.
-}
-
-\section{After}{
-
-
-After hooks run after the last step of each scenario, even when the scenario failed or thrown an error.
-A failing \code{after} hook fails the scenario.
-If an \code{after} hook calls \code{\link[=skip_scenario]{skip_scenario()}}, that hook is skipped, the next \code{after} hooks still run,
-and the scenario is skipped if it didn't fail.
-}
-
-\section{Step hooks}{
-
-
-\code{before_step()} and \code{after_step()} hooks run before and after each step that runs.
-They don't run for skipped, undefined or ambiguous steps.
-If a step hook fails, the step fails.
-}
-
-\section{Before all and after all}{
-
-
-\code{before_all()} hooks run once before the first scenario, \code{after_all()} hooks once after the last one,
-even when the run failed.
-
+Hooks run code at points of a run, typically for setup and teardown: \code{before()} and \code{after()}
+each scenario, \code{before_step()} and \code{after_step()} each step, \code{before_all()} and \code{after_all()}
+the whole run. A \code{before()} or \code{after()} hook can skip the scenario with \code{\link[=skip_scenario]{skip_scenario()}}.
 Hooks don't run in a dry run.
+}
+\section{Specification}{
+
+\subsection{Hooks}{
+
+\code{before()} and \code{after()} run code before and after each scenario, like opening and closing a connection.
+Define as many as you need: before hooks run in the order they are defined,
+after hooks in the reverse order. Where a hook is defined has no impact on what scenarios it runs for.
+Give a hook a \code{name} to find it in error messages.
+A failing before hook skips the scenario's steps and fails it. After hooks run even when the scenario failed,
+and a failing after hook fails it.
+
+What a before hook does is invisible to people who only read the features. For setup they should read,
+use a Background instead, and keep before hooks for low-level work like starting a browser or emptying a database.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Before hooks run in definition order and after hooks in reverse order
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) cat("before 1\\n"))
+    before(function(context, scenario) cat("before 2\\n"))
+    after(function(context, scenario) cat("after 1\\n"))
+    after(function(context, scenario) cat("after 2\\n"))
+    given("an empty basket", function(context) cat("step\\n"))
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it has 0 errors
+  And the output includes
+    """
+    before 1
+    before 2
+    step
+    after 2
+    after 1
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Before hooks run in definition order and after hooks in reverse order
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) cat("before 1\\n"))
+    before(function(context, scenario) cat("before 2\\n"))
+    after(function(context, scenario) cat("after 1\\n"))
+    after(function(context, scenario) cat("after 2\\n"))
+    given("an empty basket", function(context) cat("step\\n"))
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it has 0 errors
+  And the output includes
+    """
+    before 1
+    before 2
+    step
+    after 2
+    after 1
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks get the scenario, and after hooks get its result
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      @smoke
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      cat("before:", scenario$name, scenario$tags, basename(scenario$uri), "\\n")
+    \})
+    after(function(context, scenario) \{
+      cat("after:", scenario$status, conditionMessage(scenario$error), "\\n")
+    \})
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) stop("basket is full"))
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the output includes
+    """
+    before: Add an item @smoke basket.feature
+    """
+  And the output includes
+    """
+    after: failed Step "I add an item" failed
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Hooks get the scenario, and after hooks get its result
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      @smoke
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      cat("before:", scenario$name, scenario$tags, basename(scenario$uri), "\\n")
+    \})
+    after(function(context, scenario) \{
+      cat("after:", scenario$status, conditionMessage(scenario$error), "\\n")
+    \})
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) stop("basket is full"))
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the output includes
+    """
+    before: Add an item @smoke basket.feature
+    """
+  And the output includes
+    """
+    after: failed Step "I add an item" failed
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A named hook's errors start with its name
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Save the basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) stop("connection refused"), name = "Connect to the database")
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A named hook's errors start with its name
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Save the basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) stop("connection refused"), name = "Connect to the database")
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A failing before hook skips the steps and fails the scenario
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      stop("no database")
+    \})
+    given("an empty basket", function(context) \{
+      stop("this step must not execute")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes "no database"
+  And the steps and hooks have these results:
+    | step                  | status  |
+    | Before                | failed  |
+    | Given an empty basket | skipped |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A failing before hook skips the steps and fails the scenario
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      stop("no database")
+    \})
+    given("an empty basket", function(context) \{
+      stop("this step must not execute")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes "no database"
+  And the steps and hooks have these results:
+    | step                  | status  |
+    | Before                | failed  |
+    | Given an empty basket | skipped |
+}}
+
+Source: \code{tests/acceptance/hooks.feature}
+}
+
+\subsection{Tagged hooks}{
+
+A hook with \code{tags} runs only for the scenarios that match its tag expression,
+like \code{before(connect, tags = "@db")}.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Tagged hooks run only for scenarios that match the tag expression
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      @db
+      Scenario: Save the basket
+        Given an empty basket
+<span></span>
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) cat("connect for", scenario$name, "\\n"), tags = "@db")
+    after(function(context, scenario) cat("disconnect for", scenario$name, "\\n"), tags = "@db")
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it has 0 errors
+  And the output includes "connect for Save the basket"
+  And the output includes "disconnect for Save the basket"
+  And the output doesn't include "connect for Add an item"
+  And the output doesn't include "disconnect for Add an item"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Tagged hooks run only for scenarios that match the tag expression
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      @db
+      Scenario: Save the basket
+        Given an empty basket
+
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) cat("connect for", scenario$name, "\\n"), tags = "@db")
+    after(function(context, scenario) cat("disconnect for", scenario$name, "\\n"), tags = "@db")
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it has 0 errors
+  And the output includes "connect for Save the basket"
+  And the output includes "disconnect for Save the basket"
+  And the output doesn't include "connect for Add an item"
+  And the output doesn't include "disconnect for Add an item"
+}}
+
+Source: \code{tests/acceptance/tagged_hooks.feature}
+}
+
+\subsection{Step hooks}{
+
+\code{before_step()} and \code{after_step()} run code before and after each step.
+They get the step, and after step hooks also get its result.
+They don't run for skipped, undefined or ambiguous steps. A failing step hook fails the step.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Step hooks run around each step and after step hooks get its result
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+        Then the basket has 1 item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before_step(function(context, step) cat("before:", step$keyword, step$text, "\\n"))
+    after_step(function(context, step) cat("after:", step$text, step$status, "\\n"))
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) stop("basket is full"))
+    then("the basket has \{int\} item", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the output includes
+    """
+    before: Given an empty basket
+    after: an empty basket passed
+    before: When I add an item
+    after: I add an item failed
+    """
+  And the steps have these results:
+    | step                       | status  |
+    | Given an empty basket      | passed  |
+    | When I add an item         | failed  |
+    | Then the basket has 1 item | skipped |
+  And the output doesn't include "before: Then the basket has 1 item"
+  And the output doesn't include "after: the basket has 1 item"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Step hooks run around each step and after step hooks get its result
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+        Then the basket has 1 item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before_step(function(context, step) cat("before:", step$keyword, step$text, "\\n"))
+    after_step(function(context, step) cat("after:", step$text, step$status, "\\n"))
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) stop("basket is full"))
+    then("the basket has \{int\} item", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the output includes
+    """
+    before: Given an empty basket
+    after: an empty basket passed
+    before: When I add an item
+    after: I add an item failed
+    """
+  And the steps have these results:
+    | step                       | status  |
+    | Given an empty basket      | passed  |
+    | When I add an item         | failed  |
+    | Then the basket has 1 item | skipped |
+  And the output doesn't include "before: Then the basket has 1 item"
+  And the output doesn't include "after: the basket has 1 item"
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A failing step hook fails the step
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    after_step(function(context, step) stop("step left a mess"))
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) stop("this step must not execute"))
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the error message includes "step left a mess"
+  And the steps have these results:
+    | step                  | status  |
+    | Given an empty basket | failed  |
+    | When I add an item    | skipped |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A failing step hook fails the step
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    after_step(function(context, step) stop("step left a mess"))
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) stop("this step must not execute"))
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the error message includes "step left a mess"
+  And the steps have these results:
+    | step                  | status  |
+    | Given an empty basket | failed  |
+    | When I add an item    | skipped |
+}}
+
+Source: \code{tests/acceptance/before_after_step_hooks.feature}
+}
+
+\subsection{Before all and after all hooks}{
+
+\code{before_all()} and \code{after_all()} run code once, before the first scenario and after the last one,
+like starting and stopping a server. They take no arguments, or a \code{context} to attach data to the report,
+which isn't shared with the scenarios.
+A failing \code{before_all()} hook stops the run before any scenario, after the other \code{before_all()} hooks ran.
+\code{after_all()} hooks run even when the run failed, and a failing one fails the run.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Before all and after all hooks run once for the whole run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+<span></span>
+      Scenario: Remove an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before_all(function() cat("start the server\\n"))
+    after_all(function() cat("stop the server\\n"))
+    before(function(context, scenario) cat("scenario\\n"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And the output includes "start the server" once
+  And the output includes "stop the server" once
+  And the output includes these lines in order:
+    """
+    start the server
+    scenario
+    scenario
+    stop the server
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Before all and after all hooks run once for the whole run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+
+      Scenario: Remove an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before_all(function() cat("start the server\\n"))
+    after_all(function() cat("stop the server\\n"))
+    before(function(context, scenario) cat("scenario\\n"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And the output includes "start the server" once
+  And the output includes "stop the server" once
+  And the output includes these lines in order:
+    """
+    start the server
+    scenario
+    scenario
+    stop the server
+    """
+}}
+
+Source: \code{tests/acceptance/before_after_all_hooks.feature}
+}
 }
 
 \examples{
@@ -114,10 +604,6 @@ before(function(context, scenario) {
 before(function(context, scenario) {
   if (!nzchar(Sys.getenv("API_KEY"))) skip_scenario("API_KEY is not set")
 }, tags = "@api")
-
-after_step(function(context, step) {
-  message(step$text, ": ", step$status)
-})
 
 before_all(function() {
   options(warn = 2)

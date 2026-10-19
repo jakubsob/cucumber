@@ -83,11 +83,10 @@ name_hook <- function(hook, name) {
 #'
 #' @description
 #'
-#' Hooks are blocks of code that can run at various points in the Cucumber execution cycle. They are typically used for setup and teardown of the environment before and after each scenario.
-#'
-#' Where a hook is defined has no impact on what scenarios it is run for.
-#'
-#' You can define any number of hooks of each kind. Before hooks run in the order they are defined, after hooks in the reverse order.
+#' Hooks run code at points of a run, typically for setup and teardown: `before()` and `after()`
+#' each scenario, `before_step()` and `after_step()` each step, `before_all()` and `after_all()`
+#' the whole run. A `before()` or `after()` hook can skip the scenario with [skip_scenario()].
+#' Hooks don't run in a dry run.
 #'
 #' @param hook A function that will be run.
 #'
@@ -104,36 +103,12 @@ name_hook <- function(hook, name) {
 #'
 #' @param name A name for the hook, shown in its error messages, e.g. `Hook "Connect to the database" failed: ...`.
 #'
-#' @section Before:
-#'
-#' Whatever happens in a `before` hook is invisible to people who only read the features.
-#' You should consider using a background as a more explicit alternative, especially if the setup should be readable by non-technical people.
-#' Only use a `before` hook for low-level logic such as starting a browser or deleting data from a database.
-#'
-#' If a `before` hook fails, the rest of the `before` hooks and all the scenario's steps are skipped, and the scenario fails.
-#'
-#' If a `before` hook calls [skip_scenario()], the rest of the `before` hooks and all the scenario's steps are skipped,
-#' and the scenario is skipped. `after` hooks still run and get `"skipped"` as the scenario's `status`.
-#'
-#' @section After:
-#'
-#' After hooks run after the last step of each scenario, even when the scenario failed or thrown an error.
-#' A failing `after` hook fails the scenario.
-#' If an `after` hook calls [skip_scenario()], that hook is skipped, the next `after` hooks still run,
-#' and the scenario is skipped if it didn't fail.
-#'
-#' @section Step hooks:
-#'
-#' `before_step()` and `after_step()` hooks run before and after each step that runs.
-#' They don't run for skipped, undefined or ambiguous steps.
-#' If a step hook fails, the step fails.
-#'
-#' @section Before all and after all:
-#'
-#' `before_all()` hooks run once before the first scenario, `after_all()` hooks once after the last one,
-#' even when the run failed.
-#'
-#' Hooks don't run in a dry run.
+#' @eval features_rd(features = c(
+#'   "hooks.feature",
+#'   "tagged_hooks.feature",
+#'   "before_after_step_hooks.feature",
+#'   "before_after_all_hooks.feature"
+#' ))
 #'
 #' @examples
 #' \dontrun{
@@ -164,10 +139,6 @@ name_hook <- function(hook, name) {
 #' before(function(context, scenario) {
 #'   if (!nzchar(Sys.getenv("API_KEY"))) skip_scenario("API_KEY is not set")
 #' }, tags = "@api")
-#'
-#' after_step(function(context, step) {
-#'   message(step$text, ": ", step$status)
-#' })
 #'
 #' before_all(function() {
 #'   options(warn = 2)

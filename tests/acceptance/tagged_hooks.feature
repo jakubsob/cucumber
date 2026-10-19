@@ -5,6 +5,7 @@ Feature: Tagged hooks
   Background:
     Given a package
 
+  @rd
   Scenario: Tagged hooks run only for scenarios that match the tag expression
     Given a file named "features/basket.feature" with
       """

@@ -1,11 +1,18 @@
 Feature: Hooks
   `before()` and `after()` run code before and after each scenario, like opening and closing a connection.
   Define as many as you need: before hooks run in the order they are defined,
-  after hooks in the reverse order. Give a hook a `name` to find it in error messages.
+  after hooks in the reverse order. Where a hook is defined has no impact on what scenarios it runs for.
+  Give a hook a `name` to find it in error messages.
+  A failing before hook skips the scenario's steps and fails it. After hooks run even when the scenario failed,
+  and a failing after hook fails it.
+
+  What a before hook does is invisible to people who only read the features. For setup they should read,
+  use a Background instead, and keep before hooks for low-level work like starting a browser or emptying a database.
 
   Background:
     Given a package
 
+  @rd
   Scenario: Before hooks run in definition order and after hooks in reverse order
     Given a file named "features/basket.feature" with
       """
@@ -35,6 +42,7 @@ Feature: Hooks
       after 1
       """
 
+  @rd
   Scenario: Hooks get the scenario, and after hooks get its result
     Given a file named "features/basket.feature" with
       """
@@ -69,6 +77,7 @@ Feature: Hooks
       after: failed Step "I add an item" failed
       """
 
+  @rd
   Scenario: A named hook's errors start with its name
     Given a file named "features/basket.feature" with
       """
@@ -88,6 +97,7 @@ Feature: Hooks
     Then it has 1 failed
     And the error message includes "Hook \"Connect to the database\" failed: connection refused"
 
+  @rd
   Scenario: A failing before hook skips the steps and fails the scenario
     Given a file named "features/basket.feature" with
       """

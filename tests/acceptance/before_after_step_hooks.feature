@@ -1,10 +1,12 @@
 Feature: Step hooks
   `before_step()` and `after_step()` run code before and after each step.
   They get the step, and after step hooks also get its result.
+  They don't run for skipped, undefined or ambiguous steps. A failing step hook fails the step.
 
   Background:
     Given a package
 
+  @rd
   Scenario: Step hooks run around each step and after step hooks get its result
     Given a file named "features/basket.feature" with
       """
@@ -42,6 +44,7 @@ Feature: Step hooks
     And the output doesn't include "before: Then the basket has 1 item"
     And the output doesn't include "after: the basket has 1 item"
 
+  @rd
   Scenario: A failing step hook fails the step
     Given a file named "features/basket.feature" with
       """

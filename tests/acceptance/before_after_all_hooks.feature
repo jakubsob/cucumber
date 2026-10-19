@@ -1,12 +1,14 @@
 Feature: Before all and after all hooks
   `before_all()` and `after_all()` run code once, before the first scenario and after the last one,
-  like starting and stopping a server.
+  like starting and stopping a server. They take no arguments, or a `context` to attach data to the report,
+  which isn't shared with the scenarios.
   A failing `before_all()` hook stops the run before any scenario, after the other `before_all()` hooks ran.
   `after_all()` hooks run even when the run failed, and a failing one fails the run.
 
   Background:
     Given a package
 
+  @rd
   Scenario: Before all and after all hooks run once for the whole run
     Given a file named "features/basket.feature" with
       """
