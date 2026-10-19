@@ -76,6 +76,23 @@ Feature: Progress reporter
       4 scenarios (1 failed, 1 undefined, 2 passed)
       """
 
+  Scenario: A warning is printed as it's raised
+    Given a file named "features/setup-hooks.R" with
+      """
+      before(function(context, scenario) {
+        if (scenario$name == "Add an item") warning("The shop is busy")
+      })
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then the output includes
+      """
+      Warning:
+      The shop is busy
+      """
+
   Scenario: The error that stopped the run is printed
     Given a file named "features/setup-steps.R" with
       """

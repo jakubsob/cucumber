@@ -1,7 +1,7 @@
 @rd
 Feature: Pretty reporter
   `CucumberPrettyReporter` prints each step as it runs, with its Doc String or Data Table
-  and the warnings it raised, and the error of a hook that failed where the hook runs. Long Doc Strings and Data Tables can be cut short
+  and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
   with `reporter_max_docstring_lines` and `reporter_max_table_lines`.
 
   Background:
@@ -51,6 +51,30 @@ Feature: Pretty reporter
       Error:
       The shop is closed
       - Given an empty basket
+      """
+
+  Scenario: A hook's warning is printed where the hook runs
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) warning("The shop is busy"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes these lines in order:
+      """
+      Scenario: Add an item
+      Warning:
+      The shop is busy
+      v Given an empty basket
       """
 
   Scenario: Long Doc Strings and Data Tables are cut short

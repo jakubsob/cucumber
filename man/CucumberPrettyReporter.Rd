@@ -52,7 +52,7 @@ To report a run your way, extend \link{CucumberReporter}.
 \subsection{Pretty reporter}{
 
 \code{CucumberPrettyReporter} prints each step as it runs, with its Doc String or Data Table
-and the warnings it raised, and the error of a hook that failed where the hook runs. Long Doc Strings and Data Tables can be cut short
+and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
 with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 
 \if{html}{\out{<pre class="gherkin"><code>Background:
@@ -150,6 +150,54 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Error:
     The shop is closed
     - Given an empty basket
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A hook's warning is printed where the hook runs
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) warning("The shop is busy"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes these lines in order:
+    """
+    Scenario: Add an item
+    Warning:
+    The shop is busy
+    v Given an empty basket
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A hook's warning is printed where the hook runs
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) warning("The shop is busy"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes these lines in order:
+    """
+    Scenario: Add an item
+    Warning:
+    The shop is busy
+    v Given an empty basket
     """
 }}
 

@@ -183,6 +183,40 @@ it finishes, and again in the summary at the end.
     """
 }}
 
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A warning is printed as it's raised
+  Given a file named "features/setup-hooks.R" with
+    """
+    before(function(context, scenario) \{
+      if (scenario$name == "Add an item") warning("The shop is busy")
+    \})
+    """
+  When I run it and it fails
+    """
+    test("features")
+    """
+  Then the output includes
+    """
+    Warning:
+    The shop is busy
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A warning is printed as it's raised
+  Given a file named "features/setup-hooks.R" with
+    """
+    before(function(context, scenario) \{
+      if (scenario$name == "Add an item") warning("The shop is busy")
+    \})
+    """
+  When I run it and it fails
+    """
+    test("features")
+    """
+  Then the output includes
+    """
+    Warning:
+    The shop is busy
+    """
+}}
+
 \if{html}{\out{<pre class="gherkin"><code>Scenario: The error that stopped the run is printed
   Given a file named "features/setup-steps.R" with
     """
