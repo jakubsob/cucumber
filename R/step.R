@@ -1,27 +1,25 @@
 #' @keywords internal
 #' @importFrom rlang exec
 #' @importFrom checkmate assert_string assert_function
-make_step <- function() {
-  function(description, implementation) {
-    assert_string(description)
-    assert_function(implementation)
-    args <- names(formals(implementation))
-    if (!identical(args[length(args)], "context")) {
-      suggested <- paste(c(setdiff(args, "context"), "context"), collapse = ", ")
-      abort(
-        message = "A step definition must have `context` as its last argument.",
-        body = c(i = glue("Use `function({suggested})`."))
-      )
-    }
-    step <- structure(
-      implementation,
-      description = description,
-      order = next_registration(),
-      class = c("step", class(implementation))
+define_step <- function(description, implementation) {
+  assert_string(description)
+  assert_function(implementation)
+  args <- names(formals(implementation))
+  if (!identical(args[length(args)], "context")) {
+    suggested <- paste(c(setdiff(args, "context"), "context"), collapse = ", ")
+    abort(
+      message = "A step definition must have `context` as its last argument.",
+      body = c(i = glue("Use `function({suggested})`."))
     )
-    register_step(step)
-    invisible(step)
   }
+  step <- structure(
+    implementation,
+    description = description,
+    order = next_registration(),
+    class = c("step", class(implementation))
+  )
+  register_step(step)
+  invisible(step)
 }
 
 #' Define a step
@@ -155,15 +153,15 @@ NULL
 
 #' @rdname step
 #' @export
-given <- make_step()
+given <- define_step
 
 #' @rdname step
 #' @export
-when <- make_step()
+when <- define_step
 
 #' @rdname step
 #' @export
-then <- make_step()
+then <- define_step
 
 #' @importFrom rlang list2
 .steps <- function(...) {
