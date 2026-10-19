@@ -1,3 +1,4 @@
+# nocov start
 # Updates the samples of the Cucumber Compatibility Kit
 # (https://github.com/cucumber/compatibility-kit) in tests/testthat/cck. It's
 # internal, call it from the package root:
@@ -119,3 +120,4 @@ update_cck <- function(ref = "main", pkg = ".") {
 
   testthat::test_local(pkg, filter = "cck")
 }
+# nocov end

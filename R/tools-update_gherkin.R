@@ -1,3 +1,4 @@
+# nocov start
 # Updates the parts of the Gherkin parser that come from the official one:
 # R/gherkin_states.R, its state machine, R/sysdata.rda, the keywords of every
 # language, and tests/testthat/gherkin, its test data. It's internal, call it from the package root:
@@ -431,3 +432,4 @@ write_states <- function(parser, commit, out) {
     out
   )
 }
+# nocov end

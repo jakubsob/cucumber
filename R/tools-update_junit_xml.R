@@ -1,3 +1,4 @@
+# nocov start
 # Updates the JUnit XML each sample of the Cucumber Compatibility Kit, in
 # tests/testthat/cck, must be reported as: the test data of the official
 # JUnit XML formatter (https://github.com/cucumber/junit-xml-formatter),
@@ -48,3 +49,4 @@ update_junit_xml <- function(ref = "main", pkg = ".") {
 
   testthat::test_local(pkg, filter = "reporter-junit")
 }
+# nocov end

@@ -1,3 +1,4 @@
+# nocov start
 # Updates the official Cucumber HTML report
 # (https://github.com/cucumber/html-formatter) in inst/html-formatter, which
 # CucumberHtmlReporter fills with the messages of a run. It's internal, call it
@@ -55,3 +56,4 @@ update_html_formatter <- function(version = "latest", pkg = ".") {
   )
   invisible(manifest$version)
 }
+# nocov end
