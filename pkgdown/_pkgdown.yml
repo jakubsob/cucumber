@@ -60,6 +60,7 @@ reference:
       - pending
       - skip_scenario
       - attachments
+      - define_parameter_type
   - title: Run tests
     contents:
       - test
@@ -76,13 +77,12 @@ reference:
       - CucumberHtmlReporter
       - CucumberJunitReporter
       - CucumberMultiReporter
-  - title: Reports
-    contents:
-      - read_messages
   - title: Documentation
     contents:
       - features_rd
-  - title: Optional
+  - title: Options
     contents:
-      - define_parameter_type
       - opts
+  - title: Custom reports
+    contents:
+      - read_messages
