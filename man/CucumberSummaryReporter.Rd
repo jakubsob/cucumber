@@ -41,7 +41,7 @@ Feature: Basket
       Scenario: Add an item
         Given an empty basket
         When I add 1 item
-
+<span></span>
       Scenario: Remove an item
         Given an empty basket
         When I remove 1 item
@@ -65,7 +65,7 @@ Feature: Basket
   And the output includes
     """
     Failures
-
+<span></span>
     Feature: Basket
     Scenario: Remove an item
     v Given an empty basket

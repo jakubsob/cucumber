@@ -35,7 +35,7 @@ as it finishes. The bar is drawn only in a terminal that can redraw a line.
       Scenario: Remove an item
         Given an empty basket
         When I remove 1 item
-
+<span></span>
       Scenario: Add an item
         Given an empty basket
         When I add 1 item

@@ -79,25 +79,25 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
     Feature: Basket
       A basket holds the items a customer wants to buy.
-
+<span></span>
       Background:
         Given an empty basket
-
+<span></span>
       @rd
       Scenario: Add an item
         When I add 1 item
         Then the basket has 1 item
-
+<span></span>
       @example
       Scenario: Remove an item from an empty basket
         When I remove 1 item
         Then the basket is empty
-
+<span></span>
       @rd
       Scenario Outline: Add items
         When I add &lt;n&gt; items
         Then the basket has &lt;n&gt; items
-
+<span></span>
         Examples:
           | n |
           | 2 |
@@ -150,27 +150,27 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
   Then the help page "add" includes
     """
     Specification:
-
+<span></span>
     Basket:
-
+<span></span>
     A basket holds the items a customer wants to buy.
-
+<span></span>
     Background:
       Given an empty basket
-
+<span></span>
     Scenario: Add an item
       When I add 1 item
       Then the basket has 1 item
-
+<span></span>
     Scenario Outline: Add items
       When I add &lt;n&gt; items
       Then the basket has &lt;n&gt; items
-
+<span></span>
       Examples:
         | n |
         | 2 |
         | 3 |
-
+<span></span>
     Source: 'tests/acceptance/basket.feature'
     """
   And the help page "add" doesn't include "Remove an item"
@@ -219,7 +219,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: The scenarios are in the pkgdown reference page
   They're Gherkin code blocks, like those of a Markdown page.
-
+<span></span>
   Given a file named "DESCRIPTION" with
     """
     Package: example
@@ -281,6 +281,94 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
 }}
 
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The blank lines of a scenario are kept in the pkgdown reference page
+  Given a file named "DESCRIPTION" with
+    """
+    Package: example
+    Version: 0.1.0
+    Title: Example
+    Description: An example.
+    License: MIT
+    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+    Encoding: UTF-8
+    """
+  And a file named "tests/acceptance/checkout.feature" with
+    """
+    Feature: Checkout
+      @rd
+      Scenario: Pay for the basket
+        The customer pays for every item in the basket.
+<span></span>
+        Given a basket with 2 items
+        When I pay
+        Then the basket is empty
+    """
+  And a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(features = "checkout.feature")
+    #' @export
+    add &lt;- function(basket, n) basket + n
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    pkgdown::build_reference(".", topics = "add", preview = FALSE)
+    """
+  Then the reference page "add" has the Gherkin block
+    """
+    Scenario: Pay for the basket
+      The customer pays for every item in the basket.
+<span></span>
+      Given a basket with 2 items
+      When I pay
+      Then the basket is empty
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The blank lines of a scenario are kept in the pkgdown reference page
+  Given a file named "DESCRIPTION" with
+    """
+    Package: example
+    Version: 0.1.0
+    Title: Example
+    Description: An example.
+    License: MIT
+    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+    Encoding: UTF-8
+    """
+  And a file named "tests/acceptance/checkout.feature" with
+    """
+    Feature: Checkout
+      @rd
+      Scenario: Pay for the basket
+        The customer pays for every item in the basket.
+
+        Given a basket with 2 items
+        When I pay
+        Then the basket is empty
+    """
+  And a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(features = "checkout.feature")
+    #' @export
+    add <- function(basket, n) basket + n
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    pkgdown::build_reference(".", topics = "add", preview = FALSE)
+    """
+  Then the reference page "add" has the Gherkin block
+    """
+    Scenario: Pay for the basket
+      The customer pays for every item in the basket.
+
+      Given a basket with 2 items
+      When I pay
+      Then the basket is empty
+    """
+}}
+
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A scenario selected by its line
   Given a file named "R/add.R" with
     """
@@ -328,7 +416,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Scenario Outline: Add items
       When I add &lt;n&gt; items
       Then the basket has &lt;n&gt; items
-
+<span></span>
       Examples:
         | n |
         | 3 |
@@ -492,28 +580,28 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 \if{html}{\out{<pre class="gherkin"><code>Scenario: Scenarios of a Rule are under the Rule
   Only the selected Examples of a Scenario Outline are shown, and only the Rules with
   selected scenarios.
-
+<span></span>
   Given a file named "tests/acceptance/discounts.feature" with
     """
     Feature: Discounts
-
+<span></span>
       Rule: Orders over 100 get 10\% off
-
+<span></span>
         Scenario Outline: Discount of an order
           When I order for &lt;total&gt;
           Then I pay &lt;paid&gt;
-
+<span></span>
           @rd
           Examples: Discounted
             | total | paid |
             | 200   | 180  |
-
+<span></span>
           Examples: Not discounted
             | total | paid |
             | 100   | 100  |
-
+<span></span>
       Rule: Members get free shipping
-
+<span></span>
         Scenario: A member orders
           When a member orders
           Then shipping is free
@@ -532,17 +620,17 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
   Then the help page "discount" includes
     """
     Discounts:
-
+<span></span>
     *Rule: Orders over 100 get 10\% off*
-
+<span></span>
     Scenario Outline: Discount of an order
       When I order for &lt;total&gt;
       Then I pay &lt;paid&gt;
-
+<span></span>
       Examples: Discounted
         | total | paid |
         | 200   | 180  |
-
+<span></span>
     Source: 'tests/acceptance/discounts.feature'
     """
   And the help page "discount" doesn't include "Not discounted"

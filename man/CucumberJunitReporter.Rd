@@ -38,28 +38,28 @@ fails. CI services read it to show the results of the run.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: Each scenario is a test case, with its result
   A pending, undefined or ambiguous scenario is a failed test case.
-
+<span></span>
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
       Scenario: Add an item
         Given an empty basket
-
+<span></span>
       Scenario: Remove an item
         Given an empty basket
         When I remove an item
-
+<span></span>
       Scenario: Pay
         Given an empty basket
         When I pay
-
+<span></span>
       Scenario: Skip
         Given the basket isn't ready
-
+<span></span>
       Rule: Items are counted
         Scenario Outline: Add &lt;n&gt; items
           When I add &lt;n&gt; items
-
+<span></span>
           Examples: Few
             | n |
             | 1 |
@@ -192,7 +192,7 @@ fails. CI services read it to show the results of the run.
   An error can have characters XML doesn't allow, like the escape character of the colors of
   a terminal. Each is written as the text of its character reference, like `&amp;#27;`, so the
   report is still XML that CI services read.
-
+<span></span>
   Given a file named "features/basket.feature" with
     """
     Feature: Basket

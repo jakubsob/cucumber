@@ -157,7 +157,7 @@ messages of the run, so it works offline.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: The attachments of a step are shown under it
   A screenshot and the logs attached when a step fails are shown under the step that failed.
-
+<span></span>
   Given a file named "features/basket.feature" with
     """
     Feature: Basket

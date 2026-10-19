@@ -111,6 +111,50 @@ Feature: Scenarios as documentation
         Then the basket has 1 item
       """
 
+  Scenario: The blank lines of a scenario are kept in the pkgdown reference page
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/checkout.feature" with
+      """
+      Feature: Checkout
+        @rd
+        Scenario: Pay for the basket
+          The customer pays for every item in the basket.
+
+          Given a basket with 2 items
+          When I pay
+          Then the basket is empty
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "add", preview = FALSE)
+      """
+    Then the reference page "add" has the Gherkin block
+      """
+      Scenario: Pay for the basket
+        The customer pays for every item in the basket.
+
+        Given a basket with 2 items
+        When I pay
+        Then the basket is empty
+      """
+
   Scenario: A scenario selected by its line
     Given a file named "R/add.R" with
       """

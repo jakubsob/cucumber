@@ -108,6 +108,9 @@ feature_rd <- function(document, pickles, source, file) {
     rd_escape <- \(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
     html <- gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", code, fixed = TRUE), fixed = TRUE), fixed = TRUE)
     html <- rd_escape(html)
+    # pkgdown splits a section into paragraphs at blank lines, even in \out,
+    # and joins the lines around them, so a blank line gets an empty element
+    html[grepl("^\\s*$", html)] <- "<span></span>"
     html[[1]] <- paste0("\\if{html}{\\out{<pre class=\"gherkin\"><code>", html[[1]])
     html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre>}}")
     code <- rd_escape(code)

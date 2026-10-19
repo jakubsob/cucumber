@@ -95,7 +95,7 @@ show them, like the HTML report.
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A step attaches images
   Read an image, like a screenshot, with `readBin()` and attach it with its media type.
   It's base64 encoded, and the HTML report shows it.
-
+<span></span>
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -105,13 +105,13 @@ show them, like the HTML report.
   And a file named "features/setup-steps.R" with
     """
     read_file &lt;- function(path) readBin(path, "raw", file.size(path))
-
+<span></span>
     when("I add an item", function(context) \{
       png("basket.png")
       plot(1:3)
       dev.off()
       context$attach(read_file("basket.png"), "image/png", file_name = "basket.png")
-
+<span></span>
       jpeg("basket.jpg")
       plot(1:3)
       dev.off()
@@ -164,7 +164,7 @@ show them, like the HTML report.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks attach data too
   `before_all()` and `after_all()` hooks get a `context` to attach with when they take one argument.
-
+<span></span>
   Given a file named "features/basket.feature" with
     """
     Feature: Basket

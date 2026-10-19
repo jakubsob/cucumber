@@ -49,11 +49,11 @@ it finishes, and again in the summary at the end.
       Scenario: Add an item
         Given an empty basket
         When I add 1 item
-
+<span></span>
       Scenario: Remove an item
         Given an empty basket
         When I remove 1 item
-
+<span></span>
       Scenario: Pay for the items
         Given an empty basket
         When I pay

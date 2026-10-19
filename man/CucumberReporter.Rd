@@ -256,13 +256,13 @@ testthat reporters can't.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A reporter that fails stops the run with its error
   The scenarios after it don't run, and the error names the reporter and the event it failed in.
-
+<span></span>
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
       Scenario: Add an item
         Given an empty basket
-
+<span></span>
       Scenario: Remove an item
         Given an empty basket
     """

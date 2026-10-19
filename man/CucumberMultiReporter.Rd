@@ -24,7 +24,7 @@ several reporters, to show the progress of a run and write its reports at once.
       Scenario: Add an item
         Given an empty basket
         When I add an item
-
+<span></span>
       Scenario: Remove an item
         Given an empty basket
         When I remove an item
@@ -58,7 +58,7 @@ several reporters, to show the progress of a run and write its reports at once.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A run shows its progress and writes its reports
   The run's messages aren't stored, only the reports written from them.
-
+<span></span>
   When I run it and it fails
     """
     test("features", reporter = CucumberMultiReporter$new(list(
@@ -158,7 +158,7 @@ several reporters, to show the progress of a run and write its reports at once.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A report that can't be written fails the run
   The scenarios run, and the error names the reporter that failed when the run ended.
-
+<span></span>
   When I run it and it fails
     """
     test("features", reporter = CucumberMultiReporter$new(list(
