@@ -23,35 +23,22 @@ If \code{run()} is placed in a \verb{tests/testthat/test-*.R} file and you call 
 it runs in the \code{tests/testthat} directory. The default value \code{"."} finds all feature
 files in the \code{tests/testthat} directory.}
 
-\item{filter}{If not NULL, only features with file names matching this regular expression
-will be executed. Matching is performed on the file name after it's stripped of ".feature".}
+\item{filter}{If not NULL, run only the feature files whose name matches this regular expression.}
 
-\item{tags}{If not NULL, filter scenarios by tag expression string
-(e.g., \code{"@smoke and not @slow"}, \code{"@gui or @database"}).
-Tag expressions support \code{and}, \code{or}, \code{not} operators and parentheses for grouping,
-like the official \href{https://github.com/cucumber/tag-expressions}{cucumber/tag-expressions}.
-Tags are written with their \code{@}. Escape a parenthesis in a tag with a backslash, e.g. \code{"@wip\\\\(x\\\\)"}.}
+\item{tags}{If not NULL, run only the scenarios that match this tag expression, e.g. \code{"@smoke and not @slow"}.}
 
 \item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing.}
 
-\item{strict}{If \code{TRUE}, pending and undefined steps fail the scenario.
-If \code{FALSE}, they skip it.}
+\item{strict}{If \code{FALSE}, pending and undefined steps skip their scenario instead of failing it.}
 
-\item{dry_run}{If \code{TRUE}, steps are matched to step definitions, but neither
-step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
-They are reported, but don't fail a dry run: a scenario with one is skipped.}
+\item{dry_run}{If \code{TRUE}, match steps to step definitions without running steps or hooks.}
 
-\item{name}{If not NULL, only scenarios with names matching any of these regular expressions
-will be executed. For a Scenario Outline, the name is matched after its \verb{<placeholders>} are replaced.}
+\item{name}{If not NULL, run only the scenarios whose name matches any of these regular expressions.}
 
-\item{features}{If not NULL, only these feature files will be executed. Relative paths are relative to \code{path}.
-Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}, or several
-lines, e.g. \code{"addition.feature:12:20"}. The line of a Scenario Outline runs all of its examples,
-the line of an example row runs only that example.}
+\item{features}{If not NULL, run only these feature files, relative to \code{path}.
+Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.}
 
-\item{fail_fast}{If \code{TRUE}, the scenarios after the first failed scenario are skipped:
-their hooks and steps don't run. With \code{strict = TRUE}, a scenario with a pending or
-undefined step counts as failed.}
+\item{fail_fast}{If \code{TRUE}, skip the scenarios after the first failed scenario.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

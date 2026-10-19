@@ -1,3 +1,4 @@
+@rd
 Feature: Strict mode
   By default, pending and undefined steps fail the run.
   With `strict = FALSE` they skip their scenario instead. Ambiguous steps fail either way.

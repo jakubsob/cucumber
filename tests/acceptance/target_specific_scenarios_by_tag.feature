@@ -47,6 +47,7 @@ Feature: Running scenarios by tag
             Then I get 5
         """
 
+    @rd
     Scenario: A single tag runs the scenarios that have it
       When I run
         """
@@ -88,6 +89,7 @@ Feature: Running scenarios by tag
         | UI and fast    |
         | UI and slow    |
 
+    @rd
     Scenario: "not" runs the scenarios that don't have the tag, untagged ones too
       When I run
         """
@@ -99,6 +101,7 @@ Feature: Running scenarios by tag
         | UI and fast    |
         | Untagged       |
 
+    @rd
     Scenario: Parentheses group parts of an expression
       When I run
         """
@@ -247,6 +250,7 @@ Feature: Running scenarios by tag
         | Team                    |
         | Starts like an operator |
 
+    @rd
     Scenario: Parentheses in a tag are escaped with a backslash
       When I run
         """

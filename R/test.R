@@ -9,32 +9,11 @@
 #' cucumber::run()
 #' }
 #'
+#' @inheritParams test
 #' @param path Path to the directory containing the `.feature` files. Its subdirectories are searched too.
 #'   If `run()` is placed in a `tests/testthat/test-*.R` file and you call `testthat::test_dir` or similar,
 #'   it runs in the `tests/testthat` directory. The default value `"."` finds all feature
 #'   files in the `tests/testthat` directory.
-#'
-#' @param filter If not NULL, only features with file names matching this regular expression
-#'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
-#' @param tags If not NULL, filter scenarios by tag expression string
-#'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
-#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping,
-#'   like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions).
-#'   Tags are written with their `@`. Escape a parenthesis in a tag with a backslash, e.g. `"@wip\\(x\\)"`.
-#' @param name If not NULL, only scenarios with names matching any of these regular expressions
-#'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
-#' @param features If not NULL, only these feature files will be executed. Relative paths are relative to `path`.
-#'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`, or several
-#'   lines, e.g. `"addition.feature:12:20"`. The line of a Scenario Outline runs all of its examples,
-#'   the line of an example row runs only that example.
-#' @param strict If `TRUE`, pending and undefined steps fail the scenario.
-#'   If `FALSE`, they skip it.
-#' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
-#'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
-#'   They are reported, but don't fail a dry run: a scenario with one is skipped.
-#' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
-#'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
-#'   undefined step counts as failed.
 #' @param reporter A [CucumberReporter], or `NULL` to report nothing.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
@@ -374,13 +353,6 @@ test_cucumber_code <- function(path, ...) {
 #'
 #'   If you want to run Cucumber tests alongside `testthat` tests, you can use `cucumber::run()` in one of the `test-*.R` files in your `tests/testthat` directory.
 #'
-#' - Use [`setup-*.R`](https://testthat.r-lib.org/articles/special-files.html#setup-files)
-#'   files for calling [step()], [define_parameter_type()] and [hook()] to leverage testthat loading mechanism.
-#'
-#'   If your [step()], [define_parameter_type()] and [hook()] are called from somewhere else, you are responsible for loading them.
-#'
-#'   Read more about testthat special files in the [testthat documentation](https://testthat.r-lib.org/articles/special-files.html).
-#'
 #' - Use `test-*.R` files to test the support code you might have implemented that is used to run Cucumber tests.
 #'
 #'   Those tests won't be run when calling [cucumber::test()]. To run those tests use
@@ -391,27 +363,14 @@ test_cucumber_code <- function(path, ...) {
 #'   [CucumberProgressReporter].
 #' @param path Path to the directory containing the `.feature` files. Its subdirectories are
 #'   searched too. Defaults to the `cucumber.path` option, or `"tests/acceptance"` if it's not set.
-#' @param filter If not NULL, only features with file names matching this regular expression
-#'   will be executed. Matching is performed on the file name after it's stripped of ".feature".
-#' @param tags If not NULL, filter scenarios by tag expression string
-#'   (e.g., `"@smoke and not @slow"`, `"@gui or @database"`).
-#'   Tag expressions support `and`, `or`, `not` operators and parentheses for grouping,
-#'   like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions).
-#'   Tags are written with their `@`. Escape a parenthesis in a tag with a backslash, e.g. `"@wip\\(x\\)"`.
-#' @param name If not NULL, only scenarios with names matching any of these regular expressions
-#'   will be executed. For a Scenario Outline, the name is matched after its `<placeholders>` are replaced.
-#' @param features If not NULL, only these feature files will be executed. Relative paths are relative to `path`.
-#'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`, or several
-#'   lines, e.g. `"addition.feature:12:20"`. The line of a Scenario Outline runs all of its examples,
-#'   the line of an example row runs only that example.
-#' @param strict If `TRUE`, pending and undefined steps fail the scenario.
-#'   If `FALSE`, they skip it.
-#' @param dry_run If `TRUE`, steps are matched to step definitions, but neither
-#'   step definitions nor hooks are run. Use it to find undefined and ambiguous steps.
-#'   They are reported, but don't fail a dry run: a scenario with one is skipped.
-#' @param fail_fast If `TRUE`, the scenarios after the first failed scenario are skipped:
-#'   their hooks and steps don't run. With `strict = TRUE`, a scenario with a pending or
-#'   undefined step counts as failed.
+#' @param filter If not NULL, run only the feature files whose name matches this regular expression.
+#' @param tags If not NULL, run only the scenarios that match this tag expression, e.g. `"@smoke and not @slow"`.
+#' @param name If not NULL, run only the scenarios whose name matches any of these regular expressions.
+#' @param features If not NULL, run only these feature files, relative to `path`.
+#'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`.
+#' @param strict If `FALSE`, pending and undefined steps skip their scenario instead of failing it.
+#' @param dry_run If `TRUE`, match steps to step definitions without running steps or hooks.
+#' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.
 #'
 #' @examples
 #' \dontrun{
@@ -431,6 +390,18 @@ test_cucumber_code <- function(path, ...) {
 #' # Find undefined steps without running anything
 #' cucumber::test("tests/acceptance", dry_run = TRUE)
 #' }
+#'
+#' @eval features_rd(features = c(
+#'   "r-running_tests.feature",
+#'   "r-support_code.feature",
+#'   "paths.feature",
+#'   "target_specific_scenarios_by_tag.feature",
+#'   "target_specific_scenarios_by_name.feature",
+#'   "target_specific_scenarios_by_line.feature",
+#'   "strict_mode.feature",
+#'   "dryrun_mode.feature",
+#'   "fail_fast.feature"
+#' ))
 #'
 #' @importFrom testthat test_dir
 #' @importFrom withr defer with_file

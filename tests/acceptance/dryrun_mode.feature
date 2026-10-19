@@ -3,6 +3,7 @@ Feature: Dry run
   Use it to find undefined and ambiguous steps without running the scenarios.
   Undefined and ambiguous steps are reported, but they don't fail a dry run: a scenario with one is skipped.
 
+  @rd
   Scenario: A dry run doesn't run steps or hooks
     Given a package
     And a file named "features/basket.feature" with
@@ -36,6 +37,7 @@ Feature: Dry run
       | Given an empty basket | skipped |
       | When I add an item    | skipped |
 
+  @rd
   Scenario: A dry run reports undefined steps without failing
     Given a package
     And a file named "features/basket.feature" with

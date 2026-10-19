@@ -41,6 +41,7 @@ Feature: Running scenarios by line
       })
       """
 
+  @rd
   Scenario: Only the scenario at the line is run
     When I run
       """
@@ -59,6 +60,7 @@ Feature: Running scenarios by line
       | scenario           |
       | Adding big numbers |
 
+  @rd
   Scenario: Several lines and several files can be given
     When I run
       """
@@ -70,6 +72,7 @@ Feature: Running scenarios by line
       | Adding big numbers        |
       | Subtracting small numbers |
 
+  @rd
   Scenario: The line of a Scenario Outline runs all its examples
     When I run
       """
@@ -80,6 +83,7 @@ Feature: Running scenarios by line
       | Adding 2 |
       | Adding 3 |
 
+  @rd
   Scenario: The line of an example row runs only that example
     When I run
       """

@@ -40,6 +40,7 @@ Feature: Running scenarios by name
       })
       """
 
+  @rd
   Scenario: Only the scenarios whose name matches are run
     When I run
       """
@@ -69,6 +70,7 @@ Feature: Running scenarios by name
       | Adding big numbers        |
       | Subtracting small numbers |
 
+  @rd
   Scenario: The name of an outline's example has its placeholders replaced
     When I run
       """

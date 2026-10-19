@@ -35,6 +35,7 @@ Feature: Choosing feature files
       })
       """
 
+  @rd
   Scenario: Feature files in the directory and its subdirectories are run
     When I run
       """
@@ -68,6 +69,7 @@ Feature: Choosing feature files
 
   Rule: `features` lists the feature files to run
 
+    @rd
     Scenario: Only the listed feature files are run
       When I run
         """
@@ -100,6 +102,7 @@ Feature: Choosing feature files
 
     The name is the file name without `.feature`. Extra arguments of `test()` are passed to `grepl()`.
 
+    @rd
     Scenario: Only feature files whose name matches are run
       When I run
         """

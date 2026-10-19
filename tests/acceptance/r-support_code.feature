@@ -23,6 +23,7 @@ Feature: Loading step definitions and support code
       })
       """
 
+  @rd
   Scenario: Code in a setup file is available in steps
     Given a file named "features/setup-calculate.R" with
       """
@@ -45,6 +46,7 @@ Feature: Loading step definitions and support code
       """
     Then it passes
 
+  @rd
   Scenario: Code of the loaded package is available in steps
     Given a file named "R/calculate.R" with
       """

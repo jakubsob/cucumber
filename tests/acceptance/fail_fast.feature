@@ -39,6 +39,7 @@ Feature: Fail fast
       })
       """
 
+  @rd
   Scenario: Scenarios after a failed scenario are skipped
     When I run
       """
@@ -77,6 +78,7 @@ Feature: Fail fast
     Then the output includes "4 scenarios (1 failed, 3 passed)"
     And the output includes "before In the next feature file"
 
+  @rd
   Scenario: An undefined step fails fast in strict mode
     Given a file named "features/a.feature" with
       """

@@ -37,6 +37,7 @@ Feature: Running tests with test()
       })
       """
 
+  @rd
   Scenario: Feature files in tests/acceptance are run by default
     When I run
       """
@@ -46,6 +47,7 @@ Feature: Running tests with test()
       | scenario                   |
       | Adding in tests/acceptance |
 
+  @rd
   Scenario: Feature files are run from the directory set in the cucumber.path option
     When I run
       """
