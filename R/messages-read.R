@@ -31,9 +31,6 @@
 #' }
 #' @export
 read_messages <- function(x) {
-  if (inherits(x, "cucumber_messages")) {
-    return(x)
-  }
   rlang::check_installed("jsonlite", "to read Cucumber Messages.")
   if (inherits(x, "CucumberMessagesReporter")) {
     x <- x$file

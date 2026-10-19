@@ -1391,13 +1391,3 @@ CucumberPrettyReporter <- R6::R6Class(
 get_reporter <- function() {
   getOption(".cucumber_reporter", default = CucumberProgressReporter$new())
 }
-
-#' Set reporter in options
-#'
-#' @param reporter Reporter instance
-#' @keywords internal
-#' @noRd
-set_reporter <- function(reporter) {
-  options(.cucumber_reporter = reporter)
-  invisible(reporter)
-}
