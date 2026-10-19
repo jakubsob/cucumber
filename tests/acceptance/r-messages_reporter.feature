@@ -54,6 +54,16 @@ Feature: Messages reporter
       testRunFinished
       """
 
+  Scenario: The messages are written to a connection
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new(stdout()))
+      """
+    Then the output includes
+      """
+      {"testRunFinished":
+      """
+
   Scenario: Each step's result is written when it finishes
     Given a file named "features/setup-steps.R" with
       """

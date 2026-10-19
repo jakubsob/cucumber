@@ -67,6 +67,27 @@ Feature: Step hooks
       | Given an empty basket | failed  |
       | When I add an item    | skipped |
 
+  Scenario: A step hook can't skip the scenario
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_step(function(context, step) skip_scenario("The shop is closed"))
+      when("I add an item", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step               | status |
+      | When I add an item | failed |
+    And the error message includes "`skip_scenario()` can only be called in a `before()` or `after()` hook or a step."
+
   Scenario: A failing after step hook fails a pending step
     Given a file named "features/basket.feature" with
       """

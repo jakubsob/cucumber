@@ -125,6 +125,26 @@ like the HTML, JUnit and JSON formatters.
     """
 }}
 
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The messages are written to a connection
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new(stdout()))
+    """
+  Then the output includes
+    """
+    \{"testRunFinished":
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The messages are written to a connection
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new(stdout()))
+    """
+  Then the output includes
+    """
+    \{"testRunFinished":
+    """
+}}
+
 \if{html}{\out{<pre class="gherkin"><code>Scenario: Each step's result is written when it finishes
   Given a file named "features/setup-steps.R" with
     """

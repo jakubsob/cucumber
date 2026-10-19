@@ -145,6 +145,26 @@ Feature: Attachments
       | When I add an item | failed |
     And the error message includes "A raw vector attachment must have a `media_type`."
 
+  Scenario: An attachment must be a string or a raw vector
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) context$attach(1:3))
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step               | status |
+      | When I add an item | failed |
+    And the error message includes "An attachment must be a string or a raw vector."
+
   Scenario: The pretty reporter prints the logs and links under their step
     Other data is printed with its media type and file name.
 
