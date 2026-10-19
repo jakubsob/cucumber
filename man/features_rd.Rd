@@ -10,6 +10,7 @@ features_rd(
   tags = getOption("cucumber.rd_tags", "@rd"),
   name = NULL,
   features = NULL,
+  section = getOption("cucumber.rd_section", "Specification"),
   ...
 )
 }
@@ -32,6 +33,9 @@ are documented.}
 relative to \code{path}. Add \verb{:line} to select only the scenario at that line, e.g.
 \code{"addition.feature:12"}. The line of an example row selects only that example.}
 
+\item{section}{Name of the section. Defaults to the \code{cucumber.rd_section} option, or
+\code{"Specification"} if it's not set.}
+
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }
 \value{
@@ -47,7 +51,7 @@ of the help find how it behaves. Call it with \verb{@eval} in the function's rox
 add <- function(basket, n) basket + n
 }\if{html}{\out{</div>}}
 
-It adds a "Specification" section with each selected feature: its name, its description,
+It adds a section, "Specification" by default, with each selected feature: its name, its description,
 the Backgrounds of the selected scenarios and the scenarios as they are written, without
 their tags. Of a Scenario Outline, only the selected Examples rows are shown.
 
@@ -66,7 +70,8 @@ It turns on markdown for the roxygen block it's in.
 "Specification" section, so readers of the help find how it behaves. Call it with \verb{@eval}
 in the function's roxygen block. It selects scenarios like \code{test()}: by \code{features} and their
 lines, \code{filter}, \code{name} and \code{tags}. By default only scenarios tagged \verb{@rd} are selected,
-set the \code{cucumber.rd_tags} option to use another tag expression.
+set the \code{cucumber.rd_tags} option to use another tag expression. Name the section with
+\code{section}, or for every help page with the \code{cucumber.rd_section} option.
 
 \if{html}{\out{<pre class="gherkin"><code>Background:
   Given a package
@@ -422,6 +427,66 @@ set the \code{cucumber.rd_tags} option to use another tag expression.
     """
   Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
   And the help page "remove" doesn't include "Scenario: Add an item"
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The section has another name
+  Given a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")
+    #' @export
+    add &lt;- function(basket, n) basket + n
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "add" includes "Examples of use:"
+  And the help page "add" doesn't include "Specification:"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The section has another name
+  Given a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")
+    #' @export
+    add <- function(basket, n) basket + n
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "add" includes "Examples of use:"
+  And the help page "add" doesn't include "Specification:"
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The sections of every help page have another name
+  Given a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(features = "basket.feature:8")
+    #' @export
+    add &lt;- function(basket, n) basket + n
+    """
+  When I run
+    """
+    withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
+    """
+  Then the help page "add" includes "Behavior:"
+  And the help page "add" doesn't include "Specification:"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The sections of every help page have another name
+  Given a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(features = "basket.feature:8")
+    #' @export
+    add <- function(basket, n) basket + n
+    """
+  When I run
+    """
+    withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
+    """
+  Then the help page "add" includes "Behavior:"
+  And the help page "add" doesn't include "Specification:"
 }}
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A selection without scenarios is an error

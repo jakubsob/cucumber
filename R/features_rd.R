@@ -11,7 +11,7 @@
 #' add <- function(basket, n) basket + n
 #' ```
 #'
-#' It adds a "Specification" section with each selected feature: its name, its description,
+#' It adds a section, "Specification" by default, with each selected feature: its name, its description,
 #' the Backgrounds of the selected scenarios and the scenarios as they are written, without
 #' their tags. Of a Scenario Outline, only the selected Examples rows are shown.
 #'
@@ -35,6 +35,8 @@
 #' @param features If not NULL, only these feature files are documented. Relative paths are
 #'   relative to `path`. Add `:line` to select only the scenario at that line, e.g.
 #'   `"addition.feature:12"`. The line of an example row selects only that example.
+#' @param section Name of the section. Defaults to the `cucumber.rd_section` option, or
+#'   `"Specification"` if it's not set.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return Lines of roxygen tags, for `@eval`.
 #'
@@ -48,8 +50,10 @@ features_rd <- function(
   tags = getOption("cucumber.rd_tags", "@rd"),
   name = NULL,
   features = NULL,
+  section = getOption("cucumber.rd_section", "Specification"),
   ...
 ) {
+  checkmate::assert_string(section, min.chars = 1)
   check_grepl_args(...)
   lines <- feature_lines(features, path)
   files <- select_features(path, filter, lines, ...)
@@ -65,7 +69,7 @@ features_rd <- function(
       trace = empty_trace()
     )
   }
-  c("@md", "@section Specification:", rd)
+  c("@md", paste0("@section ", section, ":"), rd)
 }
 
 #' Markdown of a feature with its selected scenarios, written as in its source

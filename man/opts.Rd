@@ -38,6 +38,11 @@ default: \code{Inf}
 Tag expression of the scenarios \code{\link[=features_rd]{features_rd()}} puts in help pages.
 
 default: \code{"@rd"}
+\item \code{cucumber.rd_section}
+
+Name of the section \code{\link[=features_rd]{features_rd()}} puts scenarios in.
+
+default: \code{"Specification"}
 }
 
 See \code{\link[base:options]{base::options()}} and \code{\link[base:options]{base::getOption()}} on how to work with options.

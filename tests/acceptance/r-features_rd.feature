@@ -4,7 +4,8 @@ Feature: Scenarios as documentation
   "Specification" section, so readers of the help find how it behaves. Call it with `@eval`
   in the function's roxygen block. It selects scenarios like `test()`: by `features` and their
   lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected,
-  set the `cucumber.rd_tags` option to use another tag expression.
+  set the `cucumber.rd_tags` option to use another tag expression. Name the section with
+  `section`, or for every help page with the `cucumber.rd_section` option.
 
   Background:
     Given a package
@@ -183,6 +184,36 @@ Feature: Scenarios as documentation
       """
     Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
     And the help page "remove" doesn't include "Scenario: Add an item"
+
+  Scenario: The section has another name
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes "Examples of use:"
+    And the help page "add" doesn't include "Specification:"
+
+  Scenario: The sections of every help page have another name
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:8")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
+      """
+    Then the help page "add" includes "Behavior:"
+    And the help page "add" doesn't include "Specification:"
 
   Scenario: A selection without scenarios is an error
     When I run it and it fails

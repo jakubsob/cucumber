@@ -40,6 +40,12 @@
 #'
 #'   default: `"@rd"`
 #'
+#' - `cucumber.rd_section`
+#'
+#'   Name of the section [features_rd()] puts scenarios in.
+#'
+#'   default: `"Specification"`
+#'
 #' See [base::options()] and [base::getOption()] on how to work with options.
 #'
 #' @md
