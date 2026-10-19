@@ -1,9 +1,8 @@
 #' Run Cucumber tests in a `testthat` context
 #'
 #' @description
-#' It's purpose is to be able to run Cucumber tests alongside `testthat` tests.
-#'
-#' To do that, place a call to `run()` in one of the `test-*.R` files in your `tests/testthat` directory.
+#' Call `run()` in a `tests/testthat/test-*.R` file to run the feature files
+#' alongside the package's `testthat` tests.
 #'
 #' @examples \dontrun{
 #' #' tests/testthat/test-cucumber.R
@@ -40,6 +39,8 @@
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
+#'
+#' @eval features_rd(features = "r-running_alongside_testthat.feature")
 #'
 #' @importFrom rlang abort
 #' @export

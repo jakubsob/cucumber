@@ -1,3 +1,4 @@
+@rd
 Feature: Running scenarios alongside testthat tests
   `run()` in a `tests/testthat/test-*.R` file runs the feature files in `tests/testthat`
   as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.

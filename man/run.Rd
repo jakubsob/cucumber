@@ -60,10 +60,213 @@ NULL, invisibly.
 To get result and a report, use \code{cucumber::test()}, or inspect the result of \code{testthat} function call.
 }
 \description{
-It's purpose is to be able to run Cucumber tests alongside \code{testthat} tests.
-
-To do that, place a call to \code{run()} in one of the \verb{test-*.R} files in your \code{tests/testthat} directory.
+Call \code{run()} in a \verb{tests/testthat/test-*.R} file to run the feature files
+alongside the package's \code{testthat} tests.
 }
+\section{Specification}{
+
+\subsection{Running scenarios alongside testthat tests}{
+
+\code{run()} in a \verb{tests/testthat/test-*.R} file runs the feature files in \code{tests/testthat}
+as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
+It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package
+  And a file named "R/calculate.R" with
+    """
+    calculate &lt;- function(x) x + 1
+    """
+  And a file named "tests/testthat/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Given I calculate
+        Then the result is 2
+    """
+  And a file named "tests/testthat/test-acceptance.R" with
+    """
+    run()
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+  And a file named "R/calculate.R" with
+    """
+    calculate <- function(x) x + 1
+    """
+  And a file named "tests/testthat/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Given I calculate
+        Then the result is 2
+    """
+  And a file named "tests/testthat/test-acceptance.R" with
+    """
+    run()
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Scenarios run with the package's testthat tests
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result &lt;- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-calculate.R" with
+    """
+    test_that("calculate adds one", \{
+      expect_equal(calculate(1), 2)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local()
+    """
+  Then it has 2 passed
+  And it ran "Scenario: Adding one"
+  And it ran "calculate adds one"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Scenarios run with the package's testthat tests
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-calculate.R" with
+    """
+    test_that("calculate adds one", \{
+      expect_equal(calculate(1), 2)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local()
+    """
+  Then it has 2 passed
+  And it ran "Scenario: Adding one"
+  And it ran "calculate adds one"
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
+  Given a file named "tests/testthat/steps/steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result &lt;- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    env &lt;- new.env()
+    source("tests/testthat/steps/steps.R", local = env)
+    testthat::test_local(env = env)
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
+  Given a file named "tests/testthat/steps/steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    env <- new.env()
+    source("tests/testthat/steps/steps.R", local = env)
+    testthat::test_local(env = env)
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario Outline: run() chooses what to run like test(), with &lt;argument&gt;
+  Given a file named "tests/testthat/other.feature" with
+    """
+    Feature: Other
+      @slow
+      Scenario: Not run
+        Given I calculate
+    """
+  And a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result &lt;- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-acceptance.R" with
+    """
+    run(&lt;argument&gt; = "&lt;value&gt;")
+    """
+  When I run
+    """
+    testthat::test_local()
+    """
+  Then only these scenarios ran:
+    | scenario   |
+    | Adding one |
+<span></span>
+  Examples:
+    | argument | value             |
+    | filter   | calculate         |
+    | features | calculate.feature |
+    | tags     | not @slow         |
+    | name     | Adding one        |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario Outline: run() chooses what to run like test(), with <argument>
+  Given a file named "tests/testthat/other.feature" with
+    """
+    Feature: Other
+      @slow
+      Scenario: Not run
+        Given I calculate
+    """
+  And a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-acceptance.R" with
+    """
+    run(<argument> = "<value>")
+    """
+  When I run
+    """
+    testthat::test_local()
+    """
+  Then only these scenarios ran:
+    | scenario   |
+    | Adding one |
+
+  Examples:
+    | argument | value             |
+    | filter   | calculate         |
+    | features | calculate.feature |
+    | tags     | not @slow         |
+    | name     | Adding one        |
+}}
+
+Source: \code{tests/acceptance/r-running_alongside_testthat.feature}
+}
+}
+
 \examples{
 \dontrun{
 #' tests/testthat/test-cucumber.R

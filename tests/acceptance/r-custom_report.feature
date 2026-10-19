@@ -1,3 +1,4 @@
+@rd
 Feature: Custom report
   `read_messages()` reads the messages a `CucumberMessagesReporter` wrote as tibbles of the run's
   features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.
