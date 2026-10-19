@@ -46,33 +46,19 @@ Each line that isn't a blank line has to start with a Gherkin _keyword_, followe
 
 The primary keywords are:
 
-- [Keywords](#keywords)
-    - [Feature](#feature)
-    - [Rule](#rule)
-    - [Example](#example) (or `Scenario`)
-    - [Steps](#steps)
-      - [Given](#given)
-      - [When](#when)
-      - [Then](#then)
-      - [And, But](#and-but)
-      - [\*](#)
-    - [Background](#background)
-      - [Tips for using Background](#tips-for-using-background)
-    - [Scenario Outline](#scenario-outline) (or `Scenario Template`)
-    - [Examples](#examples)
-  - [Step Arguments](#step-arguments)
-    - [Doc Strings](#doc-strings)
-    - [Data Tables](#data-tables)
-  - [Tags](#tags)
-    - [Tag inheritance](#tag-inheritance)
-    - [Running a subset of scenarios](#running-a-subset-of-scenarios)
-    - [Tag expressions](#tag-expressions)
-    - [Using tags for documentation](#using-tags-for-documentation)
+* [`Feature`](#feature)
+* [`Rule`](#rule)
+* [`Example`](#example) (or `Scenario`)
+* [`Given`](#given), [`When`](#when), [`Then`](#then), [`And`, `But`](#and-but) for [steps](#steps) (or `*`)
+* [`Background`](#background)
+* [`Scenario Outline`](#scenario-outline) (or `Scenario Template`)
+* [`Examples`](#examples) (or `Scenarios`)
 
 There are a few secondary keywords as well:
 
 * `"""` ([Doc Strings](#doc-strings))
 * `|` ([Data Tables](#data-tables))
+* `@` ([Tags](#tags))
 * `#` (Comments)
 
 # Feature
@@ -93,7 +79,7 @@ Feature: Guess the word
 
 The name and the optional description have no special meaning to Cucumber. Their purpose is to provide a place for you to document important aspects of the feature, such as a brief explanation and a list of business rules (general acceptance criteria).
 
-The free format description for Feature ends when you start a line with the keyword `Background`, `Example` or `Scenario Outline` (or their alias keywords).
+The free format description for Feature ends when you start a line with the keyword `Background`, `Rule`, `Example` or `Scenario Outline` (or their alias keywords).
 
 You can only have a single `Feature` in a `.feature` file.
 
@@ -201,13 +187,13 @@ Most software does something people could do manually (just not as efficiently).
 
 Try hard to come up with examples that don't make any assumptions about technology or user interface. Imagine it's 1922, when there were no computers.
 
-Implementation details should be hidden in `step()`.
+Implementation details should be hidden in the step definitions (see `?step`).
 
 ## Then
 
 `Then` steps are used to describe an _expected_ outcome, or result.
 
-The `step()` definition of a `Then` step should use an _assertion_ to compare the _actual_ outcome (what the system actually does) to the _expected_ outcome (what the step says the system is supposed to do).
+The step definition of a `Then` step should use an _assertion_ to compare the _actual_ outcome (what the system actually does) to the _expected_ outcome (what the step says the system is supposed to do).
 
 An outcome _should_ be on an **observable** output. That is, something that comes _out_ of the system (report, user interface, message), and not a behavior deeply buried inside the system (like a record in a database).
 
@@ -281,7 +267,7 @@ Occasionally you'll find yourself repeating the same `Given` steps in all of the
 
 Since it is repeated in every scenario, this is an indication that those steps are not _essential_ to describe the scenarios; they are _incidental details_. You can literally move such `Given` steps to the background, by grouping them under a `Background` section.
 
-A `Background` allows you to add some context to the scenarios that follow it. It can contain one or more `Given` steps, which are run before _each_ scenario, but after any before `hook()`.
+A `Background` allows you to add some context to the scenarios that follow it. It can contain one or more `Given` steps, which are run before _each_ scenario, but after any `before()` hooks (see `?hook`).
 
 A `Background` is placed before the first `Scenario`/`Example`, at the same level of indentation.
 
@@ -369,7 +355,7 @@ A `Scenario Outline` must contain one or more `Examples` (or `Scenarios`) sectio
 
 The steps can use `<>` delimited _parameters_ that reference headers in the examples table. Cucumber will replace these parameters with values from the table _before_ it tries to match the step against a step definition.
 
-If our `?step`s use {string} parameters, we must use quotes around the values in the table for them to match correctly.
+If our step definitions use `{string}` parameters, we must use quotes around the values in the table for them to match correctly.
 
 ```gherkin
 Scenario Outline: eating
@@ -383,23 +369,23 @@ Scenario Outline: eating
     | 'twenty' | 'five' | 'fifteen' |
 ```
 
-This Scenario Outline results in two Scenarios being run, with modified names to indicate which row of the examples table is being run:
+This Scenario Outline results in two Scenarios being run, both named `eating`. Scenarios that share a name are numbered in test results: `eating (1)`, `eating (2)`.
 
 ```gherkin
-Scenario: eating (Example 1)
+Scenario: eating
   Given there are 'twelve' cucumbers
   When I eat 'five' cucumbers
   Then I should have 'seven' cucumbers
 
-Scenario: eating (Example 2)
+Scenario: eating
   Given there are 'twenty' cucumbers
   When I eat 'five' cucumbers
   Then I should have 'fifteen' cucumbers
 ```
 
-<!-- You can use parameters in `Scenario Outline` descriptions as well. -->
+You can use parameters in the `Scenario Outline` name as well, to give each scenario its own name, for example `Scenario Outline: eat <eat> out of <start>`.
 
-<!-- You can also use parameters in [multiline step arguments](#step-arguments). -->
+You can also use parameters in [multiline step arguments](#step-arguments).
 
 # Step Arguments
 
@@ -426,7 +412,18 @@ It will automatically be passed as the last argument in the step definition. See
 
 Indentation of the opening `"""` is unimportant, although common practice is two spaces in from the enclosing step. The indentation inside the triple quotes, however, is significant. Each line of the Doc String will be dedented according to the opening `"""`. Indentation beyond the column of the opening `"""` will therefore be preserved.
 
-Doc strings also support using three backticks or three single quotes as the delimiter.
+Doc strings also support using three backticks as the delimiter:
+
+````gherkin
+Given a blog post named "Random" with Markdown body
+  ```
+  Some Title, Eh?
+  ===============
+  Here is the first paragraph of my blog post.
+  ```
+````
+
+You can specify the content type of a Doc String after the opening delimiter, for example `"""markdown`. It is passed to the step definition along with the text, see `?step`.
 
 # Data Tables
 
@@ -435,16 +432,16 @@ Doc strings also support using three backticks or three single quotes as the del
 ```gherkin
 Given the following users exist:
   | name   | email              | twitter         |
-  | Aslak  | [email protected]  | @aslak_hellesoy |
-  | Julien | [email protected]  | @jbpros         |
-  | Matt   | [email protected]  | @mattwynne      |
+  | Aslak  | aslak@cucumber.io  | @aslak_hellesoy |
+  | Julien | julien@cucumber.io | @jbpros         |
+  | Matt   | matt@cucumber.io   | @mattwynne      |
 ```
 
 Just like `Doc Strings`, `Data Tables` will be passed to the step definition as the last argument. See `?step` for details.
 
 ## Table Cell Escaping
 
-If you want to use a newline character in a table cell, you can write this as `\n`. If you need a `|` as part of the cell, you can escape it as `\|`.
+If you want to use a newline character in a table cell, you can write this as `\n`. If you need a `|` as part of the cell, you can escape it as `\|`. And finally, if you need a `\`, you can escape that with `\\`.
 
 # Tags
 
@@ -479,6 +476,7 @@ Feature: Verify billing
 Tags can be placed above the following Gherkin elements:
 
 * `Feature`
+* `Rule`
 * `Scenario`
 * `Scenario Outline`
 * `Examples`
@@ -571,15 +569,11 @@ Tag expressions support the following operators:
 
 **Operator precedence:** `not` has the highest precedence, followed by `and`, then `or`. Use parentheses to change the order of evaluation.
 
-The operators are case-insensitive (`and`, `AND`, and `And` all work the same way).
+The operators are lowercase: `AND` is read as a tag, so `@smoke AND @fast` is a syntax error.
 
 ### Tag names
 
-Tag names can contain:
-* Alphanumeric characters (a-z, A-Z, 0-9)
-* Underscores (`_`)
-* Hyphens (`-`)
-* Dots (`.`)
+In a tag expression, a tag is everything up to whitespace or a parenthesis. To use a parenthesis, whitespace or a backslash in a tag, escape it with a backslash. In an R string the backslash itself is escaped: `tags = "@wip\\(x\\)"`.
 
 Tag names are case-sensitive: `@Smoke` and `@smoke` are different tags.
 
