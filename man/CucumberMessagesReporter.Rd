@@ -25,7 +25,24 @@ their source references, kept when the files are sourced with
 like the \code{message} formatter of other Cucumber implementations. Official tools read it,
 like the HTML, JUnit and JSON formatters.
 
-\preformatted{Background:
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add 2 apples
+        Then the basket has 2 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) context$items &lt;- 0)
+    given("an empty basket", function(context) \{\})
+    when("I add \{int\} apples", function(int, context) context$items &lt;- context$items + int)
+    then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -42,9 +59,40 @@ like the HTML, JUnit and JSON formatters.
     when("I add \{int\} apples", function(int, context) context$items <- context$items + int)
     then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))
     """
-}
+}}
 
-\preformatted{Scenario: The run is written as messages
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The run is written as messages
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))
+    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+    cat(vapply(messages, names, character(1)), sep = "\\n")
+    """
+  Then the output includes
+    """
+    meta
+    source
+    gherkinDocument
+    pickle
+    hook
+    stepDefinition
+    stepDefinition
+    stepDefinition
+    testRunStarted
+    testCase
+    testCaseStarted
+    testStepStarted
+    testStepFinished
+    testStepStarted
+    testStepFinished
+    testStepStarted
+    testStepFinished
+    testStepStarted
+    testStepFinished
+    testCaseFinished
+    testRunFinished
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The run is written as messages
   When I run
     """
     test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))
@@ -75,9 +123,28 @@ like the HTML, JUnit and JSON formatters.
     testCaseFinished
     testRunFinished
     """
-}
+}}
 
-\preformatted{Scenario: Each step's result is written when it finishes
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Each step's result is written when it finishes
+  Given a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add \{int\} apples", function(int, context) pending())
+    """
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+    finished &lt;- Filter(\\(message) !is.null(message$testStepFinished), messages)
+    cat(vapply(finished, \\(message) message$testStepFinished$testStepResult$status, character(1)), sep = "\\n")
+    """
+  Then the output includes
+    """
+    PASSED
+    PENDING
+    UNDEFINED
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Each step's result is written when it finishes
   Given a file named "features/setup-steps.R" with
     """
     given("an empty basket", function(context) \{\})
@@ -96,9 +163,27 @@ like the HTML, JUnit and JSON formatters.
     PENDING
     UNDEFINED
     """
-}
+}}
 
-\preformatted{Scenario: The run is written as messages and its progress is printed
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The run is written as messages and its progress is printed
+  When I run
+    """
+    test("features", reporter = CucumberMultiReporter$new(list(
+      CucumberPrettyReporter$new(),
+      CucumberMessagesReporter$new("messages.ndjson")
+    )))
+    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+    cat(length(messages), "messages\\n")
+    """
+  Then the output includes
+    """
+    Scenario: Add an item
+    v Given an empty basket
+    v When I add 2 apples
+    v Then the basket has 2 items
+    """
+  And the output includes "21 messages"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The run is written as messages and its progress is printed
   When I run
     """
     test("features", reporter = CucumberMultiReporter$new(list(
@@ -116,7 +201,7 @@ like the HTML, JUnit and JSON formatters.
     v Then the basket has 2 items
     """
   And the output includes "21 messages"
-}
+}}
 
 Source: \code{tests/acceptance/r-messages_reporter.feature}
 }

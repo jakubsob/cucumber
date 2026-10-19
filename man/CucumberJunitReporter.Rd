@@ -30,11 +30,62 @@ its messages with \link{CucumberMessagesReporter} and pass their file to
 \code{CucumberJunitReporter} writes the JUnit XML report of a run when the run ends, even when it
 fails. CI services read it to show the results of the run.
 
-\preformatted{Background:
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
   Given a package
-}
+}}
 
-\preformatted{Scenario: Each scenario is a test case, with its result
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Each scenario is a test case, with its result
+  A pending, undefined or ambiguous scenario is a failed test case.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+
+      Scenario: Remove an item
+        Given an empty basket
+        When I remove an item
+
+      Scenario: Pay
+        Given an empty basket
+        When I pay
+
+      Scenario: Skip
+        Given the basket isn't ready
+
+      Rule: Items are counted
+        Scenario Outline: Add &lt;n&gt; items
+          When I add &lt;n&gt; items
+
+          Examples: Few
+            | n |
+            | 1 |
+            | 2 |
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I remove an item", function(context) stop("The basket is empty"))
+    when("I pay", function(context) pending())
+    given("the basket isn't ready", function(context) skip_scenario("Not ready"))
+    when("I add \{int\} items", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+    """
+  Then the JUnit report "report.xml" has these test cases:
+    | classname | name                                                        | result  | message                       |
+    | Basket    | Add an item                                                 | passed  |                               |
+    | Basket    | Remove an item                                              | failure | The basket is empty           |
+    | Basket    | Pay                                                         | failure | Step "I pay" is pending: TODO |
+    | Basket    | Skip                                                        | skipped |                               |
+    | Basket    | Items are counted - Add &lt;n&gt; items - Few - #1.1: Add 1 items | passed  |                               |
+    | Basket    | Items are counted - Add &lt;n&gt; items - Few - #1.2: Add 2 items | passed  |                               |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Each scenario is a test case, with its result
   A pending, undefined or ambiguous scenario is a failed test case.
 
   Given a file named "features/basket.feature" with
@@ -83,9 +134,34 @@ fails. CI services read it to show the results of the run.
     | Basket    | Skip                                                        | skipped |                               |
     | Basket    | Items are counted - Add <n> items - Few - #1.1: Add 1 items | passed  |                               |
     | Basket    | Items are counted - Add <n> items - Few - #1.2: Add 2 items | passed  |                               |
-}
+}}
 
-\preformatted{Scenario: A test case's output is its steps and their results
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A test case's output is its steps and their results
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Remove an item
+        Given an empty basket
+        When I remove an item
+        Then the basket is empty
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I remove an item", function(context) stop("The basket is empty"))
+    then("the basket is empty", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+    """
+  Then the output of the test case "Remove an item" in the JUnit report "report.xml" is
+    """
+    Given an empty basket.......................................................passed
+    When I remove an item.......................................................failed
+    Then the basket is empty....................................................skipped
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A test case's output is its steps and their results
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -110,9 +186,27 @@ fails. CI services read it to show the results of the run.
     When I remove an item.......................................................failed
     Then the basket is empty....................................................skipped
     """
-}
+}}
 
-\preformatted{Scenario: The report is written to cucumber-junit.xml by default
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The report is written to cucumber-junit.xml by default
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberJunitReporter$new())
+    """
+  Then the JUnit report "cucumber-junit.xml" has these test cases:
+    | name        | result |
+    | Add an item | passed |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The report is written to cucumber-junit.xml by default
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -130,7 +224,7 @@ fails. CI services read it to show the results of the run.
   Then the JUnit report "cucumber-junit.xml" has these test cases:
     | name        | result |
     | Add an item | passed |
-}
+}}
 
 Source: \code{tests/acceptance/r-junit_reporter.feature}
 }

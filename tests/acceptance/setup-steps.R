@@ -418,10 +418,9 @@ then("the help page {string} doesn't include {string}", function(topic, text, co
   expect_false(grepl(text, page, fixed = TRUE), info = page)
 })
 
-then("the reference page {string} includes", function(topic, text, context) {
-  # Compare line by line, ignoring indentation
+# A block of Gherkin code of a pkgdown reference page, highlighted by the site's script
+then("the reference page {string} has the Gherkin block", function(topic, text, context) {
   html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
-  needle <- paste(trimws(strsplit(text, "\n")[[1]]), collapse = "\n")
-  page <- paste(trimws(strsplit(xml2::xml_text(html), "\n")[[1]]), collapse = "\n")
-  expect_true(grepl(needle, page, fixed = TRUE), info = paste0("Expected:\n", needle, "\n\nIn reference page:\n", page))
+  blocks <- trimws(xml2::xml_text(xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code")))
+  expect_true(text %in% blocks, info = paste0("Expected:\n", text, "\n\nGherkin blocks:\n", paste(blocks, collapse = "\n\n")))
 })

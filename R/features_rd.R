@@ -98,10 +98,17 @@ feature_rd <- function(document, pickles, source, file) {
     }
     code <- sub(paste0("^ {0,", node$location$column - 1, "}"), "", source[lines])
     # Rd, not a markdown code block: pkgdown empties code blocks of a language
-    # pandoc can't highlight, like gherkin, and highlights the others as R
-    code <- gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", code, fixed = TRUE))
-    code[[1]] <- paste0("\\preformatted{", code[[1]])
-    c(code, "}", "")
+    # pandoc can't highlight, like gherkin, and highlights the others as R. In
+    # HTML it's a gherkin block, as in a markdown page, for the site's script
+    # to highlight
+    rd_escape <- \(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
+    html <- gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", code, fixed = TRUE), fixed = TRUE), fixed = TRUE)
+    html <- rd_escape(html)
+    html[[1]] <- paste0("\\if{html}{\\out{<pre class=\"gherkin\"><code>", html[[1]])
+    html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre>}}")
+    code <- rd_escape(code)
+    code[[1]] <- paste0("\\if{text,latex}{\\preformatted{", code[[1]])
+    c(html, code, "}}", "")
   }
   scenario_block <- function(scenario) {
     if (is.null(scenario) || !scenario$id %in% selected) {

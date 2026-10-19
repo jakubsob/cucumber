@@ -79,6 +79,8 @@ Feature: Scenarios as documentation
     And the help page "add" doesn't include "@rd"
 
   Scenario: The scenarios are in the pkgdown reference page
+    They're Gherkin code blocks, like those of a Markdown page.
+
     Given a file named "DESCRIPTION" with
       """
       Package: example
@@ -101,7 +103,7 @@ Feature: Scenarios as documentation
       roxygen2::roxygenise()
       pkgdown::build_reference(".", topics = "add", preview = FALSE)
       """
-    Then the reference page "add" includes
+    Then the reference page "add" has the Gherkin block
       """
       Scenario: Add an item
         When I add 1 item

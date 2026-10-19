@@ -55,11 +55,34 @@ To report a run your way, extend \link{CucumberReporter}.
 and the warnings it raised. Long Doc Strings and Data Tables can be cut short
 with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 
-\preformatted{Background:
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
   Given a package
-}
+}}
 
-\preformatted{Scenario: A step's warnings are printed under it
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A step's warnings are printed under it
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) warning("the basket is dusty"))
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes
+    """
+    v Given an empty basket
+    Warning:
+    the basket is dusty
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A step's warnings are printed under it
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -80,9 +103,54 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Warning:
     the basket is dusty
     """
-}
+}}
 
-\preformatted{Scenario: Long Doc Strings and Data Tables are cut short
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Long Doc Strings and Data Tables are cut short
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        Given a note
+          ```
+          line 1
+          line 2
+          line 3
+          ```
+        And these items
+          | item     |
+          | cucumber |
+          | tomato   |
+          | pepper   |
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a note", function(doc_string, context) \{\})
+    given("these items", function(data_table, context) \{\})
+    """
+  When I run
+    """
+    test(
+      "features",
+      reporter = CucumberPrettyReporter$new(
+        reporter_max_docstring_lines = 1,
+        reporter_max_table_lines = 2
+      )
+    )
+    """
+  Then the output includes
+    """
+    v Given a note
+    \\"\\"\\"
+    line 1
+    ... and 2 more line(s)
+    \\"\\"\\"
+    v And these items
+    | item     |
+    | cucumber |
+    | tomato   |
+    ... and 1 more line(s)
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Long Doc Strings and Data Tables are cut short
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -127,7 +195,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     | tomato   |
     ... and 1 more line(s)
     """
-}
+}}
 
 Source: \code{tests/acceptance/r-pretty_reporter.feature}
 }
