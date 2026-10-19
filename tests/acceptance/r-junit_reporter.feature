@@ -82,6 +82,29 @@ Feature: JUnit reporter
       Then the basket is empty....................................................skipped
       """
 
+  Scenario: An error with characters XML doesn't allow is written as the message of the failure
+    An error can have characters XML doesn't allow, like the escape character of the colors of
+    a terminal. Each is written as the text of its character reference, like `&#27;`, so the
+    report is still XML that CI services read.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Remove an item
+          When I remove an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I remove an item", function(context) stop("The basket is \033[31mempty\033[39m"))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+      """
+    Then the JUnit report "report.xml" has these test cases:
+      | name           | result  | message                                 |
+      | Remove an item | failure | The basket is &#27;[31mempty&#27;[39m |
+
   Scenario: The report is written to cucumber-junit.xml by default
     Given a file named "features/basket.feature" with
       """
