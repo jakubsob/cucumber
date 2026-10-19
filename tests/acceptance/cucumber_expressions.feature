@@ -4,6 +4,7 @@ Feature: Cucumber Expressions
   "{}" matches anything, and all other text is matched literally.
   An invalid expression is an error pointing at the problem.
 
+  @rd
   Scenario: Optional text matches with or without it
     Given a package
     And a file named "features/expressions.feature" with
@@ -32,6 +33,7 @@ Feature: Cucumber Expressions
       """
     Then it passes
 
+  @rd
   Scenario: Alternative words match any of them
     Given a package
     And a file named "features/expressions.feature" with
@@ -57,6 +59,7 @@ Feature: Cucumber Expressions
       """
     Then it passes
 
+  @rd
   Scenario: Anonymous parameter matches anything as text
     Given a package
     And a file named "features/expressions.feature" with
@@ -81,6 +84,7 @@ Feature: Cucumber Expressions
       """
     Then it passes
 
+  @rd
   Scenario: Special characters match literally and can be escaped
     Given a package
     And a file named "features/expressions.feature" with
@@ -111,6 +115,7 @@ Feature: Cucumber Expressions
       """
     Then it passes
 
+  @rd
   Scenario: An escaped space keeps words together in an alternative
     Given a package
     And a file named "features/expressions.feature" with

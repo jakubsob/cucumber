@@ -1,7 +1,9 @@
 Feature: Step definition snippets
   An undefined step is reported with a snippet of the step definition it needs, ready to paste into a setup file.
   When more than one parameter type matches a part of the step, the alternative step definitions are listed as comments.
+  Keep only one of them, as a step that matches several step definitions is ambiguous.
 
+  @rd
   Scenario: An undefined step is reported with a snippet
     Given a package
     And a file named "features/basket.feature" with
@@ -27,6 +29,7 @@ Feature: Step definition snippets
         })
       """
 
+  @rd
   Scenario: Alternative step definitions are listed when more than one parameter type matches
     Given a package
     And a file named "features/basket.feature" with

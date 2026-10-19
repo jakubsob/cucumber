@@ -8,6 +8,7 @@ Feature: Parameter types
 
   Rule: Built-in parameter types convert the text to R values
 
+    @rd
     Scenario: {int} captures an integer from step text
       Given a file named "features/params.feature" with
         """
@@ -50,6 +51,7 @@ Feature: Parameter types
         """
       Then the error message includes "No step found for: \"the count is +5\""
 
+    @rd
     Scenario: {float} captures a decimal number from step text
       Given a file named "features/params.feature" with
         """
@@ -75,6 +77,7 @@ Feature: Parameter types
       Then it passes
       And it has 1 passed
 
+    @rd
     Scenario: {float} also captures an integer
       Given a file named "features/params.feature" with
         """
@@ -122,6 +125,7 @@ Feature: Parameter types
         """
       Then it passes
 
+    @rd
     Scenario: {string} captures a quoted string and strips quotes
       Given a file named "features/params.feature" with
         """
@@ -175,6 +179,7 @@ Feature: Parameter types
         """
       Then it passes
 
+    @rd
     Scenario: {word} captures a single unquoted word
       Given a file named "features/params.feature" with
         """
@@ -220,6 +225,7 @@ Feature: Parameter types
 
   Rule: {int} is an R integer
 
+    @rd
     Scenario: {int} fails on a value too big for an R integer
       Given a file named "features/params.feature" with
         """
@@ -240,6 +246,7 @@ Feature: Parameter types
 
   Rule: Custom parameter types are defined with define_parameter_type()
 
+    @rd
     Scenario: A custom parameter type can be registered and used in steps
       Given a file named "features/params.feature" with
         """
@@ -269,6 +276,7 @@ Feature: Parameter types
       Then it passes
       And it has 1 passed
 
+    @rd
     Scenario: A custom parameter type's regexp is a plain regular expression
       Given a file named "features/params.feature" with
         """
@@ -289,6 +297,7 @@ Feature: Parameter types
         """
       Then it passes
 
+    @rd
     Scenario: A custom parameter type can have several regexps
       Given a file named "features/params.feature" with
         """
@@ -311,6 +320,7 @@ Feature: Parameter types
         """
       Then it passes
 
+    @rd
     Scenario: A custom parameter type's transformer gets the text of each capture group
       Given a file named "features/params.feature" with
         """
@@ -357,6 +367,7 @@ Feature: Parameter types
     Like in cucumber-js, the run goes on: the steps it would match are undefined, and the
     summary lists the undefined parameter types.
 
+    @rd
     Scenario: Steps of a step definition with an undefined parameter type are undefined
       Given a file named "features/airports.feature" with
         """

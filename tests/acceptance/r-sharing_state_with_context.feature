@@ -1,3 +1,4 @@
+@rd
 Feature: Sharing state with context
   Every step definition and scenario hook gets `context`.
   It's an environment that steps and hooks of one scenario share.

@@ -34,6 +34,7 @@ Feature: Step definition arguments
       | missing Data Table   | function(n, context) {}                 | The step definition has 2 arguments, but the step passes 3. |
       | extra argument       | function(n, table, extra, context) {}   | The step definition has 4 arguments, but the step passes 3. |
 
+  @rd
   Scenario Outline: A step definition without `context` as its last argument is an error, <case>
     Given a file named "features/basket.feature" with
       """
@@ -57,6 +58,7 @@ Feature: Step definition arguments
       | missing context  | function(n) {}          |
       | context not last | function(context, n) {} |
 
+  @rd
   Scenario: A step definition with `...` gets any number of arguments
     Given a file named "features/basket.feature" with
       """
@@ -76,6 +78,7 @@ Feature: Step definition arguments
       """
     Then it passes
 
+  @rd
   Scenario: A step definition's arguments with a default value can be left out
     Given a file named "features/basket.feature" with
       """

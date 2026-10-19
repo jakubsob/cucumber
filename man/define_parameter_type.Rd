@@ -30,18 +30,572 @@ whose regexp is the same as the regexp of another parameter type.}
 An object of class \code{parameter}, invisibly. Function should be called for side effects.
 }
 \description{
-The following parameter types are available by default:\tabular{ll}{
-   \strong{Type} \tab \strong{Description} \cr
-   \code{{int}} \tab Matches integers, for example \code{71} or \code{-19}. Converts value with \code{as.integer}, failing the step if it's out of range. \cr
-   \code{{float}} \tab Matches floats, for example \code{3.6}, \code{.8}, \code{-9.2} or \code{1.5E3}, and integers like \code{12}. Converts value with \code{as.double}. \cr
-   \code{{word}} \tab Matches words without whitespace, for example \code{banana} or \code{foo-bar} (but not \verb{banana split}). \cr
-   \code{{string}} \tab Matches single-quoted or double-quoted strings, for example \code{"banana split"} or \code{'banana split'} (but not \verb{banana split}). Only the text between the quotes is extracted, and escaped quotes in it, like \verb{\\"}, are unescaped. \cr
-   \code{{}} \tab Matches anything and passes it as text. \cr
+Built-in parameter types are \code{{int}}, \code{{float}}, \code{{word}}, \code{{string}} and the anonymous \code{{}}.
+Define your own before the steps that use it are run, e.g. in a \verb{setup-*.R} file.
+}
+\section{Specification}{
+
+\subsection{Parameter types}{
+
+A parameter like \code{{int}} in a step definition's Cucumber Expression captures a part of the step
+and passes it to the step definition converted to an R value.
+Register your own with \code{define_parameter_type()}.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\strong{Rule: Built-in parameter types convert the text to R values}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: \{int\} captures an integer from step text
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Integer parameter
+        Given the count is 42
+        Then I verify the count is 42
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the count is \{int\}", function(n, context) \{
+      context$value &lt;- n
+    \})
+    then("I verify the count is \{int\}", function(n, context) \{
+      expect_equal(context$value, n)
+      expect_true(is.integer(context$value))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: \{int\} captures an integer from step text
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Integer parameter
+        Given the count is 42
+        Then I verify the count is 42
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the count is \{int\}", function(n, context) \{
+      context$value <- n
+    \})
+    then("I verify the count is \{int\}", function(n, context) \{
+      expect_equal(context$value, n)
+      expect_true(is.integer(context$value))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: \{float\} captures a decimal number from step text
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Float parameter
+        Given the price is 3.99
+        Then I verify the price is 3.99
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the price is \{float\}", function(price, context) \{
+      context$price &lt;- price
+    \})
+    then("I verify the price is \{float\}", function(price, context) \{
+      expect_equal(context$price, price)
+      expect_true(is.double(context$price))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: \{float\} captures a decimal number from step text
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Float parameter
+        Given the price is 3.99
+        Then I verify the price is 3.99
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the price is \{float\}", function(price, context) \{
+      context$price <- price
+    \})
+    then("I verify the price is \{float\}", function(price, context) \{
+      expect_equal(context$price, price)
+      expect_true(is.double(context$price))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: \{float\} also captures an integer
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Integer as a float
+        Given the price is 12
+        Then I verify the price is 12
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the price is \{float\}", function(price, context) \{
+      context$price &lt;- price
+    \})
+    then("I verify the price is \{float\}", function(price, context) \{
+      expect_identical(context$price, price)
+      expect_identical(context$price, 12)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: \{float\} also captures an integer
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Integer as a float
+        Given the price is 12
+        Then I verify the price is 12
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the price is \{float\}", function(price, context) \{
+      context$price <- price
+    \})
+    then("I verify the price is \{float\}", function(price, context) \{
+      expect_identical(context$price, price)
+      expect_identical(context$price, 12)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: \{string\} captures a quoted string and strips quotes
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: String parameter double quotes
+        Given the name is "Alice"
+        Then I verify the name is "Alice"
+<span></span>
+      Scenario: String parameter single quotes
+        Given the name is 'Bob'
+        Then I verify the name is "Bob"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the name is \{string\}", function(name, context) \{
+      context$name &lt;- name
+    \})
+    then("I verify the name is \{string\}", function(name, context) \{
+      expect_equal(context$name, name)
+      expect_false(startsWith(context$name, "\\""))
+      expect_false(startsWith(context$name, "'"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 2 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: \{string\} captures a quoted string and strips quotes
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: String parameter double quotes
+        Given the name is "Alice"
+        Then I verify the name is "Alice"
+
+      Scenario: String parameter single quotes
+        Given the name is 'Bob'
+        Then I verify the name is "Bob"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the name is \{string\}", function(name, context) \{
+      context$name <- name
+    \})
+    then("I verify the name is \{string\}", function(name, context) \{
+      expect_equal(context$name, name)
+      expect_false(startsWith(context$name, "\\""))
+      expect_false(startsWith(context$name, "'"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 2 passed
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: \{word\} captures a single unquoted word
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Word parameter
+        Given the colour is red
+        Then I verify the colour is red
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the colour is \{word\}", function(colour, context) \{
+      context$colour &lt;- colour
+    \})
+    then("I verify the colour is \{word\}", function(colour, context) \{
+      expect_equal(context$colour, colour)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: \{word\} captures a single unquoted word
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Word parameter
+        Given the colour is red
+        Then I verify the colour is red
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the colour is \{word\}", function(colour, context) \{
+      context$colour <- colour
+    \})
+    then("I verify the colour is \{word\}", function(colour, context) \{
+      expect_equal(context$colour, colour)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+\strong{Rule: \{int\} is an R integer}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: \{int\} fails on a value too big for an R integer
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Big number
+        Given the count is 3000000000
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the count is \{int\}", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the error message includes "3000000000 is out of range for an integer"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: \{int\} fails on a value too big for an R integer
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Big number
+        Given the count is 3000000000
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the count is \{int\}", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 errors
+  And the error message includes "3000000000 is out of range for an integer"
+}}
+
+\strong{Rule: Custom parameter types are defined with define_parameter_type()}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type can be registered and used in steps
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Custom parameter
+        Given the direction is north
+        Then I verify the direction is north
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type(
+      name = "direction",
+      regexp = "north|south|east|west",
+      transformer = toupper
+    )
+    given("the direction is \{direction\}", function(dir, context) \{
+      context$direction &lt;- dir
+    \})
+    then("I verify the direction is \{direction\}", function(dir, context) \{
+      expect_equal(context$direction, "NORTH")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A custom parameter type can be registered and used in steps
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Custom parameter
+        Given the direction is north
+        Then I verify the direction is north
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type(
+      name = "direction",
+      regexp = "north|south|east|west",
+      transformer = toupper
+    )
+    given("the direction is \{direction\}", function(dir, context) \{
+      context$direction <- dir
+    \})
+    then("I verify the direction is \{direction\}", function(dir, context) \{
+      expect_equal(context$direction, "NORTH")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type's regexp is a plain regular expression
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Version
+        Given the version is 1.2
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type("version", "\\\\d+\\\\.\\\\d+", numeric_version)
+    given("the version is \{version\}", function(version, context) \{
+      expect_equal(version, numeric_version("1.2"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A custom parameter type's regexp is a plain regular expression
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Version
+        Given the version is 1.2
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type("version", "\\\\d+\\\\.\\\\d+", numeric_version)
+    given("the version is \{version\}", function(version, context) \{
+      expect_equal(version, numeric_version("1.2"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type can have several regexps
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Answers
+        Given the answer is yes
+        And the answer is no
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type("answer", c("yes", "no"), \\(x) x == "yes")
+    given("the answer is \{answer\}", function(answer, context) \{
+      context$answers &lt;- c(context$answers, answer)
+      if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A custom parameter type can have several regexps
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Answers
+        Given the answer is yes
+        And the answer is no
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type("answer", c("yes", "no"), \\(x) x == "yes")
+    given("the answer is \{answer\}", function(answer, context) \{
+      context$answers <- c(context$answers, answer)
+      if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type's transformer gets the text of each capture group
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Point
+        Given a point at 1,2 and 3 more
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type("point", "(\\\\d+),(\\\\d+)", function(x, y) as.integer(c(x, y)))
+    given("a point at \{point\} and \{int\} more", function(point, n, context) \{
+      expect_equal(point, c(1L, 2L))
+      expect_equal(n, 3L)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A custom parameter type's transformer gets the text of each capture group
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Point
+        Given a point at 1,2 and 3 more
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    define_parameter_type("point", "(\\\\d+),(\\\\d+)", function(x, y) as.integer(c(x, y)))
+    given("a point at \{point\} and \{int\} more", function(point, n, context) \{
+      expect_equal(point, c(1L, 2L))
+      expect_equal(n, 3L)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\strong{Rule: A step definition with an undefined parameter type defines no step}
+
+Like in cucumber-js, the run goes on: the steps it would match are undefined, and the
+summary lists the undefined parameter types.
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Steps of a step definition with an undefined parameter type are undefined
+  Given a file named "features/airports.feature" with
+    """
+    Feature: Airports
+      Scenario: Strike
+        Given CDG is closed because of a strike
+<span></span>
+      Scenario: Open
+        Given LHR is open
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("\{airport\} is closed because of a strike", function(airport, context) \{\})
+    given("LHR is open", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | scenario | step                                    | status    |
+    | Strike   | Given CDG is closed because of a strike | undefined |
+    | Open     | Given LHR is open                       | passed    |
+  And the output includes
+    """
+    Undefined parameter types:
+    - "airport" e.g. &#96;\{airport\} is closed because of a strike&#96;
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Steps of a step definition with an undefined parameter type are undefined
+  Given a file named "features/airports.feature" with
+    """
+    Feature: Airports
+      Scenario: Strike
+        Given CDG is closed because of a strike
+
+      Scenario: Open
+        Given LHR is open
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("\{airport\} is closed because of a strike", function(airport, context) \{\})
+    given("LHR is open", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | scenario | step                                    | status    |
+    | Strike   | Given CDG is closed because of a strike | undefined |
+    | Open     | Given LHR is open                       | passed    |
+  And the output includes
+    """
+    Undefined parameter types:
+    - "airport" e.g. `\{airport\} is closed because of a strike`
+    """
+}}
+
+Source: \code{tests/acceptance/parameter_types.feature}
+}
 }
 
-
-To use custom parameter types, call \code{define_parameter_type} before \code{cucumber::test} is called.
-}
 \examples{
 define_parameter_type("color", "red|blue|green", as.character)
 define_parameter_type(

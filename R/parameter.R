@@ -40,17 +40,8 @@ ANONYMOUS <- .parameter(
 #' Define extra parameters to use in Cucumber steps.
 #'
 #' @description
-#' The following parameter types are available by default:
-#'
-#' | **Type**           | **Description**                                                                                                                                         |
-#' | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-#' | `{int}`            | Matches integers, for example `71` or `-19`. Converts value with `as.integer`, failing the step if it's out of range.                                    |
-#' | `{float}`          | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`.                                    |
-#' | `{word}`           | Matches words without whitespace, for example `banana` or `foo-bar` (but not `banana split`).                                                           |
-#' | `{string}`         | Matches single-quoted or double-quoted strings, for example `"banana split"` or `'banana split'` (but not `banana split`). Only the text between the quotes is extracted, and escaped quotes in it, like `\"`, are unescaped. |
-#' | `{}`               | Matches anything and passes it as text.                                                                                                                  |
-#'
-#' To use custom parameter types, call `define_parameter_type` before `cucumber::test` is called.
+#' Built-in parameter types are `{int}`, `{float}`, `{word}`, `{string}` and the anonymous `{}`.
+#' Define your own before the steps that use it are run, e.g. in a `setup-*.R` file.
 #'
 #' @param name
 #'  The name of the parameter.
@@ -80,6 +71,8 @@ ANONYMOUS <- .parameter(
 #' cucumber::define_parameter_type("color", "red|blue|green", as.character)
 #' cucumber::test(".", "./steps")
 #' }
+#'
+#' @eval features_rd(features = "parameter_types.feature")
 #'
 #' @md
 #' @export

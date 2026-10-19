@@ -3,7 +3,9 @@ Feature: Regular expressions
   is a regular expression instead of a Cucumber Expression.
   Each capture group is passed to the step. A group whose regexp is the regexp of a parameter type,
   like `(\\d+)` for `{int}`, is converted like that parameter; any other group is passed as text.
+  A regular expression without "^" and "$" can match a part of the step's text.
 
+  @rd
   Scenario: Capture groups are passed to the step, converted by parameter type
     Given a package
     And a file named "features/basket.feature" with
@@ -50,6 +52,7 @@ Feature: Regular expressions
       """
     Then it passes
 
+  @rd
   Scenario: A capture group that doesn't match passes NA
     Given a package
     And a file named "features/vegetables.feature" with

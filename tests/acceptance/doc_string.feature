@@ -7,6 +7,7 @@ Feature: Doc Strings
 
   Rule: A step definition gets the Doc String as one string, after the step's parameters
 
+    @rd
     Scenario: A step definition gets the Doc String
       Given a file named "features/docstring.feature" with
         """
@@ -186,6 +187,7 @@ Feature: Doc Strings
 
     It is `json` for a Doc String opened with ```json.
 
+    @rd
     Scenario: A Doc String's media type is in its media_type attribute
       Given a file named "features/docstring.feature" with
         """
@@ -225,6 +227,7 @@ Feature: Doc Strings
 
   Rule: In R, the `cucumber.docstring_as_lines` option passes a Doc String as a character vector of lines
 
+    @rd
     Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
       Given a file named "features/docstring.feature" with
         """

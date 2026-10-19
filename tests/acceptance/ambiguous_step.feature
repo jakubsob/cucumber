@@ -3,6 +3,7 @@ Feature: Ambiguous steps
   When it matches more than one, the step is reported as ambiguous, listing
   every matching definition, and the scenario fails.
 
+  @rd
   Scenario: A step matching two definitions fails with both definitions listed
     Given a package
     And a file named "features/user.feature" with
@@ -71,6 +72,36 @@ Feature: Ambiguous steps
     And the error message includes
       """
       "I add an item" (setup-steps.R:4)
+      """
+
+  @rd
+  Scenario: Steps are matched without their keyword
+    A Given and a Then step with the same text match the same step definitions,
+    so choose words that tell them apart, like "my account has a balance of £430"
+    and "my account should have a balance of £430".
+
+    Given a package
+    And a file named "features/account.feature" with
+      """
+      Feature: Account
+        Scenario: Withdraw
+          Given there is money in my account
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("there is money in my account", function(context) {})
+      then("there is money in my account", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                               | status    |
+      | Given there is money in my account | ambiguous |
+    And the error message includes
+      """
+      Multiple step definitions match: "there is money in my account"
       """
 
   Scenario: {int} and {float} definitions are ambiguous for an integer

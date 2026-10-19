@@ -14,65 +14,13 @@ when(description, implementation)
 then(description, implementation)
 }
 \arguments{
-\item{description}{A description of the step.
+\item{description}{A \href{https://github.com/cucumber/cucumber-expressions}{Cucumber Expression}
+or a regular expression that matches the text of steps, without their keyword.
+Its parameters, like \code{{int}}, are passed to the implementation, see \code{\link[=define_parameter_type]{define_parameter_type()}}.}
 
-Cucumber executes each step in a scenario one at a time, in the sequence you’ve written them in.
-When Cucumber tries to execute a step, it looks for a matching step definition to execute.
-
-\strong{Keywords are not taken into account when looking for a step definition.}
-This means you cannot have a \code{Given}, \code{When}, \code{Then}, \code{And} or \code{But} step with the same text as another step.
-
-Cucumber considers the following steps duplicates:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Given there is money in my account
-Then there is money in my account
-}\if{html}{\out{</div>}}
-
-This might seem like a limitation, but it forces you to come up with a less ambiguous, more clear domain language:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Given my account has a balance of £430
-Then my account should have a balance of £430
-}\if{html}{\out{</div>}}
-
-To pass arguments, description can contain placeholders in curly braces.
-
-To match:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{Given my account has a balance of £430
-}\if{html}{\out{</div>}}
-
-use:
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{given("my account has a balance of £\{float\}", function(balance, context) \{
-
-\})
-}\if{html}{\out{</div>}}
-
-If no step definition is found an error will be thrown, with a snippet of a step definition to add.
-When a value in the step matches more than one parameter type, like \code{5} for \code{{int}} and \code{{float}},
-the snippet suggests one definition per parameter type. The first one is code, the others are
-commented out alternatives. Keep only one of them, as a step matching several definitions is an error.
-
-If multiple steps definitions for a single step are found an error will be thrown.}
-
-\item{implementation}{A function that will be run during test execution.
-
-The implementation function must always have the last parameter named \code{context}.
-It holds the environment where test state can be stored to be passed to the next step.
-Its \code{attach()}, \code{log()} and \code{link()} attach data to the report, see \link{attachments}.
-
-If a step has a description \code{"I have {int} cucumbers in my basket"} then the implementation
-function should be \verb{function(n, context)}. The \code{{int}} value will be passed to
-\code{n}, this parameter can have any name.
-
-If a table or a docstring is defined for a step, it will be passed as an argument after placeholder parameters
-and before \code{context}. The function should be a \verb{function(n, table, context)}.
-A docstring is one string, with its media type (like \code{json} for \verb{"""json}) in the
-\code{media_type} attribute. Set the \code{cucumber.docstring_as_lines} option to \code{TRUE} to get it
-as a character vector of lines instead, see \link{opts}.
-See
-\href{https://github.com/jakubsob/cucumber/blob/main/inst/examples/table/tests/acceptance/setup-steps.R}{an example}
-on how to write implementation that uses tables or docstrings.}
+\item{implementation}{A function that gets the step's parameters, then its Data Table or
+Doc String, then \code{context}: an environment that the steps and hooks of a scenario share.
+Its \code{attach()}, \code{log()} and \code{link()} attach data to the report, see \link{attachments}.}
 }
 \value{
 A function of class \code{step}, invisibly. Function should be called for side effects.
@@ -80,40 +28,1198 @@ A function of class \code{step}, invisibly. Function should be called for side e
 \description{
 Provide a description that matches steps in feature files and the implementation function that will be run.
 }
-\details{
-Descriptions are \href{https://github.com/cucumber/cucumber-expressions}{Cucumber Expressions}.
-Text is matched literally, except for:\tabular{ll}{
-   \strong{Syntax} \tab \strong{Meaning} \cr
-   \code{{int}} \tab A parameter, see \code{\link[=define_parameter_type]{define_parameter_type()}}. Its value is passed to the implementation. \cr
-   \code{{}} \tab An anonymous parameter. Matches anything and passes it to the implementation as text. \cr
-   \code{(s)} \tab Optional text. \code{"I have {int} cucumber(s)"} matches \verb{I have 1 cucumber} and \verb{I have 2 cucumbers}. \cr
-   \code{a/b} \tab Alternative words. \code{"I press the Enter/Return key"} matches either word. \cr
+\section{Specification}{
+
+\subsection{Cucumber Expressions}{
+
+Step descriptions are Cucumber Expressions:
+text in parentheses is optional, words separated by "/" are alternatives,
+"{}" matches anything, and all other text is matched literally.
+An invalid expression is an error pointing at the problem.
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Optional text matches with or without it
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Optional text
+      Scenario: Singular and plural
+        Given I have 1 cucumber
+        When I eat 2 cucumbers
+        Then I have eaten 2 cucumbers
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("I have \{int\} cucumber(s)", function(n, context) \{
+      context$n &lt;- n
+    \})
+    when("I eat \{int\} cucumber(s)", function(n, context) \{
+      context$eaten &lt;- n
+    \})
+    then("I have eaten \{int\} cucumber(s)", function(n, context) \{
+      expect_equal(context$eaten, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Optional text matches with or without it
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Optional text
+      Scenario: Singular and plural
+        Given I have 1 cucumber
+        When I eat 2 cucumbers
+        Then I have eaten 2 cucumbers
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("I have \{int\} cucumber(s)", function(n, context) \{
+      context$n <- n
+    \})
+    when("I eat \{int\} cucumber(s)", function(n, context) \{
+      context$eaten <- n
+    \})
+    then("I have eaten \{int\} cucumber(s)", function(n, context) \{
+      expect_equal(context$eaten, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Alternative words match any of them
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Alternatives
+      Scenario: Either key
+        When I press the Enter key
+        And I press the Return key
+        Then the key was pressed 2 times
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I press the Enter/Return key", function(context) \{
+      context$presses &lt;- sum(context$presses, 1)
+    \})
+    then("the key was pressed \{int\} times", function(n, context) \{
+      expect_equal(context$presses, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Alternative words match any of them
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Alternatives
+      Scenario: Either key
+        When I press the Enter key
+        And I press the Return key
+        Then the key was pressed 2 times
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I press the Enter/Return key", function(context) \{
+      context$presses <- sum(context$presses, 1)
+    \})
+    then("the key was pressed \{int\} times", function(n, context) \{
+      expect_equal(context$presses, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Anonymous parameter matches anything as text
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Anonymous parameter
+      Scenario: Any value
+        Given the user is John Smith from 42 Street
+        Then the user should be "John Smith from 42 Street"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the user is \{\}", function(user, context) \{
+      context$user &lt;- user
+    \})
+    then("the user should be \{string\}", function(user, context) \{
+      expect_identical(context$user, user)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Anonymous parameter matches anything as text
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Anonymous parameter
+      Scenario: Any value
+        Given the user is John Smith from 42 Street
+        Then the user should be "John Smith from 42 Street"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the user is \{\}", function(user, context) \{
+      context$user <- user
+    \})
+    then("the user should be \{string\}", function(user, context) \{
+      expect_identical(context$user, user)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Special characters match literally and can be escaped
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Literal text
+      Scenario: Punctuation
+        Given the total is 5.00?
+        When I visit /about
+        Then I see (5) items on a/b
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the total is \{float\}?", function(total, context) \{
+      context$total &lt;- total
+    \})
+    when("I visit \\\\/about", function(context) \{
+      context$page &lt;- "/about"
+    \})
+    then("I see \\\\(\{int\}) items on a\\\\/b", function(n, context) \{
+      expect_equal(n, 5L)
+      expect_equal(context$total, 5)
+      expect_equal(context$page, "/about")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Special characters match literally and can be escaped
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Literal text
+      Scenario: Punctuation
+        Given the total is 5.00?
+        When I visit /about
+        Then I see (5) items on a/b
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the total is \{float\}?", function(total, context) \{
+      context$total <- total
+    \})
+    when("I visit \\\\/about", function(context) \{
+      context$page <- "/about"
+    \})
+    then("I see \\\\(\{int\}) items on a\\\\/b", function(n, context) \{
+      expect_equal(n, 5L)
+      expect_equal(context$total, 5)
+      expect_equal(context$page, "/about")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: An escaped space keeps words together in an alternative
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Alternatives with spaces
+      Scenario: Either city
+        Given I lived in New York
+        And I lived in Boston
+        Then I lived in 2 cities
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("I lived in New\\\\ York/Boston", function(context) \{
+      context$cities &lt;- sum(context$cities, 1)
+    \})
+    then("I lived in \{int\} cities", function(n, context) \{
+      expect_equal(context$cities, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: An escaped space keeps words together in an alternative
+  Given a package
+  And a file named "features/expressions.feature" with
+    """
+    Feature: Alternatives with spaces
+      Scenario: Either city
+        Given I lived in New York
+        And I lived in Boston
+        Then I lived in 2 cities
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("I lived in New\\\\ York/Boston", function(context) \{
+      context$cities <- sum(context$cities, 1)
+    \})
+    then("I lived in \{int\} cities", function(n, context) \{
+      expect_equal(context$cities, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+Source: \code{tests/acceptance/cucumber_expressions.feature}
 }
 
+\subsection{Regular expressions}{
 
-To match \code{(}, \verb{\{}, \code{/} or a space between alternatives literally, escape it with a backslash,
-e.g. \code{"a\\\\/b"} or \code{"I live in New\\\\ York/Boston"}. An invalid expression, like an empty optional \verb{()} or an
-alternative without text, is an error.
+A step description that starts with "^", ends with "$" or is surrounded by "/"
+is a regular expression instead of a Cucumber Expression.
+Each capture group is passed to the step. A group whose regexp is the regexp of a parameter type,
+like \verb{(\\\\d+)} for \code{{int}}, is converted like that parameter; any other group is passed as text.
+A regular expression without "^" and "$" can match a part of the step's text.
 
-Placeholders in expressions are replaced with regular expressions that match values in the feature file.
-The expression \code{"I have {int} cucumbers in my basket"} will be converted to
-\code{"^I have ((?:-?\\\\d+)|(?:\\\\d+)) cucumbers in my basket$"}. The extracted value of \code{{int}}
-will be passed to the implementation function after being transformed with \code{as.integer}.
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Capture groups are passed to the step, converted by parameter type
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Colours
+        Given I have a red cucumber
+        And I have a green cucumber
+        Then I have 2 cucumbers
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("^I have a (red|green) cucumber$", function(colour, context) \{
+      context$colours &lt;- c(context$colours, colour)
+    \})
+    then("/I have (\\\\d+) cucumbers/", function(n, context) \{
+      expect_identical(n, 2L)
+      expect_equal(context$colours, c("red", "green"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Capture groups are passed to the step, converted by parameter type
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Colours
+        Given I have a red cucumber
+        And I have a green cucumber
+        Then I have 2 cucumbers
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("^I have a (red|green) cucumber$", function(colour, context) \{
+      context$colours <- c(context$colours, colour)
+    \})
+    then("/I have (\\\\d+) cucumbers/", function(n, context) \{
+      expect_identical(n, 2L)
+      expect_equal(context$colours, c("red", "green"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A capture group that doesn't match passes NA
+  Given a package
+  And a file named "features/vegetables.feature" with
+    """
+    Feature: Vegetables
+      Scenario: Optional groups
+        Given a cucumber and a carrot
+        Then the vegetables are cucumber and carrot
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) \{
+      context$vegetables &lt;- c(first, second, third)
+    \})
+    then("^the vegetables are cucumber and carrot$", function(context) \{
+      expect_equal(context$vegetables, c("cucumber", "carrot", NA))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A capture group that doesn't match passes NA
+  Given a package
+  And a file named "features/vegetables.feature" with
+    """
+    Feature: Vegetables
+      Scenario: Optional groups
+        Given a cucumber and a carrot
+        Then the vegetables are cucumber and carrot
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) \{
+      context$vegetables <- c(first, second, third)
+    \})
+    then("^the vegetables are cucumber and carrot$", function(context) \{
+      expect_equal(context$vegetables, c("cucumber", "carrot", NA))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+Source: \code{tests/acceptance/regular_expressions.feature}
 }
-\section{Regular expressions}{
-A description that starts with \code{^}, ends with \code{$} or is surrounded by \code{/} is a regular expression
-instead of a Cucumber Expression. Each capture group's text is passed to the implementation, in order:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{given("^I have (\\\\d+) (red|green) cucumbers?$", function(n, colour, context) \{
+\subsection{Step definition arguments}{
 
-\})
-}\if{html}{\out{</div>}}
+A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
+then \code{context}, in this order.
 
-A capture group whose regexp is the regexp of a parameter type, like \verb{\\d+} for \code{{int}}, is
-transformed by it. Other capture groups are passed as text, and \code{NA} when they don't match.
-A regular expression without \code{^} and \code{$} can match a part of the step's text.
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
 
-To define your own parameter types use \code{\link{define_parameter_type}}.
+\if{html}{\out{<pre class="gherkin"><code>Scenario Outline: A step definition without &#96;context&#96; as its last argument is an error, &lt;case&gt;
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        When I add 3 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add \{int\} items", &lt;definition&gt;)
+    """
+  When I run it and it fails
+    """
+    test("features")
+    """
+  Then it fails with "A step definition must have &#96;context&#96; as its last argument."
+  And it fails with "Use &#96;function(n, context)&#96;."
+<span></span>
+  Examples:
+    | case             | definition              |
+    | missing context  | function(n) \{\}          |
+    | context not last | function(context, n) \{\} |</code></pre>}}
+\if{text,latex}{\preformatted{Scenario Outline: A step definition without `context` as its last argument is an error, <case>
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        When I add 3 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add \{int\} items", <definition>)
+    """
+  When I run it and it fails
+    """
+    test("features")
+    """
+  Then it fails with "A step definition must have `context` as its last argument."
+  And it fails with "Use `function(n, context)`."
+
+  Examples:
+    | case             | definition              |
+    | missing context  | function(n) \{\}          |
+    | context not last | function(context, n) \{\} |
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A step definition with &#96;...&#96; gets any number of arguments
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        When I add 3 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add \{int\} items", function(..., context) \{
+      expect_equal(list(...), list(3L))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A step definition with `...` gets any number of arguments
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        When I add 3 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add \{int\} items", function(..., context) \{
+      expect_equal(list(...), list(3L))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A step definition's arguments with a default value can be left out
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        When I add 3 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add \{int\} items", function(n, unit = "piece", context) \{
+      expect_equal(n, 3L)
+      expect_equal(unit, "piece")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A step definition's arguments with a default value can be left out
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        When I add 3 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add \{int\} items", function(n, unit = "piece", context) \{
+      expect_equal(n, 3L)
+      expect_equal(unit, "piece")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+Source: \code{tests/acceptance/r-step_definition_arguments.feature}
+}
+
+\subsection{Sharing state with context}{
+
+Every step definition and scenario hook gets \code{context}.
+It's an environment that steps and hooks of one scenario share.
+Each scenario starts with a new, empty \code{context}.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+        Then the basket has 1 item
+<span></span>
+      Scenario: Look into the basket
+        Then the basket has 0 items
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+        Then the basket has 1 item
+
+      Scenario: Look into the basket
+        Then the basket has 0 items
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Steps of a scenario share context
+  Given a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) \{
+      context$items &lt;- c(context$items, "apple")
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{
+      expect_length(context$items, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 2 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Steps of a scenario share context
+  Given a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) \{
+      context$items <- c(context$items, "apple")
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{
+      expect_length(context$items, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 2 passed
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks share context with the steps
+  Given a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      context$items &lt;- character()
+    \})
+    after(function(context, scenario) \{
+      cat(scenario$name, "ends with", length(context$items), "items\\n")
+    \})
+    when("I add an item", function(context) \{
+      context$items &lt;- c(context$items, "apple")
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{
+      expect_length(context$items, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And the output includes "Add an item ends with 1 items"
+  And the output includes "Look into the basket ends with 0 items"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Hooks share context with the steps
+  Given a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      context$items <- character()
+    \})
+    after(function(context, scenario) \{
+      cat(scenario$name, "ends with", length(context$items), "items\\n")
+    \})
+    when("I add an item", function(context) \{
+      context$items <- c(context$items, "apple")
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{
+      expect_length(context$items, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And the output includes "Add an item ends with 1 items"
+  And the output includes "Look into the basket ends with 0 items"
+}}
+
+Source: \code{tests/acceptance/r-sharing_state_with_context.feature}
+}
+
+\subsection{Data Tables}{
+
+A Data Table is a table under a step. The step definition gets it after the step's parameters.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\strong{Rule: A step definition gets the Data Table after the step's parameters}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A Data Table comes after the step's parameters
+  Given a file named "features/table.feature" with
+    """
+    Feature: Tables
+      Scenario: Table with parameter
+        Given 2 items in the basket
+          | item   |
+          | apple  |
+          | banana |
+        Then verify the basket has 2 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("\{int\} items in the basket", function(count, table, context) \{
+      context$expected_count &lt;- count
+      context$items &lt;- table$item
+    \})
+    then("verify the basket has \{int\} items", function(n, context) \{
+      expect_equal(length(context$items), n)
+      expect_equal(context$expected_count, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A Data Table comes after the step's parameters
+  Given a file named "features/table.feature" with
+    """
+    Feature: Tables
+      Scenario: Table with parameter
+        Given 2 items in the basket
+          | item   |
+          | apple  |
+          | banana |
+        Then verify the basket has 2 items
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("\{int\} items in the basket", function(count, table, context) \{
+      context$expected_count <- count
+      context$items <- table$item
+    \})
+    then("verify the basket has \{int\} items", function(n, context) \{
+      expect_equal(length(context$items), n)
+      expect_equal(context$expected_count, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+\strong{Rule: In R, a Data Table is a tibble whose first row holds the column names}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A step receives a Data Table as a tibble
+  Given a file named "features/table.feature" with
+    """
+    Feature: Tables
+      Scenario: Step with table
+        Given a list of numbers
+          | value |
+          | 1     |
+          | 2     |
+          | 3     |
+        Then the sum is 6
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a list of numbers", function(table, context) \{
+      expect_s3_class(table, "tbl_df")
+      context$numbers &lt;- as.integer(table$value)
+    \})
+    then("the sum is \{int\}", function(n, context) \{
+      expect_equal(sum(context$numbers), n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A step receives a Data Table as a tibble
+  Given a file named "features/table.feature" with
+    """
+    Feature: Tables
+      Scenario: Step with table
+        Given a list of numbers
+          | value |
+          | 1     |
+          | 2     |
+          | 3     |
+        Then the sum is 6
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a list of numbers", function(table, context) \{
+      expect_s3_class(table, "tbl_df")
+      context$numbers <- as.integer(table$value)
+    \})
+    then("the sum is \{int\}", function(n, context) \{
+      expect_equal(sum(context$numbers), n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+}}
+
+Source: \code{tests/acceptance/data_tables.feature}
+}
+
+\subsection{Doc Strings}{
+
+A Doc String is a block of text under a step, between ``` or """ delimiters.
+The step definition gets it as one string, after the step's parameters.
+
+\if{html}{\out{<pre class="gherkin"><code>Background:
+  Given a package</code></pre>}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+}}
+
+\strong{Rule: A step definition gets the Doc String as one string, after the step's parameters}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A step definition gets the Doc String
+  Given a file named "features/docstring.feature" with
+    """
+    Feature: Doc Strings
+      Scenario: Step with a Doc String
+        Given a message
+          &#96;&#96;&#96;
+          Hello, world!
+          &#96;&#96;&#96;
+        Then the message is "Hello, world!"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a message", function(message, context) \{
+      context$message &lt;- message
+    \})
+    then("the message is \{string\}", function(expected, context) \{
+      expect_equal(context$message[[1]], expected)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A step definition gets the Doc String
+  Given a file named "features/docstring.feature" with
+    """
+    Feature: Doc Strings
+      Scenario: Step with a Doc String
+        Given a message
+          ```
+          Hello, world!
+          ```
+        Then the message is "Hello, world!"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a message", function(message, context) \{
+      context$message <- message
+    \})
+    then("the message is \{string\}", function(expected, context) \{
+      expect_equal(context$message[[1]], expected)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+\strong{Rule: The media type is in the string's \code{media_type} attribute}
+
+It is \code{json} for a Doc String opened with ```json.
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A Doc String's media type is in its media_type attribute
+  Given a file named "features/docstring.feature" with
+    """
+    Feature: Doc Strings
+      Scenario: A request body
+        Given a body
+          &#96;&#96;&#96;json
+          \{"id": 1\}
+          &#96;&#96;&#96;
+        Then the body is JSON
+      Scenario: Text without a media type
+        Given a body
+          &#96;&#96;&#96;
+          Hello
+          &#96;&#96;&#96;
+        Then the body has no media type
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a body", function(body, context) \{
+      context$body &lt;- body
+    \})
+    then("the body is JSON", function(context) \{
+      expect_equal(attr(context$body, "media_type"), "json")
+      expect_equal(c(context$body), "\{\\"id\\": 1\}")
+    \})
+    then("the body has no media type", function(context) \{
+      expect_null(attr(context$body, "media_type"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 2 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A Doc String's media type is in its media_type attribute
+  Given a file named "features/docstring.feature" with
+    """
+    Feature: Doc Strings
+      Scenario: A request body
+        Given a body
+          ```json
+          \{"id": 1\}
+          ```
+        Then the body is JSON
+      Scenario: Text without a media type
+        Given a body
+          ```
+          Hello
+          ```
+        Then the body has no media type
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a body", function(body, context) \{
+      context$body <- body
+    \})
+    then("the body is JSON", function(context) \{
+      expect_equal(attr(context$body, "media_type"), "json")
+      expect_equal(c(context$body), "\{\\"id\\": 1\}")
+    \})
+    then("the body has no media type", function(context) \{
+      expect_null(attr(context$body, "media_type"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+  And it has 2 passed
+}}
+
+\strong{Rule: In R, the \code{cucumber.docstring_as_lines} option passes a Doc String as a character vector of lines}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
+  Given a file named "features/docstring.feature" with
+    """
+    Feature: Doc Strings
+      Scenario: A script
+        Given a script
+          &#96;&#96;&#96;r
+          x &lt;- 1
+          y &lt;- 2
+          &#96;&#96;&#96;
+        Then the script is a vector of lines
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a script", function(script, context) \{
+      context$script &lt;- script
+    \})
+    then("the script is a vector of lines", function(context) \{
+      expect_equal(c(context$script), c("x &lt;- 1", "y &lt;- 2"))
+      expect_equal(attr(context$script, "media_type"), "r")
+    \})
+    """
+  When I run
+    """
+    withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
+    """
+  Then it passes
+  And it has 1 passed</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
+  Given a file named "features/docstring.feature" with
+    """
+    Feature: Doc Strings
+      Scenario: A script
+        Given a script
+          ```r
+          x <- 1
+          y <- 2
+          ```
+        Then the script is a vector of lines
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a script", function(script, context) \{
+      context$script <- script
+    \})
+    then("the script is a vector of lines", function(context) \{
+      expect_equal(c(context$script), c("x <- 1", "y <- 2"))
+      expect_equal(attr(context$script, "media_type"), "r")
+    \})
+    """
+  When I run
+    """
+    withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
+    """
+  Then it passes
+  And it has 1 passed
+}}
+
+Source: \code{tests/acceptance/doc_string.feature}
+}
+
+\subsection{Step definition snippets}{
+
+An undefined step is reported with a snippet of the step definition it needs, ready to paste into a setup file.
+When more than one parameter type matches a part of the step, the alternative step definitions are listed as comments.
+Keep only one of them, as a step that matches several step definitions is ambiguous.
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: An undefined step is reported with a snippet
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Start shopping
+        Given an empty basket
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    No step found for: "an empty basket"
+    """
+  And the error message includes
+    """
+    Add a step definition:
+      given("an empty basket", function(context) \{
+        pending()
+      \})
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: An undefined step is reported with a snippet
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Start shopping
+        Given an empty basket
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    No step found for: "an empty basket"
+    """
+  And the error message includes
+    """
+    Add a step definition:
+      given("an empty basket", function(context) \{
+        pending()
+      \})
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Alternative step definitions are listed when more than one parameter type matches
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Count cucumbers
+        Given I have 5 cucumbers in my basket
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    Add a step definition:
+      given("I have \{int\} cucumbers in my basket", function(int, context) \{
+      # given("I have \{float\} cucumbers in my basket", function(float, context) \{
+        pending()
+      \})
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Alternative step definitions are listed when more than one parameter type matches
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Count cucumbers
+        Given I have 5 cucumbers in my basket
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    Add a step definition:
+      given("I have \{int\} cucumbers in my basket", function(int, context) \{
+      # given("I have \{float\} cucumbers in my basket", function(float, context) \{
+        pending()
+      \})
+    """
+}}
+
+Source: \code{tests/acceptance/step_definition_snippets.feature}
+}
+
+\subsection{Ambiguous steps}{
+
+A step must match exactly one step definition.
+When it matches more than one, the step is reported as ambiguous, listing
+every matching definition, and the scenario fails.
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A step matching two definitions fails with both definitions listed
+  Given a package
+  And a file named "features/user.feature" with
+    """
+    Feature: User
+      Scenario: Name a user
+        Given the user is "John"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the user is \{\}", function(user, context) \{
+      context$user &lt;- user
+    \})
+    given("the user is \{string\}", function(user, context) \{
+      context$user &lt;- user
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    Multiple step definitions match: "the user is "John""
+    """
+  And the error message includes
+    """
+    "the user is \{\}" (setup-steps.R:1)
+    """
+  And the error message includes
+    """
+    "the user is \{string\}" (setup-steps.R:4)
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A step matching two definitions fails with both definitions listed
+  Given a package
+  And a file named "features/user.feature" with
+    """
+    Feature: User
+      Scenario: Name a user
+        Given the user is "John"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the user is \{\}", function(user, context) \{
+      context$user <- user
+    \})
+    given("the user is \{string\}", function(user, context) \{
+      context$user <- user
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the error message includes
+    """
+    Multiple step definitions match: "the user is "John""
+    """
+  And the error message includes
+    """
+    "the user is \{\}" (setup-steps.R:1)
+    """
+  And the error message includes
+    """
+    "the user is \{string\}" (setup-steps.R:4)
+    """
+}}
+
+ZiUJNEeXOQthU4ODeRDSRlOVtwvhEKNO-49\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
+  A Given and a Then step with the same text match the same step definitions,
+  so choose words that tell them apart, like "my account has a balance of £430"
+  and "my account should have a balance of £430".
+
+  Given a package
+  And a file named "features/account.feature" with
+    """
+    Feature: Account
+      Scenario: Withdraw
+        Given there is money in my account
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("there is money in my account", function(context) \{\})
+    then("there is money in my account", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | step                               | status    |
+    | Given there is money in my account | ambiguous |
+  And the error message includes
+    """
+    Multiple step definitions match: "there is money in my account"
+    """
+}}
+
+Source: \code{tests/acceptance/ambiguous_step.feature}
+}
 }
 
 \examples{

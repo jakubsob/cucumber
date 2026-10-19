@@ -6,6 +6,7 @@ Feature: Data Tables
 
   Rule: A step definition gets the Data Table after the step's parameters
 
+    @rd
     Scenario: A Data Table comes after the step's parameters
       Given a file named "features/table.feature" with
         """
@@ -65,6 +66,7 @@ Feature: Data Tables
 
   Rule: In R, a Data Table is a tibble whose first row holds the column names
 
+    @rd
     Scenario: A step receives a Data Table as a tibble
       Given a file named "features/table.feature" with
         """
