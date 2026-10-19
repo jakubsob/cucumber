@@ -86,7 +86,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Features as documentation
 
-- ✨ `features_rd()` puts scenarios of feature files in the help page of a function, in a "Specification" section. Call it with `@eval` in the function's roxygen block, like `#' @eval cucumber::features_rd(features = "basket.feature")`. It selects scenarios like `test()`, by `features` and their lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected, set the `cucumber.rd_tags` option to use another tag expression. Name the section with `section`, or for every help page with the `cucumber.rd_section` option. On a pkgdown site, the scenarios are Gherkin code blocks, like those of a Markdown page.
+- ✨ `features_rd()` puts scenarios of feature files in the help page of a function, in a "Specification" section. Call it with `@eval` in the function's roxygen block, like `#' @eval cucumber::features_rd(features = "basket.feature")`. It selects scenarios like `test()`, by `features` and their lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected, set the `cucumber.rd_tags` option to use another tag expression. Name the section with `section`, or for every help page with the `cucumber.rd_section` option. Scenarios of a Rule are shown under the Rule, and of a Scenario Outline only the selected Examples, without their tags. On a pkgdown site, the scenarios are Gherkin code blocks, like those of a Markdown page.
 
 ## Snippets
 

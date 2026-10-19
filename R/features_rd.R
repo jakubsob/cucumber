@@ -118,7 +118,11 @@ feature_rd <- function(document, pickles, source, file) {
     if (is.null(scenario) || !scenario$id %in% selected) {
       return(NULL)
     }
-    block(scenario, unlist(map(scenario$examples, \(examples) unselected_rows(examples, selected))))
+    # Without the Examples' tags, like the scenario's
+    drop <- unlist(map(scenario$examples, \(examples) {
+      c(map_int(examples$tags, \(tag) tag$location$line), unselected_rows(examples, selected))
+    }))
+    block(scenario, drop)
   }
   children_rd <- function(children) {
     scenarios <- unlist(map(children, \(child) scenario_block(child$scenario)))

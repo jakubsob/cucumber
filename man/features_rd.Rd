@@ -489,6 +489,124 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
   And the help page "add" doesn't include "Specification:"
 }}
 
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Scenarios of a Rule are under the Rule
+  Only the selected Examples of a Scenario Outline are shown, and only the Rules with
+  selected scenarios.
+
+  Given a file named "tests/acceptance/discounts.feature" with
+    """
+    Feature: Discounts
+
+      Rule: Orders over 100 get 10\% off
+
+        Scenario Outline: Discount of an order
+          When I order for &lt;total&gt;
+          Then I pay &lt;paid&gt;
+
+          @rd
+          Examples: Discounted
+            | total | paid |
+            | 200   | 180  |
+
+          Examples: Not discounted
+            | total | paid |
+            | 100   | 100  |
+
+      Rule: Members get free shipping
+
+        Scenario: A member orders
+          When a member orders
+          Then shipping is free
+    """
+  And a file named "R/discount.R" with
+    """
+    #' Discount an order
+    #' @eval cucumber::features_rd(features = "discounts.feature")
+    #' @export
+    discount &lt;- function(total) total
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "discount" includes
+    """
+    Discounts:
+
+    *Rule: Orders over 100 get 10\% off*
+
+    Scenario Outline: Discount of an order
+      When I order for &lt;total&gt;
+      Then I pay &lt;paid&gt;
+
+      Examples: Discounted
+        | total | paid |
+        | 200   | 180  |
+
+    Source: 'tests/acceptance/discounts.feature'
+    """
+  And the help page "discount" doesn't include "Not discounted"
+  And the help page "discount" doesn't include "Members get free shipping"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Scenarios of a Rule are under the Rule
+  Only the selected Examples of a Scenario Outline are shown, and only the Rules with
+  selected scenarios.
+
+  Given a file named "tests/acceptance/discounts.feature" with
+    """
+    Feature: Discounts
+
+      Rule: Orders over 100 get 10\% off
+
+        Scenario Outline: Discount of an order
+          When I order for <total>
+          Then I pay <paid>
+
+          @rd
+          Examples: Discounted
+            | total | paid |
+            | 200   | 180  |
+
+          Examples: Not discounted
+            | total | paid |
+            | 100   | 100  |
+
+      Rule: Members get free shipping
+
+        Scenario: A member orders
+          When a member orders
+          Then shipping is free
+    """
+  And a file named "R/discount.R" with
+    """
+    #' Discount an order
+    #' @eval cucumber::features_rd(features = "discounts.feature")
+    #' @export
+    discount <- function(total) total
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "discount" includes
+    """
+    Discounts:
+
+    *Rule: Orders over 100 get 10\% off*
+
+    Scenario Outline: Discount of an order
+      When I order for <total>
+      Then I pay <paid>
+
+      Examples: Discounted
+        | total | paid |
+        | 200   | 180  |
+
+    Source: 'tests/acceptance/discounts.feature'
+    """
+  And the help page "discount" doesn't include "Not discounted"
+  And the help page "discount" doesn't include "Members get free shipping"
+}}
+
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A selection without scenarios is an error
   When I run it and it fails
     """
