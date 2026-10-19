@@ -74,3 +74,16 @@ Feature: Reporters
       CucumberProgressReporter$new()$report("cucumber.ndjson")
       """
     Then the output includes "1 failed"
+
+  Scenario: A report that can't be written fails the run
+    The scenarios run, and the error names the reporter that failed when the run ended.
+
+    When I run it and it fails
+      """
+      test("features", reporter = CucumberMultiReporter$new(list(
+        CucumberProgressReporter$new(),
+        CucumberHtmlReporter$new("missing/report.html")
+      )), stop_on_failure = FALSE)
+      """
+    Then it fails with "Reporter `CucumberHtmlReporter` failed in `end_run()`."
+    And the output includes "2 scenarios (1 failed, 1 passed)"

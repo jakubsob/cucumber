@@ -156,6 +156,32 @@ several reporters, to show the progress of a run and write its reports at once.
   Then the output includes "1 failed"
 }}
 
+\if{html}{\out{<pre class="gherkin"><code>Scenario: A report that can't be written fails the run
+  The scenarios run, and the error names the reporter that failed when the run ended.
+
+  When I run it and it fails
+    """
+    test("features", reporter = CucumberMultiReporter$new(list(
+      CucumberProgressReporter$new(),
+      CucumberHtmlReporter$new("missing/report.html")
+    )), stop_on_failure = FALSE)
+    """
+  Then it fails with "Reporter `CucumberHtmlReporter` failed in `end_run()`."
+  And the output includes "2 scenarios (1 failed, 1 passed)"</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: A report that can't be written fails the run
+  The scenarios run, and the error names the reporter that failed when the run ended.
+
+  When I run it and it fails
+    """
+    test("features", reporter = CucumberMultiReporter$new(list(
+      CucumberProgressReporter$new(),
+      CucumberHtmlReporter$new("missing/report.html")
+    )), stop_on_failure = FALSE)
+    """
+  Then it fails with "Reporter `CucumberHtmlReporter` failed in `end_run()`."
+  And the output includes "2 scenarios (1 failed, 1 passed)"
+}}
+
 Source: \code{tests/acceptance/r-reporters.feature}
 }
 }

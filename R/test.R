@@ -81,9 +81,10 @@ run <- function(
   # The reporter gets the error that stopped the run, like a failing before all
   # hook, unless it's the reporter that failed
   if (!inherits(error, "cucumber_reporter_error")) {
-    end_error <- tryCatch(
+    # A restart of its own, or the error would stop the run this one is nested in
+    end_error <- withRestarts(
       cucumber_event(reporter, "end_run", error),
-      cucumber_reporter_error = identity
+      cucumber_abort_run = identity
     )
     if (inherits(end_error, "cucumber_reporter_error")) {
       error <- end_error
