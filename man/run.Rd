@@ -142,7 +142,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
   And it ran "calculate adds one"
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Step definitions sourced into an environment are passed with &#96;test_local(env = )&#96;
   Given a file named "tests/testthat/steps/steps.R" with
     """
     given("I calculate", function(context) \{

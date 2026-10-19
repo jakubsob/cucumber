@@ -695,6 +695,180 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
   And the help page "discount" doesn't include "Members get free shipping"
 }}
 
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Doc Strings between &#96;&#96;&#96; are shown as written
+  Backticks of the scenarios don't pair with the backticks of the description.
+<span></span>
+  Given a file named "DESCRIPTION" with
+    """
+    Package: example
+    Version: 0.1.0
+    Title: Example
+    Description: An example.
+    License: MIT
+    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+    Encoding: UTF-8
+    """
+  And a file named "tests/acceptance/scripts.feature" with
+    """
+    Feature: Scripts
+      A script is a Doc String between &#96;&#96;&#96; delimiters.
+<span></span>
+      @rd
+      Scenario: Run a script
+        When I run
+          &#96;&#96;&#96;r
+          x &lt;- 1
+          &#96;&#96;&#96;
+        Then &#96;x&#96; is 1
+    """
+  And a file named "R/run_script.R" with
+    """
+    #' Run a script
+    #' @eval cucumber::features_rd(features = "scripts.feature")
+    #' @export
+    run_script &lt;- function(script) eval(parse(text = script))
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    pkgdown::build_reference(".", topics = "run_script", preview = FALSE)
+    """
+  Then the help page "run_script" includes
+    """
+    Scenario: Run a script
+      When I run
+        &#96;&#96;&#96;r
+        x &lt;- 1
+        &#96;&#96;&#96;
+      Then &#96;x&#96; is 1
+    """
+  And the reference page "run_script" has the Gherkin block
+    """
+    Scenario: Run a script
+      When I run
+        &#96;&#96;&#96;r
+        x &lt;- 1
+        &#96;&#96;&#96;
+      Then &#96;x&#96; is 1
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Doc Strings between ``` are shown as written
+  Backticks of the scenarios don't pair with the backticks of the description.
+
+  Given a file named "DESCRIPTION" with
+    """
+    Package: example
+    Version: 0.1.0
+    Title: Example
+    Description: An example.
+    License: MIT
+    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+    Encoding: UTF-8
+    """
+  And a file named "tests/acceptance/scripts.feature" with
+    """
+    Feature: Scripts
+      A script is a Doc String between ``` delimiters.
+
+      @rd
+      Scenario: Run a script
+        When I run
+          ```r
+          x <- 1
+          ```
+        Then `x` is 1
+    """
+  And a file named "R/run_script.R" with
+    """
+    #' Run a script
+    #' @eval cucumber::features_rd(features = "scripts.feature")
+    #' @export
+    run_script <- function(script) eval(parse(text = script))
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    pkgdown::build_reference(".", topics = "run_script", preview = FALSE)
+    """
+  Then the help page "run_script" includes
+    """
+    Scenario: Run a script
+      When I run
+        ```r
+        x <- 1
+        ```
+      Then `x` is 1
+    """
+  And the reference page "run_script" has the Gherkin block
+    """
+    Scenario: Run a script
+      When I run
+        ```r
+        x <- 1
+        ```
+      Then `x` is 1
+    """
+}}
+
+\if{html}{\out{<pre class="gherkin"><code>Scenario: Names of features and Rules are shown as written
+  Given a file named "tests/acceptance/discounts.feature" with
+    """
+    Feature: Discounts of \{percent\}\%
+<span></span>
+      Rule: \{int\} items get 10\% off
+<span></span>
+        @rd
+        Scenario: Order 3 items
+          When I order 3 items
+          Then I get 10\% off
+    """
+  And a file named "R/discount.R" with
+    """
+    #' Discount an order
+    #' @eval cucumber::features_rd(features = "discounts.feature")
+    #' @export
+    discount &lt;- function(total) total
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "discount" includes
+    """
+    Discounts of \{percent\}\%:
+<span></span>
+    *Rule: \{int\} items get 10\% off*
+    """</code></pre>}}
+\if{text,latex}{\preformatted{Scenario: Names of features and Rules are shown as written
+  Given a file named "tests/acceptance/discounts.feature" with
+    """
+    Feature: Discounts of \{percent\}\%
+
+      Rule: \{int\} items get 10\% off
+
+        @rd
+        Scenario: Order 3 items
+          When I order 3 items
+          Then I get 10\% off
+    """
+  And a file named "R/discount.R" with
+    """
+    #' Discount an order
+    #' @eval cucumber::features_rd(features = "discounts.feature")
+    #' @export
+    discount <- function(total) total
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "discount" includes
+    """
+    Discounts of \{percent\}\%:
+
+    *Rule: \{int\} items get 10\% off*
+    """
+}}
+
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A selection without scenarios is an error
   When I run it and it fails
     """

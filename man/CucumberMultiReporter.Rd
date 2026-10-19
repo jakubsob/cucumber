@@ -166,7 +166,7 @@ several reporters, to show the progress of a run and write its reports at once.
       CucumberHtmlReporter$new("missing/report.html")
     )), stop_on_failure = FALSE)
     """
-  Then it fails with "Reporter `CucumberHtmlReporter` failed in `end_run()`."
+  Then it fails with "Reporter &#96;CucumberHtmlReporter&#96; failed in &#96;end_run()&#96;."
   And the output includes "2 scenarios (1 failed, 1 passed)"</code></pre>}}
 \if{text,latex}{\preformatted{Scenario: A report that can't be written fails the run
   The scenarios run, and the error names the reporter that failed when the run ended.

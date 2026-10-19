@@ -105,7 +105,7 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     """
     1 of 3 scenarios failed
     - Add items: Then the basket has 4 items
-      Expected `context$items` to equal `n`.
+      Expected &#96;context$items&#96; to equal &#96;n&#96;.
     """</code></pre>}}
 \if{text,latex}{\preformatted{Scenario: A summary of the steps that failed, with their errors
   When I run

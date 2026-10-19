@@ -52,7 +52,7 @@ messages of the run, so it works offline.
     | step                       | status | error                                                    |
     | Given an empty basket      | passed |                                                          |
     | When I add an item         | passed |                                                          |
-    | Then the basket has 1 item | failed | expectation_failure Expected `context$items` to equal 2. |</code></pre>}}
+    | Then the basket has 1 item | failed | expectation_failure Expected &#96;context$items&#96; to equal 2. |</code></pre>}}
 \if{text,latex}{\preformatted{Scenario: Each step is shown with its result and the error of a step that didn't pass
   Given a file named "features/basket.feature" with
     """

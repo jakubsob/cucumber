@@ -87,7 +87,7 @@ show them, like the HTML report. The pretty reporter prints them under their ste
 }}
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: A step attaches images
-  Read an image, like a screenshot, with `readBin()` and attach it with its media type.
+  Read an image, like a screenshot, with &#96;readBin()&#96; and attach it with its media type.
   It's base64 encoded, and the HTML report shows it.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -157,7 +157,7 @@ show them, like the HTML report. The pretty reporter prints them under their ste
 }}
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks attach data too
-  `before_all()` and `after_all()` hooks get a `context` to attach with when they take one argument.
+  &#96;before_all()&#96; and &#96;after_all()&#96; hooks get a &#96;context&#96; to attach with when they take one argument.
 <span></span>
   Given a file named "features/basket.feature" with
     """

@@ -289,7 +289,7 @@ testthat reporters can't.
     source("broken-reporter.R")
     test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
     """
-  Then it fails with "Reporter `BrokenReporter` failed in `add_message()`."
+  Then it fails with "Reporter &#96;BrokenReporter&#96; failed in &#96;add_message()&#96;."
   And it fails with "can't format the step"
   And the output includes "message: testCaseStarted" once</code></pre>}}
 \if{text,latex}{\preformatted{Scenario: A reporter that fails stops the run with its error
@@ -347,7 +347,7 @@ testthat reporters can't.
     """
     test("features", reporter = testthat::ProgressReporter$new())
     """
-  Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."</code></pre>}}
+  Then it fails with "&#96;reporter&#96; must be a &#96;CucumberReporter&#96;, or &#96;NULL&#96; to report nothing."</code></pre>}}
 \if{text,latex}{\preformatted{Scenario: A testthat reporter can't report a run
   Given a file named "features/basket.feature" with
     """

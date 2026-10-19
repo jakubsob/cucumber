@@ -207,11 +207,11 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Feature: Basket
       Scenario: Add items
         Given a note
-          ```
+          &#96;&#96;&#96;
           line 1
           line 2
           line 3
-          ```
+          &#96;&#96;&#96;
         And these items
           | item     |
           | cucumber |

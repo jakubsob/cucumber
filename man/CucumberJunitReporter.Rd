@@ -190,7 +190,7 @@ fails. CI services read it to show the results of the run.
 
 \if{html}{\out{<pre class="gherkin"><code>Scenario: An error with characters XML doesn't allow is written as the message of the failure
   An error can have characters XML doesn't allow, like the escape character of the colors of
-  a terminal. Each is written as the text of its character reference, like `&amp;#27;`, so the
+  a terminal. Each is written as the text of its character reference, like &#96;&amp;#27;&#96;, so the
   report is still XML that CI services read.
 <span></span>
   Given a file named "features/basket.feature" with

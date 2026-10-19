@@ -107,6 +107,10 @@ feature_rd <- function(document, pickles, source, file) {
     # to highlight
     rd_escape <- \(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
     html <- gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", code, fixed = TRUE), fixed = TRUE), fixed = TRUE)
+    # roxygen reads the lines of a block as one markdown paragraph, so its
+    # backticks, like of a ```r Doc String, would make code spans with the
+    # backticks of the descriptions
+    html <- gsub("`", "&#96;", html, fixed = TRUE)
     html <- rd_escape(html)
     # pkgdown splits a section into paragraphs at blank lines, even in \out,
     # and joins the lines around them, so a blank line gets an empty element
@@ -141,10 +145,10 @@ feature_rd <- function(document, pickles, source, file) {
     if (is.null(rd)) {
       return(NULL)
     }
-    c(paste0("**", rule$keyword, ": ", rule$name, "**"), "", description_rd(rule$description), rd)
+    c(paste0("**", rule$keyword, ": ", escape_braces(rule$name), "**"), "", description_rd(rule$description), rd)
   }
   c(
-    paste0("## ", if (nzchar(feature$name)) feature$name else feature$keyword),
+    paste0("## ", escape_braces(if (nzchar(feature$name)) feature$name else feature$keyword)),
     "",
     description_rd(feature$description),
     children_rd(feature$children),
@@ -172,6 +176,14 @@ unselected_rows <- function(examples, selected) {
   }
   last <- if (length(rows) > 0) rows[[length(rows)]] else examples$tableHeader
   seq(first_line(examples), last$location$line %||% examples$location$line)
+}
+
+#' Escape the braces of markdown text, which Rd would read as a group. roxygen
+#' escapes the rest.
+#' @keywords internal
+#' @noRd
+escape_braces <- function(x) {
+  gsub("([{}])", "\\\\\\1", x)
 }
 
 description_rd <- function(description) {
