@@ -60,6 +60,9 @@ define_step <- function(description, implementation) {
 #'   "r-sharing_state_with_context.feature",
 #'   "data_tables.feature",
 #'   "doc_string.feature",
+#'   "passing_steps.feature",
+#'   "failing_steps.feature",
+#'   "undefined_step.feature",
 #'   "step_definition_snippets.feature",
 #'   "ambiguous_step.feature"
 #' ))

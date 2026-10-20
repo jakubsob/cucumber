@@ -1051,6 +1051,310 @@ It is \code{json} for a Doc String opened with ```json.
 Source: \code{tests/acceptance/doc_string.feature}
 }
 
+\subsection{Passing steps}{
+
+A step passes when its step definition returns without an error.
+A scenario passes when all its steps pass, even if they have no expectations.
+
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A scenario whose steps pass without expectations passes
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{
+      context$basket &lt;- list()
+    \})
+    when("I add an item", function(context) \{
+      context$basket &lt;- c(context$basket, "item")
+    \})
+    """
+  When I run
+    """
+    test("features", reporter = NULL)
+    """
+  Then it passes
+  And it has 1 passed
+  And it has 0 skipped</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A scenario whose steps pass without expectations passes
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{
+      context$basket <- list()
+    \})
+    when("I add an item", function(context) \{
+      context$basket <- c(context$basket, "item")
+    \})
+    """
+  When I run
+    """
+    test("features", reporter = NULL)
+    """
+  Then it passes
+  And it has 1 passed
+  And it has 0 skipped
+%</pre>
+}}
+
+Source: \code{tests/acceptance/passing_steps.feature}
+}
+
+\subsection{Failing steps}{
+
+A step fails when its step definition throws an error or a failed expectation.
+The steps after it are skipped, and the other scenarios still run.
+
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps after a failing step are skipped
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+        Then the basket has 1 item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) \{
+      expect_equal(1, 2)
+    \})
+    then("the basket has \{int\} item", function(n, context) \{
+      stop("this step must not execute")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the steps have these results:
+    | step                       | status  |
+    | Given an empty basket      | passed  |
+    | When I add an item         | failed  |
+    | Then the basket has 1 item | skipped |</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Steps after a failing step are skipped
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+        Then the basket has 1 item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) \{
+      expect_equal(1, 2)
+    \})
+    then("the basket has \{int\} item", function(n, context) \{
+      stop("this step must not execute")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And the steps have these results:
+    | step                       | status  |
+    | Given an empty basket      | passed  |
+    | When I add an item         | failed  |
+    | Then the basket has 1 item | skipped |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step that throws an error fails, and the other scenarios still run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+<span></span>
+      Scenario: Look into the basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) \{
+      stop("basket is full")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And it has 1 passed
+  And the error message includes "basket is full"
+  And the scenarios have these results:
+    | scenario             | status |
+    | Add an item          | failed |
+    | Look into the basket | passed |</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A step that throws an error fails, and the other scenarios still run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+
+      Scenario: Look into the basket
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("I add an item", function(context) \{
+      stop("basket is full")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it has 1 failed
+  And it has 1 passed
+  And the error message includes "basket is full"
+  And the scenarios have these results:
+    | scenario             | status |
+    | Add an item          | failed |
+    | Look into the basket | passed |
+%</pre>
+}}
+
+Source: \code{tests/acceptance/failing_steps.feature}
+}
+
+\subsection{Undefined steps}{
+
+A step that matches no step definition is undefined.
+It's reported with a snippet of the missing step definition, and the other scenarios still run.
+
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: An undefined step doesn't stop the run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+        Then the basket has 1 item
+<span></span>
+      Scenario: Look into the basket
+        Given an empty basket
+    """
+  And a file named "features/checkout.feature" with
+    """
+    Feature: Checkout
+      Scenario: Pay
+        When I pay 5 euro
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it ran "Scenario: Pay"
+  And it has 2 failed
+  And the steps have these results:
+    | scenario             | step                       | status    |
+    | Add an item          | Given an empty basket      | passed    |
+    | Add an item          | When I add an item         | undefined |
+    | Add an item          | Then the basket has 1 item | undefined |
+    | Look into the basket | Given an empty basket      | passed    |
+    | Pay                  | When I pay 5 euro          | undefined |
+  And the output includes
+    """
+    when("I pay \{int\} euro", function(int, context) \{
+    """</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: An undefined step doesn't stop the run
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+        Then the basket has 1 item
+
+      Scenario: Look into the basket
+        Given an empty basket
+    """
+  And a file named "features/checkout.feature" with
+    """
+    Feature: Checkout
+      Scenario: Pay
+        When I pay 5 euro
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then it ran "Scenario: Pay"
+  And it has 2 failed
+  And the steps have these results:
+    | scenario             | step                       | status    |
+    | Add an item          | Given an empty basket      | passed    |
+    | Add an item          | When I add an item         | undefined |
+    | Add an item          | Then the basket has 1 item | undefined |
+    | Look into the basket | Given an empty basket      | passed    |
+    | Pay                  | When I pay 5 euro          | undefined |
+  And the output includes
+    """
+    when("I pay \{int\} euro", function(int, context) \{
+    """
+%</pre>
+}}
+
+Source: \code{tests/acceptance/undefined_step.feature}
+}
+
 \subsection{Step definition snippets}{
 
 An undefined step is reported with a snippet of the step definition it needs, ready to paste into a setup file.
@@ -1236,7 +1540,7 @@ every matching definition, and the scenario fails.
 %</pre>
 }}
 
-df39U9Xd8Ntpqbig3JbvMQlhi1hbdVFQ-49\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
+XCbBSUwahx6nWuRzdgCw9rBSixcvETFM-63\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
   A Given and a Then step with the same text match the same step definitions,
   so choose words that tell them apart, like "my account has a balance of £430"
   and "my account should have a balance of £430".

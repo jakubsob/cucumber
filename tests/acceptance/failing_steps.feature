@@ -1,3 +1,4 @@
+@rd
 Feature: Failing steps
   A step fails when its step definition throws an error or a failed expectation.
   The steps after it are skipped, and the other scenarios still run.

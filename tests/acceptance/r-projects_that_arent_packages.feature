@@ -25,6 +25,7 @@ Feature: Testing projects that aren't packages
         add_two <- function(x) x + 2
         """
 
+    @rd
     Scenario: Steps can use a box module
       Given a file named "tests/acceptance/setup-steps.R" with
         """
@@ -75,6 +76,7 @@ Feature: Testing projects that aren't packages
 
   Rule: Code sourced into an environment is available to steps
 
+    @rd
     Scenario: Steps and code sourced into `env` are used by test()
       Given a file named "tests/calculate.feature" with
         """

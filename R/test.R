@@ -371,6 +371,8 @@ test_cucumber_code <- function(path, ...) {
 #' @param strict If `FALSE`, pending and undefined steps skip their scenario instead of failing it.
 #' @param dry_run If `TRUE`, match steps to step definitions without running steps or hooks.
 #' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.
+#' @param env Environment in which to run the tests, e.g. with step definitions and
+#'   code sourced into it, for a project that isn't a package.
 #'
 #' @examples
 #' \dontrun{
@@ -394,6 +396,7 @@ test_cucumber_code <- function(path, ...) {
 #' @eval features_rd(features = c(
 #'   "r-running_tests.feature",
 #'   "r-support_code.feature",
+#'   "r-projects_that_arent_packages.feature",
 #'   "paths.feature",
 #'   "target_specific_scenarios_by_tag.feature",
 #'   "target_specific_scenarios_by_name.feature",

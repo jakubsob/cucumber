@@ -32,7 +32,8 @@ searched too. Defaults to the \code{cucumber.path} option, or \code{"tests/accep
 \item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing. Defaults to
 \link{CucumberProgressReporter}.}
 
-\item{env}{Environment in which to execute the tests. Expert use only.}
+\item{env}{Environment in which to run the tests, e.g. with step definitions and
+code sourced into it, for a project that isn't a package.}
 
 \item{load_helpers}{Source helper files before running the tests?}
 
@@ -298,6 +299,174 @@ Code of the package under test is available once the package is loaded, e.g. wit
 }}
 
 Source: \code{tests/acceptance/r-support_code.feature}
+}
+
+\subsection{Testing projects that aren't packages}{
+
+cucumber doesn't need a package. Step definitions can use code from \code{box} modules
+(https://github.com/klmr/box), or code sourced into an environment passed to \code{test(env = )}.
+
+\strong{Rule: Steps can use box modules}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a file named "tests/acceptance/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Given I add one to 1
+        Then the result is 2
+<span></span>
+      Scenario: Adding two
+        Given I add two to 1
+        Then the result is 3
+    """
+  And a file named "src/calculate.R" with
+    """
+    #' @export
+    add_one &lt;- function(x) x + 1
+<span></span>
+    #' @export
+    add_two &lt;- function(x) x + 2
+    """</code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a file named "tests/acceptance/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Given I add one to 1
+        Then the result is 2
+
+      Scenario: Adding two
+        Given I add two to 1
+        Then the result is 3
+    """
+  And a file named "src/calculate.R" with
+    """
+    #' @export
+    add_one <- function(x) x + 1
+
+    #' @export
+    add_two <- function(x) x + 2
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps can use a box module
+  Given a file named "tests/acceptance/setup-steps.R" with
+    """
+    box::use(cucumber[given, then])
+    box::use(../../src/calculate)
+<span></span>
+    given("I add one to \{int\}", function(x, context) \{
+      context$result &lt;- calculate$add_one(x)
+    \})
+    given("I add two to \{int\}", function(x, context) \{
+      context$result &lt;- calculate$add_two(x)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    box::purge_cache()
+    test()
+    """
+  Then it passes
+  And it has 2 passed</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Steps can use a box module
+  Given a file named "tests/acceptance/setup-steps.R" with
+    """
+    box::use(cucumber[given, then])
+    box::use(../../src/calculate)
+
+    given("I add one to \{int\}", function(x, context) \{
+      context$result <- calculate$add_one(x)
+    \})
+    given("I add two to \{int\}", function(x, context) \{
+      context$result <- calculate$add_two(x)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    box::purge_cache()
+    test()
+    """
+  Then it passes
+  And it has 2 passed
+%</pre>
+}}
+
+\strong{Rule: Code sourced into an environment is available to steps}
+
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps and code sourced into `env` are used by test()
+  Given a file named "tests/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Given I calculate
+        Then the result is 2
+    """
+  And a file named "src/calculate.R" with
+    """
+    calculate &lt;- function(x) x + 1
+    """
+  And a file named "tests/steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result &lt;- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    env &lt;- new.env()
+    source("tests/steps.R", local = env)
+    source("src/calculate.R", local = env)
+    test("tests", env = env)
+    """
+  Then it passes</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Steps and code sourced into `env` are used by test()
+  Given a file named "tests/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Given I calculate
+        Then the result is 2
+    """
+  And a file named "src/calculate.R" with
+    """
+    calculate <- function(x) x + 1
+    """
+  And a file named "tests/steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    env <- new.env()
+    source("tests/steps.R", local = env)
+    source("src/calculate.R", local = env)
+    test("tests", env = env)
+    """
+  Then it passes
+%</pre>
+}}
+
+Source: \code{tests/acceptance/r-projects_that_arent_packages.feature}
 }
 
 \subsection{Choosing feature files}{

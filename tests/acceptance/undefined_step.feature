@@ -1,3 +1,4 @@
+@rd
 Feature: Undefined steps
   A step that matches no step definition is undefined.
   It's reported with a snippet of the missing step definition, and the other scenarios still run.

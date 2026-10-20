@@ -1,3 +1,4 @@
+@rd
 Feature: Passing steps
   A step passes when its step definition returns without an error.
   A scenario passes when all its steps pass, even if they have no expectations.
