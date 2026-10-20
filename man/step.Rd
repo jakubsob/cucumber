@@ -1542,7 +1542,36 @@ every matching definition, and the scenario fails.
 %</pre>
 }}
 
-Q5XyZsAGhFNkr0wvtJ1hYmi8b9vU50iL-63\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps are matched without their keyword
+  A Given and a Then step with the same text match the same step definitions,
+  so choose words that tell them apart, like "my account has a balance of £430"
+  and "my account should have a balance of £430".
+<span></span>
+  Given a package
+  And a file named "features/account.feature" with
+    """
+    Feature: Account
+      Scenario: Withdraw
+        Given there is money in my account
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("there is money in my account", function(context) \{\})
+    then("there is money in my account", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | step                               | status    |
+    | Given there is money in my account | ambiguous |
+  And the error message includes
+    """
+    Multiple step definitions match: "there is money in my account"
+    """</code></pre >}}  
+\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
   A Given and a Then step with the same text match the same step definitions,
   so choose words that tell them apart, like "my account has a balance of £430"
   and "my account should have a balance of £430".
@@ -1571,7 +1600,7 @@ Q5XyZsAGhFNkr0wvtJ1hYmi8b9vU50iL-63\if{text,latex}{\preformatted{Scenario: Steps
     Multiple step definitions match: "there is money in my account"
     """
 %</pre>
-}}
+}}  
 
 Source: \code{tests/acceptance/ambiguous_step.feature}
 }

@@ -364,6 +364,37 @@ Feature: Scenarios as documentation
         Then the result is 2
       """
 
+  Scenario: Scenarios with characters of more than one byte are shown as written
+    Given a file named "tests/acceptance/prices.feature" with
+      """
+      Feature: Prices
+        Prices are in pounds.
+
+        @rd
+        Scenario: A price in pounds
+          Given a price of £430
+          Then the price is £430
+      """
+    And a file named "R/price.R" with
+      """
+      #' Price an item
+      #' @eval cucumber::features_rd(features = "prices.feature")
+      #' @export
+      price <- function(x) x
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "price" includes
+      """
+      Prices are in pounds.
+
+      Scenario: A price in pounds
+        Given a price of £430
+        Then the price is £430
+      """
+
   Scenario: Names of features and Rules are shown as written
     Given a file named "tests/acceptance/discounts.feature" with
       """

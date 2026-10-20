@@ -112,14 +112,18 @@ feature_rd <- function(document, pickles, source, file) {
     # and joins the lines around them, so a blank line gets an empty element
     html[grepl("^\\s*$", html)] <- "<span></span>"
     html[[1]] <- paste0("<pre class=\"gherkin\"><code>", html[[1]])
+    # roxygen finds the end of an \if in bytes, but cuts the text in
+    # characters, so each extra byte of a character like £ takes one more
+    # character after it: spaces, not the Rd that follows
+    padding <- \(x) strrep(" ", sum(nchar(x, "bytes") - nchar(x)))
     # roxygen evaluates `r ` code of the markdown before it reads Rd, so a
     # ```r Doc String and the backticks of a description would make R code.
     # Markdown isn't read in an HTML block, from a line starting with <pre to
     # a line with </pre>: both copies are in one, ended by an Rd comment
-    html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre >}}")
+    html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre >}}", padding(html))
     code <- rd_escape(code)
     code[[1]] <- paste0("\\if{text,latex}{\\preformatted{", code[[1]])
-    c("\\if{html}{\\out{", html, code, "%</pre>", "}}", "")
+    c("\\if{html}{\\out{", html, code, "%</pre>", paste0("}}", padding(code)), "")
   }
   scenario_block <- function(scenario) {
     if (is.null(scenario) || !scenario$id %in% selected) {
