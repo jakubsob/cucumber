@@ -126,6 +126,59 @@ See the [examples directory](https://github.com/jakubsob/cucumber/tree/main/inst
 
 Write the official Cucumber HTML report of a run with `CucumberHtmlReporter`, and its JUnit XML report with `CucumberJunitReporter`. Steps and hooks attach screenshots and logs to it, like those of a failing [shinytest2](https://rstudio.github.io/shinytest2/) scenario: see the [Reports article](https://jakubsob.github.io/cucumber/articles/reporting.html) and [its report](https://jakubsob.github.io/cucumber/shinytest2-report.html).
 
+## Scenarios as documentation
+
+Feature files already say how your package behaves, so let them document it. Tag the scenarios that illustrate a function with `@rd`
+
+```{r rd-feature, echo = FALSE, results = "asis"}
+rd_feature <- c(
+  "Feature: Basket",
+  "  A basket holds the items a customer wants to buy.",
+  "",
+  "  @rd",
+  "  Scenario: Add an item",
+  "    Given an empty basket",
+  "    When I add 1 item",
+  "    Then the basket has 1 item",
+  "",
+  "  Scenario: Remove an item from an empty basket",
+  "    Given an empty basket",
+  "    When I remove 1 item",
+  "    Then the basket is empty"
+)
+rd_roxygen <- c(
+  "#' Add items to a basket",
+  "#' @eval cucumber::features_rd(features = \"basket.feature\")",
+  "#' @export",
+  "add <- function(basket, n) basket + n"
+)
+cat("```gherkin", rd_feature, "```", sep = "\n")
+```
+
+and put them in its help page with `features_rd()`:
+
+```{r rd-roxygen, echo = FALSE, results = "asis"}
+cat("```r", rd_roxygen, "```", sep = "\n")
+```
+
+`devtools::document()` adds a Specification section to `?add` with the feature's description and the tagged scenarios:
+
+```{r rd-help, echo = FALSE}
+withr::with_tempdir({
+  dir.create("tests/acceptance", recursive = TRUE)
+  writeLines(rd_feature, "tests/acceptance/basket.feature")
+  rd <- roxygen2::roc_proc_text(roxygen2::rd_roclet(), paste(rd_roxygen, collapse = "\n"))
+  rd_file <- tempfile(fileext = ".Rd")
+  writeLines(format(rd[["add.Rd"]]), rd_file)
+  help <- capture.output(tools::Rd2txt(rd_file, options = list(underline_titles = FALSE)))
+  #section <- paste0(getOption("cucumber.rd_section", "Specification"), ":")
+  #cat(help[which(help == section):length(help)], sep = "\n")
+  cat(help, sep = "\n")
+})
+```
+
+The help pages of this package are written this way, see [`?hook`](https://jakubsob.github.io/cucumber/reference/hook.html) or [`?test`](https://jakubsob.github.io/cucumber/reference/test.html): the scenarios that test cucumber explain it, and stay true because they run.
+
 ## How it works
 
 The `.feature` files are parsed and matched against step definitions.

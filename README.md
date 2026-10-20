@@ -224,6 +224,67 @@ article](https://jakubsob.github.io/cucumber/articles/reporting.html)
 and [its
 report](https://jakubsob.github.io/cucumber/shinytest2-report.html).
 
+## Scenarios as documentation
+
+Feature files already say how your package behaves, so let them document
+it. Tag the scenarios that illustrate a function with `@rd`
+
+``` gherkin
+Feature: Basket
+  A basket holds the items a customer wants to buy.
+
+  @rd
+  Scenario: Add an item
+    Given an empty basket
+    When I add 1 item
+    Then the basket has 1 item
+
+  Scenario: Remove an item from an empty basket
+    Given an empty basket
+    When I remove 1 item
+    Then the basket is empty
+```
+
+and put them in its help page with `features_rd()`:
+
+``` r
+#' Add items to a basket
+#' @eval cucumber::features_rd(features = "basket.feature")
+#' @export
+add <- function(basket, n) basket + n
+```
+
+`devtools::document()` adds a Specification section to `?add` with the
+feature’s description and the tagged scenarios:
+
+    Add items to a basket
+
+    Description:
+
+         Add items to a basket
+
+    Usage:
+
+         add(basket, n)
+         
+    Specification:
+
+      Basket:
+
+           A basket holds the items a customer wants to buy.
+
+           Scenario: Add an item
+             Given an empty basket
+             When I add 1 item
+             Then the basket has 1 item
+           
+           Source: 'tests/acceptance/basket.feature'
+
+The help pages of this package are written this way, see
+[`?hook`](https://jakubsob.github.io/cucumber/reference/hook.html) or
+[`?test`](https://jakubsob.github.io/cucumber/reference/test.html): the
+scenarios that test cucumber explain it, and stay true because they run.
+
 ## How it works
 
 The `.feature` files are parsed and matched against step definitions.
