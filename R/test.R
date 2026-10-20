@@ -368,7 +368,7 @@ test_cucumber_code <- function(path, ...) {
 #' @param name If not NULL, run only the scenarios whose name matches any of these regular expressions.
 #' @param features If not NULL, run only these feature files, relative to `path`.
 #'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`.
-#' @param strict If `FALSE`, pending and undefined steps skip their scenario instead of failing it.
+#' @param strict If `FALSE`, pending and undefined steps don't fail the run.
 #' @param dry_run If `TRUE`, match steps to step definitions without running steps or hooks.
 #' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.
 #' @param env Environment in which to run the tests, e.g. with step definitions and

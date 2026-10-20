@@ -29,7 +29,7 @@ files in the \code{tests/testthat} directory.}
 
 \item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing.}
 
-\item{strict}{If \code{FALSE}, pending and undefined steps skip their scenario instead of failing it.}
+\item{strict}{If \code{FALSE}, pending and undefined steps don't fail the run.}
 
 \item{dry_run}{If \code{TRUE}, match steps to step definitions without running steps or hooks.}
 

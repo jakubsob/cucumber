@@ -1,7 +1,8 @@
 @rd
 Feature: Strict mode
   By default, pending and undefined steps fail the run.
-  With `strict = FALSE` they skip their scenario instead. Ambiguous steps fail either way.
+  With `strict = FALSE` they don't: their scenario is reported as pending or undefined, and the steps
+  after them are skipped. Ambiguous steps fail either way.
 
   Background:
     Given a package

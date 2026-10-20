@@ -42,7 +42,7 @@ code sourced into it, for a project that isn't a package.}
 \item{stop_on_warning}{If \code{TRUE}, throw an error if any tests generate
 warnings.}
 
-\item{strict}{If \code{FALSE}, pending and undefined steps skip their scenario instead of failing it.}
+\item{strict}{If \code{FALSE}, pending and undefined steps don't fail the run.}
 
 \item{dry_run}{If \code{TRUE}, match steps to step definitions without running steps or hooks.}
 
@@ -1172,7 +1172,8 @@ Source: \code{tests/acceptance/target_specific_scenarios_by_line.feature}
 \subsection{Strict mode}{
 
 By default, pending and undefined steps fail the run.
-With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fail either way.
+With \code{strict = FALSE} they don't: their scenario is reported as pending or undefined, and the steps
+after them are skipped. Ambiguous steps fail either way.
 
 \if{html}{\out{
 <pre class="gherkin"><code>Background:
