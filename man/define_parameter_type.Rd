@@ -553,7 +553,7 @@ Register your own with \code{define_parameter_type()}.
 
 \strong{Rule: A step definition with an undefined parameter type defines no step}
 
-Like in cucumber-js, the run goes on: the steps it would match are undefined, and the
+The run goes on: the steps it would match are undefined, and the
 summary lists the undefined parameter types.
 
 \if{html}{\out{

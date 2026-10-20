@@ -364,7 +364,7 @@ Feature: Parameter types
       Then it fails with "There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}"
 
   Rule: A step definition with an undefined parameter type defines no step
-    Like in cucumber-js, the run goes on: the steps it would match are undefined, and the
+    The run goes on: the steps it would match are undefined, and the
     summary lists the undefined parameter types.
 
     @rd

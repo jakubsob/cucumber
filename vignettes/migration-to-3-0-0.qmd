@@ -260,7 +260,7 @@ given("I have {int} cucumbers", function(n, context) { ... })
 
 ### Undefined parameter types
 
-A step definition that uses a parameter type that isn't defined, like `{colour}` without `define_parameter_type("colour", ...)`, defines no step, like in cucumber-js. The steps it would match are undefined, and the summary of the run lists the undefined parameter types. Define it, or remove the braces.
+A step definition that uses a parameter type that isn't defined, like `{colour}` without `define_parameter_type("colour", ...)`, defines no step. The steps it would match are undefined, and the summary of the run lists the undefined parameter types. Define it, or remove the braces.
 
 ### Ambiguous steps
 
@@ -357,10 +357,10 @@ cucumber::test(dry_run = TRUE)
 # Run scenarios whose name matches a regular expression
 cucumber::test(name = "^Adding")
 
-# Run the scenario at line 12 of a feature file, like `cucumber-js features/addition.feature:12`
+# Run the scenario at line 12 of a feature file
 cucumber::test(features = "addition.feature:12")
 
-# Skip the remaining scenarios after the first failed one, like `cucumber-js --fail-fast`
+# Skip the remaining scenarios after the first failed one
 cucumber::test(fail_fast = TRUE)
 ```
 
@@ -448,8 +448,8 @@ after(function(context, scenario) {
 # Reporters
 
 - The default reporter, `CucumberProgressReporter`, prints one line per feature with its scenarios counted by status, like testthat's `ProgressReporter`, and prints each scenario that didn't pass. The reporter that printed each step is now `CucumberPrettyReporter`.
-- `CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` print like the `progress`, `progress-bar` and `summary` formatters of cucumber-js.
-- Cucumber reporters aren't testthat reporters anymore, and testthat reporters can't report a cucumber run. A `CucumberReporter` gets the start and the end of the run, its warnings, and the run as [Cucumber Messages](https://github.com/cucumber/messages), like the formatters of cucumber-js: each feature, scenario, step and hook, and their results.
+- `CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` print like the `progress`, `progress-bar` and `summary` formatters of Cucumber.
+- Cucumber reporters aren't testthat reporters anymore, and testthat reporters can't report a cucumber run. A `CucumberReporter` gets the start and the end of the run, its warnings, and the run as [Cucumber Messages](https://github.com/cucumber/messages): each feature, scenario, step and hook, and their results.
 - `CucumberPrettyReporter` prints each step with the keyword it's written with, each scenario with its keyword, like `Example:` or `Scenario Outline:`, and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
 
 ## Migrating from 2.2.0
@@ -483,7 +483,7 @@ A step's status is `"FAILED"` for both failed expectations and errors. The `"err
 
 # Snippets
 
-Snippets for undefined steps are generated like cucumber-js:
+Snippets for undefined steps are generated like in Cucumber:
 
 - Parameters are in the order they appear in the step.
 - A value matched by several parameter types gives one suggestion per type, e.g. `{int}` and a commented-out `{float}` for `5`.

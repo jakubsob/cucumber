@@ -150,8 +150,7 @@ withr::with_dir(fail_dir, {
 
 To see every step as it runs, use `CucumberPrettyReporter`.
 `CucumberDotsReporter`, `CucumberProgressBarReporter` and
-`CucumberSummaryReporter` print like the `progress`, `progress-bar` and
-`summary` formatters of cucumber-js:
+`CucumberSummaryReporter`.
 
 ``` r
 withr::with_dir(pass_dir, {
