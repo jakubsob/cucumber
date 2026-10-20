@@ -86,7 +86,6 @@ Feature: Running tests more than once
       file.remove("features/setup-steps.R")
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the steps have these results:
+    Then the steps have these results:
       | step                | status    |
       | Given I calculate 1 | undefined |

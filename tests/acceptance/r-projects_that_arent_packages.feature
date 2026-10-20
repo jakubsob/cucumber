@@ -73,8 +73,10 @@ Feature: Testing projects that aren't packages
         box::purge_cache()
         test()
         """
-      Then it passes
-      And it has 2 passed
+      Then the scenarios have these results:
+        | scenario   | status |
+        | Adding one | passed |
+        | Adding two | passed |
 
   Rule: Code sourced into an environment is available to steps
 

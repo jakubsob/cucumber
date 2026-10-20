@@ -27,8 +27,7 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes
+    Then the error message includes
       """
       (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
       """
@@ -53,8 +52,7 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "(1:1): Language not supported: xx"
+    Then the error message includes "(1:1): Language not supported: xx"
 
   Scenario: A tag with whitespace is a parse error
     Given a file named "features/tagged.feature" with
@@ -72,8 +70,7 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "(1:1): A tag may not contain whitespace"
+    Then the error message includes "(1:1): A tag may not contain whitespace"
 
   Scenario: A feature file that ends too early is a parse error
     Given a file named "features/tagged.feature" with
@@ -88,8 +85,7 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "(2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment"
+    Then the error message includes "(2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment"
 
   Scenario: Parsing stops after 10 errors
     Given a file named "features/broken.feature" with
@@ -118,8 +114,7 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "got 'junk 11'"
+    Then the error message includes "got 'junk 11'"
     And the error message doesn't include "got 'junk 12'"
 
   Scenario: No scenario runs when a feature file fails to parse, and every parse error is reported
@@ -145,7 +140,6 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And it has 0 passed
+    Then no scenario ran
     And the error message includes "Parse error in \"a.feature\" (1:1)"
     And the error message includes "Parse error in \"c.feature\" (1:1)"

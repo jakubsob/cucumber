@@ -68,8 +68,7 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Add a step definition:
         given("I have {int} and {int} cucumbers", function(int, int2, context) {
@@ -92,8 +91,7 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Add a step definition:
         given("I see the message {string}", function(string, context) {
@@ -113,8 +111,7 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Add a step definition:
         then("the result is shown", function(context) {

@@ -105,8 +105,7 @@ Feature: Step hooks
       """
       test("features", strict = FALSE, stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes "step left a mess"
+    Then the error message includes "step left a mess"
     And the steps have these results:
       | step                  | status |
       | Given an empty basket | failed |

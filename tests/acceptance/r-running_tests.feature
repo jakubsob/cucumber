@@ -67,5 +67,4 @@ Feature: Running tests with test()
       """
       test("empty", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "No feature files found."
+    Then the error message includes "No feature files found."

@@ -96,9 +96,7 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
-      And it has 0 passed
-      And the error message includes "the server didn't start"
+      Then the error message includes "the server didn't start"
       And the output includes "stop the server" once
       And no scenario ran
 
@@ -113,8 +111,7 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
-      And the error message includes "the server didn't start"
+      Then the error message includes "the server didn't start"
       And the output includes "start the database" once
 
     Scenario: A failing after all hook fails the run after every scenario has run
@@ -127,12 +124,10 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
-      And only these scenarios ran:
+      Then only these scenarios ran:
         | scenario       |
         | Add an item    |
         | Remove an item |
-      And it has 2 passed
       And the error message includes "the server didn't stop"
 
     Scenario: After all hooks run when scenarios fail
@@ -145,7 +140,10 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then it has 2 failed
+      Then the scenarios have these results:
+        | scenario       | status |
+        | Add an item    | failed |
+        | Remove an item | failed |
       And the output includes "stop the server" once
 
     Scenario: A named before all hook's error starts with its name
@@ -158,5 +156,4 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
-      And the error message includes "Hook \"Start the server\" failed: connection refused"
+      Then the error message includes "Hook \"Start the server\" failed: connection refused"

@@ -43,5 +43,7 @@ Feature: Language
       """
       test("features")
       """
-    Then it passes
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario    | status |
+      | Adding one  | passed |
+      | Adding more | passed |

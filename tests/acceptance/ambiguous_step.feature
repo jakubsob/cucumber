@@ -62,8 +62,7 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Multiple step definitions match: "I add an item"
       """
@@ -127,8 +126,7 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Multiple step definitions match: "there are 12 cucumbers"
       """

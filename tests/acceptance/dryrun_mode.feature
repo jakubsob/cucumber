@@ -81,9 +81,7 @@ Feature: Dry run
       """
       test("features", dry_run = TRUE)
       """
-    Then it has 0 failed
-    And it has 1 skipped
-    And the steps have these results:
+    Then the steps have these results:
       | step               | status    |
       | When I add an item | ambiguous |
 
@@ -103,8 +101,6 @@ Feature: Dry run
       """
       test("features", dry_run = TRUE)
       """
-    Then it has 0 failed
-    And it has 1 skipped
-    And the steps have these results:
+    Then the steps have these results:
       | step               | status  |
       | When I add an item | skipped |

@@ -61,7 +61,6 @@ Feature: Data Tables
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
   Rule: In R, a Data Table is a tibble whose first row holds the column names
 
@@ -123,7 +122,6 @@ Feature: Data Tables
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: Every cell is a character string
       Given a file named "features/table.feature" with

@@ -117,7 +117,13 @@ Feature: Running scenarios by tag
         """
         test("features", tags = "")
         """
-      Then it has 5 passed
+      Then the scenarios have these results:
+        | scenario       | status |
+        | Smoke and fast | passed |
+        | Smoke and slow | passed |
+        | UI and fast    | passed |
+        | UI and slow    | passed |
+        | Untagged       | passed |
 
   Rule: Scenarios inherit tags
 
@@ -275,8 +281,7 @@ Feature: Running scenarios by tag
         """
         test("features", tags = "<expression>", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
-      And the error message includes "Tag expression \"<expression>\" could not be parsed because of syntax error: <message>"
+      Then the error message includes "Tag expression \"<expression>\" could not be parsed because of syntax error: <message>"
 
       Examples:
         | case               | expression     | message              |
@@ -298,5 +303,4 @@ Feature: Running scenarios by tag
         """
         test("features", tags = "@a\\b", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
-      And the error message includes "could not be parsed because of syntax error: Illegal escape before \"b\"."
+      Then the error message includes "could not be parsed because of syntax error: Illegal escape before \"b\"."

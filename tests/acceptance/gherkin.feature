@@ -29,8 +29,10 @@ Feature: Gherkin
       """
       test("features")
       """
-    Then it passes
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario                                     | status |
+      | Flat                                         | passed |
+      | Tabs and a step deeper than the previous one | passed |
 
   Scenario: A feature without scenarios runs nothing
     Given a file named "features/empty.feature" with
@@ -46,7 +48,7 @@ Feature: Gherkin
       """
       test("features")
       """
-    Then it has 0 passed
+    Then no scenario ran
     And the output doesn't include "Feature: Not written yet"
 
   Scenario: An empty feature file runs nothing
@@ -62,7 +64,7 @@ Feature: Gherkin
       """
       test("features")
       """
-    Then it has 0 passed
+    Then no scenario ran
 
   Scenario: A scenario without steps passes
     Given a file named "features/basket.feature" with
@@ -75,7 +77,6 @@ Feature: Gherkin
       test("features")
       """
     Then it passes
-    And it has 1 passed
 
   Scenario Outline: <keyword> can be used instead of Feature
     Given a file named "features/eating.feature" with

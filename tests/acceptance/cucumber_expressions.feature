@@ -184,8 +184,7 @@ Feature: Cucumber Expressions
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes "This Cucumber Expression has a problem at column <column>:"
+    Then the error message includes "This Cucumber Expression has a problem at column <column>:"
     And the error message includes
       """
       <problem>

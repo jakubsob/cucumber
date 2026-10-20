@@ -29,8 +29,10 @@ Feature: Background
       """
       test("features")
       """
-    Then it passes
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario        | status |
+      | First scenario  | passed |
+      | Second scenario | passed |
 
   Scenario: Each scenario runs the Background anew
     Given a package
@@ -65,8 +67,10 @@ Feature: Background
       """
       test("features")
       """
-    Then it passes
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario        | status |
+      | Increment once  | passed |
+      | Increment twice | passed |
 
   Scenario: A failing background step marks the scenario as failed
     Given a package
@@ -92,4 +96,6 @@ Feature: Background
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
+    Then the scenarios have these results:
+      | scenario    | status |
+      | Should fail | failed |

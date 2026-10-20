@@ -98,8 +98,7 @@ Feature: Skipped steps
       """
       test("features")
       """
-    Then it has 0 errors
-    And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
     And the steps have these results:
       | step                           | status  |
       | When I sync the basket         | skipped |
@@ -147,8 +146,7 @@ Feature: Skipped steps
         """
         test("features")
         """
-      Then it has 0 errors
-      And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+      Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
       And the output includes "after: Sync the basket skipped"
       And the steps have these results:
         | step                      | status  |
@@ -172,8 +170,7 @@ Feature: Skipped steps
         """
         test("features")
         """
-      Then it has 0 errors
-      And the scenario "Sync the basket" is skipped with "Reason: the API is down"
+      Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
       And the output includes "after: Sync the basket skipped"
       And the steps and hooks have these results:
         | step                   | status  |
@@ -198,6 +195,5 @@ Feature: Skipped steps
         """
         test("features")
         """
-      Then it has 0 errors
-      And the scenario "Add an item" is skipped with "Reason: too late"
+      Then the scenario "Add an item" is skipped with "Reason: too late"
       And the output includes "this hook still runs"

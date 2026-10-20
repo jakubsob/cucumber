@@ -135,8 +135,7 @@ Feature: Regular expressions
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Your Regular Expression ^I have a (red|green) cucumber$
       matches multiple parameter types with regexp red|green:

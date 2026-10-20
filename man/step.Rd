@@ -1542,7 +1542,7 @@ every matching definition, and the scenario fails.
 %</pre>
 }}
 
-haepmmvqMV9RHJ97GfWgS8w43Uw1lYOj-63\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
+Q5XyZsAGhFNkr0wvtJ1hYmi8b9vU50iL-63\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
   A Given and a Then step with the same text match the same step definitions,
   so choose words that tell them apart, like "my account has a balance of £430"
   and "my account should have a balance of £430".

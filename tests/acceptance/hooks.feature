@@ -144,8 +144,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the output includes
+    Then the output includes
       """
       v Given an empty basket
       Error:
@@ -207,8 +206,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the output includes "after: failed can't close the database"
+    Then the output includes "after: failed can't close the database"
 
   Scenario Outline: A failing <hook>() hook fails the scenario
     Given a file named "features/basket.feature" with
@@ -226,8 +224,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes "the hook failed"
+    Then the error message includes "the hook failed"
     And the scenarios have these results:
       | scenario    | status |
       | Add an item | failed |

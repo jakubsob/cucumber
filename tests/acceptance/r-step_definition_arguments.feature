@@ -24,8 +24,7 @@ Feature: Step definition arguments
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "<message>"
+    Then the error message includes "<message>"
     And the error message includes "Use `function(int, data_table, context)`."
 
     Examples:

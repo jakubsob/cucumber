@@ -38,8 +38,10 @@ Feature: Rule
       """
       test("features")
       """
-    Then it passes
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario        | status |
+      | Add one item    | passed |
+      | Remove one item | passed |
 
   Scenario: A Rule Background runs after the Feature Background, only for its own scenarios
     Given a package
@@ -87,8 +89,12 @@ Feature: Rule
       """
       test("features")
       """
-    Then it passes
-    And it has 4 passed
+    Then the scenarios have these results:
+      | scenario                    | status |
+      | Outside any rule            | passed |
+      | Full basket                 | passed |
+      | Removing from a full basket | passed |
+      | Removing from a full basket | passed |
 
   Scenario: Rule tags are inherited by its scenarios
     Given a package

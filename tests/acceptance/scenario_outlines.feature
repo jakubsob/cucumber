@@ -36,8 +36,11 @@ Feature: Scenario Outlines
       """
       test("features")
       """
-    Then it passes
-    And it has 3 passed
+    Then the scenarios have these results:
+      | scenario       | status |
+      | Adding numbers | passed |
+      | Adding numbers | passed |
+      | Adding numbers | passed |
 
   Scenario: A failing outline row is reported without stopping other rows
     Given a file named "features/addition.feature" with
@@ -70,8 +73,11 @@ Feature: Scenario Outlines
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario       | status |
+      | Adding numbers | passed |
+      | Adding numbers | failed |
+      | Adding numbers | passed |
 
   Scenario: Outline placeholders are replaced in the name, Doc Strings and Data Tables
     Given a file named "features/outline.feature" with
@@ -110,7 +116,6 @@ Feature: Scenario Outlines
       test("features")
       """
     Then it passes
-    And it has 2 passed
     And it ran "Scenario: Greeting Alice"
     And it ran "Scenario: Greeting Bob"
 

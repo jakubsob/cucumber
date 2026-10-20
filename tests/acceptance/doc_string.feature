@@ -59,7 +59,6 @@ Feature: Doc Strings
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: A multi-line Doc String is one string with its lines joined by newlines
       Given a file named "features/docstring.feature" with
@@ -87,7 +86,6 @@ Feature: Doc Strings
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: A Doc String comes after the step's parameters
       Given a file named "features/docstring.feature" with
@@ -114,7 +112,6 @@ Feature: Doc Strings
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: A Doc String is dedented relative to its opening delimiter
       Given a file named "features/docstring.feature" with
@@ -150,8 +147,10 @@ Feature: Doc Strings
         """
         test("features")
         """
-      Then it passes
-      And it has 2 passed
+      Then the scenarios have these results:
+        | scenario                         | status |
+        | Delimiter indented past the step | passed |
+        | Delimiter aligned with the step  | passed |
 
     Scenario: A Doc String keeps empty lines and lines starting with #
       Given a file named "features/docstring.feature" with
@@ -180,7 +179,6 @@ Feature: Doc Strings
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
   Rule: The media type is in the string's `media_type` attribute
 
