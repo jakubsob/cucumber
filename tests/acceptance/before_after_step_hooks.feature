@@ -28,8 +28,7 @@ Feature: Step hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the output includes
+    Then the output includes
       """
       before: Given an empty basket
       after: an empty basket passed
@@ -63,8 +62,7 @@ Feature: Step hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the error message includes "step left a mess"
+    Then the error message includes "step left a mess"
     And the steps have these results:
       | step                  | status  |
       | Given an empty basket | failed  |

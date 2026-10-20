@@ -31,8 +31,10 @@ Feature: Sharing state with context
       """
       test("features")
       """
-    Then it passes
-    And it has 2 passed
+    Then the scenarios have these results:
+      | scenario             | status |
+      | Add an item          | passed |
+      | Look into the basket | passed |
 
   Scenario: Hooks share context with the steps
     Given a file named "features/setup-steps.R" with

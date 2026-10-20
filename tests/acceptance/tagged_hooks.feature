@@ -27,7 +27,7 @@ Feature: Tagged hooks
       """
       test("features")
       """
-    Then it has 0 errors
+    Then it passes
     And the output includes "connect for Save the basket"
     And the output includes "disconnect for Save the basket"
     And the output doesn't include "connect for Add an item"

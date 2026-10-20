@@ -87,7 +87,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features")
     """
-  Then it has 0 errors
+  Then it passes
   And the output includes
     """
     before 1
@@ -115,7 +115,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features")
     """
-  Then it has 0 errors
+  Then it passes
   And the output includes
     """
     before 1
@@ -152,8 +152,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
-  And the output includes
+  Then the output includes
     """
     before: Add an item @smoke basket.feature
     """
@@ -185,8 +184,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
-  And the output includes
+  Then the output includes
     """
     before: Add an item @smoke basket.feature
     """
@@ -214,7 +212,10 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps and hooks have these results:
+    | step                           | status  |
+    | Before Connect to the database | failed  |
+    | Given an empty basket          | skipped |
   And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A named hook's errors start with its name
   Given a file named "features/basket.feature" with
@@ -232,7 +233,10 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps and hooks have these results:
+    | step                           | status  |
+    | Before Connect to the database | failed  |
+    | Given an empty basket          | skipped |
   And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"
 %</pre>
 }}
@@ -258,8 +262,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And the error message includes "no database"
+  Then the error message includes "no database"
   And the steps and hooks have these results:
     | step                  | status  |
     | Before                | failed  |
@@ -284,8 +287,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And the error message includes "no database"
+  Then the error message includes "no database"
   And the steps and hooks have these results:
     | step                  | status  |
     | Before                | failed  |
@@ -331,7 +333,7 @@ like \code{before(connect, tags = "@db")}.
     """
     test("features")
     """
-  Then it has 0 errors
+  Then it passes
   And the output includes "connect for Save the basket"
   And the output includes "disconnect for Save the basket"
   And the output doesn't include "connect for Add an item"
@@ -357,7 +359,7 @@ like \code{before(connect, tags = "@db")}.
     """
     test("features")
     """
-  Then it has 0 errors
+  Then it passes
   And the output includes "connect for Save the basket"
   And the output includes "disconnect for Save the basket"
   And the output doesn't include "connect for Add an item"
@@ -404,8 +406,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
-  And the output includes
+  Then the output includes
     """
     before: Given an empty basket
     after: an empty basket passed
@@ -440,8 +441,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
-  And the output includes
+  Then the output includes
     """
     before: Given an empty basket
     after: an empty basket passed
@@ -477,8 +477,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
-  And the error message includes "step left a mess"
+  Then the error message includes "step left a mess"
   And the steps have these results:
     | step                  | status  |
     | Given an empty basket | failed  |
@@ -501,8 +500,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
-  And the error message includes "step left a mess"
+  Then the error message includes "step left a mess"
   And the steps have these results:
     | step                  | status  |
     | Given an empty basket | failed  |

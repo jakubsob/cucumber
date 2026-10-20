@@ -374,8 +374,10 @@ cucumber doesn't need a package. Step definitions can use code from \code{box} m
     box::purge_cache()
     test()
     """
-  Then it passes
-  And it has 2 passed</code></pre >}}
+  Then the scenarios have these results:
+    | scenario   | status |
+    | Adding one | passed |
+    | Adding two | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Steps can use a box module
   Given a file named "tests/acceptance/setup-steps.R" with
     """
@@ -397,8 +399,10 @@ cucumber doesn't need a package. Step definitions can use code from \code{box} m
     box::purge_cache()
     test()
     """
-  Then it passes
-  And it has 2 passed
+  Then the scenarios have these results:
+    | scenario   | status |
+    | Adding one | passed |
+    | Adding two | passed |
 %</pre>
 }}
 
@@ -1206,9 +1210,10 @@ With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fai
     """
     test("features", strict = FALSE)
     """
-  Then it has 1 passed
-  And it has 1 skipped
-  And it has 0 failed</code></pre >}}
+  Then the scenarios have these results:
+    | scenario            | status  |
+    | Implemented         | passed  |
+    | Not yet implemented | pending |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A pending step skips the scenario when not strict
   Given a file named "features/mixed.feature" with
     """
@@ -1236,9 +1241,10 @@ With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fai
     """
     test("features", strict = FALSE)
     """
-  Then it has 1 passed
-  And it has 1 skipped
-  And it has 0 failed
+  Then the scenarios have these results:
+    | scenario            | status  |
+    | Implemented         | passed  |
+    | Not yet implemented | pending |
 %</pre>
 }}
 
@@ -1258,8 +1264,9 @@ With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fai
     """
     test("features", strict = FALSE)
     """
-  Then it has 1 skipped
-  And it has 0 failed</code></pre >}}
+  Then the scenarios have these results:
+    | scenario    | status    |
+    | Add an item | undefined |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An undefined step skips the scenario when not strict
   Given a file named "features/basket.feature" with
     """
@@ -1275,8 +1282,9 @@ With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fai
     """
     test("features", strict = FALSE)
     """
-  Then it has 1 skipped
-  And it has 0 failed
+  Then the scenarios have these results:
+    | scenario    | status    |
+    | Add an item | undefined |
 %</pre>
 }}
 
@@ -1297,8 +1305,7 @@ With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fai
     """
     test("features", strict = FALSE, stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And the steps have these results:
+  Then the steps have these results:
     | step               | status    |
     | When I add an item | ambiguous |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An ambiguous step fails the scenario even when not strict
@@ -1317,8 +1324,7 @@ With \code{strict = FALSE} they skip their scenario instead. Ambiguous steps fai
     """
     test("features", strict = FALSE, stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And the steps have these results:
+  Then the steps have these results:
     | step               | status    |
     | When I add an item | ambiguous |
 %</pre>
@@ -1360,9 +1366,7 @@ Undefined and ambiguous steps are reported, but they don't fail a dry run: a sce
     """
     test("features", dry_run = TRUE)
     """
-  Then it has 0 errors
-  And it has 0 failed
-  And the steps and hooks have these results:
+  Then the steps and hooks have these results:
     | step                  | status  |
     | Given an empty basket | skipped |
     | When I add an item    | skipped |</code></pre >}}
@@ -1392,9 +1396,7 @@ Undefined and ambiguous steps are reported, but they don't fail a dry run: a sce
     """
     test("features", dry_run = TRUE)
     """
-  Then it has 0 errors
-  And it has 0 failed
-  And the steps and hooks have these results:
+  Then the steps and hooks have these results:
     | step                  | status  |
     | Given an empty basket | skipped |
     | When I add an item    | skipped |
@@ -1421,9 +1423,7 @@ Undefined and ambiguous steps are reported, but they don't fail a dry run: a sce
     """
     test("features", dry_run = TRUE)
     """
-  Then it has 0 failed
-  And it has 1 skipped
-  And the steps have these results:
+  Then the steps have these results:
     | step                  | status    |
     | Given an empty basket | skipped   |
     | When I add an item    | undefined |
@@ -1450,9 +1450,7 @@ Undefined and ambiguous steps are reported, but they don't fail a dry run: a sce
     """
     test("features", dry_run = TRUE)
     """
-  Then it has 0 failed
-  And it has 1 skipped
-  And the steps have these results:
+  Then the steps have these results:
     | step                  | status    |
     | Given an empty basket | skipped   |
     | When I add an item    | undefined |

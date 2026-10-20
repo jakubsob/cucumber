@@ -25,7 +25,9 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
+    Then the steps have these results:
+      | step                     | status    |
+      | Given the user is "John" | ambiguous |
     And the error message includes
       """
       Multiple step definitions match: "the user is "John""

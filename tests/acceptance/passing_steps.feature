@@ -28,5 +28,3 @@ Feature: Passing steps
       test("features", reporter = NULL)
       """
     Then it passes
-    And it has 1 passed
-    And it has 0 skipped

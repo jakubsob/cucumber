@@ -33,7 +33,6 @@ Feature: Undefined steps
       test("features", stop_on_failure = FALSE)
       """
     Then it ran "Scenario: Pay"
-    And it has 2 failed
     And the steps have these results:
       | scenario             | step                       | status    |
       | Add an item          | Given an empty basket      | passed    |

@@ -42,7 +42,7 @@ Feature: Running scenarios alongside testthat tests
       """
       testthat::test_local()
       """
-    Then it has 2 passed
+    Then it passes
     And it ran "Scenario: Adding one"
     And it ran "calculate adds one"
 

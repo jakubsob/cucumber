@@ -32,7 +32,6 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: {int} matches only integers without a plus sign
       Given a file named "features/params.feature" with
@@ -75,7 +74,6 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     @rd
     Scenario: {float} also captures an integer
@@ -153,8 +151,10 @@ Feature: Parameter types
         """
         test("features")
         """
-      Then it passes
-      And it has 2 passed
+      Then the scenarios have these results:
+        | scenario                       | status |
+        | String parameter double quotes | passed |
+        | String parameter single quotes | passed |
 
     Scenario: {string} unescapes escaped quotes
       Given a file named "features/params.feature" with
@@ -202,7 +202,6 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: {word} matches anything without whitespace
       Given a file named "features/params.feature" with
@@ -241,7 +240,9 @@ Feature: Parameter types
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then it has 1 errors
+      Then the steps have these results:
+        | step                          | status |
+        | Given the count is 3000000000 | failed |
       And the error message includes "3000000000 is out of range for an integer"
 
   Rule: Custom parameter types are defined with define_parameter_type()
@@ -274,7 +275,6 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     @rd
     Scenario: A custom parameter type's regexp is a plain regular expression

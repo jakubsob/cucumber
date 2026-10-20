@@ -117,7 +117,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     """
     testthat::test_local()
     """
-  Then it has 2 passed
+  Then it passes
   And it ran "Scenario: Adding one"
   And it ran "calculate adds one"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Scenarios run with the package's testthat tests
@@ -140,7 +140,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     """
     testthat::test_local()
     """
-  Then it has 2 passed
+  Then it passes
   And it ran "Scenario: Adding one"
   And it ran "calculate adds one"
 %</pre>

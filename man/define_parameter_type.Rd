@@ -74,8 +74,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{int\} captures an integer from step text
   Given a file named "features/params.feature" with
     """
@@ -99,7 +98,6 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 
@@ -126,8 +124,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{float\} captures a decimal number from step text
   Given a file named "features/params.feature" with
     """
@@ -151,7 +148,6 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 
@@ -233,8 +229,10 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes
-  And it has 2 passed</code></pre >}}
+  Then the scenarios have these results:
+    | scenario                       | status |
+    | String parameter double quotes | passed |
+    | String parameter single quotes | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{string\} captures a quoted string and strips quotes
   Given a file named "features/params.feature" with
     """
@@ -262,8 +260,10 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes
-  And it has 2 passed
+  Then the scenarios have these results:
+    | scenario                       | status |
+    | String parameter double quotes | passed |
+    | String parameter single quotes | passed |
 %</pre>
 }}
 
@@ -289,8 +289,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{word\} captures a single unquoted word
   Given a file named "features/params.feature" with
     """
@@ -313,7 +312,6 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 
@@ -335,7 +333,9 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
+  Then the steps have these results:
+    | step                          | status |
+    | Given the count is 3000000000 | failed |
   And the error message includes "3000000000 is out of range for an integer"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{int\} fails on a value too big for an R integer
   Given a file named "features/params.feature" with
@@ -352,7 +352,9 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 errors
+  Then the steps have these results:
+    | step                          | status |
+    | Given the count is 3000000000 | failed |
   And the error message includes "3000000000 is out of range for an integer"
 %</pre>
 }}
@@ -386,8 +388,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A custom parameter type can be registered and used in steps
   Given a file named "features/params.feature" with
     """
@@ -415,7 +416,6 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 

@@ -33,9 +33,10 @@ Feature: Strict mode
       """
       test("features", strict = FALSE)
       """
-    Then it has 1 passed
-    And it has 1 skipped
-    And it has 0 failed
+    Then the scenarios have these results:
+      | scenario            | status  |
+      | Implemented         | passed  |
+      | Not yet implemented | pending |
 
   Scenario: An undefined step skips the scenario when not strict
     Given a file named "features/basket.feature" with
@@ -52,8 +53,9 @@ Feature: Strict mode
       """
       test("features", strict = FALSE)
       """
-    Then it has 1 skipped
-    And it has 0 failed
+    Then the scenarios have these results:
+      | scenario    | status    |
+      | Add an item | undefined |
 
   Scenario: An ambiguous step fails the scenario even when not strict
     Given a file named "features/basket.feature" with
@@ -71,7 +73,6 @@ Feature: Strict mode
       """
       test("features", strict = FALSE, stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the steps have these results:
+    Then the steps have these results:
       | step               | status    |
       | When I add an item | ambiguous |

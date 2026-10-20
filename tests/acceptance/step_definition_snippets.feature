@@ -16,7 +16,9 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
+    Then the steps have these results:
+      | step                  | status    |
+      | Given an empty basket | undefined |
     And the error message includes
       """
       No step found for: "an empty basket"
@@ -42,7 +44,9 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
+    Then the steps have these results:
+      | step                                  | status    |
+      | Given I have 5 cucumbers in my basket | undefined |
     And the error message includes
       """
       Add a step definition:

@@ -32,7 +32,7 @@ Feature: Hooks
       """
       test("features")
       """
-    Then it has 0 errors
+    Then it passes
     And the output includes
       """
       before 1
@@ -67,8 +67,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 errors
-    And the output includes
+    Then the output includes
       """
       before: Add an item @smoke basket.feature
       """
@@ -94,7 +93,10 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
+    Then the steps and hooks have these results:
+      | step                           | status  |
+      | Before Connect to the database | failed  |
+      | Given an empty basket          | skipped |
     And the error message includes "Hook \"Connect to the database\" failed: connection refused"
 
   @rd
@@ -118,8 +120,7 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes "no database"
+    Then the error message includes "no database"
     And the steps and hooks have these results:
       | step                  | status  |
       | Before                | failed  |

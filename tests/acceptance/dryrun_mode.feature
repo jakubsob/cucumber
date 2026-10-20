@@ -30,9 +30,7 @@ Feature: Dry run
       """
       test("features", dry_run = TRUE)
       """
-    Then it has 0 errors
-    And it has 0 failed
-    And the steps and hooks have these results:
+    Then the steps and hooks have these results:
       | step                  | status  |
       | Given an empty basket | skipped |
       | When I add an item    | skipped |
@@ -57,9 +55,7 @@ Feature: Dry run
       """
       test("features", dry_run = TRUE)
       """
-    Then it has 0 failed
-    And it has 1 skipped
-    And the steps have these results:
+    Then the steps have these results:
       | step                  | status    |
       | Given an empty basket | skipped   |
       | When I add an item    | undefined |

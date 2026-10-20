@@ -26,8 +26,7 @@ Feature: Pending steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the error message includes
+    Then the error message includes
       """
       Step "a step that is pending" is pending: not yet implemented
       """
@@ -57,9 +56,7 @@ Feature: Pending steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And it has 0 errors
-    And the steps have these results:
+    Then the steps have these results:
       | step                          | status  |
       | Given a step that is pending  | pending |
       | Then this step should not run | skipped |

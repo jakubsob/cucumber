@@ -33,7 +33,6 @@ Feature: Doc Strings
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: A Doc String can be between """ delimiters
       Given a file named "features/docstring.feature" with
@@ -222,8 +221,10 @@ Feature: Doc Strings
         """
         test("features")
         """
-      Then it passes
-      And it has 2 passed
+      Then the scenarios have these results:
+        | scenario                  | status |
+        | A request body            | passed |
+        | Text without a media type | passed |
 
   Rule: In R, the `cucumber.docstring_as_lines` option passes a Doc String as a character vector of lines
 
@@ -255,4 +256,3 @@ Feature: Doc Strings
         withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
         """
       Then it passes
-      And it has 1 passed

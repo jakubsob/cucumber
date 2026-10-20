@@ -47,8 +47,10 @@ Feature: Testing projects that aren't packages
         box::purge_cache()
         test()
         """
-      Then it passes
-      And it has 2 passed
+      Then the scenarios have these results:
+        | scenario   | status |
+        | Adding one | passed |
+        | Adding two | passed |
 
     Scenario: Steps can attach functions from a box module
       Given a file named "tests/acceptance/setup-steps.R" with

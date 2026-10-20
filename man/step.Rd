@@ -624,8 +624,10 @@ Each scenario starts with a new, empty \code{context}.
     """
     test("features")
     """
-  Then it passes
-  And it has 2 passed</code></pre >}}
+  Then the scenarios have these results:
+    | scenario             | status |
+    | Add an item          | passed |
+    | Look into the basket | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Steps of a scenario share context
   Given a file named "features/setup-steps.R" with
     """
@@ -640,8 +642,10 @@ Each scenario starts with a new, empty \code{context}.
     """
     test("features")
     """
-  Then it passes
-  And it has 2 passed
+  Then the scenarios have these results:
+    | scenario             | status |
+    | Add an item          | passed |
+    | Look into the basket | passed |
 %</pre>
 }}
 
@@ -739,8 +743,7 @@ A Data Table is a table under a step. The step definition gets it after the step
     """
     test("features")
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A Data Table comes after the step's parameters
   Given a file named "features/table.feature" with
     """
@@ -768,7 +771,6 @@ A Data Table is a table under a step. The step definition gets it after the step
     test("features")
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 
@@ -875,8 +877,7 @@ The step definition gets it as one string, after the step's parameters.
     """
     test("features")
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step definition gets the Doc String
   Given a file named "features/docstring.feature" with
     """
@@ -902,7 +903,6 @@ The step definition gets it as one string, after the step's parameters.
     test("features")
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 
@@ -945,8 +945,10 @@ It is \code{json} for a Doc String opened with ```json.
     """
     test("features")
     """
-  Then it passes
-  And it has 2 passed</code></pre >}}
+  Then the scenarios have these results:
+    | scenario                  | status |
+    | A request body            | passed |
+    | Text without a media type | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A Doc String's media type is in its media_type attribute
   Given a file named "features/docstring.feature" with
     """
@@ -981,8 +983,10 @@ It is \code{json} for a Doc String opened with ```json.
     """
     test("features")
     """
-  Then it passes
-  And it has 2 passed
+  Then the scenarios have these results:
+    | scenario                  | status |
+    | A request body            | passed |
+    | Text without a media type | passed |
 %</pre>
 }}
 
@@ -1015,8 +1019,7 @@ It is \code{json} for a Doc String opened with ```json.
     """
     withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
     """
-  Then it passes
-  And it has 1 passed</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
   Given a file named "features/docstring.feature" with
     """
@@ -1044,7 +1047,6 @@ It is \code{json} for a Doc String opened with ```json.
     withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
     """
   Then it passes
-  And it has 1 passed
 %</pre>
 }}
 
@@ -1086,9 +1088,7 @@ A scenario passes when all its steps pass, even if they have no expectations.
     """
     test("features", reporter = NULL)
     """
-  Then it passes
-  And it has 1 passed
-  And it has 0 skipped</code></pre >}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A scenario whose steps pass without expectations passes
   Given a file named "features/basket.feature" with
     """
@@ -1111,8 +1111,6 @@ A scenario passes when all its steps pass, even if they have no expectations.
     test("features", reporter = NULL)
     """
   Then it passes
-  And it has 1 passed
-  And it has 0 skipped
 %</pre>
 }}
 
@@ -1156,8 +1154,7 @@ The steps after it are skipped, and the other scenarios still run.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And the steps have these results:
+  Then the steps have these results:
     | step                       | status  |
     | Given an empty basket      | passed  |
     | When I add an item         | failed  |
@@ -1185,8 +1182,7 @@ The steps after it are skipped, and the other scenarios still run.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And the steps have these results:
+  Then the steps have these results:
     | step                       | status  |
     | Given an empty basket      | passed  |
     | When I add an item         | failed  |
@@ -1216,9 +1212,7 @@ The steps after it are skipped, and the other scenarios still run.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And it has 1 passed
-  And the error message includes "basket is full"
+  Then the error message includes "basket is full"
   And the scenarios have these results:
     | scenario             | status |
     | Add an item          | failed |
@@ -1244,9 +1238,7 @@ The steps after it are skipped, and the other scenarios still run.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
-  And it has 1 passed
-  And the error message includes "basket is full"
+  Then the error message includes "basket is full"
   And the scenarios have these results:
     | scenario             | status |
     | Add an item          | failed |
@@ -1298,7 +1290,6 @@ It's reported with a snippet of the missing step definition, and the other scena
     test("features", stop_on_failure = FALSE)
     """
   Then it ran "Scenario: Pay"
-  And it has 2 failed
   And the steps have these results:
     | scenario             | step                       | status    |
     | Add an item          | Given an empty basket      | passed    |
@@ -1337,7 +1328,6 @@ It's reported with a snippet of the missing step definition, and the other scena
     test("features", stop_on_failure = FALSE)
     """
   Then it ran "Scenario: Pay"
-  And it has 2 failed
   And the steps have these results:
     | scenario             | step                       | status    |
     | Add an item          | Given an empty basket      | passed    |
@@ -1374,7 +1364,9 @@ Keep only one of them, as a step that matches several step definitions is ambigu
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps have these results:
+    | step                  | status    |
+    | Given an empty basket | undefined |
   And the error message includes
     """
     No step found for: "an empty basket"
@@ -1398,7 +1390,9 @@ Keep only one of them, as a step that matches several step definitions is ambigu
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps have these results:
+    | step                  | status    |
+    | Given an empty basket | undefined |
   And the error message includes
     """
     No step found for: "an empty basket"
@@ -1426,7 +1420,9 @@ Keep only one of them, as a step that matches several step definitions is ambigu
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps have these results:
+    | step                                  | status    |
+    | Given I have 5 cucumbers in my basket | undefined |
   And the error message includes
     """
     Add a step definition:
@@ -1447,7 +1443,9 @@ Keep only one of them, as a step that matches several step definitions is ambigu
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps have these results:
+    | step                                  | status    |
+    | Given I have 5 cucumbers in my basket | undefined |
   And the error message includes
     """
     Add a step definition:
@@ -1490,7 +1488,9 @@ every matching definition, and the scenario fails.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps have these results:
+    | step                     | status    |
+    | Given the user is "John" | ambiguous |
   And the error message includes
     """
     Multiple step definitions match: "the user is "John""
@@ -1524,7 +1524,9 @@ every matching definition, and the scenario fails.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then it has 1 failed
+  Then the steps have these results:
+    | step                     | status    |
+    | Given the user is "John" | ambiguous |
   And the error message includes
     """
     Multiple step definitions match: "the user is "John""
@@ -1540,7 +1542,7 @@ every matching definition, and the scenario fails.
 %</pre>
 }}
 
-XCbBSUwahx6nWuRzdgCw9rBSixcvETFM-63\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
+haepmmvqMV9RHJ97GfWgS8w43Uw1lYOj-63\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
   A Given and a Then step with the same text match the same step definitions,
   so choose words that tell them apart, like "my account has a balance of £430"
   and "my account should have a balance of £430".

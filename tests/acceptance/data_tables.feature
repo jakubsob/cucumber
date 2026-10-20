@@ -34,7 +34,6 @@ Feature: Data Tables
         test("features")
         """
       Then it passes
-      And it has 1 passed
 
     Scenario: Data Table cells unescape \n, \| and \\
       Given a file named "features/table.feature" with

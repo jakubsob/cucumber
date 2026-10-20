@@ -29,8 +29,7 @@ Feature: Failing steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And the steps have these results:
+    Then the steps have these results:
       | step                       | status  |
       | Given an empty basket      | passed  |
       | When I add an item         | failed  |
@@ -57,9 +56,7 @@ Feature: Failing steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then it has 1 failed
-    And it has 1 passed
-    And the error message includes "basket is full"
+    Then the error message includes "basket is full"
     And the scenarios have these results:
       | scenario             | status |
       | Add an item          | failed |
