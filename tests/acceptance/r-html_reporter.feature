@@ -2,7 +2,7 @@
 Feature: HTML reporter
   `CucumberHtmlReporter` writes the official Cucumber HTML report of a run when the run ends,
   even when it fails. The page is one file, with the report's script and styles and the
-  messages of the run, so it works offline.
+  messages of the run, so it works offline. It can be searched and filtered by status, text and tags.
 
   Background:
     Given a package

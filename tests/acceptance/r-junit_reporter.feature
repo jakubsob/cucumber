@@ -3,6 +3,12 @@ Feature: JUnit reporter
   `CucumberJunitReporter` writes the JUnit XML report of a run when the run ends, even when it
   fails. CI services read it to show the results of the run.
 
+  Each scenario is a test case, each example of an outline being one. Its class name is the feature's
+  name and its name is the scenario's, after the rule's, followed by the name and number of the example.
+  A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
+  undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
+  A `before_all()` or `after_all()` hook that failed is a failed test case too, named after where it's defined.
+
   Background:
     Given a package
 

@@ -1,7 +1,8 @@
 @rd
 Feature: Progress bar reporter
   `CucumberProgressBarReporter` shows a bar of the steps and hooks run so far. A scenario that didn't pass is printed as soon
-  as it finishes. The bar is drawn only in a terminal that can redraw a line.
+  as it finishes, and the summary of the run at the end. The bar is drawn only in a terminal that can
+  redraw a line. Elsewhere, like in CI, only the scenarios that didn't pass and the summary are printed.
 
   Background:
     Given a package

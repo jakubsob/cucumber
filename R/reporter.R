@@ -1,13 +1,8 @@
 #' Cucumber Reporter Base Class
 #'
 #' @description
-#' Base class for cucumber reporters. A reporter gets the run as
-#' [Cucumber Messages](https://github.com/cucumber/messages): each feature,
-#' scenario, step and hook and their results. It also gets the start and the end of the run,
-#' and the warnings raised in it.
-#'
-#' Extend it to report a run your way, overriding the methods you need. Each
-#' does nothing by default.
+#' Base class for cucumber reporters. Extend it to report a run your way,
+#' overriding the methods you need. Each does nothing by default.
 #'
 #' @section Methods:
 #' \describe{
@@ -209,13 +204,9 @@ CucumberMultiReporter <- R6::R6Class(
 #' Cucumber Messages Reporter
 #'
 #' @description
-#' Writes the run as [Cucumber Messages](https://github.com/cucumber/messages):
-#' one JSON message per line (NDJSON), like the `message` formatter of other
-#' Cucumber implementations. The official tools read it, like the HTML,
-#' JUnit and JSON formatters.
-#'
-#' It reports only the messages. To also see the progress of the run, combine
-#' it with another reporter in a [CucumberMultiReporter].
+#' Writes the run as [Cucumber Messages](https://github.com/cucumber/messages).
+#' To also see the progress of the run, combine it with another reporter in a
+#' [CucumberMultiReporter].
 #'
 #' The messages follow the protocol version 34.2.1 and are checked with the
 #' Cucumber Compatibility Kit. Locations of step definitions and hooks need
@@ -470,11 +461,8 @@ reported_step <- function(q, pickle_step, result) {
 #' Summary Reporter for Cucumber
 #'
 #' @description
-#' A reporter that prints only the summary of the run: the scenarios and steps
-#' counted by status, and the
-#' scenarios that didn't pass, with their steps and errors.
-#'
-#' The other cucumber reporters print the same summary at the end of the run:
+#' Prints only the summary of the run. The other cucumber reporters print it at
+#' the end of the run too:
 #' [CucumberProgressReporter], [CucumberProgressBarReporter] and
 #' [CucumberPrettyReporter].
 #'
@@ -831,13 +819,6 @@ DOTS_CHARACTERS <- c(
 #' Prints one character for each step and hook as it finishes, then the summary of
 #' [CucumberSummaryReporter]:
 #'
-#' - `.` passed (green)
-#' - `F` failed (red)
-#' - `-` skipped (cyan)
-#' - `P` pending (yellow)
-#' - `U` undefined (yellow)
-#' - `A` ambiguous (red)
-#'
 #' ```
 #' ......F--
 #'
@@ -910,15 +891,8 @@ progress_cells <- function(statuses) {
 #' Progress Reporter for Cucumber
 #'
 #' @description
-#' The default reporter. Like testthat's `ProgressReporter`, it prints one line
-#' for each feature, with its scenarios counted by status: failed (`F`),
-#' pending (`P`), undefined (`U`), skipped (`S`) and passed (`OK`). An
-#' ambiguous scenario counts as failed. While a feature runs, its line is
-#' redrawn with a spinner after each step.
-#'
-#' A scenario that didn't pass is printed as soon as it finishes, with its
-#' steps and errors. The summary of [CucumberSummaryReporter] is printed at
-#' the end.
+#' The default reporter. Prints one line for each feature, with its scenarios
+#' counted by status, then the summary of [CucumberSummaryReporter]:
 #'
 #' ```
 #'   |  F  P  U  S  OK | Feature
@@ -931,11 +905,6 @@ progress_cells <- function(statuses) {
 #'       Error: Can't remove more apples than there are.
 #' ✖ |  1           2 | Basket [1.2s]
 #' ```
-#'
-#' A feature that took a second or more shows how long it took. The line is
-#' redrawn only in a terminal that can redraw a line, see
-#' [cli::is_dynamic_tty()]. Elsewhere, like in CI, each feature's line is
-#' printed once it finishes.
 #'
 #' To see each step, use [CucumberPrettyReporter].
 #'
@@ -1075,9 +1044,7 @@ CucumberProgressReporter <- R6::R6Class(
 #' Progress Bar Reporter for Cucumber
 #'
 #' @description
-#' Shows a bar of the steps and hooks run so far, redrawn in place. A scenario that didn't pass is
-#' printed above the bar as soon as it finishes, with its steps and errors. The
-#' scenarios and steps counted by status are printed at the end.
+#' Shows a bar of the steps and hooks run so far, redrawn in place:
 #'
 #' ```
 #' Feature: Basket
@@ -1087,10 +1054,6 @@ CucumberProgressReporter <- R6::R6Class(
 #'       Error: Can't remove more apples than there are.
 #' 12/40 steps [==============                                         ]
 #' ```
-#'
-#' The bar is drawn only in a terminal that can redraw a line, see
-#' [cli::is_dynamic_tty()]. Elsewhere, like in CI, only the scenarios that
-#' didn't pass and the summary are printed.
 #'
 #' @examples
 #' \dontrun{
@@ -1165,23 +1128,8 @@ CucumberProgressBarReporter <- R6::R6Class(
 #' Pretty Reporter for Cucumber
 #'
 #' @description
-#' A reporter that prints each feature, scenario and step as it runs, then the
-#' summary of
-#' [CucumberSummaryReporter].
-#'
-#' @details
-#' Prints each step as it executes with a status indicator, grouped under
-#' scenario and feature headers:
-#'
-#' - \ifelse{latex}{[x]}{✓} for passed steps (green)
-#' - \ifelse{latex}{[ ]}{✗} for failed steps (red)
-#' - `-` for skipped steps (cyan)
-#' - `P` for pending steps (yellow)
-#' - `U` for undefined steps (yellow)
-#' - `A` for ambiguous steps (red)
-#'
-#' A step's Doc String or Data Table and the warnings it raised are printed
-#' under it.
+#' Prints each feature, scenario and step as it runs, then the summary of
+#' [CucumberSummaryReporter]:
 #'
 #' ```
 #' Feature: Addition
@@ -1191,23 +1139,6 @@ CucumberProgressBarReporter <- R6::R6Class(
 #'     [x] When I press add
 #'     [x] Then the result should be 120 on the screen
 #' ```
-#'
-#' ## Usage
-#'
-#' Pass a reporter instance to [cucumber::test()] or [cucumber::run()]:
-#'
-#' ```r
-#' # Step-level detail
-#' cucumber::test("tests/acceptance", reporter = cucumber::CucumberPrettyReporter$new())
-#'
-#' # Silent mode
-#' cucumber::test("tests/acceptance", reporter = NULL)
-#'
-#' # From within a test file
-#' cucumber::run(reporter = cucumber::CucumberPrettyReporter$new())
-#' ```
-#'
-#' To report a run your way, extend [CucumberReporter].
 #'
 #' @seealso [CucumberReporter]
 #' @md

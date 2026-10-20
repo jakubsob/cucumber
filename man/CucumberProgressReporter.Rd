@@ -4,15 +4,8 @@
 \alias{CucumberProgressReporter}
 \title{Progress Reporter for Cucumber}
 \description{
-The default reporter. Like testthat's \code{ProgressReporter}, it prints one line
-for each feature, with its scenarios counted by status: failed (\code{F}),
-pending (\code{P}), undefined (\code{U}), skipped (\code{S}) and passed (\code{OK}). An
-ambiguous scenario counts as failed. While a feature runs, its line is
-redrawn with a spinner after each step.
-
-A scenario that didn't pass is printed as soon as it finishes, with its
-steps and errors. The summary of \link{CucumberSummaryReporter} is printed at
-the end.
+The default reporter. Prints one line for each feature, with its scenarios
+counted by status, then the summary of \link{CucumberSummaryReporter}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  |  F  P  U  S  OK | Feature
 ✔ |              3 | Addition
@@ -25,11 +18,6 @@ Feature: Basket
 ✖ |  1           2 | Basket [1.2s]
 }\if{html}{\out{</div>}}
 
-A feature that took a second or more shows how long it took. The line is
-redrawn only in a terminal that can redraw a line, see
-\code{\link[cli:is_dynamic_tty]{cli::is_dynamic_tty()}}. Elsewhere, like in CI, each feature's line is
-printed once it finishes.
-
 To see each step, use \link{CucumberPrettyReporter}.
 }
 \section{Specification}{
@@ -38,10 +26,14 @@ To see each step, use \link{CucumberPrettyReporter}.
 
 \code{CucumberProgressReporter} is the default reporter. Like testthat's \code{ProgressReporter}, it prints
 one line for each feature, with its scenarios counted by status: failed (F), pending (P),
-undefined (U), skipped (S) and passed (OK). A scenario that didn't pass is printed as soon as
+undefined (U), skipped (S) and passed (OK). An ambiguous scenario counts as failed. A feature that
+took a second or more shows how long it took. A scenario that didn't pass is printed as soon as
 it finishes, and again in the summary at the end.
+In a terminal that can redraw a line, a feature's line is redrawn with a spinner after each step.
+Elsewhere, like in CI, it's printed once the feature finishes.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -69,7 +61,7 @@ it finishes, and again in the summary at the end.
     given("an empty basket", function(context) \{\})
     when("I add \{int\} item", function(n, context) \{\})
     when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -99,9 +91,11 @@ it finishes, and again in the summary at the end.
     when("I add \{int\} item", function(n, context) \{\})
     when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Each feature is a line with its scenarios counted by status
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Each feature is a line with its scenarios counted by status
   When I run
     """
     test("features", stop_on_failure = FALSE)
@@ -117,7 +111,7 @@ it finishes, and again in the summary at the end.
   And the output includes
     """
     v |               1 | Checkout
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each feature is a line with its scenarios counted by status
   When I run
     """
@@ -135,9 +129,11 @@ it finishes, and again in the summary at the end.
     """
     v |               1 | Checkout
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A scenario that didn't pass is printed when it finishes
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A scenario that didn't pass is printed when it finishes
   When I run
     """
     test("features", stop_on_failure = FALSE)
@@ -158,7 +154,7 @@ it finishes, and again in the summary at the end.
   And the output includes
     """
     4 scenarios (1 failed, 1 undefined, 2 passed)
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A scenario that didn't pass is printed when it finishes
   When I run
     """
@@ -181,9 +177,11 @@ it finishes, and again in the summary at the end.
     """
     4 scenarios (1 failed, 1 undefined, 2 passed)
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A warning is printed as it's raised
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A warning is printed as it's raised
   Given a file named "features/setup-hooks.R" with
     """
     before(function(context, scenario) \{
@@ -198,7 +196,7 @@ it finishes, and again in the summary at the end.
     """
     Warning:
     The shop is busy
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A warning is printed as it's raised
   Given a file named "features/setup-hooks.R" with
     """
@@ -215,9 +213,11 @@ it finishes, and again in the summary at the end.
     Warning:
     The shop is busy
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The error that stopped the run is printed
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The error that stopped the run is printed
   Given a file named "features/setup-steps.R" with
     """
     before_all(function() stop("the server didn't start"))
@@ -235,7 +235,7 @@ it finishes, and again in the summary at the end.
   And the output includes
     """
     0 scenarios
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The error that stopped the run is printed
   Given a file named "features/setup-steps.R" with
     """
@@ -255,6 +255,7 @@ it finishes, and again in the summary at the end.
     """
     0 scenarios
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-progress_reporter.feature}

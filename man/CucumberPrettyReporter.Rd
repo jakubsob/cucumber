@@ -4,24 +4,8 @@
 \alias{CucumberPrettyReporter}
 \title{Pretty Reporter for Cucumber}
 \description{
-A reporter that prints each feature, scenario and step as it runs, then the
-summary of
-\link{CucumberSummaryReporter}.
-}
-\details{
-Prints each step as it executes with a status indicator, grouped under
-scenario and feature headers:
-\itemize{
-\item \ifelse{latex}{[x]}{✓} for passed steps (green)
-\item \ifelse{latex}{[ ]}{✗} for failed steps (red)
-\item \code{-} for skipped steps (cyan)
-\item \code{P} for pending steps (yellow)
-\item \code{U} for undefined steps (yellow)
-\item \code{A} for ambiguous steps (red)
-}
-
-A step's Doc String or Data Table and the warnings it raised are printed
-under it.
+Prints each feature, scenario and step as it runs, then the summary of
+\link{CucumberSummaryReporter}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Addition
   Scenario: Add two numbers
@@ -30,22 +14,6 @@ under it.
     [x] When I press add
     [x] Then the result should be 120 on the screen
 }\if{html}{\out{</div>}}
-\subsection{Usage}{
-
-Pass a reporter instance to \code{\link[=test]{test()}} or \code{\link[=run]{run()}}:
-
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{# Step-level detail
-cucumber::test("tests/acceptance", reporter = cucumber::CucumberPrettyReporter$new())
-
-# Silent mode
-cucumber::test("tests/acceptance", reporter = NULL)
-
-# From within a test file
-cucumber::run(reporter = cucumber::CucumberPrettyReporter$new())
-}\if{html}{\out{</div>}}
-
-To report a run your way, extend \link{CucumberReporter}.
-}
 }
 \section{Specification}{
 
@@ -55,13 +23,16 @@ To report a run your way, extend \link{CucumberReporter}.
 and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
 with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step's warnings are printed under it
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step's warnings are printed under it
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -81,7 +52,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     v Given an empty basket
     Warning:
     the basket is dusty
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step's warnings are printed under it
   Given a file named "features/basket.feature" with
     """
@@ -103,9 +74,11 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Warning:
     the basket is dusty
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A hook's error is printed where the hook runs
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A hook's error is printed where the hook runs
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -127,7 +100,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Error:
     The shop is closed
     - Given an empty basket
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A hook's error is printed where the hook runs
   Given a file named "features/basket.feature" with
     """
@@ -151,9 +124,11 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     The shop is closed
     - Given an empty basket
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A hook's warning is printed where the hook runs
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A hook's warning is printed where the hook runs
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -175,7 +150,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Warning:
     The shop is busy
     v Given an empty basket
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A hook's warning is printed where the hook runs
   Given a file named "features/basket.feature" with
     """
@@ -199,19 +174,21 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     The shop is busy
     v Given an empty basket
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Long Doc Strings and Data Tables are cut short
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Long Doc Strings and Data Tables are cut short
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
       Scenario: Add items
         Given a note
-          &#96;&#96;&#96;
+          ```
           line 1
           line 2
           line 3
-          &#96;&#96;&#96;
+          ```
         And these items
           | item     |
           | cucumber |
@@ -245,7 +222,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     | cucumber |
     | tomato   |
     ... and 1 more line(s)
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Long Doc Strings and Data Tables are cut short
   Given a file named "features/basket.feature" with
     """
@@ -291,6 +268,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     | tomato   |
     ... and 1 more line(s)
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-pretty_reporter.feature}

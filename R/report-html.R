@@ -2,15 +2,10 @@
 #'
 #' @description
 #' Writes the run as the official Cucumber HTML report
-#' (<https://github.com/cucumber/html-formatter>). The page is one file that
-#' works offline: it shows every feature with its results, and can be searched
-#' and filtered by status, text and tags.
-#'
-#' The report is written when the run ends, even when it fails. To also see
-#' the progress of the run, combine it with another reporter in a
-#' [CucumberMultiReporter]. To write the report of a run after it ran, store
-#' its messages with [CucumberMessagesReporter] and pass their file to
-#' `report()`.
+#' (<https://github.com/cucumber/html-formatter>). To also see the progress of
+#' the run, combine it with another reporter in a [CucumberMultiReporter]. To
+#' write the report of a run after it ran, store its messages with
+#' [CucumberMessagesReporter] and pass their file to `report()`.
 #'
 #' @seealso Steps and hooks attach screenshots and logs to the report, see
 #'   [attachments] and `vignette("reporting", package = "cucumber")`.

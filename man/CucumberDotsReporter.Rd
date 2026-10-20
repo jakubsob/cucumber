@@ -6,14 +6,6 @@
 \description{
 Prints one character for each step and hook as it finishes, then the summary of
 \link{CucumberSummaryReporter}:
-\itemize{
-\item \code{.} passed (green)
-\item \code{F} failed (red)
-\item \code{-} skipped (cyan)
-\item \code{P} pending (yellow)
-\item \code{U} undefined (yellow)
-\item \code{A} ambiguous (red)
-}
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{......F--
 
@@ -32,7 +24,8 @@ Summary
 \code{U} undefined and \code{A} ambiguous. At the end it prints the summary of the run with the
 scenarios that didn't pass.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -56,7 +49,7 @@ scenarios that didn't pass.
       context$items &lt;- context$items - n
     \})
     then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -82,9 +75,11 @@ scenarios that didn't pass.
     \})
     then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Each step is printed as a character
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Each step is printed as a character
   When I run
     """
     test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
@@ -97,7 +92,7 @@ scenarios that didn't pass.
     """
     2 scenarios (1 failed, 1 passed)
     6 steps (1 failed, 1 skipped, 4 passed)
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each step is printed as a character
   When I run
     """
@@ -112,9 +107,11 @@ scenarios that didn't pass.
     2 scenarios (1 failed, 1 passed)
     6 steps (1 failed, 1 skipped, 4 passed)
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The scenarios that didn't pass are printed at the end
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The scenarios that didn't pass are printed at the end
   When I run
     """
     test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
@@ -129,7 +126,7 @@ scenarios that didn't pass.
     x When I remove 1 item
     """
   And the output includes "The basket is empty"
-  And the output doesn't include "Scenario: Add an item"</code></pre>}}
+  And the output doesn't include "Scenario: Add an item"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The scenarios that didn't pass are printed at the end
   When I run
     """
@@ -146,6 +143,7 @@ scenarios that didn't pass.
     """
   And the output includes "The basket is empty"
   And the output doesn't include "Scenario: Add an item"
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-dots_reporter.feature}

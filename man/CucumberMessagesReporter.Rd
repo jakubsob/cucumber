@@ -4,13 +4,9 @@
 \alias{CucumberMessagesReporter}
 \title{Cucumber Messages Reporter}
 \description{
-Writes the run as \href{https://github.com/cucumber/messages}{Cucumber Messages}:
-one JSON message per line (NDJSON), like the \code{message} formatter of other
-Cucumber implementations. The official tools read it, like the HTML,
-JUnit and JSON formatters.
-
-It reports only the messages. To also see the progress of the run, combine
-it with another reporter in a \link{CucumberMultiReporter}.
+Writes the run as \href{https://github.com/cucumber/messages}{Cucumber Messages}.
+To also see the progress of the run, combine it with another reporter in a
+\link{CucumberMultiReporter}.
 
 The messages follow the protocol version 34.2.1 and are checked with the
 Cucumber Compatibility Kit. Locations of step definitions and hooks need
@@ -25,7 +21,8 @@ their source references, kept when the files are sourced with
 like the \code{message} formatter of other Cucumber implementations. Official tools read it,
 like the HTML, JUnit and JSON formatters.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -41,7 +38,7 @@ like the HTML, JUnit and JSON formatters.
     given("an empty basket", function(context) \{\})
     when("I add \{int\} apples", function(int, context) context$items &lt;- context$items + int)
     then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -59,9 +56,11 @@ like the HTML, JUnit and JSON formatters.
     when("I add \{int\} apples", function(int, context) context$items <- context$items + int)
     then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The run is written as messages
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The run is written as messages
   When I run
     """
     test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))
@@ -91,7 +90,7 @@ like the HTML, JUnit and JSON formatters.
     testStepFinished
     testCaseFinished
     testRunFinished
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The run is written as messages
   When I run
     """
@@ -123,9 +122,11 @@ like the HTML, JUnit and JSON formatters.
     testCaseFinished
     testRunFinished
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The messages are written to a connection
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The messages are written to a connection
   When I run
     """
     test("features", reporter = CucumberMessagesReporter$new(stdout()))
@@ -133,7 +134,7 @@ like the HTML, JUnit and JSON formatters.
   Then the output includes
     """
     \{"testRunFinished":
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The messages are written to a connection
   When I run
     """
@@ -143,9 +144,11 @@ like the HTML, JUnit and JSON formatters.
     """
     \{"testRunFinished":
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Each step's result is written when it finishes
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Each step's result is written when it finishes
   Given a file named "features/setup-steps.R" with
     """
     given("an empty basket", function(context) \{\})
@@ -163,7 +166,7 @@ like the HTML, JUnit and JSON formatters.
     PASSED
     PENDING
     UNDEFINED
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each step's result is written when it finishes
   Given a file named "features/setup-steps.R" with
     """
@@ -183,9 +186,11 @@ like the HTML, JUnit and JSON formatters.
     PENDING
     UNDEFINED
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The run is written as messages and its progress is printed
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The run is written as messages and its progress is printed
   When I run
     """
     test("features", reporter = CucumberMultiReporter$new(list(
@@ -202,7 +207,7 @@ like the HTML, JUnit and JSON formatters.
     v When I add 2 apples
     v Then the basket has 2 items
     """
-  And the output includes "21 messages"</code></pre>}}
+  And the output includes "21 messages"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The run is written as messages and its progress is printed
   When I run
     """
@@ -221,6 +226,7 @@ like the HTML, JUnit and JSON formatters.
     v Then the basket has 2 items
     """
   And the output includes "21 messages"
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-messages_reporter.feature}

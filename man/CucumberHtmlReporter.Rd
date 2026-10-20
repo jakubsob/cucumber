@@ -5,15 +5,10 @@
 \title{Cucumber HTML Reporter}
 \description{
 Writes the run as the official Cucumber HTML report
-(\url{https://github.com/cucumber/html-formatter}). The page is one file that
-works offline: it shows every feature with its results, and can be searched
-and filtered by status, text and tags.
-
-The report is written when the run ends, even when it fails. To also see
-the progress of the run, combine it with another reporter in a
-\link{CucumberMultiReporter}. To write the report of a run after it ran, store
-its messages with \link{CucumberMessagesReporter} and pass their file to
-\code{report()}.
+(\url{https://github.com/cucumber/html-formatter}). To also see the progress of
+the run, combine it with another reporter in a \link{CucumberMultiReporter}. To
+write the report of a run after it ran, store its messages with
+\link{CucumberMessagesReporter} and pass their file to \code{report()}.
 }
 \section{Specification}{
 
@@ -21,15 +16,18 @@ its messages with \link{CucumberMessagesReporter} and pass their file to
 
 \code{CucumberHtmlReporter} writes the official Cucumber HTML report of a run when the run ends,
 even when it fails. The page is one file, with the report's script and styles and the
-messages of the run, so it works offline.
+messages of the run, so it works offline. It can be searched and filtered by status, text and tags.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Each step is shown with its result and the error of a step that didn't pass
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Each step is shown with its result and the error of a step that didn't pass
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -52,7 +50,7 @@ messages of the run, so it works offline.
     | step                       | status | error                                                    |
     | Given an empty basket      | passed |                                                          |
     | When I add an item         | passed |                                                          |
-    | Then the basket has 1 item | failed | expectation_failure Expected &#96;context$items&#96; to equal 2. |</code></pre>}}
+    | Then the basket has 1 item | failed | expectation_failure Expected `context$items` to equal 2. |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each step is shown with its result and the error of a step that didn't pass
   Given a file named "features/basket.feature" with
     """
@@ -77,9 +75,11 @@ messages of the run, so it works offline.
     | Given an empty basket      | passed |                                                          |
     | When I add an item         | passed |                                                          |
     | Then the basket has 1 item | failed | expectation_failure Expected `context$items` to equal 2. |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The report is written to cucumber-report.html by default
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The report is written to cucumber-report.html by default
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -96,7 +96,7 @@ messages of the run, so it works offline.
     """
   Then the HTML report "cucumber-report.html" shows these steps:
     | step                  | status |
-    | Given an empty basket | passed |</code></pre>}}
+    | Given an empty basket | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The report is written to cucumber-report.html by default
   Given a file named "features/basket.feature" with
     """
@@ -115,9 +115,11 @@ messages of the run, so it works offline.
   Then the HTML report "cucumber-report.html" shows these steps:
     | step                  | status |
     | Given an empty basket | passed |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Text of the messages can't end the report's script
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Text of the messages can't end the report's script
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -134,7 +136,7 @@ messages of the run, so it works offline.
     """
   Then the HTML report "report.html" shows these steps:
     | step                  | status |
-    | Given an empty basket | passed |</code></pre>}}
+    | Given an empty basket | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Text of the messages can't end the report's script
   Given a file named "features/basket.feature" with
     """
@@ -153,9 +155,11 @@ messages of the run, so it works offline.
   Then the HTML report "report.html" shows these steps:
     | step                  | status |
     | Given an empty basket | passed |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The attachments of a step are shown under it
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The attachments of a step are shown under it
   A screenshot and the logs attached when a step fails are shown under the step that failed.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -184,7 +188,7 @@ messages of the run, so it works offline.
   Then the HTML report "report.html" shows these attachments:
     | step               | kind  | content           |
     | When I add an item | image | basket.png        |
-    | When I add an item | text  | Opened the basket |</code></pre>}}
+    | When I add an item | text  | Opened the basket |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The attachments of a step are shown under it
   A screenshot and the logs attached when a step fails are shown under the step that failed.
 
@@ -215,6 +219,7 @@ messages of the run, so it works offline.
     | step               | kind  | content           |
     | When I add an item | image | basket.png        |
     | When I add an item | text  | Opened the basket |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-html_reporter.feature}

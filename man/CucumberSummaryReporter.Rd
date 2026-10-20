@@ -4,11 +4,8 @@
 \alias{CucumberSummaryReporter}
 \title{Summary Reporter for Cucumber}
 \description{
-A reporter that prints only the summary of the run: the scenarios and steps
-counted by status, and the
-scenarios that didn't pass, with their steps and errors.
-
-The other cucumber reporters print the same summary at the end of the run:
+Prints only the summary of the run. The other cucumber reporters print it at
+the end of the run too:
 \link{CucumberProgressReporter}, \link{CucumberProgressBarReporter} and
 \link{CucumberPrettyReporter}.
 
@@ -33,7 +30,8 @@ Feature: Basket
 
 \code{CucumberSummaryReporter} prints only the summary of the run: the scenarios and steps counted by status, and the scenarios that didn't pass.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Only the summary is printed
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Only the summary is printed
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -72,7 +70,7 @@ Feature: Basket
     x When I remove 1 item
     """
   And the output doesn't include "Scenario: Add an item"
-  And the output doesn't include "...."</code></pre>}}
+  And the output doesn't include "...."</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Only the summary is printed
   Given a package
   And a file named "features/basket.feature" with
@@ -113,6 +111,7 @@ Feature: Basket
     """
   And the output doesn't include "Scenario: Add an item"
   And the output doesn't include "...."
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-summary_reporter.feature}

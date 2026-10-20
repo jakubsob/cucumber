@@ -4,9 +4,7 @@
 \alias{CucumberProgressBarReporter}
 \title{Progress Bar Reporter for Cucumber}
 \description{
-Shows a bar of the steps and hooks run so far, redrawn in place. A scenario that didn't pass is
-printed above the bar as soon as it finishes, with its steps and errors. The
-scenarios and steps counted by status are printed at the end.
+Shows a bar of the steps and hooks run so far, redrawn in place:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Basket
   Scenario: Remove an item
@@ -15,19 +13,17 @@ scenarios and steps counted by status are printed at the end.
       Error: Can't remove more apples than there are.
 12/40 steps [==============                                         ]
 }\if{html}{\out{</div>}}
-
-The bar is drawn only in a terminal that can redraw a line, see
-\code{\link[cli:is_dynamic_tty]{cli::is_dynamic_tty()}}. Elsewhere, like in CI, only the scenarios that
-didn't pass and the summary are printed.
 }
 \section{Specification}{
 
 \subsection{Progress bar reporter}{
 
 \code{CucumberProgressBarReporter} shows a bar of the steps and hooks run so far. A scenario that didn't pass is printed as soon
-as it finishes. The bar is drawn only in a terminal that can redraw a line.
+as it finishes, and the summary of the run at the end. The bar is drawn only in a terminal that can
+redraw a line. Elsewhere, like in CI, only the scenarios that didn't pass and the summary are printed.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -45,7 +41,7 @@ as it finishes. The bar is drawn only in a terminal that can redraw a line.
     given("an empty basket", function(context) \{\})
     when("I add \{int\} item", function(n, context) \{\})
     when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -65,16 +61,18 @@ as it finishes. The bar is drawn only in a terminal that can redraw a line.
     when("I add \{int\} item", function(n, context) \{\})
     when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The bar counts the steps run
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The bar counts the steps run
   When I run
     """
     reporter &lt;- withr::with_options(list(cli.dynamic = TRUE), CucumberProgressBarReporter$new())
     test("features", reporter = reporter, stop_on_failure = FALSE)
     """
   Then the output includes "1/4 steps ["
-  And the output includes "4/4 steps ["</code></pre>}}
+  And the output includes "4/4 steps ["</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The bar counts the steps run
   When I run
     """
@@ -83,9 +81,11 @@ as it finishes. The bar is drawn only in a terminal that can redraw a line.
     """
   Then the output includes "1/4 steps ["
   And the output includes "4/4 steps ["
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A scenario that didn't pass is printed when it finishes
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A scenario that didn't pass is printed when it finishes
   When I run
     """
     test("features", reporter = CucumberProgressBarReporter$new(), stop_on_failure = FALSE)
@@ -104,7 +104,7 @@ as it finishes. The bar is drawn only in a terminal that can redraw a line.
     """
     2 scenarios (1 failed, 1 passed)
     4 steps (1 failed, 3 passed)
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A scenario that didn't pass is printed when it finishes
   When I run
     """
@@ -125,6 +125,7 @@ as it finishes. The bar is drawn only in a terminal that can redraw a line.
     2 scenarios (1 failed, 1 passed)
     4 steps (1 failed, 3 passed)
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-progress_bar_reporter.feature}

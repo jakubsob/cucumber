@@ -5,20 +5,9 @@
 \title{Cucumber JUnit Reporter}
 \description{
 Writes the run as a JUnit XML report, the one of the official Cucumber
-JUnit XML formatter (\url{https://github.com/cucumber/junit-xml-formatter}).
-CI services, like Jenkins, GitHub Actions or GitLab,
-read it to show the results of the run.
-
-Each scenario is a test case, each example of an outline being one. Its
-class name is the feature's name and its name is the scenario's, after the
-rule's, followed by the name and number of the example. A scenario that
-passed, failed or was skipped is a passed, failed or skipped test case. A
-pending, undefined or ambiguous scenario is a failed one. Its steps and
-their results are the test case's output. A \code{before_all()} or \code{after_all()}
-hook that failed is a failed test case too, named after where it's defined.
-
-The report is written when the run ends, even when it fails. To also see
-the progress of the run, combine it with another reporter in a
+JUnit XML formatter (\url{https://github.com/cucumber/junit-xml-formatter}),
+for CI services like Jenkins, GitHub Actions or GitLab. To also see the
+progress of the run, combine it with another reporter in a
 \link{CucumberMultiReporter}. To write the report of a run after it ran, store
 its messages with \link{CucumberMessagesReporter} and pass their file to
 \code{report()}.
@@ -30,13 +19,22 @@ its messages with \link{CucumberMessagesReporter} and pass their file to
 \code{CucumberJunitReporter} writes the JUnit XML report of a run when the run ends, even when it
 fails. CI services read it to show the results of the run.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+Each scenario is a test case, each example of an outline being one. Its class name is the feature's
+name and its name is the scenario's, after the rule's, followed by the name and number of the example.
+A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
+undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
+A \code{before_all()} or \code{after_all()} hook that failed is a failed test case too, named after where it's defined.
+
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Each scenario is a test case, with its result
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Each scenario is a test case, with its result
   A pending, undefined or ambiguous scenario is a failed test case.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -84,7 +82,7 @@ fails. CI services read it to show the results of the run.
     | Basket    | Pay                                                         | failure | Step "I pay" is pending: TODO |
     | Basket    | Skip                                                        | skipped |                               |
     | Basket    | Items are counted - Add &lt;n&gt; items - Few - #1.1: Add 1 items | passed  |                               |
-    | Basket    | Items are counted - Add &lt;n&gt; items - Few - #1.2: Add 2 items | passed  |                               |</code></pre>}}
+    | Basket    | Items are counted - Add &lt;n&gt; items - Few - #1.2: Add 2 items | passed  |                               |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each scenario is a test case, with its result
   A pending, undefined or ambiguous scenario is a failed test case.
 
@@ -134,9 +132,11 @@ fails. CI services read it to show the results of the run.
     | Basket    | Skip                                                        | skipped |                               |
     | Basket    | Items are counted - Add <n> items - Few - #1.1: Add 1 items | passed  |                               |
     | Basket    | Items are counted - Add <n> items - Few - #1.2: Add 2 items | passed  |                               |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A test case's output is its steps and their results
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A test case's output is its steps and their results
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -160,7 +160,7 @@ fails. CI services read it to show the results of the run.
     Given an empty basket.......................................................passed
     When I remove an item.......................................................failed
     Then the basket is empty....................................................skipped
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A test case's output is its steps and their results
   Given a file named "features/basket.feature" with
     """
@@ -186,11 +186,13 @@ fails. CI services read it to show the results of the run.
     When I remove an item.......................................................failed
     Then the basket is empty....................................................skipped
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: An error with characters XML doesn't allow is written as the message of the failure
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: An error with characters XML doesn't allow is written as the message of the failure
   An error can have characters XML doesn't allow, like the escape character of the colors of
-  a terminal. Each is written as the text of its character reference, like &#96;&amp;#27;&#96;, so the
+  a terminal. Each is written as the text of its character reference, like `&amp;#27;`, so the
   report is still XML that CI services read.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -209,7 +211,7 @@ fails. CI services read it to show the results of the run.
     """
   Then the JUnit report "report.xml" has these test cases:
     | name           | result  | message                                 |
-    | Remove an item | failure | The basket is &amp;#27;[31mempty&amp;#27;[39m |</code></pre>}}
+    | Remove an item | failure | The basket is &amp;#27;[31mempty&amp;#27;[39m |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An error with characters XML doesn't allow is written as the message of the failure
   An error can have characters XML doesn't allow, like the escape character of the colors of
   a terminal. Each is written as the text of its character reference, like `&#27;`, so the
@@ -232,9 +234,11 @@ fails. CI services read it to show the results of the run.
   Then the JUnit report "report.xml" has these test cases:
     | name           | result  | message                                 |
     | Remove an item | failure | The basket is &#27;[31mempty&#27;[39m |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The report is written to cucumber-junit.xml by default
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The report is written to cucumber-junit.xml by default
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -251,7 +255,7 @@ fails. CI services read it to show the results of the run.
     """
   Then the JUnit report "cucumber-junit.xml" has these test cases:
     | name        | result |
-    | Add an item | passed |</code></pre>}}
+    | Add an item | passed |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The report is written to cucumber-junit.xml by default
   Given a file named "features/basket.feature" with
     """
@@ -270,6 +274,7 @@ fails. CI services read it to show the results of the run.
   Then the JUnit report "cucumber-junit.xml" has these test cases:
     | name        | result |
     | Add an item | passed |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-junit_reporter.feature}

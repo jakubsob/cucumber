@@ -4,13 +4,8 @@
 \alias{CucumberReporter}
 \title{Cucumber Reporter Base Class}
 \description{
-Base class for cucumber reporters. A reporter gets the run as
-\href{https://github.com/cucumber/messages}{Cucumber Messages}: each feature,
-scenario, step and hook and their results. It also gets the start and the end of the run,
-and the warnings raised in it.
-
-Extend it to report a run your way, overriding the methods you need. Each
-does nothing by default.
+Base class for cucumber reporters. Extend it to report a run your way,
+overriding the methods you need. Each does nothing by default.
 }
 \section{Methods}{
 
@@ -46,7 +41,8 @@ run, each of its Cucumber Messages and the warnings raised in it.
 Pass the reporter to \code{test()} or \code{run()} with \code{reporter}. Only cucumber reporters can report a run,
 testthat reporters can't.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "event-reporter.R" with
     """
@@ -62,7 +58,7 @@ testthat reporters can't.
         add_warning = function(warning) cat("warning:", conditionMessage(warning), "\\n")
       )
     )
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "event-reporter.R" with
@@ -80,9 +76,11 @@ testthat reporters can't.
       )
     )
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A reporter gets the run as Cucumber Messages
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A reporter gets the run as Cucumber Messages
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -114,7 +112,7 @@ testthat reporters can't.
     message: testCaseFinished
     message: testRunFinished
     end run: passed
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A reporter gets the run as Cucumber Messages
   Given a file named "features/basket.feature" with
     """
@@ -148,9 +146,11 @@ testthat reporters can't.
     message: testRunFinished
     end run: passed
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A reporter gets the warnings raised in steps and hooks
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A reporter gets the warnings raised in steps and hooks
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -177,7 +177,7 @@ testthat reporters can't.
     warning: the basket is dusty
     message: testStepFinished
     message: testCaseFinished
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A reporter gets the warnings raised in steps and hooks
   Given a file named "features/basket.feature" with
     """
@@ -206,9 +206,11 @@ testthat reporters can't.
     message: testStepFinished
     message: testCaseFinished
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A reporter gets the error that stopped the run
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A reporter gets the error that stopped the run
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -229,7 +231,7 @@ testthat reporters can't.
     """
     start run
     end run: the server didn't start
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A reporter gets the error that stopped the run
   Given a file named "features/basket.feature" with
     """
@@ -252,9 +254,11 @@ testthat reporters can't.
     start run
     end run: the server didn't start
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A reporter that fails stops the run with its error
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A reporter that fails stops the run with its error
   The scenarios after it don't run, and the error names the reporter and the event it failed in.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -289,9 +293,9 @@ testthat reporters can't.
     source("broken-reporter.R")
     test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
     """
-  Then it fails with "Reporter &#96;BrokenReporter&#96; failed in &#96;add_message()&#96;."
+  Then it fails with "Reporter `BrokenReporter` failed in `add_message()`."
   And it fails with "can't format the step"
-  And the output includes "message: testCaseStarted" once</code></pre>}}
+  And the output includes "message: testCaseStarted" once</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A reporter that fails stops the run with its error
   The scenarios after it don't run, and the error names the reporter and the event it failed in.
 
@@ -330,9 +334,11 @@ testthat reporters can't.
   Then it fails with "Reporter `BrokenReporter` failed in `add_message()`."
   And it fails with "can't format the step"
   And the output includes "message: testCaseStarted" once
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A testthat reporter can't report a run
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A testthat reporter can't report a run
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -347,7 +353,7 @@ testthat reporters can't.
     """
     test("features", reporter = testthat::ProgressReporter$new())
     """
-  Then it fails with "&#96;reporter&#96; must be a &#96;CucumberReporter&#96;, or &#96;NULL&#96; to report nothing."</code></pre>}}
+  Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A testthat reporter can't report a run
   Given a file named "features/basket.feature" with
     """
@@ -364,6 +370,7 @@ testthat reporters can't.
     test("features", reporter = testthat::ProgressReporter$new())
     """
   Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-custom_reporter.feature}

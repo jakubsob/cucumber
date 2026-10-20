@@ -2,8 +2,11 @@
 Feature: Progress reporter
   `CucumberProgressReporter` is the default reporter. Like testthat's `ProgressReporter`, it prints
   one line for each feature, with its scenarios counted by status: failed (F), pending (P),
-  undefined (U), skipped (S) and passed (OK). A scenario that didn't pass is printed as soon as
+  undefined (U), skipped (S) and passed (OK). An ambiguous scenario counts as failed. A feature that
+  took a second or more shows how long it took. A scenario that didn't pass is printed as soon as
   it finishes, and again in the summary at the end.
+  In a terminal that can redraw a line, a feature's line is redrawn with a spinner after each step.
+  Elsewhere, like in CI, it's printed once the feature finishes.
 
   Background:
     Given a package
