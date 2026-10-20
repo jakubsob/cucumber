@@ -58,7 +58,8 @@ alongside the package's \code{testthat} tests.
 as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "R/calculate.R" with
     """
@@ -74,7 +75,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
   And a file named "tests/testthat/test-acceptance.R" with
     """
     run()
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "R/calculate.R" with
@@ -92,9 +93,11 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     """
     run()
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Scenarios run with the package's testthat tests
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Scenarios run with the package's testthat tests
   Given a file named "tests/testthat/setup-steps.R" with
     """
     given("I calculate", function(context) \{
@@ -116,7 +119,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     """
   Then it has 2 passed
   And it ran "Scenario: Adding one"
-  And it ran "calculate adds one"</code></pre>}}
+  And it ran "calculate adds one"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Scenarios run with the package's testthat tests
   Given a file named "tests/testthat/setup-steps.R" with
     """
@@ -140,9 +143,11 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
   Then it has 2 passed
   And it ran "Scenario: Adding one"
   And it ran "calculate adds one"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Step definitions sourced into an environment are passed with &#96;test_local(env = )&#96;
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
   Given a file named "tests/testthat/steps/steps.R" with
     """
     given("I calculate", function(context) \{
@@ -158,7 +163,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     source("tests/testthat/steps/steps.R", local = env)
     testthat::test_local(env = env)
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
   Given a file named "tests/testthat/steps/steps.R" with
     """
@@ -176,9 +181,11 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     testthat::test_local(env = env)
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario Outline: run() chooses what to run like test(), with &lt;argument&gt;
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario Outline: run() chooses what to run like test(), with &lt;argument&gt;
   Given a file named "tests/testthat/other.feature" with
     """
     Feature: Other
@@ -212,7 +219,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     | filter   | calculate         |
     | features | calculate.feature |
     | tags     | not @slow         |
-    | name     | Adding one        |</code></pre>}}
+    | name     | Adding one        |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: run() chooses what to run like test(), with <argument>
   Given a file named "tests/testthat/other.feature" with
     """
@@ -248,6 +255,7 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     | features | calculate.feature |
     | tags     | not @slow         |
     | name     | Adding one        |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-running_alongside_testthat.feature}

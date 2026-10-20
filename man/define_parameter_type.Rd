@@ -41,15 +41,18 @@ A parameter like \code{{int}} in a step definition's Cucumber Expression capture
 and passes it to the step definition converted to an R value.
 Register your own with \code{define_parameter_type()}.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
 \strong{Rule: Built-in parameter types convert the text to R values}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: \{int\} captures an integer from step text
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: \{int\} captures an integer from step text
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -72,7 +75,7 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{int\} captures an integer from step text
   Given a file named "features/params.feature" with
     """
@@ -97,9 +100,11 @@ Register your own with \code{define_parameter_type()}.
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: \{float\} captures a decimal number from step text
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: \{float\} captures a decimal number from step text
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -122,7 +127,7 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{float\} captures a decimal number from step text
   Given a file named "features/params.feature" with
     """
@@ -147,9 +152,11 @@ Register your own with \code{define_parameter_type()}.
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: \{float\} also captures an integer
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: \{float\} also captures an integer
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -171,7 +178,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{float\} also captures an integer
   Given a file named "features/params.feature" with
     """
@@ -195,9 +202,11 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: \{string\} captures a quoted string and strips quotes
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: \{string\} captures a quoted string and strips quotes
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -225,7 +234,7 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 2 passed</code></pre>}}
+  And it has 2 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{string\} captures a quoted string and strips quotes
   Given a file named "features/params.feature" with
     """
@@ -255,9 +264,11 @@ Register your own with \code{define_parameter_type()}.
     """
   Then it passes
   And it has 2 passed
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: \{word\} captures a single unquoted word
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: \{word\} captures a single unquoted word
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -279,7 +290,7 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{word\} captures a single unquoted word
   Given a file named "features/params.feature" with
     """
@@ -303,11 +314,13 @@ Register your own with \code{define_parameter_type()}.
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
 \strong{Rule: \{int\} is an R integer}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: \{int\} fails on a value too big for an R integer
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: \{int\} fails on a value too big for an R integer
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -323,7 +336,7 @@ Register your own with \code{define_parameter_type()}.
     test("features", stop_on_failure = FALSE)
     """
   Then it has 1 errors
-  And the error message includes "3000000000 is out of range for an integer"</code></pre>}}
+  And the error message includes "3000000000 is out of range for an integer"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{int\} fails on a value too big for an R integer
   Given a file named "features/params.feature" with
     """
@@ -341,11 +354,13 @@ Register your own with \code{define_parameter_type()}.
     """
   Then it has 1 errors
   And the error message includes "3000000000 is out of range for an integer"
+%</pre>
 }}
 
 \strong{Rule: Custom parameter types are defined with define_parameter_type()}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type can be registered and used in steps
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A custom parameter type can be registered and used in steps
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -372,7 +387,7 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A custom parameter type can be registered and used in steps
   Given a file named "features/params.feature" with
     """
@@ -401,9 +416,11 @@ Register your own with \code{define_parameter_type()}.
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type's regexp is a plain regular expression
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A custom parameter type's regexp is a plain regular expression
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -421,7 +438,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A custom parameter type's regexp is a plain regular expression
   Given a file named "features/params.feature" with
     """
@@ -441,9 +458,11 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type can have several regexps
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A custom parameter type can have several regexps
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -463,7 +482,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A custom parameter type can have several regexps
   Given a file named "features/params.feature" with
     """
@@ -485,9 +504,11 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A custom parameter type's transformer gets the text of each capture group
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A custom parameter type's transformer gets the text of each capture group
   Given a file named "features/params.feature" with
     """
     Feature: Parameters
@@ -506,7 +527,7 @@ Register your own with \code{define_parameter_type()}.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A custom parameter type's transformer gets the text of each capture group
   Given a file named "features/params.feature" with
     """
@@ -527,6 +548,7 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
 \strong{Rule: A step definition with an undefined parameter type defines no step}
@@ -534,7 +556,8 @@ Register your own with \code{define_parameter_type()}.
 Like in cucumber-js, the run goes on: the steps it would match are undefined, and the
 summary lists the undefined parameter types.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Steps of a step definition with an undefined parameter type are undefined
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps of a step definition with an undefined parameter type are undefined
   Given a file named "features/airports.feature" with
     """
     Feature: Airports
@@ -560,8 +583,8 @@ summary lists the undefined parameter types.
   And the output includes
     """
     Undefined parameter types:
-    - "airport" e.g. &#96;\{airport\} is closed because of a strike&#96;
-    """</code></pre>}}
+    - "airport" e.g. `\{airport\} is closed because of a strike`
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Steps of a step definition with an undefined parameter type are undefined
   Given a file named "features/airports.feature" with
     """
@@ -590,6 +613,7 @@ summary lists the undefined parameter types.
     Undefined parameter types:
     - "airport" e.g. `\{airport\} is closed because of a strike`
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/parameter_types.feature}

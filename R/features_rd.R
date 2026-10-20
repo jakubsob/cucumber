@@ -107,19 +107,19 @@ feature_rd <- function(document, pickles, source, file) {
     # to highlight
     rd_escape <- \(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
     html <- gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", code, fixed = TRUE), fixed = TRUE), fixed = TRUE)
-    # roxygen reads the lines of a block as one markdown paragraph, so its
-    # backticks, like of a ```r Doc String, would make code spans with the
-    # backticks of the descriptions
-    html <- gsub("`", "&#96;", html, fixed = TRUE)
     html <- rd_escape(html)
     # pkgdown splits a section into paragraphs at blank lines, even in \out,
     # and joins the lines around them, so a blank line gets an empty element
     html[grepl("^\\s*$", html)] <- "<span></span>"
-    html[[1]] <- paste0("\\if{html}{\\out{<pre class=\"gherkin\"><code>", html[[1]])
-    html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre>}}")
+    html[[1]] <- paste0("<pre class=\"gherkin\"><code>", html[[1]])
+    # roxygen evaluates `r ` code of the markdown before it reads Rd, so a
+    # ```r Doc String and the backticks of a description would make R code.
+    # Markdown isn't read in an HTML block, from a line starting with <pre to
+    # a line with </pre>: both copies are in one, ended by an Rd comment
+    html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre >}}")
     code <- rd_escape(code)
     code[[1]] <- paste0("\\if{text,latex}{\\preformatted{", code[[1]])
-    c(html, code, "}}", "")
+    c("\\if{html}{\\out{", html, code, "%</pre>", "}}", "")
   }
   scenario_block <- function(scenario) {
     if (is.null(scenario) || !scenario$id %in% selected) {

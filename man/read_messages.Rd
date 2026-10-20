@@ -37,7 +37,8 @@ your own.
 \code{read_messages()} reads the messages a \code{CucumberMessagesReporter} wrote as tibbles of the run's
 features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -59,7 +60,7 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     """
     when("I add \{int\} item(s)", function(n, context) context$items &lt;- n)
     then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -83,9 +84,11 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     when("I add \{int\} item(s)", function(n, context) context$items <- n)
     then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A summary of the steps that failed, with their errors
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A summary of the steps that failed, with their errors
   When I run
     """
     write_failures &lt;- function(messages, output) \{
@@ -105,8 +108,8 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     """
     1 of 3 scenarios failed
     - Add items: Then the basket has 4 items
-      Expected &#96;context$items&#96; to equal &#96;n&#96;.
-    """</code></pre>}}
+      Expected `context$items` to equal `n`.
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A summary of the steps that failed, with their errors
   When I run
     """
@@ -129,9 +132,11 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     - Add items: Then the basket has 4 items
       Expected `context$items` to equal `n`.
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Each example of an outline is a scenario, at the line of its row
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Each example of an outline is a scenario, at the line of its row
   When I run
     """
     test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
@@ -143,7 +148,7 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     basket.feature:2 Add an item passed
     basket.feature:12 Add items passed
     basket.feature:13 Add items failed
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each example of an outline is a scenario, at the line of its row
   When I run
     """
@@ -157,6 +162,7 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     basket.feature:12 Add items passed
     basket.feature:13 Add items failed
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-custom_report.feature}

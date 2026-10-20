@@ -318,8 +318,8 @@ Feature: Scenarios as documentation
     And the help page "discount" doesn't include "Not discounted"
     And the help page "discount" doesn't include "Members get free shipping"
 
-  Scenario: Doc Strings between ``` are shown as written
-    Backticks of the scenarios don't pair with the backticks of the description.
+  Scenario: Code between backticks is shown as written
+    roxygen doesn't evaluate it as inline R code.
 
     Given a file named "DESCRIPTION" with
       """
@@ -331,48 +331,37 @@ Feature: Scenarios as documentation
       Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
       Encoding: UTF-8
       """
-    And a file named "tests/acceptance/scripts.feature" with
+    And a file named "tests/acceptance/calculator.feature" with
       """
-      Feature: Scripts
-        A script is a Doc String between ``` delimiters.
-
+      Feature: Calculator
         @rd
-        Scenario: Run a script
-          When I run
-            ```r
-            x <- 1
-            ```
-          Then `x` is 1
+        Scenario: Evaluate an expression
+          When I evaluate `r 1 + 1`
+          Then the result is 2
       """
-    And a file named "R/run_script.R" with
+    And a file named "R/calculate.R" with
       """
-      #' Run a script
-      #' @eval cucumber::features_rd(features = "scripts.feature")
+      #' Evaluate an expression
+      #' @eval cucumber::features_rd(features = "calculator.feature")
       #' @export
-      run_script <- function(script) eval(parse(text = script))
+      calculate <- function(expression) eval(parse(text = expression))
       """
     When I run
       """
       roxygen2::roxygenise()
-      pkgdown::build_reference(".", topics = "run_script", preview = FALSE)
+      pkgdown::build_reference(".", topics = "calculate", preview = FALSE)
       """
-    Then the help page "run_script" includes
+    Then the help page "calculate" includes
       """
-      Scenario: Run a script
-        When I run
-          ```r
-          x <- 1
-          ```
-        Then `x` is 1
+      Scenario: Evaluate an expression
+        When I evaluate `r 1 + 1`
+        Then the result is 2
       """
-    And the reference page "run_script" has the Gherkin block
+    And the reference page "calculate" has the Gherkin block
       """
-      Scenario: Run a script
-        When I run
-          ```r
-          x <- 1
-          ```
-        Then `x` is 1
+      Scenario: Evaluate an expression
+        When I evaluate `r 1 + 1`
+        Then the result is 2
       """
 
   Scenario: Names of features and Rules are shown as written

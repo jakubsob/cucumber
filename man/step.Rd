@@ -37,7 +37,8 @@ text in parentheses is optional, words separated by "/" are alternatives,
 "{}" matches anything, and all other text is matched literally.
 An invalid expression is an error pointing at the problem.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Optional text matches with or without it
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Optional text matches with or without it
   Given a package
   And a file named "features/expressions.feature" with
     """
@@ -63,7 +64,7 @@ An invalid expression is an error pointing at the problem.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Optional text matches with or without it
   Given a package
   And a file named "features/expressions.feature" with
@@ -91,9 +92,11 @@ An invalid expression is an error pointing at the problem.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Alternative words match any of them
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Alternative words match any of them
   Given a package
   And a file named "features/expressions.feature" with
     """
@@ -116,7 +119,7 @@ An invalid expression is an error pointing at the problem.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Alternative words match any of them
   Given a package
   And a file named "features/expressions.feature" with
@@ -141,9 +144,11 @@ An invalid expression is an error pointing at the problem.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Anonymous parameter matches anything as text
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Anonymous parameter matches anything as text
   Given a package
   And a file named "features/expressions.feature" with
     """
@@ -165,7 +170,7 @@ An invalid expression is an error pointing at the problem.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Anonymous parameter matches anything as text
   Given a package
   And a file named "features/expressions.feature" with
@@ -189,9 +194,11 @@ An invalid expression is an error pointing at the problem.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Special characters match literally and can be escaped
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Special characters match literally and can be escaped
   Given a package
   And a file named "features/expressions.feature" with
     """
@@ -219,7 +226,7 @@ An invalid expression is an error pointing at the problem.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Special characters match literally and can be escaped
   Given a package
   And a file named "features/expressions.feature" with
@@ -249,9 +256,11 @@ An invalid expression is an error pointing at the problem.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: An escaped space keeps words together in an alternative
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: An escaped space keeps words together in an alternative
   Given a package
   And a file named "features/expressions.feature" with
     """
@@ -274,7 +283,7 @@ An invalid expression is an error pointing at the problem.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An escaped space keeps words together in an alternative
   Given a package
   And a file named "features/expressions.feature" with
@@ -299,6 +308,7 @@ An invalid expression is an error pointing at the problem.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
 Source: \code{tests/acceptance/cucumber_expressions.feature}
@@ -312,7 +322,8 @@ Each capture group is passed to the step. A group whose regexp is the regexp of 
 like \verb{(\\\\d+)} for \code{{int}}, is converted like that parameter; any other group is passed as text.
 A regular expression without "^" and "$" can match a part of the step's text.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Capture groups are passed to the step, converted by parameter type
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Capture groups are passed to the step, converted by parameter type
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -336,7 +347,7 @@ A regular expression without "^" and "$" can match a part of the step's text.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Capture groups are passed to the step, converted by parameter type
   Given a package
   And a file named "features/basket.feature" with
@@ -362,9 +373,11 @@ A regular expression without "^" and "$" can match a part of the step's text.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A capture group that doesn't match passes NA
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A capture group that doesn't match passes NA
   Given a package
   And a file named "features/vegetables.feature" with
     """
@@ -386,7 +399,7 @@ A regular expression without "^" and "$" can match a part of the step's text.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A capture group that doesn't match passes NA
   Given a package
   And a file named "features/vegetables.feature" with
@@ -410,6 +423,7 @@ A regular expression without "^" and "$" can match a part of the step's text.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
 Source: \code{tests/acceptance/regular_expressions.feature}
@@ -420,13 +434,16 @@ Source: \code{tests/acceptance/regular_expressions.feature}
 A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
 then \code{context}, in this order.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario Outline: A step definition without &#96;context&#96; as its last argument is an error, &lt;case&gt;
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario Outline: A step definition without `context` as its last argument is an error, &lt;case&gt;
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -441,13 +458,13 @@ then \code{context}, in this order.
     """
     test("features")
     """
-  Then it fails with "A step definition must have &#96;context&#96; as its last argument."
-  And it fails with "Use &#96;function(n, context)&#96;."
+  Then it fails with "A step definition must have `context` as its last argument."
+  And it fails with "Use `function(n, context)`."
 <span></span>
   Examples:
     | case             | definition              |
     | missing context  | function(n) \{\}          |
-    | context not last | function(context, n) \{\} |</code></pre>}}
+    | context not last | function(context, n) \{\} |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: A step definition without `context` as its last argument is an error, <case>
   Given a file named "features/basket.feature" with
     """
@@ -470,9 +487,11 @@ then \code{context}, in this order.
     | case             | definition              |
     | missing context  | function(n) \{\}          |
     | context not last | function(context, n) \{\} |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step definition with &#96;...&#96; gets any number of arguments
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step definition with `...` gets any number of arguments
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -489,7 +508,7 @@ then \code{context}, in this order.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step definition with `...` gets any number of arguments
   Given a file named "features/basket.feature" with
     """
@@ -508,9 +527,11 @@ then \code{context}, in this order.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step definition's arguments with a default value can be left out
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step definition's arguments with a default value can be left out
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -528,7 +549,7 @@ then \code{context}, in this order.
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step definition's arguments with a default value can be left out
   Given a file named "features/basket.feature" with
     """
@@ -548,6 +569,7 @@ then \code{context}, in this order.
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-step_definition_arguments.feature}
@@ -559,7 +581,8 @@ Every step definition and scenario hook gets \code{context}.
 It's an environment that steps and hooks of one scenario share.
 Each scenario starts with a new, empty \code{context}.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -570,7 +593,7 @@ Each scenario starts with a new, empty \code{context}.
 <span></span>
       Scenario: Look into the basket
         Then the basket has 0 items
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -583,9 +606,11 @@ Each scenario starts with a new, empty \code{context}.
       Scenario: Look into the basket
         Then the basket has 0 items
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Steps of a scenario share context
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps of a scenario share context
   Given a file named "features/setup-steps.R" with
     """
     when("I add an item", function(context) \{
@@ -600,7 +625,7 @@ Each scenario starts with a new, empty \code{context}.
     test("features")
     """
   Then it passes
-  And it has 2 passed</code></pre>}}
+  And it has 2 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Steps of a scenario share context
   Given a file named "features/setup-steps.R" with
     """
@@ -617,9 +642,11 @@ Each scenario starts with a new, empty \code{context}.
     """
   Then it passes
   And it has 2 passed
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks share context with the steps
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Hooks share context with the steps
   Given a file named "features/setup-steps.R" with
     """
     before(function(context, scenario) \{
@@ -641,7 +668,7 @@ Each scenario starts with a new, empty \code{context}.
     """
   Then it passes
   And the output includes "Add an item ends with 1 items"
-  And the output includes "Look into the basket ends with 0 items"</code></pre>}}
+  And the output includes "Look into the basket ends with 0 items"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Hooks share context with the steps
   Given a file named "features/setup-steps.R" with
     """
@@ -665,6 +692,7 @@ Each scenario starts with a new, empty \code{context}.
   Then it passes
   And the output includes "Add an item ends with 1 items"
   And the output includes "Look into the basket ends with 0 items"
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-sharing_state_with_context.feature}
@@ -674,15 +702,18 @@ Source: \code{tests/acceptance/r-sharing_state_with_context.feature}
 
 A Data Table is a table under a step. The step definition gets it after the step's parameters.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
 \strong{Rule: A step definition gets the Data Table after the step's parameters}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A Data Table comes after the step's parameters
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A Data Table comes after the step's parameters
   Given a file named "features/table.feature" with
     """
     Feature: Tables
@@ -709,7 +740,7 @@ A Data Table is a table under a step. The step definition gets it after the step
     test("features")
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A Data Table comes after the step's parameters
   Given a file named "features/table.feature" with
     """
@@ -738,11 +769,13 @@ A Data Table is a table under a step. The step definition gets it after the step
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
 \strong{Rule: In R, a Data Table is a tibble whose first row holds the column names}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step receives a Data Table as a tibble
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step receives a Data Table as a tibble
   Given a file named "features/table.feature" with
     """
     Feature: Tables
@@ -768,7 +801,7 @@ A Data Table is a table under a step. The step definition gets it after the step
     """
     test("features")
     """
-  Then it passes</code></pre>}}
+  Then it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step receives a Data Table as a tibble
   Given a file named "features/table.feature" with
     """
@@ -796,6 +829,7 @@ A Data Table is a table under a step. The step definition gets it after the step
     test("features")
     """
   Then it passes
+%</pre>
 }}
 
 Source: \code{tests/acceptance/data_tables.feature}
@@ -806,23 +840,26 @@ Source: \code{tests/acceptance/data_tables.feature}
 A Doc String is a block of text under a step, between ``` or """ delimiters.
 The step definition gets it as one string, after the step's parameters.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
 \strong{Rule: A step definition gets the Doc String as one string, after the step's parameters}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step definition gets the Doc String
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step definition gets the Doc String
   Given a file named "features/docstring.feature" with
     """
     Feature: Doc Strings
       Scenario: Step with a Doc String
         Given a message
-          &#96;&#96;&#96;
+          ```
           Hello, world!
-          &#96;&#96;&#96;
+          ```
         Then the message is "Hello, world!"
     """
   And a file named "features/setup-steps.R" with
@@ -839,7 +876,7 @@ The step definition gets it as one string, after the step's parameters.
     test("features")
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step definition gets the Doc String
   Given a file named "features/docstring.feature" with
     """
@@ -866,27 +903,29 @@ The step definition gets it as one string, after the step's parameters.
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
 \strong{Rule: The media type is in the string's \code{media_type} attribute}
 
 It is \code{json} for a Doc String opened with ```json.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A Doc String's media type is in its media_type attribute
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A Doc String's media type is in its media_type attribute
   Given a file named "features/docstring.feature" with
     """
     Feature: Doc Strings
       Scenario: A request body
         Given a body
-          &#96;&#96;&#96;json
+          ```json
           \{"id": 1\}
-          &#96;&#96;&#96;
+          ```
         Then the body is JSON
       Scenario: Text without a media type
         Given a body
-          &#96;&#96;&#96;
+          ```
           Hello
-          &#96;&#96;&#96;
+          ```
         Then the body has no media type
     """
   And a file named "features/setup-steps.R" with
@@ -907,7 +946,7 @@ It is \code{json} for a Doc String opened with ```json.
     test("features")
     """
   Then it passes
-  And it has 2 passed</code></pre>}}
+  And it has 2 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A Doc String's media type is in its media_type attribute
   Given a file named "features/docstring.feature" with
     """
@@ -944,20 +983,22 @@ It is \code{json} for a Doc String opened with ```json.
     """
   Then it passes
   And it has 2 passed
+%</pre>
 }}
 
 \strong{Rule: In R, the \code{cucumber.docstring_as_lines} option passes a Doc String as a character vector of lines}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
   Given a file named "features/docstring.feature" with
     """
     Feature: Doc Strings
       Scenario: A script
         Given a script
-          &#96;&#96;&#96;r
+          ```r
           x &lt;- 1
           y &lt;- 2
-          &#96;&#96;&#96;
+          ```
         Then the script is a vector of lines
     """
   And a file named "features/setup-steps.R" with
@@ -975,7 +1016,7 @@ It is \code{json} for a Doc String opened with ```json.
     withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
     """
   Then it passes
-  And it has 1 passed</code></pre>}}
+  And it has 1 passed</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
   Given a file named "features/docstring.feature" with
     """
@@ -1004,6 +1045,7 @@ It is \code{json} for a Doc String opened with ```json.
     """
   Then it passes
   And it has 1 passed
+%</pre>
 }}
 
 Source: \code{tests/acceptance/doc_string.feature}
@@ -1015,7 +1057,8 @@ An undefined step is reported with a snippet of the step definition it needs, re
 When more than one parameter type matches a part of the step, the alternative step definitions are listed as comments.
 Keep only one of them, as a step that matches several step definitions is ambiguous.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: An undefined step is reported with a snippet
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: An undefined step is reported with a snippet
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -1038,7 +1081,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
       given("an empty basket", function(context) \{
         pending()
       \})
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An undefined step is reported with a snippet
   Given a package
   And a file named "features/basket.feature" with
@@ -1063,9 +1106,11 @@ Keep only one of them, as a step that matches several step definitions is ambigu
         pending()
       \})
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Alternative step definitions are listed when more than one parameter type matches
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Alternative step definitions are listed when more than one parameter type matches
   Given a package
   And a file named "features/basket.feature" with
     """
@@ -1085,7 +1130,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
       # given("I have \{float\} cucumbers in my basket", function(float, context) \{
         pending()
       \})
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Alternative step definitions are listed when more than one parameter type matches
   Given a package
   And a file named "features/basket.feature" with
@@ -1107,6 +1152,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
         pending()
       \})
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/step_definition_snippets.feature}
@@ -1118,7 +1164,8 @@ A step must match exactly one step definition.
 When it matches more than one, the step is reported as ambiguous, listing
 every matching definition, and the scenario fails.
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step matching two definitions fails with both definitions listed
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step matching two definitions fails with both definitions listed
   Given a package
   And a file named "features/user.feature" with
     """
@@ -1151,7 +1198,7 @@ every matching definition, and the scenario fails.
   And the error message includes
     """
     "the user is \{string\}" (setup-steps.R:4)
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step matching two definitions fails with both definitions listed
   Given a package
   And a file named "features/user.feature" with
@@ -1186,9 +1233,10 @@ every matching definition, and the scenario fails.
     """
     "the user is \{string\}" (setup-steps.R:4)
     """
+%</pre>
 }}
 
-ZiUJNEeXOQthU4ODeRDSRlOVtwvhEKNO-49\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
+df39U9Xd8Ntpqbig3JbvMQlhi1hbdVFQ-49\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
   A Given and a Then step with the same text match the same step definitions,
   so choose words that tell them apart, like "my account has a balance of £430"
   and "my account should have a balance of £430".
@@ -1216,6 +1264,7 @@ ZiUJNEeXOQthU4ODeRDSRlOVtwvhEKNO-49\if{text,latex}{\preformatted{Scenario: Steps
     """
     Multiple step definitions match: "there is money in my account"
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/ambiguous_step.feature}

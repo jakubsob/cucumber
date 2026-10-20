@@ -73,7 +73,8 @@ lines, \code{filter}, \code{name} and \code{tags}. By default only scenarios tag
 set the \code{cucumber.rd_tags} option to use another tag expression. Name the section with
 \code{section}, or for every help page with the \code{cucumber.rd_section} option.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
   Given a package
   And a file named "tests/acceptance/basket.feature" with
     """
@@ -102,7 +103,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
           | n |
           | 2 |
           | 3 |
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "tests/acceptance/basket.feature" with
@@ -133,9 +134,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
           | 2 |
           | 3 |
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The scenarios tagged @rd are in the help page
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The scenarios tagged @rd are in the help page
   Given a file named "R/add.R" with
     """
     #' Add items to a basket
@@ -174,7 +177,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Source: 'tests/acceptance/basket.feature'
     """
   And the help page "add" doesn't include "Remove an item"
-  And the help page "add" doesn't include "@rd"</code></pre>}}
+  And the help page "add" doesn't include "@rd"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The scenarios tagged @rd are in the help page
   Given a file named "R/add.R" with
     """
@@ -215,9 +218,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
   And the help page "add" doesn't include "Remove an item"
   And the help page "add" doesn't include "@rd"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The scenarios are in the pkgdown reference page
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The scenarios are in the pkgdown reference page
   They're Gherkin code blocks, like those of a Markdown page.
 <span></span>
   Given a file named "DESCRIPTION" with
@@ -247,7 +252,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Scenario: Add an item
       When I add 1 item
       Then the basket has 1 item
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The scenarios are in the pkgdown reference page
   They're Gherkin code blocks, like those of a Markdown page.
 
@@ -279,9 +284,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
       When I add 1 item
       Then the basket has 1 item
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The blank lines of a scenario are kept in the pkgdown reference page
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The blank lines of a scenario are kept in the pkgdown reference page
   Given a file named "DESCRIPTION" with
     """
     Package: example
@@ -323,7 +330,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
       Given a basket with 2 items
       When I pay
       Then the basket is empty
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The blank lines of a scenario are kept in the pkgdown reference page
   Given a file named "DESCRIPTION" with
     """
@@ -367,9 +374,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
       When I pay
       Then the basket is empty
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A scenario selected by its line
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A scenario selected by its line
   Given a file named "R/add.R" with
     """
     #' Add items to a basket
@@ -382,7 +391,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     roxygen2::roxygenise()
     """
   Then the help page "add" includes "Scenario: Add an item"
-  And the help page "add" doesn't include "Scenario Outline: Add items"</code></pre>}}
+  And the help page "add" doesn't include "Scenario Outline: Add items"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A scenario selected by its line
   Given a file named "R/add.R" with
     """
@@ -397,9 +406,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
   Then the help page "add" includes "Scenario: Add an item"
   And the help page "add" doesn't include "Scenario Outline: Add items"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: An example of an outline selected by the line of its row
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: An example of an outline selected by the line of its row
   Given a file named "R/add.R" with
     """
     #' Add items to a basket
@@ -421,7 +432,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
         | n |
         | 3 |
     """
-  And the help page "add" doesn't include "| 2 |"</code></pre>}}
+  And the help page "add" doesn't include "| 2 |"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An example of an outline selected by the line of its row
   Given a file named "R/add.R" with
     """
@@ -445,9 +456,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
         | 3 |
     """
   And the help page "add" doesn't include "| 2 |"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Scenarios selected by name, whatever their tags
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Scenarios selected by name, whatever their tags
   Given a file named "R/remove.R" with
     """
     #' Remove items from a basket
@@ -465,7 +478,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
       When I remove 1 item
       Then the basket is empty
     """
-  And the help page "remove" doesn't include "Scenario: Add an item"</code></pre>}}
+  And the help page "remove" doesn't include "Scenario: Add an item"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Scenarios selected by name, whatever their tags
   Given a file named "R/remove.R" with
     """
@@ -485,9 +498,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
       Then the basket is empty
     """
   And the help page "remove" doesn't include "Scenario: Add an item"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Another tag marks the scenarios for documentation
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Another tag marks the scenarios for documentation
   Given a file named "R/remove.R" with
     """
     #' Remove items from a basket
@@ -500,7 +515,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     withr::with_options(list(cucumber.rd_tags = "@example"), roxygen2::roxygenise())
     """
   Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
-  And the help page "remove" doesn't include "Scenario: Add an item"</code></pre>}}
+  And the help page "remove" doesn't include "Scenario: Add an item"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Another tag marks the scenarios for documentation
   Given a file named "R/remove.R" with
     """
@@ -515,9 +530,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
   Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
   And the help page "remove" doesn't include "Scenario: Add an item"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The section has another name
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The section has another name
   Given a file named "R/add.R" with
     """
     #' Add items to a basket
@@ -530,7 +547,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     roxygen2::roxygenise()
     """
   Then the help page "add" includes "Examples of use:"
-  And the help page "add" doesn't include "Specification:"</code></pre>}}
+  And the help page "add" doesn't include "Specification:"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The section has another name
   Given a file named "R/add.R" with
     """
@@ -545,9 +562,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
   Then the help page "add" includes "Examples of use:"
   And the help page "add" doesn't include "Specification:"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: The sections of every help page have another name
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: The sections of every help page have another name
   Given a file named "R/add.R" with
     """
     #' Add items to a basket
@@ -560,7 +579,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
     """
   Then the help page "add" includes "Behavior:"
-  And the help page "add" doesn't include "Specification:"</code></pre>}}
+  And the help page "add" doesn't include "Specification:"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The sections of every help page have another name
   Given a file named "R/add.R" with
     """
@@ -575,9 +594,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
   Then the help page "add" includes "Behavior:"
   And the help page "add" doesn't include "Specification:"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Scenarios of a Rule are under the Rule
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Scenarios of a Rule are under the Rule
   Only the selected Examples of a Scenario Outline are shown, and only the Rules with
   selected scenarios.
 <span></span>
@@ -634,7 +655,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Source: 'tests/acceptance/discounts.feature'
     """
   And the help page "discount" doesn't include "Not discounted"
-  And the help page "discount" doesn't include "Members get free shipping"</code></pre>}}
+  And the help page "discount" doesn't include "Members get free shipping"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Scenarios of a Rule are under the Rule
   Only the selected Examples of a Scenario Outline are shown, and only the Rules with
   selected scenarios.
@@ -693,10 +714,12 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
   And the help page "discount" doesn't include "Not discounted"
   And the help page "discount" doesn't include "Members get free shipping"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Doc Strings between &#96;&#96;&#96; are shown as written
-  Backticks of the scenarios don't pair with the backticks of the description.
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Code between backticks is shown as written
+  roxygen doesn't evaluate it as inline R code.
 <span></span>
   Given a file named "DESCRIPTION" with
     """
@@ -708,51 +731,40 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
     Encoding: UTF-8
     """
-  And a file named "tests/acceptance/scripts.feature" with
+  And a file named "tests/acceptance/calculator.feature" with
     """
-    Feature: Scripts
-      A script is a Doc String between &#96;&#96;&#96; delimiters.
-<span></span>
+    Feature: Calculator
       @rd
-      Scenario: Run a script
-        When I run
-          &#96;&#96;&#96;r
-          x &lt;- 1
-          &#96;&#96;&#96;
-        Then &#96;x&#96; is 1
+      Scenario: Evaluate an expression
+        When I evaluate `r 1 + 1`
+        Then the result is 2
     """
-  And a file named "R/run_script.R" with
+  And a file named "R/calculate.R" with
     """
-    #' Run a script
-    #' @eval cucumber::features_rd(features = "scripts.feature")
+    #' Evaluate an expression
+    #' @eval cucumber::features_rd(features = "calculator.feature")
     #' @export
-    run_script &lt;- function(script) eval(parse(text = script))
+    calculate &lt;- function(expression) eval(parse(text = expression))
     """
   When I run
     """
     roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "run_script", preview = FALSE)
+    pkgdown::build_reference(".", topics = "calculate", preview = FALSE)
     """
-  Then the help page "run_script" includes
+  Then the help page "calculate" includes
     """
-    Scenario: Run a script
-      When I run
-        &#96;&#96;&#96;r
-        x &lt;- 1
-        &#96;&#96;&#96;
-      Then &#96;x&#96; is 1
+    Scenario: Evaluate an expression
+      When I evaluate `r 1 + 1`
+      Then the result is 2
     """
-  And the reference page "run_script" has the Gherkin block
+  And the reference page "calculate" has the Gherkin block
     """
-    Scenario: Run a script
-      When I run
-        &#96;&#96;&#96;r
-        x &lt;- 1
-        &#96;&#96;&#96;
-      Then &#96;x&#96; is 1
-    """</code></pre>}}
-\if{text,latex}{\preformatted{Scenario: Doc Strings between ``` are shown as written
-  Backticks of the scenarios don't pair with the backticks of the description.
+    Scenario: Evaluate an expression
+      When I evaluate `r 1 + 1`
+      Then the result is 2
+    """</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Code between backticks is shown as written
+  roxygen doesn't evaluate it as inline R code.
 
   Given a file named "DESCRIPTION" with
     """
@@ -764,52 +776,43 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
     Encoding: UTF-8
     """
-  And a file named "tests/acceptance/scripts.feature" with
+  And a file named "tests/acceptance/calculator.feature" with
     """
-    Feature: Scripts
-      A script is a Doc String between ``` delimiters.
-
+    Feature: Calculator
       @rd
-      Scenario: Run a script
-        When I run
-          ```r
-          x <- 1
-          ```
-        Then `x` is 1
+      Scenario: Evaluate an expression
+        When I evaluate `r 1 + 1`
+        Then the result is 2
     """
-  And a file named "R/run_script.R" with
+  And a file named "R/calculate.R" with
     """
-    #' Run a script
-    #' @eval cucumber::features_rd(features = "scripts.feature")
+    #' Evaluate an expression
+    #' @eval cucumber::features_rd(features = "calculator.feature")
     #' @export
-    run_script <- function(script) eval(parse(text = script))
+    calculate <- function(expression) eval(parse(text = expression))
     """
   When I run
     """
     roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "run_script", preview = FALSE)
+    pkgdown::build_reference(".", topics = "calculate", preview = FALSE)
     """
-  Then the help page "run_script" includes
+  Then the help page "calculate" includes
     """
-    Scenario: Run a script
-      When I run
-        ```r
-        x <- 1
-        ```
-      Then `x` is 1
+    Scenario: Evaluate an expression
+      When I evaluate `r 1 + 1`
+      Then the result is 2
     """
-  And the reference page "run_script" has the Gherkin block
+  And the reference page "calculate" has the Gherkin block
     """
-    Scenario: Run a script
-      When I run
-        ```r
-        x <- 1
-        ```
-      Then `x` is 1
+    Scenario: Evaluate an expression
+      When I evaluate `r 1 + 1`
+      Then the result is 2
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Names of features and Rules are shown as written
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Names of features and Rules are shown as written
   Given a file named "tests/acceptance/discounts.feature" with
     """
     Feature: Discounts of \{percent\}\%
@@ -837,7 +840,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     Discounts of \{percent\}\%:
 <span></span>
     *Rule: \{int\} items get 10\% off*
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Names of features and Rules are shown as written
   Given a file named "tests/acceptance/discounts.feature" with
     """
@@ -867,20 +870,23 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 
     *Rule: \{int\} items get 10\% off*
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A selection without scenarios is an error
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A selection without scenarios is an error
   When I run it and it fails
     """
     cucumber::features_rd(features = "basket.feature:13")
     """
-  Then it fails with "No scenarios to document."</code></pre>}}
+  Then it fails with "No scenarios to document."</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A selection without scenarios is an error
   When I run it and it fails
     """
     cucumber::features_rd(features = "basket.feature:13")
     """
   Then it fails with "No scenarios to document."
+%</pre>
 }}
 
 Source: \code{tests/acceptance/r-features_rd.feature}

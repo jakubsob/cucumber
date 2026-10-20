@@ -23,13 +23,16 @@ A pending scenario fails the run, unless it's run with \code{strict = FALSE}.
 Use it to write the feature files first and implement the steps later.
 Hooks can call \code{pending()} too.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A pending step fails the scenario
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A pending step fails the scenario
   Given a file named "features/pending.feature" with
     """
     Feature: Pending
@@ -53,7 +56,7 @@ Hooks can call \code{pending()} too.
     """
   And the steps have these results:
     | step                         | status  |
-    | Given a step that is pending | pending |</code></pre>}}
+    | Given a step that is pending | pending |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A pending step fails the scenario
   Given a file named "features/pending.feature" with
     """
@@ -79,9 +82,11 @@ Hooks can call \code{pending()} too.
   And the steps have these results:
     | step                         | status  |
     | Given a step that is pending | pending |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Steps after a pending step are skipped
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Steps after a pending step are skipped
   Given a file named "features/pending.feature" with
     """
     Feature: Pending
@@ -107,7 +112,7 @@ Hooks can call \code{pending()} too.
   And the steps have these results:
     | step                          | status  |
     | Given a step that is pending  | pending |
-    | Then this step should not run | skipped |</code></pre>}}
+    | Then this step should not run | skipped |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Steps after a pending step are skipped
   Given a file named "features/pending.feature" with
     """
@@ -135,9 +140,11 @@ Hooks can call \code{pending()} too.
     | step                          | status  |
     | Given a step that is pending  | pending |
     | Then this step should not run | skipped |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario Outline: A before hook makes the scenario pending with pending(), strict = &lt;strict&gt;
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario Outline: A before hook makes the scenario pending with pending(), strict = &lt;strict&gt;
   A pending scenario fails the run only in strict mode, like a pending step.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -167,7 +174,7 @@ Hooks can call \code{pending()} too.
   Examples:
     | strict | outcome | message                                                   |
     | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
-    | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |</code></pre>}}
+    | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
   A pending scenario fails the run only in strict mode, like a pending step.
 
@@ -199,6 +206,7 @@ Hooks can call \code{pending()} too.
     | strict | outcome | message                                                   |
     | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/pending_steps.feature}

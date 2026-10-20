@@ -24,13 +24,16 @@ and after hooks still run and get \code{"skipped"} as its status.
 In an \code{after()} hook, it skips only that hook, and the scenario is skipped unless it failed.
 Calling it in any other hook is an error. \code{testthat::skip()} does the same.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step skips the scenario with skip_scenario()
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step skips the scenario with skip_scenario()
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -56,7 +59,7 @@ Calling it in any other hook is an error. \code{testthat::skip()} does the same.
     | step                      | status  |
     | Given an empty basket     | passed  |
     | When I sync the basket    | skipped |
-    | Then the basket is synced | skipped |</code></pre>}}
+    | Then the basket is synced | skipped |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step skips the scenario with skip_scenario()
   Given a file named "features/basket.feature" with
     """
@@ -84,9 +87,11 @@ Calling it in any other hook is an error. \code{testthat::skip()} does the same.
     | Given an empty basket     | passed  |
     | When I sync the basket    | skipped |
     | Then the basket is synced | skipped |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A before hook skips the scenario with skip_scenario()
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A before hook skips the scenario with skip_scenario()
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -125,7 +130,7 @@ Calling it in any other hook is an error. \code{testthat::skip()} does the same.
     | Sync the basket | When I sync the basket | skipped |
     | Sync the basket | After                  | passed  |
     | Add an item     | Given an empty basket  | passed  |
-    | Add an item     | After                  | passed  |</code></pre>}}
+    | Add an item     | After                  | passed  |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A before hook skips the scenario with skip_scenario()
   Given a file named "features/basket.feature" with
     """
@@ -166,9 +171,11 @@ Calling it in any other hook is an error. \code{testthat::skip()} does the same.
     | Sync the basket | After                  | passed  |
     | Add an item     | Given an empty basket  | passed  |
     | Add an item     | After                  | passed  |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -186,7 +193,7 @@ Calling it in any other hook is an error. \code{testthat::skip()} does the same.
     test("features")
     """
   Then the scenario "Add an item" is skipped with "Reason: too late"
-  And the output includes "this hook still runs"</code></pre>}}
+  And the output includes "this hook still runs"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
   Given a file named "features/basket.feature" with
     """
@@ -206,6 +213,7 @@ Calling it in any other hook is an error. \code{testthat::skip()} does the same.
     """
   Then the scenario "Add an item" is skipped with "Reason: too late"
   And the output includes "this hook still runs"
+%</pre>
 }}
 
 Source: \code{tests/acceptance/skipped_steps.feature}

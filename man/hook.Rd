@@ -59,13 +59,16 @@ and a failing after hook fails it.
 What a before hook does is invisible to people who only read the features. For setup they should read,
 use a Background instead, and keep before hooks for low-level work like starting a browser or emptying a database.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Before hooks run in definition order and after hooks in reverse order
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Before hooks run in definition order and after hooks in reverse order
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -92,7 +95,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     step
     after 2
     after 1
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Before hooks run in definition order and after hooks in reverse order
   Given a file named "features/basket.feature" with
     """
@@ -121,9 +124,11 @@ use a Background instead, and keep before hooks for low-level work like starting
     after 2
     after 1
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks get the scenario, and after hooks get its result
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Hooks get the scenario, and after hooks get its result
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -155,7 +160,7 @@ use a Background instead, and keep before hooks for low-level work like starting
   And the output includes
     """
     after: failed Step "I add an item" failed
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Hooks get the scenario, and after hooks get its result
   Given a file named "features/basket.feature" with
     """
@@ -189,9 +194,11 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     after: failed Step "I add an item" failed
     """
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A named hook's errors start with its name
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A named hook's errors start with its name
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -208,7 +215,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     test("features", stop_on_failure = FALSE)
     """
   Then it has 1 failed
-  And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"</code></pre>}}
+  And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A named hook's errors start with its name
   Given a file named "features/basket.feature" with
     """
@@ -227,9 +234,11 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
   Then it has 1 failed
   And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A failing before hook skips the steps and fails the scenario
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A failing before hook skips the steps and fails the scenario
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -254,7 +263,7 @@ use a Background instead, and keep before hooks for low-level work like starting
   And the steps and hooks have these results:
     | step                  | status  |
     | Before                | failed  |
-    | Given an empty basket | skipped |</code></pre>}}
+    | Given an empty basket | skipped |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A failing before hook skips the steps and fails the scenario
   Given a file named "features/basket.feature" with
     """
@@ -281,6 +290,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     | step                  | status  |
     | Before                | failed  |
     | Given an empty basket | skipped |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/hooks.feature}
@@ -291,13 +301,16 @@ Source: \code{tests/acceptance/hooks.feature}
 A hook with \code{tags} runs only for the scenarios that match its tag expression,
 like \code{before(connect, tags = "@db")}.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Tagged hooks run only for scenarios that match the tag expression
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Tagged hooks run only for scenarios that match the tag expression
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -322,7 +335,7 @@ like \code{before(connect, tags = "@db")}.
   And the output includes "connect for Save the basket"
   And the output includes "disconnect for Save the basket"
   And the output doesn't include "connect for Add an item"
-  And the output doesn't include "disconnect for Add an item"</code></pre>}}
+  And the output doesn't include "disconnect for Add an item"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Tagged hooks run only for scenarios that match the tag expression
   Given a file named "features/basket.feature" with
     """
@@ -349,6 +362,7 @@ like \code{before(connect, tags = "@db")}.
   And the output includes "disconnect for Save the basket"
   And the output doesn't include "connect for Add an item"
   And the output doesn't include "disconnect for Add an item"
+%</pre>
 }}
 
 Source: \code{tests/acceptance/tagged_hooks.feature}
@@ -360,13 +374,16 @@ Source: \code{tests/acceptance/tagged_hooks.feature}
 They get the step, and after step hooks also get its result.
 They don't run for skipped, undefined or ambiguous steps. A failing step hook fails the step.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Step hooks run around each step and after step hooks get its result
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Step hooks run around each step and after step hooks get its result
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -401,7 +418,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     | When I add an item         | failed  |
     | Then the basket has 1 item | skipped |
   And the output doesn't include "before: Then the basket has 1 item"
-  And the output doesn't include "after: the basket has 1 item"</code></pre>}}
+  And the output doesn't include "after: the basket has 1 item"</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Step hooks run around each step and after step hooks get its result
   Given a file named "features/basket.feature" with
     """
@@ -438,9 +455,11 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     | Then the basket has 1 item | skipped |
   And the output doesn't include "before: Then the basket has 1 item"
   And the output doesn't include "after: the basket has 1 item"
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A failing step hook fails the step
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A failing step hook fails the step
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -463,7 +482,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
   And the steps have these results:
     | step                  | status  |
     | Given an empty basket | failed  |
-    | When I add an item    | skipped |</code></pre>}}
+    | When I add an item    | skipped |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A failing step hook fails the step
   Given a file named "features/basket.feature" with
     """
@@ -488,6 +507,7 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
     | step                  | status  |
     | Given an empty basket | failed  |
     | When I add an item    | skipped |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/before_after_step_hooks.feature}
@@ -501,13 +521,16 @@ which isn't shared with the scenarios.
 A failing \code{before_all()} hook stops the run before any scenario, after the other \code{before_all()} hooks ran.
 \code{after_all()} hooks run even when the run failed, and a failing one fails the run.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Before all and after all hooks run once for the whole run
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Before all and after all hooks run once for the whole run
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -537,7 +560,7 @@ A failing \code{before_all()} hook stops the run before any scenario, after the 
     scenario
     scenario
     stop the server
-    """</code></pre>}}
+    """</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Before all and after all hooks run once for the whole run
   Given a file named "features/basket.feature" with
     """
@@ -569,6 +592,7 @@ A failing \code{before_all()} hook stops the run before any scenario, after the 
     scenario
     stop the server
     """
+%</pre>
 }}
 
 Source: \code{tests/acceptance/before_after_all_hooks.feature}

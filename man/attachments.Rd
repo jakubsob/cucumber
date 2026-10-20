@@ -26,13 +26,16 @@ a string or a raw vector with its media type, \code{context$log()} attaches text
 \code{context$link()} a URL. The attachments are reported as Cucumber Messages, and the reports
 show them, like the HTML report. The pretty reporter prints them under their step.
 
-\if{html}{\out{<pre class="gherkin"><code>Background:
-  Given a package</code></pre>}}
+\if{html}{\out{
+<pre class="gherkin"><code>Background:
+  Given a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step attaches data, a log and a link
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step attaches data, a log and a link
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
@@ -57,7 +60,7 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     | When I add an item  | application/json          | \{"items": 1\}               | IDENTITY |            |
     | When I add an item  | application/octet-stream  | AQID                       | BASE64   | basket.bin |
     | When I add an item  | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
-    | When I add an item  | text/uri-list             | https://example.com/basket | IDENTITY |            |</code></pre>}}
+    | When I add an item  | text/uri-list             | https://example.com/basket | IDENTITY |            |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step attaches data, a log and a link
   Given a file named "features/basket.feature" with
     """
@@ -84,10 +87,12 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     | When I add an item  | application/octet-stream  | AQID                       | BASE64   | basket.bin |
     | When I add an item  | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
     | When I add an item  | text/uri-list             | https://example.com/basket | IDENTITY |            |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: A step attaches images
-  Read an image, like a screenshot, with &#96;readBin()&#96; and attach it with its media type.
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: A step attaches images
+  Read an image, like a screenshot, with `readBin()` and attach it with its media type.
   It's base64 encoded, and the HTML report shows it.
 <span></span>
   Given a file named "features/basket.feature" with
@@ -119,7 +124,7 @@ show them, like the HTML report. The pretty reporter prints them under their ste
   Then the attachments are:
     | step               | media_type | encoding | file_name  |
     | When I add an item | image/png  | BASE64   | basket.png |
-    | When I add an item | image/jpeg | BASE64   | basket.jpg |</code></pre>}}
+    | When I add an item | image/jpeg | BASE64   | basket.jpg |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step attaches images
   Read an image, like a screenshot, with `readBin()` and attach it with its media type.
   It's base64 encoded, and the HTML report shows it.
@@ -154,10 +159,12 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     | step               | media_type | encoding | file_name  |
     | When I add an item | image/png  | BASE64   | basket.png |
     | When I add an item | image/jpeg | BASE64   | basket.jpg |
+%</pre>
 }}
 
-\if{html}{\out{<pre class="gherkin"><code>Scenario: Hooks attach data too
-  &#96;before_all()&#96; and &#96;after_all()&#96; hooks get a &#96;context&#96; to attach with when they take one argument.
+\if{html}{\out{
+<pre class="gherkin"><code>Scenario: Hooks attach data too
+  `before_all()` and `after_all()` hooks get a `context` to attach with when they take one argument.
 <span></span>
   Given a file named "features/basket.feature" with
     """
@@ -180,7 +187,7 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     | step      | media_type                | body               |
     | BeforeAll | text/x.cucumber.log+plain | Started the server |
     | Before    | text/x.cucumber.log+plain | Opened the browser |
-    | After     | text/html                 | &lt;html&gt;&lt;/html&gt;      |</code></pre>}}
+    | After     | text/html                 | &lt;html&gt;&lt;/html&gt;      |</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Hooks attach data too
   `before_all()` and `after_all()` hooks get a `context` to attach with when they take one argument.
 
@@ -206,6 +213,7 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     | BeforeAll | text/x.cucumber.log+plain | Started the server |
     | Before    | text/x.cucumber.log+plain | Opened the browser |
     | After     | text/html                 | <html></html>      |
+%</pre>
 }}
 
 Source: \code{tests/acceptance/attachments.feature}
