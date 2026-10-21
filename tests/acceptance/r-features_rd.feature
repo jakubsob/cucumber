@@ -155,6 +155,61 @@ Feature: Scenarios as documentation
         Then the basket is empty
       """
 
+  Scenario: The scenarios are highlighted in the pkgdown reference page
+    Their tokens have the classes pandoc gives tokens, so that the site's theme colours them
+    like other code, without a script.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/greeting.feature" with
+      """
+      Feature: Greeting
+        @rd
+        Scenario Outline: Greet a customer
+          # The customer gives their name
+          Given a customer named "<name>"
+          When I greet them with
+            ```
+            Hello!
+            ```
+          Then they reply
+
+          Examples:
+            | name |
+            | Ada  |
+      """
+    And a file named "R/greet.R" with
+      """
+      #' Greet a customer
+      #' @eval cucumber::features_rd(features = "greeting.feature")
+      #' @export
+      greet <- function(name) paste("Hello", name)
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "greet", preview = FALSE)
+      """
+    Then the reference page "greet" highlights the Gherkin
+      | token                           | class |
+      | Scenario Outline:               | kw    |
+      | Examples:                       | kw    |
+      | Given                           | fu    |
+      | When                            | fu    |
+      | # The customer gives their name | co    |
+      | "<name>"                        | st    |
+      | <name>                          | va    |
+      | Hello!                          | st    |
+      | \|                              | op    |
+
   Scenario: A scenario selected by its line
     Given a file named "R/add.R" with
       """

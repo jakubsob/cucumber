@@ -24,38 +24,38 @@ Use it to write the feature files first and implement the steps later.
 Hooks can call \code{pending()} too.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A pending step fails the scenario
-  Given a file named "features/pending.feature" with
-    """
-    Feature: Pending
-      Scenario: Not yet implemented
-        Given a step that is pending
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a step that is pending", function(context) \{
-      pending("not yet implemented")
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the error message includes
-    """
-    Step "a step that is pending" is pending: not yet implemented
-    """
-  And the steps have these results:
-    | step                         | status  |
-    | Given a step that is pending | pending |</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A pending step fails the scenario
+  <span class="fu">Given</span> a file named <span class="st">"features/pending.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Pending</span>
+<span class="st">      Scenario: Not yet implemented</span>
+<span class="st">        Given a step that is pending</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("a step that is pending", function(context) \{</span>
+<span class="st">      pending("not yet implemented")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the error message includes
+<span class="st">    """</span>
+<span class="st">    Step "a step that is pending" is pending: not yet implemented</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the steps have these results:
+    <span class="op">|</span> step                         <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Given a step that is pending <span class="op">|</span> pending <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A pending step fails the scenario
   Given a file named "features/pending.feature" with
     """
@@ -84,31 +84,31 @@ Hooks can call \code{pending()} too.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Steps after a pending step are skipped
-  Given a file named "features/pending.feature" with
-    """
-    Feature: Pending
-      Scenario: Skips the rest
-        Given a step that is pending
-        Then this step should not run
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a step that is pending", function(context) \{
-      pending()
-    \})
-    then("this step should not run", function(context) \{
-      stop("this step must not execute")
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                          | status  |
-    | Given a step that is pending  | pending |
-    | Then this step should not run | skipped |</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Steps after a pending step are skipped
+  <span class="fu">Given</span> a file named <span class="st">"features/pending.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Pending</span>
+<span class="st">      Scenario: Skips the rest</span>
+<span class="st">        Given a step that is pending</span>
+<span class="st">        Then this step should not run</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("a step that is pending", function(context) \{</span>
+<span class="st">      pending()</span>
+<span class="st">    \})</span>
+<span class="st">    then("this step should not run", function(context) \{</span>
+<span class="st">      stop("this step must not execute")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> step                          <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Given a step that is pending  <span class="op">|</span> pending <span class="op">|</span>
+    <span class="op">|</span> Then this step should not run <span class="op">|</span> skipped <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Steps after a pending step are skipped
   Given a file named "features/pending.feature" with
     """
@@ -138,37 +138,37 @@ Hooks can call \code{pending()} too.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario Outline: A before hook makes the scenario pending with pending(), strict = &lt;strict&gt;
+<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A before hook makes the scenario pending with pending(), strict = <span class="va">&lt;strict&gt;</span>
   A pending scenario fails the run only in strict mode, like a pending step.
 <span></span>
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Sync the basket
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) pending("the API client isn't written yet"))
-    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
-    given("an empty basket", function(context) stop("this step must not execute"))
-    """
-  When I run
-    """
-    test("features", strict = &lt;strict&gt;, stop_on_failure = FALSE)
-    """
-  Then the scenario "Sync the basket" is &lt;outcome&gt; with "&lt;message&gt;"
-  And the output includes "after: Sync the basket pending"
-  And the steps and hooks have these results:
-    | step                  | status  |
-    | Before                | pending |
-    | Given an empty basket | skipped |
-    | After                 | passed  |
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Sync the basket</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) pending("the API client isn't written yet"))</span>
+<span class="st">    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))</span>
+<span class="st">    given("an empty basket", function(context) stop("this step must not execute"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", strict = &lt;strict&gt;, stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenario <span class="st">"Sync the basket"</span> is <span class="va">&lt;outcome&gt;</span> with <span class="st">"<span class="va">&lt;message&gt;</span>"</span>
+  <span class="fu">And</span> the output includes <span class="st">"after: Sync the basket pending"</span>
+  <span class="fu">And</span> the steps and hooks have these results:
+    <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Before                <span class="op">|</span> pending <span class="op">|</span>
+    <span class="op">|</span> Given an empty basket <span class="op">|</span> skipped <span class="op">|</span>
+    <span class="op">|</span> After                 <span class="op">|</span> passed  <span class="op">|</span>
 <span></span>
-  Examples:
-    | strict | outcome | message                                                   |
-    | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
-    | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |</code></pre >}}
+  <span class="kw">Examples:</span>
+    <span class="op">|</span> strict <span class="op">|</span> outcome <span class="op">|</span> message                                                   <span class="op">|</span>
+    <span class="op">|</span> TRUE   <span class="op">|</span> failed  <span class="op">|</span> Hook is pending: the API client isn't written yet         <span class="op">|</span>
+    <span class="op">|</span> FALSE  <span class="op">|</span> skipped <span class="op">|</span> Reason: Hook is pending: the API client isn't written yet <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
   A pending scenario fails the run only in strict mode, like a pending step.
 

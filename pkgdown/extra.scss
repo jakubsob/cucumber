@@ -236,17 +236,6 @@ html:root pre code span {
   &.al, &.er { color: var(--rl-failed); font-weight: 700; }
 }
 
-// Gherkin, tokenised by extra.js like the pretty reporter
-pre.gherkin,
-pre.feature {
-  .gk-feature { color: var(--rl-ink); font-weight: 700; }
-  .gk-step { color: var(--rl-passed); font-weight: 700; }
-  .gk-tag, .gk-string { color: var(--rl-skipped); }
-  .gk-param { color: var(--rl-undefined); }
-  .gk-comment, .gk-pipe { color: var(--rl-muted); }
-  .gk-comment { font-style: italic; }
-}
-
 
 // Home ----------------------------------------------------------------------
 

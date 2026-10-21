@@ -25,31 +25,31 @@ Summary
 scenarios that didn't pass.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add 1 item
-        Then the basket has 1 item
-<span></span>
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove 1 item
-        Then the basket has 0 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$items &lt;- 0)
-    when("I add \{int\} item", function(n, context) context$items &lt;- context$items + n)
-    when("I remove \{int\} item", function(n, context) \{
-      if (context$items &lt; n) stop("The basket is empty")
-      context$items &lt;- context$items - n
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add 1 item</span>
+<span class="st">        Then the basket has 1 item</span>
+<span class="st"></span>
+<span class="st">      Scenario: Remove an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I remove 1 item</span>
+<span class="st">        Then the basket has 0 items</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) context$items &lt;- 0)</span>
+<span class="st">    when("I add \{int\} item", function(n, context) context$items &lt;- context$items + n)</span>
+<span class="st">    when("I remove \{int\} item", function(n, context) \{</span>
+<span class="st">      if (context$items &lt; n) stop("The basket is empty")</span>
+<span class="st">      context$items &lt;- context$items - n</span>
+<span class="st">    \})</span>
+<span class="st">    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -79,20 +79,20 @@ scenarios that didn't pass.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Each step is printed as a character
-  When I run
-    """
-    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    ....F-
-    """
-  And the output includes
-    """
-    2 scenarios (1 failed, 1 passed)
-    6 steps (1 failed, 1 skipped, 4 passed)
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step is printed as a character
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    ....F-</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    2 scenarios (1 failed, 1 passed)</span>
+<span class="st">    6 steps (1 failed, 1 skipped, 4 passed)</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each step is printed as a character
   When I run
     """
@@ -111,22 +111,22 @@ scenarios that didn't pass.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: The scenarios that didn't pass are printed at the end
-  When I run
-    """
-    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Failures
-<span></span>
-    Feature: Basket
-    Scenario: Remove an item
-    v Given an empty basket
-    x When I remove 1 item
-    """
-  And the output includes "The basket is empty"
-  And the output doesn't include "Scenario: Add an item"</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios that didn't pass are printed at the end
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Failures</span>
+<span class="st"></span>
+<span class="st">    Feature: Basket</span>
+<span class="st">    Scenario: Remove an item</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    x When I remove 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes <span class="st">"The basket is empty"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"Scenario: Add an item"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The scenarios that didn't pass are printed at the end
   When I run
     """

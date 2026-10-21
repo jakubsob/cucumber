@@ -31,46 +31,46 @@ Feature: Basket
 \code{CucumberSummaryReporter} prints only the summary of the run: the scenarios and steps counted by status, and the scenarios that didn't pass.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Only the summary is printed
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add 1 item
-<span></span>
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove 1 item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} item", function(n, context) \{\})
-    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Summary
-    2 scenarios (1 failed, 1 passed)
-    4 steps (1 failed, 3 passed)
-    """
-  And the output includes
-    """
-    Failures
-<span></span>
-    Feature: Basket
-    Scenario: Remove an item
-    v Given an empty basket
-    x When I remove 1 item
-    """
-  And the output doesn't include "Scenario: Add an item"
-  And the output doesn't include "...."</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Only the summary is printed
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add 1 item</span>
+<span class="st"></span>
+<span class="st">      Scenario: Remove an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I remove 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    when("I add \{int\} item", function(n, context) \{\})</span>
+<span class="st">    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Summary</span>
+<span class="st">    2 scenarios (1 failed, 1 passed)</span>
+<span class="st">    4 steps (1 failed, 3 passed)</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Failures</span>
+<span class="st"></span>
+<span class="st">    Feature: Basket</span>
+<span class="st">    Scenario: Remove an item</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    x When I remove 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"Scenario: Add an item"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"...."</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Only the summary is printed
   Given a package
   And a file named "features/basket.feature" with

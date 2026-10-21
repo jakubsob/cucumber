@@ -24,35 +24,35 @@ and the warnings it raised, and the error and warnings of a hook where the hook 
 with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A step's warnings are printed under it
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) warning("the basket is dusty"))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    v Given an empty basket
-    Warning:
-    the basket is dusty
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A step's warnings are printed under it
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) warning("the basket is dusty"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    Warning:</span>
+<span class="st">    the basket is dusty</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step's warnings are printed under it
   Given a file named "features/basket.feature" with
     """
@@ -78,29 +78,29 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A hook's error is printed where the hook runs
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) stop("The shop is closed"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run it and it fails
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes these lines in order:
-    """
-    Scenario: Add an item
-    Error:
-    The shop is closed
-    - Given an empty basket
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's error is printed where the hook runs
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) stop("The shop is closed"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run it and it fails
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Scenario: Add an item</span>
+<span class="st">    Error:</span>
+<span class="st">    The shop is closed</span>
+<span class="st">    - Given an empty basket</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A hook's error is printed where the hook runs
   Given a file named "features/basket.feature" with
     """
@@ -128,29 +128,29 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A hook's warning is printed where the hook runs
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) warning("The shop is busy"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes these lines in order:
-    """
-    Scenario: Add an item
-    Warning:
-    The shop is busy
-    v Given an empty basket
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's warning is printed where the hook runs
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) warning("The shop is busy"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Scenario: Add an item</span>
+<span class="st">    Warning:</span>
+<span class="st">    The shop is busy</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A hook's warning is printed where the hook runs
   Given a file named "features/basket.feature" with
     """
@@ -178,51 +178,51 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Long Doc Strings and Data Tables are cut short
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        Given a note
-          ```
-          line 1
-          line 2
-          line 3
-          ```
-        And these items
-          | item     |
-          | cucumber |
-          | tomato   |
-          | pepper   |
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a note", function(doc_string, context) \{\})
-    given("these items", function(data_table, context) \{\})
-    """
-  When I run
-    """
-    test(
-      "features",
-      reporter = CucumberPrettyReporter$new(
-        reporter_max_docstring_lines = 1,
-        reporter_max_table_lines = 2
-      )
-    )
-    """
-  Then the output includes
-    """
-    v Given a note
-    \\"\\"\\"
-    line 1
-    ... and 2 more line(s)
-    \\"\\"\\"
-    v And these items
-    | item     |
-    | cucumber |
-    | tomato   |
-    ... and 1 more line(s)
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Long Doc Strings and Data Tables are cut short
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add items</span>
+<span class="st">        Given a note</span>
+<span class="st">          ```</span>
+<span class="st">          line 1</span>
+<span class="st">          line 2</span>
+<span class="st">          line 3</span>
+<span class="st">          ```</span>
+<span class="st">        And these items</span>
+<span class="st">          | item     |</span>
+<span class="st">          | cucumber |</span>
+<span class="st">          | tomato   |</span>
+<span class="st">          | pepper   |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("a note", function(doc_string, context) \{\})</span>
+<span class="st">    given("these items", function(data_table, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test(</span>
+<span class="st">      "features",</span>
+<span class="st">      reporter = CucumberPrettyReporter$new(</span>
+<span class="st">        reporter_max_docstring_lines = 1,</span>
+<span class="st">        reporter_max_table_lines = 2</span>
+<span class="st">      )</span>
+<span class="st">    )</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    v Given a note</span>
+<span class="st">    \\"\\"\\"</span>
+<span class="st">    line 1</span>
+<span class="st">    ... and 2 more line(s)</span>
+<span class="st">    \\"\\"\\"</span>
+<span class="st">    v And these items</span>
+<span class="st">    | item     |</span>
+<span class="st">    | cucumber |</span>
+<span class="st">    | tomato   |</span>
+<span class="st">    ... and 1 more line(s)</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Long Doc Strings and Data Tables are cut short
   Given a file named "features/basket.feature" with
     """

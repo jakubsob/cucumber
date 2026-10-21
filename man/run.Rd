@@ -59,23 +59,23 @@ as part of the package's testthat tests, e.g. with \code{testthat::test_local()}
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package
-  And a file named "R/calculate.R" with
-    """
-    calculate &lt;- function(x) x + 1
-    """
-  And a file named "tests/testthat/calculate.feature" with
-    """
-    Feature: Calculate
-      Scenario: Adding one
-        Given I calculate
-        Then the result is 2
-    """
-  And a file named "tests/testthat/test-acceptance.R" with
-    """
-    run()
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"R/calculate.R"</span> with
+<span class="st">    """</span>
+<span class="st">    calculate &lt;- function(x) x + 1</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/calculate.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Calculate</span>
+<span class="st">      Scenario: Adding one</span>
+<span class="st">        Given I calculate</span>
+<span class="st">        Then the result is 2</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
+<span class="st">    """</span>
+<span class="st">    run()</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "R/calculate.R" with
@@ -97,29 +97,29 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Scenarios run with the package's testthat tests
-  Given a file named "tests/testthat/setup-steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result &lt;- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, n)
-    \})
-    """
-  And a file named "tests/testthat/test-calculate.R" with
-    """
-    test_that("calculate adds one", \{
-      expect_equal(calculate(1), 2)
-    \})
-    """
-  When I run
-    """
-    testthat::test_local()
-    """
-  Then it passes
-  And it ran "Scenario: Adding one"
-  And it ran "calculate adds one"</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios run with the package's testthat tests
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-calculate.R"</span> with
+<span class="st">    """</span>
+<span class="st">    test_that("calculate adds one", \{</span>
+<span class="st">      expect_equal(calculate(1), 2)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local()</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> it ran <span class="st">"Scenario: Adding one"</span>
+  <span class="fu">And</span> it ran <span class="st">"calculate adds one"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Scenarios run with the package's testthat tests
   Given a file named "tests/testthat/setup-steps.R" with
     """
@@ -147,23 +147,23 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
-  Given a file named "tests/testthat/steps/steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result &lt;- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, n)
-    \})
-    """
-  When I run
-    """
-    env &lt;- new.env()
-    source("tests/testthat/steps/steps.R", local = env)
-    testthat::test_local(env = env)
-    """
-  Then it passes</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Step definitions sourced into an environment are passed with `test_local(env = )`
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/steps/steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    env &lt;- new.env()</span>
+<span class="st">    source("tests/testthat/steps/steps.R", local = env)</span>
+<span class="st">    testthat::test_local(env = env)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
   Given a file named "tests/testthat/steps/steps.R" with
     """
@@ -185,41 +185,41 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario Outline: run() chooses what to run like test(), with &lt;argument&gt;
-  Given a file named "tests/testthat/other.feature" with
-    """
-    Feature: Other
-      @slow
-      Scenario: Not run
-        Given I calculate
-    """
-  And a file named "tests/testthat/setup-steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result &lt;- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, n)
-    \})
-    """
-  And a file named "tests/testthat/test-acceptance.R" with
-    """
-    run(&lt;argument&gt; = "&lt;value&gt;")
-    """
-  When I run
-    """
-    testthat::test_local()
-    """
-  Then only these scenarios ran:
-    | scenario   |
-    | Adding one |
+<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> run() chooses what to run like test(), with <span class="va">&lt;argument&gt;</span>
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/other.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Other</span>
+<span class="st">      @slow</span>
+<span class="st">      Scenario: Not run</span>
+<span class="st">        Given I calculate</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
+<span class="st">    """</span>
+<span class="st">    run(&lt;argument&gt; = "&lt;value&gt;")</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local()</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> only these scenarios ran:
+    <span class="op">|</span> scenario   <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span>
 <span></span>
-  Examples:
-    | argument | value             |
-    | filter   | calculate         |
-    | features | calculate.feature |
-    | tags     | not @slow         |
-    | name     | Adding one        |</code></pre >}}
+  <span class="kw">Examples:</span>
+    <span class="op">|</span> argument <span class="op">|</span> value             <span class="op">|</span>
+    <span class="op">|</span> filter   <span class="op">|</span> calculate         <span class="op">|</span>
+    <span class="op">|</span> features <span class="op">|</span> calculate.feature <span class="op">|</span>
+    <span class="op">|</span> tags     <span class="op">|</span> not @slow         <span class="op">|</span>
+    <span class="op">|</span> name     <span class="op">|</span> Adding one        <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: run() chooses what to run like test(), with <argument>
   Given a file named "tests/testthat/other.feature" with
     """

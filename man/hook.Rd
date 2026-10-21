@@ -60,42 +60,42 @@ What a before hook does is invisible to people who only read the features. For s
 use a Background instead, and keep before hooks for low-level work like starting a browser or emptying a database.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Before hooks run in definition order and after hooks in reverse order
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) cat("before 1\\n"))
-    before(function(context, scenario) cat("before 2\\n"))
-    after(function(context, scenario) cat("after 1\\n"))
-    after(function(context, scenario) cat("after 2\\n"))
-    given("an empty basket", function(context) cat("step\\n"))
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-  And the output includes
-    """
-    before 1
-    before 2
-    step
-    after 2
-    after 1
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Before hooks run in definition order and after hooks in reverse order
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) cat("before 1\\n"))</span>
+<span class="st">    before(function(context, scenario) cat("before 2\\n"))</span>
+<span class="st">    after(function(context, scenario) cat("after 1\\n"))</span>
+<span class="st">    after(function(context, scenario) cat("after 2\\n"))</span>
+<span class="st">    given("an empty basket", function(context) cat("step\\n"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    before 1</span>
+<span class="st">    before 2</span>
+<span class="st">    step</span>
+<span class="st">    after 2</span>
+<span class="st">    after 1</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Before hooks run in definition order and after hooks in reverse order
   Given a file named "features/basket.feature" with
     """
@@ -128,38 +128,38 @@ use a Background instead, and keep before hooks for low-level work like starting
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Hooks get the scenario, and after hooks get its result
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      @smoke
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) \{
-      cat("before:", scenario$name, scenario$tags, basename(scenario$uri), "\\n")
-    \})
-    after(function(context, scenario) \{
-      cat("after:", scenario$status, conditionMessage(scenario$error), "\\n")
-    \})
-    given("an empty basket", function(context) \{\})
-    when("I add an item", function(context) stop("basket is full"))
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    before: Add an item @smoke basket.feature
-    """
-  And the output includes
-    """
-    after: failed Step "I add an item" failed
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Hooks get the scenario, and after hooks get its result
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      @smoke</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) \{</span>
+<span class="st">      cat("before:", scenario$name, scenario$tags, basename(scenario$uri), "\\n")</span>
+<span class="st">    \})</span>
+<span class="st">    after(function(context, scenario) \{</span>
+<span class="st">      cat("after:", scenario$status, conditionMessage(scenario$error), "\\n")</span>
+<span class="st">    \})</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    when("I add an item", function(context) stop("basket is full"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    before: Add an item @smoke basket.feature</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    after: failed Step "I add an item" failed</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Hooks get the scenario, and after hooks get its result
   Given a file named "features/basket.feature" with
     """
@@ -196,27 +196,27 @@ use a Background instead, and keep before hooks for low-level work like starting
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A named hook's errors start with its name
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Save the basket
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) stop("connection refused"), name = "Connect to the database")
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps and hooks have these results:
-    | step                           | status  |
-    | Before Connect to the database | failed  |
-    | Given an empty basket          | skipped |
-  And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A named hook's errors start with its name
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Save the basket</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) stop("connection refused"), name = "Connect to the database")</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps and hooks have these results:
+    <span class="op">|</span> step                           <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Before Connect to the database <span class="op">|</span> failed  <span class="op">|</span>
+    <span class="op">|</span> Given an empty basket          <span class="op">|</span> skipped <span class="op">|</span>
+  <span class="fu">And</span> the error message includes <span class="st">"Hook \\"</span>Connect to the database\\<span class="st">" failed: connection refused"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A named hook's errors start with its name
   Given a file named "features/basket.feature" with
     """
@@ -242,31 +242,31 @@ use a Background instead, and keep before hooks for low-level work like starting
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A failing before hook skips the steps and fails the scenario
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) \{
-      stop("no database")
-    \})
-    given("an empty basket", function(context) \{
-      stop("this step must not execute")
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the error message includes "no database"
-  And the steps and hooks have these results:
-    | step                  | status  |
-    | Before                | failed  |
-    | Given an empty basket | skipped |</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A failing before hook skips the steps and fails the scenario
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) \{</span>
+<span class="st">      stop("no database")</span>
+<span class="st">    \})</span>
+<span class="st">    given("an empty basket", function(context) \{</span>
+<span class="st">      stop("this step must not execute")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the error message includes <span class="st">"no database"</span>
+  <span class="fu">And</span> the steps and hooks have these results:
+    <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Before                <span class="op">|</span> failed  <span class="op">|</span>
+    <span class="op">|</span> Given an empty basket <span class="op">|</span> skipped <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A failing before hook skips the steps and fails the scenario
   Given a file named "features/basket.feature" with
     """
@@ -304,40 +304,40 @@ A hook with \code{tags} runs only for the scenarios that match its tag expressio
 like \code{before(connect, tags = "@db")}.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Tagged hooks run only for scenarios that match the tag expression
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      @db
-      Scenario: Save the basket
-        Given an empty basket
-<span></span>
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) cat("connect for", scenario$name, "\\n"), tags = "@db")
-    after(function(context, scenario) cat("disconnect for", scenario$name, "\\n"), tags = "@db")
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-  And the output includes "connect for Save the basket"
-  And the output includes "disconnect for Save the basket"
-  And the output doesn't include "connect for Add an item"
-  And the output doesn't include "disconnect for Add an item"</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Tagged hooks run only for scenarios that match the tag expression
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      @db</span>
+<span class="st">      Scenario: Save the basket</span>
+<span class="st">        Given an empty basket</span>
+<span class="st"></span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) cat("connect for", scenario$name, "\\n"), tags = "@db")</span>
+<span class="st">    after(function(context, scenario) cat("disconnect for", scenario$name, "\\n"), tags = "@db")</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> the output includes <span class="st">"connect for Save the basket"</span>
+  <span class="fu">And</span> the output includes <span class="st">"disconnect for Save the basket"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"connect for Add an item"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"disconnect for Add an item"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Tagged hooks run only for scenarios that match the tag expression
   Given a file named "features/basket.feature" with
     """
@@ -377,49 +377,49 @@ They get the step, and after step hooks also get its result.
 They don't run for skipped, undefined or ambiguous steps. A failing step hook fails the step.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Step hooks run around each step and after step hooks get its result
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-        Then the basket has 1 item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before_step(function(context, step) cat("before:", step$keyword, step$text, "\\n"))
-    after_step(function(context, step) cat("after:", step$text, step$status, "\\n"))
-    given("an empty basket", function(context) \{\})
-    when("I add an item", function(context) stop("basket is full"))
-    then("the basket has \{int\} item", function(n, context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    before: Given an empty basket
-    after: an empty basket passed
-    before: When I add an item
-    after: I add an item failed
-    """
-  And the steps have these results:
-    | step                       | status  |
-    | Given an empty basket      | passed  |
-    | When I add an item         | failed  |
-    | Then the basket has 1 item | skipped |
-  And the output doesn't include "before: Then the basket has 1 item"
-  And the output doesn't include "after: the basket has 1 item"</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Step hooks run around each step and after step hooks get its result
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add an item</span>
+<span class="st">        Then the basket has 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before_step(function(context, step) cat("before:", step$keyword, step$text, "\\n"))</span>
+<span class="st">    after_step(function(context, step) cat("after:", step$text, step$status, "\\n"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    when("I add an item", function(context) stop("basket is full"))</span>
+<span class="st">    then("the basket has \{int\} item", function(n, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    before: Given an empty basket</span>
+<span class="st">    after: an empty basket passed</span>
+<span class="st">    before: When I add an item</span>
+<span class="st">    after: I add an item failed</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the steps have these results:
+    <span class="op">|</span> step                       <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Given an empty basket      <span class="op">|</span> passed  <span class="op">|</span>
+    <span class="op">|</span> When I add an item         <span class="op">|</span> failed  <span class="op">|</span>
+    <span class="op">|</span> Then the basket has 1 item <span class="op">|</span> skipped <span class="op">|</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"before: Then the basket has 1 item"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"after: the basket has 1 item"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Step hooks run around each step and after step hooks get its result
   Given a file named "features/basket.feature" with
     """
@@ -459,29 +459,29 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A failing step hook fails the step
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    after_step(function(context, step) stop("step left a mess"))
-    given("an empty basket", function(context) \{\})
-    when("I add an item", function(context) stop("this step must not execute"))
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the error message includes "step left a mess"
-  And the steps have these results:
-    | step                  | status  |
-    | Given an empty basket | failed  |
-    | When I add an item    | skipped |</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A failing step hook fails the step
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    after_step(function(context, step) stop("step left a mess"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    when("I add an item", function(context) stop("this step must not execute"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the error message includes <span class="st">"step left a mess"</span>
+  <span class="fu">And</span> the steps have these results:
+    <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Given an empty basket <span class="op">|</span> failed  <span class="op">|</span>
+    <span class="op">|</span> When I add an item    <span class="op">|</span> skipped <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A failing step hook fails the step
   Given a file named "features/basket.feature" with
     """
@@ -520,45 +520,45 @@ A failing \code{before_all()} hook stops the run before any scenario, after the 
 \code{after_all()} hooks run even when the run failed, and a failing one fails the run.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Before all and after all hooks run once for the whole run
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-<span></span>
-      Scenario: Remove an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before_all(function() cat("start the server\\n"))
-    after_all(function() cat("stop the server\\n"))
-    before(function(context, scenario) cat("scenario\\n"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-  And the output includes "start the server" once
-  And the output includes "stop the server" once
-  And the output includes these lines in order:
-    """
-    start the server
-    scenario
-    scenario
-    stop the server
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Before all and after all hooks run once for the whole run
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st"></span>
+<span class="st">      Scenario: Remove an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before_all(function() cat("start the server\\n"))</span>
+<span class="st">    after_all(function() cat("stop the server\\n"))</span>
+<span class="st">    before(function(context, scenario) cat("scenario\\n"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> the output includes <span class="st">"start the server"</span> once
+  <span class="fu">And</span> the output includes <span class="st">"stop the server"</span> once
+  <span class="fu">And</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    start the server</span>
+<span class="st">    scenario</span>
+<span class="st">    scenario</span>
+<span class="st">    stop the server</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Before all and after all hooks run once for the whole run
   Given a file named "features/basket.feature" with
     """

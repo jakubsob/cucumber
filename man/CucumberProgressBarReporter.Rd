@@ -23,25 +23,25 @@ as it finishes, and the summary of the run at the end. The bar is drawn only in 
 redraw a line. Elsewhere, like in CI, only the scenarios that didn't pass and the summary are printed.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove 1 item
-<span></span>
-      Scenario: Add an item
-        Given an empty basket
-        When I add 1 item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} item", function(n, context) \{\})
-    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Remove an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I remove 1 item</span>
+<span class="st"></span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    when("I add \{int\} item", function(n, context) \{\})</span>
+<span class="st">    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
   And a file named "features/basket.feature" with
@@ -65,14 +65,14 @@ redraw a line. Elsewhere, like in CI, only the scenarios that didn't pass and th
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: The bar counts the steps run
-  When I run
-    """
-    reporter &lt;- withr::with_options(list(cli.dynamic = TRUE), CucumberProgressBarReporter$new())
-    test("features", reporter = reporter, stop_on_failure = FALSE)
-    """
-  Then the output includes "1/4 steps ["
-  And the output includes "4/4 steps ["</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The bar counts the steps run
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    reporter &lt;- withr::with_options(list(cli.dynamic = TRUE), CucumberProgressBarReporter$new())</span>
+<span class="st">    test("features", reporter = reporter, stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"1/4 steps ["</span>
+  <span class="fu">And</span> the output includes <span class="st">"4/4 steps ["</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The bar counts the steps run
   When I run
     """
@@ -85,26 +85,26 @@ redraw a line. Elsewhere, like in CI, only the scenarios that didn't pass and th
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A scenario that didn't pass is printed when it finishes
-  When I run
-    """
-    test("features", reporter = CucumberProgressBarReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Feature: Basket
-    Scenario: Remove an item
-    v Given an empty basket
-    x When I remove 1 item
-    """
-  And the output includes "The basket is empty"
-  And the output doesn't include "Scenario: Add an item"
-  And the output doesn't include "steps ["
-  And the output includes
-    """
-    2 scenarios (1 failed, 1 passed)
-    4 steps (1 failed, 3 passed)
-    """</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that didn't pass is printed when it finishes
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberProgressBarReporter$new(), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">    Scenario: Remove an item</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    x When I remove 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes <span class="st">"The basket is empty"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"Scenario: Add an item"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"steps ["</span>
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    2 scenarios (1 failed, 1 passed)</span>
+<span class="st">    4 steps (1 failed, 3 passed)</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A scenario that didn't pass is printed when it finishes
   When I run
     """

@@ -4,6 +4,9 @@ vignette: >
   %\VignetteIndexEntry{What's new in 3.0.0 and how to migrate}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+format:
+  html:
+    syntax-definitions: [gherkin.xml]
 ---
 
 Cucumber 3.0.0 brings the package closer to  the official Cucumber implementations: feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin) and step descriptions are [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions).

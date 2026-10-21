@@ -27,40 +27,40 @@ a string or a raw vector with its media type, \code{context$log()} attaches text
 show them, like the HTML report. The pretty reporter prints them under their step.
 
 \if{html}{\out{
-<pre class="gherkin"><code>Background:
-  Given a package</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
 \if{text,latex}{\preformatted{Background:
   Given a package
 %</pre>
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A step attaches data, a log and a link
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      context$attach('\{"items": 1\}', "application/json")
-      context$attach(as.raw(c(1, 2, 3)), "application/octet-stream", file_name = "basket.bin")
-      context$log("Added an item")
-      context$link("https://example.com/basket")
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the attachments are:
-    | step                | media_type                | body                       | encoding | file_name   |
-    | When I add an item  | application/json          | \{"items": 1\}               | IDENTITY |            |
-    | When I add an item  | application/octet-stream  | AQID                       | BASE64   | basket.bin |
-    | When I add an item  | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
-    | When I add an item  | text/uri-list             | https://example.com/basket | IDENTITY |            |</code></pre >}}
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A step attaches data, a log and a link
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      context$attach('\{"items": 1\}', "application/json")</span>
+<span class="st">      context$attach(as.raw(c(1, 2, 3)), "application/octet-stream", file_name = "basket.bin")</span>
+<span class="st">      context$log("Added an item")</span>
+<span class="st">      context$link("https://example.com/basket")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the attachments are:
+    <span class="op">|</span> step                <span class="op">|</span> media_type                <span class="op">|</span> body                       <span class="op">|</span> encoding <span class="op">|</span> file_name   <span class="op">|</span>
+    <span class="op">|</span> When I add an item  <span class="op">|</span> application/json          <span class="op">|</span> \{<span class="st">"items"</span>: 1\}               <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span>
+    <span class="op">|</span> When I add an item  <span class="op">|</span> application/octet-stream  <span class="op">|</span> AQID                       <span class="op">|</span> BASE64   <span class="op">|</span> basket.bin <span class="op">|</span>
+    <span class="op">|</span> When I add an item  <span class="op">|</span> text/x.cucumber.log+plain <span class="op">|</span> Added an item              <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span>
+    <span class="op">|</span> When I add an item  <span class="op">|</span> text/uri-list             <span class="op">|</span> https://example.com/basket <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step attaches data, a log and a link
   Given a file named "features/basket.feature" with
     """
@@ -91,40 +91,40 @@ show them, like the HTML report. The pretty reporter prints them under their ste
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: A step attaches images
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A step attaches images
   Read an image, like a screenshot, with `readBin()` and attach it with its media type.
   It's base64 encoded, and the HTML report shows it.
 <span></span>
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    read_file &lt;- function(path) readBin(path, "raw", file.size(path))
-<span></span>
-    when("I add an item", function(context) \{
-      png("basket.png")
-      plot(1:3)
-      dev.off()
-      context$attach(read_file("basket.png"), "image/png", file_name = "basket.png")
-<span></span>
-      jpeg("basket.jpg")
-      plot(1:3)
-      dev.off()
-      context$attach(read_file("basket.jpg"), "image/jpeg", file_name = "basket.jpg")
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the attachments are:
-    | step               | media_type | encoding | file_name  |
-    | When I add an item | image/png  | BASE64   | basket.png |
-    | When I add an item | image/jpeg | BASE64   | basket.jpg |</code></pre >}}
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    read_file &lt;- function(path) readBin(path, "raw", file.size(path))</span>
+<span class="st"></span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      png("basket.png")</span>
+<span class="st">      plot(1:3)</span>
+<span class="st">      dev.off()</span>
+<span class="st">      context$attach(read_file("basket.png"), "image/png", file_name = "basket.png")</span>
+<span class="st"></span>
+<span class="st">      jpeg("basket.jpg")</span>
+<span class="st">      plot(1:3)</span>
+<span class="st">      dev.off()</span>
+<span class="st">      context$attach(read_file("basket.jpg"), "image/jpeg", file_name = "basket.jpg")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the attachments are:
+    <span class="op">|</span> step               <span class="op">|</span> media_type <span class="op">|</span> encoding <span class="op">|</span> file_name  <span class="op">|</span>
+    <span class="op">|</span> When I add an item <span class="op">|</span> image/png  <span class="op">|</span> BASE64   <span class="op">|</span> basket.png <span class="op">|</span>
+    <span class="op">|</span> When I add an item <span class="op">|</span> image/jpeg <span class="op">|</span> BASE64   <span class="op">|</span> basket.jpg <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step attaches images
   Read an image, like a screenshot, with `readBin()` and attach it with its media type.
   It's base64 encoded, and the HTML report shows it.
@@ -163,31 +163,31 @@ show them, like the HTML report. The pretty reporter prints them under their ste
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code>Scenario: Hooks attach data too
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Hooks attach data too
   `before_all()` and `after_all()` hooks get a `context` to attach with when they take one argument.
 <span></span>
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before_all(function(context) context$log("Started the server"))
-    before(function(context, scenario) context$log("Opened the browser"))
-    when("I add an item", function(context) \{\})
-    after(function(context, scenario) context$attach("&lt;html&gt;&lt;/html&gt;", "text/html", file_name = "page.html"))
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the attachments are:
-    | step      | media_type                | body               |
-    | BeforeAll | text/x.cucumber.log+plain | Started the server |
-    | Before    | text/x.cucumber.log+plain | Opened the browser |
-    | After     | text/html                 | &lt;html&gt;&lt;/html&gt;      |</code></pre >}}
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before_all(function(context) context$log("Started the server"))</span>
+<span class="st">    before(function(context, scenario) context$log("Opened the browser"))</span>
+<span class="st">    when("I add an item", function(context) \{\})</span>
+<span class="st">    after(function(context, scenario) context$attach("&lt;html&gt;&lt;/html&gt;", "text/html", file_name = "page.html"))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the attachments are:
+    <span class="op">|</span> step      <span class="op">|</span> media_type                <span class="op">|</span> body               <span class="op">|</span>
+    <span class="op">|</span> BeforeAll <span class="op">|</span> text/x.cucumber.log+plain <span class="op">|</span> Started the server <span class="op">|</span>
+    <span class="op">|</span> Before    <span class="op">|</span> text/x.cucumber.log+plain <span class="op">|</span> Opened the browser <span class="op">|</span>
+    <span class="op">|</span> After     <span class="op">|</span> text/html                 <span class="op">|</span> <span class="va">&lt;html&gt;</span><span class="va">&lt;/html&gt;</span>      <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Hooks attach data too
   `before_all()` and `after_all()` hooks get a `context` to attach with when they take one argument.
 

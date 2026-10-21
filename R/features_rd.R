@@ -20,6 +20,8 @@
 #' `cucumber.rd_tags` option to use another tag expression, or pass `tags = NULL` to select
 #' scenarios without a tag.
 #'
+#' On a pkgdown site, the scenarios are highlighted by the site's theme, like other code.
+#'
 #' It turns on markdown for the roxygen block it's in.
 #'
 #' @param path Path to the directory containing the `.feature` files. Its subdirectories are
@@ -77,7 +79,7 @@ features_rd <- function(
 #' @param pickles The selected pickles of the document
 #' @param source The lines of the feature file
 #' @return Lines of markdown, or NULL if no scenario is selected
-#' @importFrom purrr map map_int
+#' @importFrom purrr map map_chr map_int
 #' @keywords internal
 #' @noRd
 feature_rd <- function(document, pickles, source, file) {
@@ -87,6 +89,7 @@ feature_rd <- function(document, pickles, source, file) {
   feature <- document$feature
   # The scenarios and the outline rows that are selected
   selected <- unlist(map(pickles, \(pickle) pickle$message$astNodeIds))
+  tokens <- gherkin_tokens(document, source)
   # A child of the feature or of a rule ends before the first line of the next one
   starts <- c(unlist(map(c(feature$children, unlist(map(feature$children, \(child) child$rule$children), recursive = FALSE)), \(child) {
     node <- child$background %||% child$scenario %||% child$rule
@@ -103,11 +106,9 @@ feature_rd <- function(document, pickles, source, file) {
     code <- sub(paste0("^ {0,", node$location$column - 1, "}"), "", source[lines])
     # Rd, not a markdown code block: pkgdown empties code blocks of a language
     # pandoc can't highlight, like gherkin, and highlights the others as R. In
-    # HTML it's a gherkin block, as in a markdown page, for the site's script
-    # to highlight
+    # HTML it's a gherkin block, highlighted here as pandoc can't
     rd_escape <- \(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
-    html <- gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", code, fixed = TRUE), fixed = TRUE), fixed = TRUE)
-    html <- rd_escape(html)
+    html <- rd_escape(gherkin_html(code, lines, tokens))
     # pkgdown splits a section into paragraphs at blank lines, even in \out,
     # and joins the lines around them, so a blank line gets an empty element
     html[grepl("^\\s*$", html)] <- "<span></span>"
@@ -195,4 +196,69 @@ description_rd <- function(description) {
     return(NULL)
   }
   c(trimws(strsplit(description, "\n")[[1]]), "")
+}
+
+#' The lines of a document's tokens that pandoc's highlighting classes are for
+#' @param source The lines of the feature file
+#' @return A list of `keywords`, the keyword of a line and its classes by the
+#'   line, and the lines of `comments` and of Doc `strings`
+#' @keywords internal
+#' @noRd
+gherkin_tokens <- function(document, source) {
+  keywords <- list()
+  strings <- integer()
+  walk <- function(node) {
+    if (!is.list(node)) {
+      return()
+    }
+    if (!is.null(node$keyword) && !is.null(node$location)) {
+      # Only steps have a keywordType, and their keyword ends with its space
+      keywords[[as.character(node$location$line)]] <<- if (is.null(node$keywordType)) {
+        c(paste0(node$keyword, ":"), "kw")
+      } else {
+        c(trimws(node$keyword, "right"), "fu")
+      }
+    }
+    doc <- node$docString
+    if (!is.null(doc)) {
+      from <- doc$location$line
+      to <- min(which(trimws(source) == doc$delimiter & seq_along(source) > from))
+      strings <<- c(strings, from:to)
+    }
+    for (child in node) walk(child)
+  }
+  walk(document$feature)
+  list(keywords = keywords, strings = strings, comments = map_int(document$comments, \(comment) comment$location$line))
+}
+
+#' HTML of lines of a feature file, with the classes pandoc gives tokens, for
+#' pkgdown's theme to highlight
+#' @param text The lines
+#' @param lines Their numbers in the feature file
+#' @param tokens Of `gherkin_tokens()`
+#' @keywords internal
+#' @noRd
+gherkin_html <- function(text, lines, tokens) {
+  escape <- \(x) gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", x, fixed = TRUE), fixed = TRUE), fixed = TRUE)
+  span <- \(class, x) paste0("<span class=\"", class, "\">", x, "</span>")
+  inline <- function(x) {
+    x <- gsub("(\"[^\"]*\")", span("st", "\\1"), escape(x))
+    x <- gsub("(&lt;[^&[:space:]]+&gt;)", span("va", "\\1"), x)
+    gsub("(^|\\s)\\|(?=\\s|$)", paste0("\\1", span("op", "|")), x, perl = TRUE)
+  }
+  map_chr(seq_along(text), \(i) {
+    if (lines[[i]] %in% tokens$comments) {
+      return(span("co", escape(text[[i]])))
+    }
+    if (lines[[i]] %in% tokens$strings) {
+      return(span("st", escape(text[[i]])))
+    }
+    keyword <- tokens$keywords[[as.character(lines[[i]])]]
+    if (is.null(keyword)) {
+      return(inline(text[[i]]))
+    }
+    indent <- sub("^(\\s*).*", "\\1", text[[i]])
+    rest <- substring(text[[i]], nchar(indent) + nchar(keyword[[1]]) + 1)
+    paste0(indent, span(keyword[[2]], escape(keyword[[1]])), inline(rest))
+  })
 }

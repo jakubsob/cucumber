@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!-- Gherkin for pandoc, which has no grammar of it. Its tokens get the classes features_rd() gives. -->
+<language name="Gherkin" section="Other" version="1" kateversion="5.0" extensions="*.feature" license="MIT">
+  <highlighting>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <RegExpr attribute="Comment" String="#.*$" firstNonSpace="true"/>
+        <RegExpr attribute="Tag" String="@.*$" firstNonSpace="true"/>
+        <RegExpr attribute="Keyword" String="(Feature|Ability|Business Need|Rule|Background|Scenario Outline|Scenario Template|Scenario|Example|Examples|Scenarios):" firstNonSpace="true"/>
+        <RegExpr attribute="Step" String="(Given|When|Then|And|But|\*)(?=\s)" firstNonSpace="true"/>
+        <StringDetect attribute="Doc String" context="Quotes" String="&quot;&quot;&quot;" firstNonSpace="true"/>
+        <StringDetect attribute="Doc String" context="Backticks" String="```" firstNonSpace="true"/>
+        <RegExpr attribute="String" String="&quot;[^&quot;]*&quot;"/>
+        <RegExpr attribute="Parameter" String="&lt;[^&lt;&gt;\s]+&gt;"/>
+        <DetectChar attribute="Pipe" char="|"/>
+      </context>
+      <context name="Quotes" attribute="Doc String" lineEndContext="#stay">
+        <RegExpr attribute="Doc String" context="#pop" String="&quot;&quot;&quot;\s*$" firstNonSpace="true"/>
+      </context>
+      <context name="Backticks" attribute="Doc String" lineEndContext="#stay">
+        <RegExpr attribute="Doc String" context="#pop" String="```\s*$" firstNonSpace="true"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="Tag" defStyleNum="dsAttribute"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Step" defStyleNum="dsFunction"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Doc String" defStyleNum="dsString"/>
+      <itemData name="Parameter" defStyleNum="dsVariable"/>
+      <itemData name="Pipe" defStyleNum="dsOperator"/>
+    </itemDatas>
+  </highlighting>
+</language>

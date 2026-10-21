@@ -391,9 +391,18 @@ then("the help page {string} doesn't include {string}", function(topic, text, co
   expect_false(grepl(text, page, fixed = TRUE), info = page)
 })
 
-# A block of Gherkin code of a pkgdown reference page, highlighted by the site's script
+# A block of Gherkin code of a pkgdown reference page, as text
 then("the reference page {string} has the Gherkin block", function(topic, text, context) {
   html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
   blocks <- trimws(xml2::xml_text(xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code")))
   expect_true(text %in% blocks, info = paste0("Expected:\n", text, "\n\nGherkin blocks:\n", paste(blocks, collapse = "\n\n")))
+})
+
+# The tokens of the Gherkin blocks of a pkgdown reference page, with their classes
+then("the reference page {string} highlights the Gherkin", function(topic, table, context) {
+  html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
+  spans <- xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code//span[@class]")
+  tokens <- paste(trimws(xml2::xml_text(spans)), "-", xml2::xml_attr(spans, "class"))
+  expected <- paste(table$token, "-", table$class)
+  expect_true(all(expected %in% tokens), info = paste0("Missing:\n", paste(setdiff(expected, tokens), collapse = "\n"), "\n\nTokens:\n", paste(tokens, collapse = "\n")))
 })
