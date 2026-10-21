@@ -15,9 +15,7 @@
 # messages with the CCK's.
 #
 # A new sample is copied only once it's added to CCK_SAMPLES, with its R
-# step definitions. Samples are left out for what cucumber doesn't do yet:
-#
-# - markdown: Markdown with Gherkin
+# step definitions.
 #
 # A sample's .arguments.txt, like `--retry 2`, are the arguments of test() it
 # runs with.
@@ -52,6 +50,7 @@ CCK_SAMPLES <- c(
   "hooks-named",
   "hooks-skipped",
   "hooks-undefined",
+  "markdown",
   "minimal",
   "multiple-features",
   "multiple-features-reversed",

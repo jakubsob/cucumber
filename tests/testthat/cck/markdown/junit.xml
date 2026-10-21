@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.023" tests="2" skipped="0" failures="1" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Cheese" name="Nom nom nom - Ylajali! - because we need more tables - #1.1" time="0.01">
+<failure type="Error" message="You asked me to fail">
+<![CDATA[Error: You asked me to fail
+samples/markdown/markdown.feature.md:24]]>
+</failure>
+<system-out><![CDATA[
+Given some TypeScript code:.................................................passed
+And some classic Gherkin:...................................................passed
+When we use a data table and attach something and then fail.................failed
+Then this might or might not run............................................skipped
+]]></system-out>
+</testcase>
+<testcase classname="Cheese" name="Nom nom nom - Ylajali! - because we need more tables - #1.2" time="0.01">
+<system-out><![CDATA[
+Given some TypeScript code:.................................................passed
+And some classic Gherkin:...................................................passed
+When we use a data table and attach something and then pass.................passed
+Then this might or might not run............................................passed
+]]></system-out>
+</testcase>
+</testsuite>

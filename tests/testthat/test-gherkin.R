@@ -24,7 +24,7 @@ as_read <- function(message) {
 }
 
 describe("parse_gherkin", {
-  for (path in fs::dir_ls(test_path("gherkin", "good"), glob = "*.feature")) {
+  for (path in fs::dir_ls(test_path("gherkin", "good"), regexp = "[.]feature([.]md)?$")) {
     expected <- function(kind) normalize(read_ndjson(paste0(path, ".", kind, ".ndjson")))
 
     it(paste("gives the official source for", fs::path_file(path)), {

@@ -11,12 +11,15 @@
 #'
 #' @param lines Lines of a feature file.
 #' @param uri Path of the feature file, used in error messages.
+#' @param markdown Whether the document is Markdown with Gherkin, see
+#'   MARKDOWN_TOKEN_MATCHERS. A `.feature.md` file is.
 #' @return A GherkinDocument: the `feature`, NULL for an empty document, its
 #'   `comments` and its `uri`.
 #' @keywords internal
 #' @noRd
-parse_gherkin <- function(lines, uri = NULL) {
+parse_gherkin <- function(lines, uri = NULL, markdown = is_markdown(uri)) {
   p <- new.env(parent = emptyenv())
+  p$matchers <- if (markdown) MARKDOWN_TOKEN_MATCHERS else TOKEN_MATCHERS
   p$lines <- lines
   p$uri <- uri
   p$next_line <- 1L
@@ -50,6 +53,12 @@ parse_gherkin <- function(lines, uri = NULL) {
 # official gherkin-languages.json, see update_gherkin(). Step keywords include
 # the space that has to follow them. `*` is a keyword of every step type, so
 # its type is unknown.
+
+#' Whether a feature file is Markdown with Gherkin
+#' @noRd
+is_markdown <- function(uri) {
+  !is.null(uri) && endsWith(uri, ".feature.md")
+}
 
 #' The language of feature files without a `# language:` line: the
 #' `cucumber.language` option, or English
@@ -151,7 +160,7 @@ match_token <- function(p, type, token) {
   if (token$is_eof != (type == "EOF")) {
     return(NULL)
   }
-  catch_gherkin_error(p, TOKEN_MATCHERS[[type]](p, token))
+  catch_gherkin_error(p, p$matchers[[type]](p, token))
 }
 
 matched <- function(
@@ -472,7 +481,8 @@ transform_node <- function(p, node) {
       if (is.null(line)) {
         return(NULL)
       }
-      list(
+      # A Markdown document's first line can be its Feature without a keyword
+      drop_null(list(
         tags = tags,
         location = token_location(line),
         language = p$language,
@@ -480,7 +490,7 @@ transform_node <- function(p, node) {
         name = line$matched_text,
         description = description(header),
         children = children(node)
-      )
+      ))
     },
     Rule = {
       header <- get_single(node, "RuleHeader")

@@ -263,7 +263,7 @@ select_features <- function(path, filter, lines, ...) {
 #' @importFrom fs dir_ls is_file
 find_features <- function(path) {
   # A symbolic link to a feature file is run too
-  features <- dir_ls(path, glob = "*.feature$", type = c("file", "symlink"), recurse = TRUE)
+  features <- dir_ls(path, regexp = "[.]feature([.]md)?$", type = c("file", "symlink"), recurse = TRUE)
   features[is_file(features)]
 }
 
@@ -342,11 +342,9 @@ parse_features <- function(paths, reporter = NULL) {
   set_names(documents, paths)
 }
 
-#' @importFrom fs path_ext_remove path_file
+#' @importFrom fs path_file
 context_name <- function(feature) {
-  feature |>
-    path_file() |>
-    path_ext_remove()
+  sub("[.]feature([.]md)?$", "", path_file(feature))
 }
 
 #' `...` of test() and run() is passed to grepl(), so a misspelled argument
@@ -462,7 +460,8 @@ test_cucumber_code <- function(path, ...) {
 #'   "dryrun_mode.feature",
 #'   "fail_fast.feature",
 #'   "retry.feature",
-#'   "order.feature"
+#'   "order.feature",
+#'   "markdown_with_gherkin.feature"
 #' ))
 #'
 #' @importFrom testthat test_dir

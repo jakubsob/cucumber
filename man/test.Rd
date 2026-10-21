@@ -1877,6 +1877,204 @@ which shows scenarios that pass only after another one left something behind.
 
 Source: \code{tests/acceptance/order.feature}
 }
+
+\subsection{Markdown with Gherkin}{
+
+A \code{.feature.md} file is a Markdown document with Gherkin in it, which reads well wherever Markdown is
+rendered. Its headers are the Feature, Rule, Background, Scenario and Examples, its list items that start
+with a step keyword are steps, its code blocks are Doc Strings and its tables indented 2 to 5 spaces are
+Data Tables and Examples. Tags are in backticks. The rest of the Markdown is a description.
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A Markdown document runs like a feature file
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature.md"</span> with
+<span class="st">    """</span>
+<span class="st">    # Feature: Basket</span>
+<span class="st"></span>
+<span class="st">    A basket holds the items a customer wants to buy.</span>
+<span class="st">    This table isn't Gherkin, because it isn't indented:</span>
+<span class="st"></span>
+<span class="st">    | item  | price |</span>
+<span class="st">    | ----- | ----- |</span>
+<span class="st">    | apple | 1     |</span>
+<span class="st"></span>
+<span class="st">    ## Scenario Outline: Add &lt;n&gt; apples</span>
+<span class="st"></span>
+<span class="st">    * Given an empty basket</span>
+<span class="st">    * When I add &lt;n&gt; apples</span>
+<span class="st">    * Then the basket has &lt;n&gt; items</span>
+<span class="st"></span>
+<span class="st">    ### Examples:</span>
+<span class="st"></span>
+<span class="st">      | n |</span>
+<span class="st">      | - |</span>
+<span class="st">      | 1 |</span>
+<span class="st">      | 2 |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) \{</span>
+<span class="st">      context$items &lt;- 0</span>
+<span class="st">    \})</span>
+<span class="st">    when("I add \{int\} apples", function(n, context) \{</span>
+<span class="st">      context$items &lt;- context$items + n</span>
+<span class="st">    \})</span>
+<span class="st">    then("the basket has \{int\} items", function(n, context) \{</span>
+<span class="st">      expect_equal(context$items, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> scenario     <span class="op">|</span> step                        <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Add 1 apples <span class="op">|</span> Given an empty basket       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Add 1 apples <span class="op">|</span> When I add 1 apples         <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Add 1 apples <span class="op">|</span> Then the basket has 1 items <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Add 2 apples <span class="op">|</span> Given an empty basket       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Add 2 apples <span class="op">|</span> When I add 2 apples         <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Add 2 apples <span class="op">|</span> Then the basket has 2 items <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A Markdown document runs like a feature file
+  Given a file named "features/basket.feature.md" with
+    """
+    # Feature: Basket
+
+    A basket holds the items a customer wants to buy.
+    This table isn't Gherkin, because it isn't indented:
+
+    | item  | price |
+    | ----- | ----- |
+    | apple | 1     |
+
+    ## Scenario Outline: Add <n> apples
+
+    * Given an empty basket
+    * When I add <n> apples
+    * Then the basket has <n> items
+
+    ### Examples:
+
+      | n |
+      | - |
+      | 1 |
+      | 2 |
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{
+      context$items <- 0
+    \})
+    when("I add \{int\} apples", function(n, context) \{
+      context$items <- context$items + n
+    \})
+    then("the basket has \{int\} items", function(n, context) \{
+      expect_equal(context$items, n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the steps have these results:
+    | scenario     | step                        | status |
+    | Add 1 apples | Given an empty basket       | passed |
+    | Add 1 apples | When I add 1 apples         | passed |
+    | Add 1 apples | Then the basket has 1 items | passed |
+    | Add 2 apples | Given an empty basket       | passed |
+    | Add 2 apples | When I add 2 apples         | passed |
+    | Add 2 apples | Then the basket has 2 items | passed |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A code block is a Doc String and an indented table is a Data Table
+  The separator row under the header of a Markdown table isn't a row of the Data Table.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature.md"</span> with
+<span class="st">    """</span>
+<span class="st">    # Feature: Basket</span>
+<span class="st"></span>
+<span class="st">    ## Scenario: Add items</span>
+<span class="st"></span>
+<span class="st">    * Given these items:</span>
+<span class="st">      | item   | price |</span>
+<span class="st">      | ------ | ----: |</span>
+<span class="st">      | apple  | 1     |</span>
+<span class="st">      | banana | 2     |</span>
+<span class="st">    * When I add a note:</span>
+<span class="st">      ```json</span>
+<span class="st">      \{"gift": true\}</span>
+<span class="st">      ```</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("these items:", function(table, context) \{</span>
+<span class="st">      expect_equal(table$item, c("apple", "banana"))</span>
+<span class="st">    \})</span>
+<span class="st">    when("I add a note:", function(note, context) \{</span>
+<span class="st">      expect_equal(as.character(note), '\{"gift": true\}')</span>
+<span class="st">      expect_equal(attr(note, "media_type"), "json")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> step               <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Given these items: <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> When I add a note: <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A code block is a Doc String and an indented table is a Data Table
+  The separator row under the header of a Markdown table isn't a row of the Data Table.
+
+  Given a file named "features/basket.feature.md" with
+    """
+    # Feature: Basket
+
+    ## Scenario: Add items
+
+    * Given these items:
+      | item   | price |
+      | ------ | ----: |
+      | apple  | 1     |
+      | banana | 2     |
+    * When I add a note:
+      ```json
+      \{"gift": true\}
+      ```
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("these items:", function(table, context) \{
+      expect_equal(table$item, c("apple", "banana"))
+    \})
+    when("I add a note:", function(note, context) \{
+      expect_equal(as.character(note), '\{"gift": true\}')
+      expect_equal(attr(note, "media_type"), "json")
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the steps have these results:
+    | step               | status |
+    | Given these items: | passed |
+    | When I add a note: | passed |
+%</pre>
+}}
+
+Source: \code{tests/acceptance/markdown_with_gherkin.feature}
+}
 }
 
 \examples{

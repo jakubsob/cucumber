@@ -480,6 +480,88 @@ Feature: Scenarios as documentation
       *Rule: {int} items get 10% off*
       """
 
+  Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written
+    Given a file named "tests/acceptance/checkout.feature.md" with
+      """
+      # Feature: Checkout
+
+      `@rd`
+      ## Scenario: Pay for the basket
+
+      * Given a basket with 2 items
+      * When I pay
+      * Then the basket is empty
+      """
+    And a file named "R/pay.R" with
+      """
+      #' Pay for a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature.md")
+      #' @export
+      pay <- function(basket) basket
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "pay" includes
+      """
+      Checkout:
+
+      ## Scenario: Pay for the basket
+
+      * Given a basket with 2 items
+      * When I pay
+      * Then the basket is empty
+      """
+
+  Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/checkout.feature.md" with
+      """
+      # Feature: Checkout
+
+      `@rd`
+      ## Scenario Outline: Pay with <card>
+
+      * Given a basket with 2 items
+      * When I pay with "<card>"
+
+      ### Examples:
+
+        | card |
+        | ---- |
+        | visa |
+      """
+    And a file named "R/pay.R" with
+      """
+      #' Pay for a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature.md")
+      #' @export
+      pay <- function(basket) basket
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "pay", preview = FALSE)
+      """
+    Then the reference page "pay" highlights the Gherkin
+      | token             | class |
+      | Scenario Outline: | kw    |
+      | Examples:         | kw    |
+      | Given             | fu    |
+      | When              | fu    |
+      | "<card>"          | st    |
+      | \|                | op    |
+
   Scenario: A selection without scenarios is an error
     When I run it and it fails
       """

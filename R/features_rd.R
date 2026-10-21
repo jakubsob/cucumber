@@ -29,7 +29,7 @@
 #'   Relative paths are relative to the working directory, the package's root when you
 #'   run `devtools::document()`.
 #' @param filter If not NULL, only features with file names matching this regular expression
-#'   are documented. Matching is performed on the file name after it's stripped of ".feature".
+#'   are documented. Matching is performed on the file name after it's stripped of ".feature" or ".feature.md".
 #' @param tags If not NULL, select scenarios by tag expression string, see [test()].
 #'   Defaults to the `cucumber.rd_tags` option, or `"@rd"` if it's not set.
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
@@ -87,6 +87,9 @@ feature_rd <- function(document, pickles, source, file) {
     return(NULL)
   }
   feature <- document$feature
+  # In Markdown, `#` starts a header, not a comment, and indentation is kept,
+  # as it tells a Gherkin table from a Markdown one
+  markdown <- is_markdown(file)
   # The scenarios and the outline rows that are selected
   selected <- unlist(map(pickles, \(pickle) pickle$message$astNodeIds))
   tokens <- gherkin_tokens(document, source)
@@ -100,10 +103,11 @@ feature_rd <- function(document, pickles, source, file) {
     to <- min(starts[starts > from]) - 1
     lines <- setdiff(from:to, drop)
     # Without the blank lines and comments before the next child
-    while (length(lines) > 0 && grepl("^\\s*(#.*)?$", source[[lines[[length(lines)]]]])) {
+    trailing <- if (markdown) "^\\s*$" else "^\\s*(#.*)?$"
+    while (length(lines) > 0 && grepl(trailing, source[[lines[[length(lines)]]]])) {
       lines <- lines[-length(lines)]
     }
-    code <- sub(paste0("^ {0,", node$location$column - 1, "}"), "", source[lines])
+    code <- if (markdown) source[lines] else sub(paste0("^ {0,", node$location$column - 1, "}"), "", source[lines])
     # Rd, not a markdown code block: pkgdown empties code blocks of a language
     # pandoc can't highlight, like gherkin, and highlights the others as R. In
     # HTML it's a gherkin block, highlighted here as pandoc can't
@@ -257,8 +261,10 @@ gherkin_html <- function(text, lines, tokens) {
     if (is.null(keyword)) {
       return(inline(text[[i]]))
     }
-    indent <- sub("^(\\s*).*", "\\1", text[[i]])
-    rest <- substring(text[[i]], nchar(indent) + nchar(keyword[[1]]) + 1)
-    paste0(indent, span(keyword[[2]], escape(keyword[[1]])), inline(rest))
+    # After the indent, or in Markdown after `## ` or `* `
+    at <- regexpr(keyword[[1]], text[[i]], fixed = TRUE)
+    before <- substring(text[[i]], 1, at - 1)
+    rest <- substring(text[[i]], at + nchar(keyword[[1]]))
+    paste0(escape(before), span(keyword[[2]], escape(keyword[[1]])), inline(rest))
   })
 }

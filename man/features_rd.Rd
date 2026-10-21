@@ -21,7 +21,7 @@ Relative paths are relative to the working directory, the package's root when yo
 run \code{devtools::document()}.}
 
 \item{filter}{If not NULL, only features with file names matching this regular expression
-are documented. Matching is performed on the file name after it's stripped of ".feature".}
+are documented. Matching is performed on the file name after it's stripped of ".feature" or ".feature.md".}
 
 \item{tags}{If not NULL, select scenarios by tag expression string, see \code{\link[=test]{test()}}.
 Defaults to the \code{cucumber.rd_tags} option, or \code{"@rd"} if it's not set.}
@@ -1048,6 +1048,174 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 
     *Rule: \{int\} items get 10\% off*
     """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of Markdown with Gherkin are in the help page as they are written
+  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/checkout.feature.md"</span> with
+<span class="st">    """</span>
+<span class="st">    # Feature: Checkout</span>
+<span class="st"></span>
+<span class="st">    `@rd`</span>
+<span class="st">    ## Scenario: Pay for the basket</span>
+<span class="st"></span>
+<span class="st">    * Given a basket with 2 items</span>
+<span class="st">    * When I pay</span>
+<span class="st">    * Then the basket is empty</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"R/pay.R"</span> with
+<span class="st">    """</span>
+<span class="st">    #' Pay for a basket</span>
+<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature.md")</span>
+<span class="st">    #' @export</span>
+<span class="st">    pay &lt;- function(basket) basket</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    roxygen2::roxygenise()</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the help page <span class="st">"pay"</span> includes
+<span class="st">    """</span>
+<span class="st">    Checkout:</span>
+<span class="st"></span>
+<span class="st">    ## Scenario: Pay for the basket</span>
+<span class="st"></span>
+<span class="st">    * Given a basket with 2 items</span>
+<span class="st">    * When I pay</span>
+<span class="st">    * Then the basket is empty</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written
+  Given a file named "tests/acceptance/checkout.feature.md" with
+    """
+    # Feature: Checkout
+
+    `@rd`
+    ## Scenario: Pay for the basket
+
+    * Given a basket with 2 items
+    * When I pay
+    * Then the basket is empty
+    """
+  And a file named "R/pay.R" with
+    """
+    #' Pay for a basket
+    #' @eval cucumber::features_rd(features = "checkout.feature.md")
+    #' @export
+    pay <- function(basket) basket
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "pay" includes
+    """
+    Checkout:
+
+    ## Scenario: Pay for the basket
+
+    * Given a basket with 2 items
+    * When I pay
+    * Then the basket is empty
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page
+  <span class="fu">Given</span> a file named <span class="st">"DESCRIPTION"</span> with
+<span class="st">    """</span>
+<span class="st">    Package: example</span>
+<span class="st">    Version: 0.1.0</span>
+<span class="st">    Title: Example</span>
+<span class="st">    Description: An example.</span>
+<span class="st">    License: MIT</span>
+<span class="st">    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))</span>
+<span class="st">    Encoding: UTF-8</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/checkout.feature.md"</span> with
+<span class="st">    """</span>
+<span class="st">    # Feature: Checkout</span>
+<span class="st"></span>
+<span class="st">    `@rd`</span>
+<span class="st">    ## Scenario Outline: Pay with &lt;card&gt;</span>
+<span class="st"></span>
+<span class="st">    * Given a basket with 2 items</span>
+<span class="st">    * When I pay with "&lt;card&gt;"</span>
+<span class="st"></span>
+<span class="st">    ### Examples:</span>
+<span class="st"></span>
+<span class="st">      | card |</span>
+<span class="st">      | ---- |</span>
+<span class="st">      | visa |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"R/pay.R"</span> with
+<span class="st">    """</span>
+<span class="st">    #' Pay for a basket</span>
+<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature.md")</span>
+<span class="st">    #' @export</span>
+<span class="st">    pay &lt;- function(basket) basket</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    roxygen2::roxygenise()</span>
+<span class="st">    pkgdown::build_reference(".", topics = "pay", preview = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the reference page <span class="st">"pay"</span> highlights the Gherkin
+    <span class="op">|</span> token             <span class="op">|</span> class <span class="op">|</span>
+    <span class="op">|</span> Scenario Outline: <span class="op">|</span> kw    <span class="op">|</span>
+    <span class="op">|</span> Examples:         <span class="op">|</span> kw    <span class="op">|</span>
+    <span class="op">|</span> Given             <span class="op">|</span> fu    <span class="op">|</span>
+    <span class="op">|</span> When              <span class="op">|</span> fu    <span class="op">|</span>
+    <span class="op">|</span> <span class="st">"<span class="va">&lt;card&gt;</span>"</span>          <span class="op">|</span> st    <span class="op">|</span>
+    <span class="op">|</span> \\|                <span class="op">|</span> op    <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page
+  Given a file named "DESCRIPTION" with
+    """
+    Package: example
+    Version: 0.1.0
+    Title: Example
+    Description: An example.
+    License: MIT
+    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+    Encoding: UTF-8
+    """
+  And a file named "tests/acceptance/checkout.feature.md" with
+    """
+    # Feature: Checkout
+
+    `@rd`
+    ## Scenario Outline: Pay with <card>
+
+    * Given a basket with 2 items
+    * When I pay with "<card>"
+
+    ### Examples:
+
+      | card |
+      | ---- |
+      | visa |
+    """
+  And a file named "R/pay.R" with
+    """
+    #' Pay for a basket
+    #' @eval cucumber::features_rd(features = "checkout.feature.md")
+    #' @export
+    pay <- function(basket) basket
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    pkgdown::build_reference(".", topics = "pay", preview = FALSE)
+    """
+  Then the reference page "pay" highlights the Gherkin
+    | token             | class |
+    | Scenario Outline: | kw    |
+    | Examples:         | kw    |
+    | Given             | fu    |
+    | When              | fu    |
+    | "<card>"          | st    |
+    | \\|                | op    |
 %</pre>
 }}
 

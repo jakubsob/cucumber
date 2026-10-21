@@ -122,6 +122,8 @@
 #
 # - TOKEN_MATCHERS, tag_items(), table_cells() in R/gherkin.R, from
 #   GherkinClassicTokenMatcher.ts and GherkinLine.ts
+# - MARKDOWN_TOKEN_MATCHERS in R/gherkin_markdown.R, from
+#   GherkinInMarkdownTokenMatcher.ts
 # - lookahead() in R/gherkin.R, from lookahead_0/lookahead_1 in Parser.ts
 # - transform_node() and table_rows() in R/gherkin.R, from AstBuilder.ts
 # - create_pickles(), pickle_steps() and interpolate() in R/pickle.R, from
@@ -137,10 +139,10 @@
 #    commit in its header.
 # 3. Replaces the official test data in tests/testthat/gherkin: the good
 #    *.feature files with their .ast.ndjson, .pickles.ndjson and
-#    .source.ndjson, and the bad ones with their .errors.ndjson. The .feature.md files are left out, and
-#    scenario_outline_with_value_with_* are renamed to outline_value_with_*,
-#    because R CMD check flags paths over 100 bytes. It stops if another path
-#    is too long.
+#    .source.ndjson, the good *.feature.md files the same way, and the bad
+#    ones with their .errors.ndjson. scenario_outline_with_value_with_* are
+#    renamed to outline_value_with_*, because R CMD check flags paths over
+#    100 bytes. It stops if another path is too long.
 # 4. Regenerates GHERKIN_DIALECTS in R/sysdata.rda, the keywords of every
 #    language, from gherkin-languages.json.
 # 5. Writes the changes to the hand-ported files since the commit the states
@@ -159,6 +161,7 @@ GHERKIN_REPO <- "https://github.com/cucumber/gherkin.git"
 # Files ported by hand, see "What is not generated"
 HAND_PORTED <- c(
   "javascript/src/GherkinClassicTokenMatcher.ts",
+  "javascript/src/GherkinInMarkdownTokenMatcher.ts",
   "javascript/src/GherkinLine.ts",
   "javascript/src/AstBuilder.ts",
   "javascript/src/pickles/compile.ts"
@@ -224,7 +227,7 @@ copy_test_data <- function(repo, to) {
   )
   for (kind in names(expected)) {
     from <- file.path(repo, "testdata", kind)
-    features <- list.files(from, pattern = "\\.feature$")
+    features <- list.files(from, pattern = "\\.feature(\\.md)?$")
     names <- sub(
       "^scenario_outline_with_value_with_",
       "outline_value_with_",

@@ -260,6 +260,14 @@ CucumberMessagesReporter <- R6::R6Class(
   )
 )
 
+#' A feature's keyword and name, like `"Feature: Basket"`. A Markdown
+#' document's Feature can have no keyword, then it's its name.
+#' @keywords internal
+#' @noRd
+feature_label <- function(feature) {
+  if (is.null(feature$keyword)) feature$name else paste0(feature$keyword, ": ", feature$name)
+}
+
 #' Bold the label (text up to and including the first colon), name left plain
 #'
 #' e.g. "Feature: Addition" -> bold "Feature:" + " Addition"
@@ -634,11 +642,7 @@ CucumberSummaryReporter <- R6::R6Class(
           ) {
             private$finish_feature()
             private$feature_uri <- pickle$uri %||% ""
-            self$current_feature <- paste0(
-              lineage$feature$keyword,
-              ": ",
-              lineage$feature$name
-            )
+            self$current_feature <- feature_label(lineage$feature)
             private$on_feature_start()
           }
           self$current_scenario <- paste0(

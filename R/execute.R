@@ -75,7 +75,6 @@ prepare_pickles <- function(
 #' @keywords internal
 #' @noRd
 #' @importFrom testthat context_start_file
-#' @importFrom glue glue
 execute_feature <- function(
   document,
   pickles,
@@ -93,7 +92,7 @@ execute_feature <- function(
   }
 
   # Set feature context for testthat
-  context_start_file(glue("{document$feature$keyword}: {document$feature$name}"))
+  context_start_file(feature_label(document$feature))
 
   execute_pickles(
     pickles,
