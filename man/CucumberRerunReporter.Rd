@@ -175,6 +175,44 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
 %</pre>
 }}
 
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> No scenario runs again when every scenario passed
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given a step that passes</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/checkout.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Checkout</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))</span>
+<span class="st">    test("features", features = readLines("rerun.txt"))</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> no scenario ran</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: No scenario runs again when every scenario passed
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given a step that passes
+    """
+  And a file named "features/checkout.feature" with
+    """
+    Feature: Checkout
+    """
+  When I run
+    """
+    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
+    test("features", features = readLines("rerun.txt"))
+    """
+  Then no scenario ran
+%</pre>
+}}
+
 Source: \code{tests/acceptance/r-rerun_reporter.feature}
 }
 }
@@ -187,8 +225,7 @@ cucumber::test(reporter = cucumber::CucumberMultiReporter$new(list(
 )))
 
 # Run the scenarios that didn't pass again
-failed <- readLines("rerun.txt")
-if (length(failed) > 0) cucumber::test(features = failed)
+cucumber::test(features = readLines("rerun.txt"))
 }
 
 }

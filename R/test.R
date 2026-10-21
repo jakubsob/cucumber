@@ -241,7 +241,11 @@ run_test_run_hooks <- function(hooks, reporter, test_run_started_id) {
 #' @keywords internal
 #' @noRd
 select_features <- function(path, filter, lines, ...) {
-  features <- (if (length(lines) == 0) find_features(path) else names(lines)) |>
+  # No locations, like the rerun file of a run whose scenarios passed, select nothing
+  if (!is.null(lines) && length(lines) == 0) {
+    return(character())
+  }
+  features <- (if (is.null(lines)) find_features(path) else names(lines)) |>
     filter_features(filter, ...)
 
   if (length(features) == 0) {
@@ -265,11 +269,15 @@ find_features <- function(path) {
 
 #' Split `file:line:line` locations into a list of lines named by file. A file
 #' without lines runs all its scenarios, unless another location of it has lines.
+#' `NULL` without locations.
 #' @keywords internal
 #' @noRd
 #' @importFrom fs file_exists
 feature_lines <- function(features, path) {
   if (is.null(features)) {
+    return(NULL)
+  }
+  if (length(features) == 0) {
     return(list())
   }
   files <- sub("(:[0-9]+)*$", "", features)
@@ -371,10 +379,10 @@ cleanup <- function() {
 }
 
 #' @importFrom rlang call2 list2
-#' @importFrom purrr compact
 test_cucumber_code <- function(path, ...) {
-  # Arguments left at their default are dropped, so error messages show only what was set
-  call2("run", .ns = "cucumber", path, !!!compact(list2(...)), reporter = quote(getOption(".cucumber_reporter"))) |>
+  # Arguments left at their default, `NULL`, are dropped, so error messages
+  # show only what was set. An empty `features` runs no scenario, so it's kept.
+  call2("run", .ns = "cucumber", path, !!!Filter(Negate(is.null), list2(...)), reporter = quote(getOption(".cucumber_reporter"))) |>
     deparse1()
 }
 
@@ -410,6 +418,7 @@ test_cucumber_code <- function(path, ...) {
 #' @param name If not NULL, run only the scenarios whose name matches any of these regular expressions.
 #' @param features If not NULL, run only these feature files, relative to `path`.
 #'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`.
+#'   An empty vector runs no scenario.
 #' @param strict If `FALSE`, pending and undefined steps don't fail the run.
 #' @param dry_run If `TRUE`, match steps to step definitions without running steps or hooks.
 #' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.

@@ -77,3 +77,21 @@ Feature: Rerun reporter
       cat(length(readLines("rerun.txt")), "lines")
       """
     Then the output includes "0 lines"
+
+  Scenario: No scenario runs again when every scenario passed
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given a step that passes
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+      """
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
+      test("features", features = readLines("rerun.txt"))
+      """
+    Then no scenario ran

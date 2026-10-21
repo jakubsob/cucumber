@@ -16,8 +16,7 @@
 #' )))
 #'
 #' # Run the scenarios that didn't pass again
-#' failed <- readLines("rerun.txt")
-#' if (length(failed) > 0) cucumber::test(features = failed)
+#' cucumber::test(features = readLines("rerun.txt"))
 #' }
 #'
 #' @eval features_rd(features = "r-rerun_reporter.feature")

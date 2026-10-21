@@ -38,7 +38,8 @@ files in the \code{tests/testthat} directory.}
 \item{name}{If not NULL, run only the scenarios whose name matches any of these regular expressions.}
 
 \item{features}{If not NULL, run only these feature files, relative to \code{path}.
-Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.}
+Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.
+An empty vector runs no scenario.}
 
 \item{fail_fast}{If \code{TRUE}, skip the scenarios after the first failed scenario.}
 
