@@ -77,6 +77,7 @@ reference:
       - CucumberHtmlReporter
       - CucumberJunitReporter
       - CucumberRerunReporter
+      - CucumberUsageReporter
       - CucumberMultiReporter
   - title: Documentation
     contents:

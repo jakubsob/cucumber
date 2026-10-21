@@ -21,6 +21,7 @@ new_query <- function() {
   q$test_cases_finished <- list()
   q$test_steps_finished <- list()
   q$hooks <- list()
+  q$step_definitions <- list()
   q$test_run_hooks_started <- list()
   q$test_run_hooks_finished <- list()
   q$test_run_started <- NULL
@@ -37,6 +38,7 @@ new_query <- function() {
         for (step in message$steps) q$pickle_steps[[step$id]] <- step
       },
       hook = q$hooks[[message$id]] <- message,
+      stepDefinition = q$step_definitions[[message$id]] <- message,
       testRunStarted = q$test_run_started <- message,
       testRunFinished = q$test_run_finished <- message,
       testRunHookStarted = q$test_run_hooks_started[[message$id]] <- message,

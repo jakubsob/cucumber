@@ -239,6 +239,18 @@ then("the output includes these lines in order:", function(text, context) {
   }
 })
 
+# Each line is a regular expression, for output that varies, like durations
+then("the output includes lines matching these patterns in order:", function(text, context) {
+  patterns <- trimws(strsplit(text, "\n")[[1]])
+  output <- trimws(context$output)
+  at <- 0
+  for (pattern in patterns) {
+    found <- which(grepl(pattern, output) & seq_along(output) > at)
+    expect_true(length(found) > 0, info = paste0("Missing in order: ", pattern, "\n\nIn output:\n", paste(output, collapse = "\n")))
+    at <- found[1]
+  }
+})
+
 then("the output includes {string}", function(text, context) {
   output <- paste(context$output, collapse = "\n")
   expect_true(grepl(text, output, fixed = TRUE), info = output)
