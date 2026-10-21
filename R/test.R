@@ -35,10 +35,12 @@ run <- function(
   features = NULL,
   fail_fast = FALSE,
   retry = 0,
+  order = "defined",
   ...
 ) {
   check_reporter(reporter)
   retry <- checkmate::assert_count(retry, coerce = TRUE)
+  order <- resolve_order(order)
   error <- NULL
   # An error of a reporter or of cucumber itself stops the run, see abort_run()
   broken <- FALSE
@@ -47,7 +49,7 @@ run <- function(
       withCallingHandlers(
         {
           cucumber_event(reporter, "start_run")
-          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...)
+          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
         },
         # Warnings outside scenarios, like in a before all hook. testthat keeps a
         # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
@@ -109,7 +111,7 @@ fail_test <- function(error) {
 #' Run the feature files, see `run()`
 #' @keywords internal
 #' @noRd
-run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...) {
+run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...) {
   withr::defer(cleanup(), testthat::teardown_env())
   check_grepl_args(...)
 
@@ -146,23 +148,25 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
     stop(before_error)
   }
 
-  pickles <- map(set_names(features), \(path) {
-    prepare_pickles(
-      sources[[path]]$pickles,
-      glue$steps,
-      get_parameters(),
-      hooks,
-      tags = tags,
-      name = name,
-      lines = lines[[path]],
-      reporter = reporter,
-      test_run_started_id = test_run_started$id
-    )
-  })
-  for (path in features) {
+  # The scenarios of all features are put in order together
+  pickles <- unlist(
+    map(unname(features), \(path) filter_pickles(sources[[path]]$pickles, tags, name, lines[[path]])),
+    recursive = FALSE
+  )
+  pickles <- prepare_pickles(
+    order_pickles(pickles, order),
+    glue$steps,
+    get_parameters(),
+    hooks,
+    reporter = reporter,
+    test_run_started_id = test_run_started$id
+  )
+  # Consecutive scenarios of a feature run in its testthat context
+  files <- rle(map_chr(pickles, "feature_file"))
+  for (run in split(pickles, rep(seq_along(files$lengths), files$lengths))) {
     failed <- execute_feature(
-      sources[[path]]$document,
-      pickles[[path]],
+      sources[[run[[1]]$feature_file]]$document,
+      run,
       hooks,
       reporter = reporter,
       strict = strict,
@@ -174,6 +178,41 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
   }
 
   invisible(NULL)
+}
+
+#' Check `order`, see `test()`. A random order without a seed gets one, shown
+#' so the same order can be run again.
+#' @return The order, with a seed if it's random
+#' @keywords internal
+#' @noRd
+resolve_order <- function(order) {
+  checkmate::assert_string(order)
+  if (!grepl("^(defined|reverse|random(:[0-9]+)?)$", order)) {
+    abort(
+      paste0("Unknown order \"", order, "\"."),
+      body = c(i = "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\"."),
+      call = NULL,
+      trace = empty_trace()
+    )
+  }
+  if (order == "random") {
+    # Without changing the session's random numbers
+    order <- paste0("random:", withr::with_preserve_seed(sample.int(99999L, 1L)))
+    rlang::inform(paste0("Running scenarios in random order. Use `order = \"", order, "\"` to run them in this order again."))
+  }
+  order
+}
+
+#' Pickles in the order to run them, see `resolve_order()`
+#' @keywords internal
+#' @noRd
+order_pickles <- function(pickles, order) {
+  switch(
+    sub(":.*", "", order),
+    defined = pickles,
+    reverse = rev(pickles),
+    random = withr::with_seed(as.integer(sub("^random:", "", order)), pickles[sample.int(length(pickles))])
+  )
 }
 
 #' Run before all or after all hooks, each reported as a test run hook. All of
@@ -376,6 +415,10 @@ test_cucumber_code <- function(path, ...) {
 #' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.
 #' @param retry How many times to run a failed scenario again, until it passes. Only
 #'   failed scenarios are retried, not pending, undefined or ambiguous ones.
+#' @param order The order to run scenarios in: `"defined"`, the order of the feature files
+#'   and of the scenarios in them, `"reverse"`, or `"random"`. `"random:<seed>"`, like
+#'   `"random:1234"`, runs them in the random order of that seed. Without a seed, the seed
+#'   is chosen and shown, to run them in the same order again.
 #' @param env Environment in which to run the tests, e.g. with step definitions and
 #'   code sourced into it, for a project that isn't a package.
 #'
@@ -409,7 +452,8 @@ test_cucumber_code <- function(path, ...) {
 #'   "strict_mode.feature",
 #'   "dryrun_mode.feature",
 #'   "fail_fast.feature",
-#'   "retry.feature"
+#'   "retry.feature",
+#'   "order.feature"
 #' ))
 #'
 #' @importFrom testthat test_dir
@@ -434,10 +478,12 @@ test <- function(
   features = NULL,
   fail_fast = FALSE,
   retry = 0,
+  order = "defined",
   ...
 ) {
   check_reporter(reporter)
   checkmate::assert_count(retry)
+  order <- resolve_order(order)
   withr::local_options(.cucumber_reporter = reporter)
 
   file <- fs::path(path, "test-__cucumber__.R")
@@ -453,6 +499,7 @@ test <- function(
         features = features,
         fail_fast = if (fail_fast) TRUE,
         retry = if (retry > 0) retry,
+        order = if (order != "defined") order,
         ...
       ),
       con = file

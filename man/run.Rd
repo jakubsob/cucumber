@@ -15,6 +15,7 @@ run(
   features = NULL,
   fail_fast = FALSE,
   retry = 0,
+  order = "defined",
   ...
 )
 }
@@ -43,6 +44,11 @@ Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.fea
 
 \item{retry}{How many times to run a failed scenario again, until it passes. Only
 failed scenarios are retried, not pending, undefined or ambiguous ones.}
+
+\item{order}{The order to run scenarios in: \code{"defined"}, the order of the feature files
+and of the scenarios in them, \code{"reverse"}, or \code{"random"}. \code{"random:<seed>"}, like
+\code{"random:1234"}, runs them in the random order of that seed. Without a seed, the seed
+is chosen and shown, to run them in the same order again.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

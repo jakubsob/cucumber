@@ -18,7 +18,6 @@
 # step definitions. Samples are left out for what cucumber doesn't do yet:
 #
 # - markdown: Markdown with Gherkin
-# - multiple-features-reversed: running features in reverse order
 #
 # A sample's .arguments.txt, like `--retry 2`, are the arguments of test() it
 # runs with.
@@ -55,6 +54,7 @@ CCK_SAMPLES <- c(
   "hooks-undefined",
   "minimal",
   "multiple-features",
+  "multiple-features-reversed",
   "parameter-types",
   "pending",
   "pending-exception",

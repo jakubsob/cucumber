@@ -19,6 +19,7 @@ test(
   features = NULL,
   fail_fast = FALSE,
   retry = 0,
+  order = "defined",
   ...
 )
 }
@@ -56,6 +57,11 @@ Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.fea
 
 \item{retry}{How many times to run a failed scenario again, until it passes. Only
 failed scenarios are retried, not pending, undefined or ambiguous ones.}
+
+\item{order}{The order to run scenarios in: \code{"defined"}, the order of the feature files
+and of the scenarios in them, \code{"reverse"}, or \code{"random"}. \code{"random:<seed>"}, like
+\code{"random:1234"}, runs them in the random order of that seed. Without a seed, the seed
+is chosen and shown, to run them in the same order again.}
 
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
@@ -1740,6 +1746,135 @@ Only failed scenarios are retried: pending, undefined or ambiguous steps wouldn'
 }}
 
 Source: \code{tests/acceptance/retry.feature}
+}
+
+\subsection{Order}{
+
+Scenarios run in the order they are defined: feature files in order of their path, and the scenarios
+of each file from top to bottom. With \code{order}, they run in reverse or in random order instead,
+which shows scenarios that pass only after another one left something behind.
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/a.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: A</span>
+<span class="st">      Scenario: A1</span>
+<span class="st">        Given a step</span>
+<span class="st"></span>
+<span class="st">      Scenario: A2</span>
+<span class="st">        Given a step</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/b.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: B</span>
+<span class="st">      Scenario: B1</span>
+<span class="st">        Given a step</span>
+<span class="st"></span>
+<span class="st">      Scenario: B2</span>
+<span class="st">        Given a step</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("a step", function(context) \{\})</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+  And a file named "features/a.feature" with
+    """
+    Feature: A
+      Scenario: A1
+        Given a step
+
+      Scenario: A2
+        Given a step
+    """
+  And a file named "features/b.feature" with
+    """
+    Feature: B
+      Scenario: B1
+        Given a step
+
+      Scenario: B2
+        Given a step
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a step", function(context) \{\})
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of all features run in reverse order
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", order = "reverse")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> B2       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> B1       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> A2       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> A1       <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Scenarios of all features run in reverse order
+  When I run
+    """
+    test("features", order = "reverse")
+    """
+  Then the scenarios have these results:
+    | scenario | status |
+    | B2       | passed |
+    | B1       | passed |
+    | A2       | passed |
+    | A1       | passed |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of all features run in the random order of a seed
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", order = "random:1")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> A1       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> B1       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> B2       <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> A2       <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Scenarios of all features run in the random order of a seed
+  When I run
+    """
+    test("features", order = "random:1")
+    """
+  Then the scenarios have these results:
+    | scenario | status |
+    | A1       | passed |
+    | B1       | passed |
+    | B2       | passed |
+    | A2       | passed |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A random order without a seed shows the seed to run the same order again
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", order = "random")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"Running scenarios in random order. Use `order = \\"</span>random:"</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A random order without a seed shows the seed to run the same order again
+  When I run
+    """
+    test("features", order = "random")
+    """
+  Then the output includes "Running scenarios in random order. Use `order = \\"random:"
+%</pre>
+}}
+
+Source: \code{tests/acceptance/order.feature}
 }
 }
 

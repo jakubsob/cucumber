@@ -46,6 +46,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `test()` and `run()` get `name` and `features` arguments to run only some scenarios. `name = "^Adding"` runs scenarios whose name matches a regular expression. `features = "addition.feature:12"` runs the scenario at line 12 of a feature file. The line of a Scenario Outline runs all its examples, the line of an example row runs only that example.
 - ✨ `test()` and `run()` get a `fail_fast` argument. After the first failed scenario, the remaining scenarios are skipped and their hooks don't run. With `strict = TRUE`, a scenario with a pending or undefined step counts as failed.
 - ✨ `test()` and `run()` get a `retry` argument. A failed scenario runs again, up to `retry` more times, until it passes, and its last attempt is its result. Pending, undefined and ambiguous scenarios aren't retried. Each attempt is reported, with `(attempt 2)` after the scenario's name, and the summary counts only the last attempt.
+- ✨ `test()` and `run()` get an `order` argument. `order = "reverse"` runs the scenarios of all feature files in reverse order, `order = "random"` in random order, to show scenarios that depend on another one running first. A random order shows its seed, and `order = "random:<seed>"` runs the scenarios in that order again.
 - ✨ `test()` runs feature files from the directory set in the `cucumber.path` option when called without `path`, e.g. `options(cucumber.path = "features")`. It defaults to `"tests/acceptance"`, the previous default value.
 
 ## Hooks

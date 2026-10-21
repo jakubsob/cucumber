@@ -40,7 +40,8 @@ run_code <- function(code, context, catch_error = FALSE) {
     {
       cucumber:::set_default_parameters()
       withr::with_dir(context$tempdir, {
-        output <- utils::capture.output({
+        # Messages are output too, printed where they're signalled
+        output <- utils::capture.output(withCallingHandlers({
           if (catch_error) {
             context$error <- tryCatch(
               {
@@ -52,7 +53,10 @@ run_code <- function(code, context, catch_error = FALSE) {
           } else {
             context$result <- eval(parse(text = code))
           }
-        })
+        }, message = function(m) {
+          cat(conditionMessage(m))
+          invokeRestart("muffleMessage")
+        }))
         context$output <- cli::ansi_strip(output)
       })
     }
