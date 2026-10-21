@@ -11,15 +11,14 @@
 #'
 #' @param lines Lines of a feature file.
 #' @param uri Path of the feature file, used in error messages.
-#' @param markdown Whether the document is Markdown with Gherkin, see
-#'   MARKDOWN_TOKEN_MATCHERS. A `.feature.md` file is.
+#' @param flavour The flavour of Gherkin of the document, see `gherkin_flavours()`.
 #' @return A GherkinDocument: the `feature`, NULL for an empty document, its
 #'   `comments` and its `uri`.
 #' @keywords internal
 #' @noRd
-parse_gherkin <- function(lines, uri = NULL, markdown = is_markdown(uri)) {
+parse_gherkin <- function(lines, uri = NULL, flavour = gherkin_flavour(uri)) {
   p <- new.env(parent = emptyenv())
-  p$matchers <- if (markdown) MARKDOWN_TOKEN_MATCHERS else TOKEN_MATCHERS
+  p$matchers <- flavour$matchers
   p$lines <- lines
   p$uri <- uri
   p$next_line <- 1L
@@ -53,12 +52,6 @@ parse_gherkin <- function(lines, uri = NULL, markdown = is_markdown(uri)) {
 # official gherkin-languages.json, see update_gherkin(). Step keywords include
 # the space that has to follow them. `*` is a keyword of every step type, so
 # its type is unknown.
-
-#' Whether a feature file is Markdown with Gherkin
-#' @noRd
-is_markdown <- function(uri) {
-  !is.null(uri) && endsWith(uri, ".feature.md")
-}
 
 #' The language of feature files without a `# language:` line: the
 #' `cucumber.language` option, or English

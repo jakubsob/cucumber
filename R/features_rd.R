@@ -87,9 +87,7 @@ feature_rd <- function(document, pickles, source, file) {
     return(NULL)
   }
   feature <- document$feature
-  # In Markdown, `#` starts a header, not a comment, and indentation is kept,
-  # as it tells a Gherkin table from a Markdown one
-  markdown <- is_markdown(file)
+  flavour <- gherkin_flavour(file)
   # The scenarios and the outline rows that are selected
   selected <- unlist(map(pickles, \(pickle) pickle$message$astNodeIds))
   tokens <- gherkin_tokens(document, source)
@@ -103,11 +101,10 @@ feature_rd <- function(document, pickles, source, file) {
     to <- min(starts[starts > from]) - 1
     lines <- setdiff(from:to, drop)
     # Without the blank lines and comments before the next child
-    trailing <- if (markdown) "^\\s*$" else "^\\s*(#.*)?$"
-    while (length(lines) > 0 && grepl(trailing, source[[lines[[length(lines)]]]])) {
+    while (length(lines) > 0 && grepl(flavour$block_end, source[[lines[[length(lines)]]]])) {
       lines <- lines[-length(lines)]
     }
-    code <- if (markdown) source[lines] else sub(paste0("^ {0,", node$location$column - 1, "}"), "", source[lines])
+    code <- flavour$block_code(source[lines], node$location$column)
     # Rd, not a markdown code block: pkgdown empties code blocks of a language
     # pandoc can't highlight, like gherkin, and highlights the others as R. In
     # HTML it's a gherkin block, highlighted here as pandoc can't

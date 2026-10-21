@@ -263,7 +263,7 @@ select_features <- function(path, filter, lines, ...) {
 #' @importFrom fs dir_ls is_file
 find_features <- function(path) {
   # A symbolic link to a feature file is run too
-  features <- dir_ls(path, regexp = "[.]feature([.]md)?$", type = c("file", "symlink"), recurse = TRUE)
+  features <- dir_ls(path, regexp = feature_file_pattern(), type = c("file", "symlink"), recurse = TRUE)
   features[is_file(features)]
 }
 
@@ -344,7 +344,7 @@ parse_features <- function(paths, reporter = NULL) {
 
 #' @importFrom fs path_file
 context_name <- function(feature) {
-  sub("[.]feature([.]md)?$", "", path_file(feature))
+  sub(feature_file_pattern(), "", path_file(feature))
 }
 
 #' `...` of test() and run() is passed to grepl(), so a misspelled argument

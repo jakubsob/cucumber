@@ -4,7 +4,7 @@
 # Strings. Any other Markdown is a description. Its lines are classified by
 # these token matchers instead of TOKEN_MATCHERS, ported from
 # GherkinInMarkdownTokenMatcher.ts of the official parser, and parsed by the
-# same state machine.
+# same state machine, see gherkin_flavours().
 
 MARKDOWN_HEADER <- "^#{1,6}\\s"
 MARKDOWN_BULLET <- "^\\s*[*+-]\\s*"

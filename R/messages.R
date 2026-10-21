@@ -86,8 +86,7 @@ meta_message <- function() {
 source_message <- function(path) {
   data <- readChar(path, file.size(path), useBytes = TRUE)
   Encoding(data) <- "UTF-8"
-  media_type <- if (is_markdown(path)) "text/x.cucumber.gherkin+markdown" else "text/x.cucumber.gherkin+plain"
-  list(uri = path, data = data, mediaType = media_type)
+  list(uri = path, data = data, mediaType = gherkin_flavour(path)$media_type)
 }
 
 #' A parse error, with its location read from the error message
