@@ -13,6 +13,12 @@
 #'
 #'   default: `"tests/acceptance"`
 #'
+#' - `cucumber.language`
+#'
+#'   Language of the feature files without a `# language:` line, like `"fr"`.
+#'
+#'   default: `"en"`
+#'
 #' - `cucumber.docstring_as_lines`
 #'
 #'   If `TRUE`, step definitions get a Doc String as a character vector of lines,
@@ -47,6 +53,8 @@
 #'   default: `"Specification"`
 #'
 #' See [base::options()] and [base::getOption()] on how to work with options.
+#'
+#' @eval features_rd(features = "language.feature")
 #'
 #' @md
 #' @name opts

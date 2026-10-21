@@ -15,6 +15,11 @@ The following options are available:
 Directory with \code{.feature} files that \code{\link[=test]{test()}} runs when called without \code{path}.
 
 default: \code{"tests/acceptance"}
+\item \code{cucumber.language}
+
+Language of the feature files without a \verb{# language:} line, like \code{"fr"}.
+
+default: \code{"en"}
 \item \code{cucumber.docstring_as_lines}
 
 If \code{TRUE}, step definitions get a Doc String as a character vector of lines,
@@ -47,3 +52,104 @@ default: \code{"Specification"}
 
 See \code{\link[base:options]{base::options()}} and \code{\link[base:options]{base::getOption()}} on how to work with options.
 }
+\section{Specification}{
+
+\subsection{Language}{
+
+A \verb{# language:} line at the top of a feature file sets the language of its keywords,
+like in the official Gherkin parser. The languages are the ones in the official gherkin-languages.json.
+Step definitions don't change, because steps are matched without their keyword.
+The \code{cucumber.language} option sets the language of feature files without a \verb{# language:} line.
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package</code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The cucumber.language option sets the language of feature files without a language line
+  <span class="fu">Given</span> a file named <span class="st">"features/addition.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Fonctionnalité: Addition</span>
+<span class="st">      Scénario: Adding one</span>
+<span class="st">        Soit I have 1</span>
+<span class="st">        Quand I add 1</span>
+<span class="st">        Alors I should have 2</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/subtraction.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    # language: en</span>
+<span class="st">    Feature: Subtraction</span>
+<span class="st">      Scenario: Taking one</span>
+<span class="st">        Given I have 2</span>
+<span class="st">        When I add -1</span>
+<span class="st">        Then I should have 1</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I have \{int\}", function(n, context) \{</span>
+<span class="st">      context$n &lt;- n</span>
+<span class="st">    \})</span>
+<span class="st">    when("I add \{int\}", function(n, context) \{</span>
+<span class="st">      context$n &lt;- context$n + n</span>
+<span class="st">    \})</span>
+<span class="st">    then("I should have \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$n, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    withr::with_options(list(cucumber.language = "fr"), test("features"))</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario   <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Taking one <span class="op">|</span> passed <span class="op">|</span></code></pre >}}  
+\if{text,latex}{\preformatted{Scenario: The cucumber.language option sets the language of feature files without a language line
+  Given a file named "features/addition.feature" with
+    """
+    Fonctionnalité: Addition
+      Scénario: Adding one
+        Soit I have 1
+        Quand I add 1
+        Alors I should have 2
+    """
+  And a file named "features/subtraction.feature" with
+    """
+    # language: en
+    Feature: Subtraction
+      Scenario: Taking one
+        Given I have 2
+        When I add -1
+        Then I should have 1
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("I have \{int\}", function(n, context) \{
+      context$n <- n
+    \})
+    when("I add \{int\}", function(n, context) \{
+      context$n <- context$n + n
+    \})
+    then("I should have \{int\}", function(n, context) \{
+      expect_equal(context$n, n)
+    \})
+    """
+  When I run
+    """
+    withr::with_options(list(cucumber.language = "fr"), test("features"))
+    """
+  Then the scenarios have these results:
+    | scenario   | status |
+    | Adding one | passed |
+    | Taking one | passed |
+%</pre>
+}}  
+
+Source: \code{tests/acceptance/language.feature}
+}
+}
+

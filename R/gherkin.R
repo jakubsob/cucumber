@@ -23,8 +23,8 @@ parse_gherkin <- function(lines, uri = NULL) {
   p$queue <- list()
   p$docstring_separator <- NULL
   p$indent_to_remove <- 0L
-  # Like the official parser, a file without a `# language:` line is in English
-  p$language <- "en"
+  # A file without a `# language:` line is in the default language
+  p$language <- default_language()
   p$comments <- list()
   p$errors <- character()
   p$stack <- list(new_ast_node("None"))
@@ -50,6 +50,24 @@ parse_gherkin <- function(lines, uri = NULL) {
 # official gherkin-languages.json, see update_gherkin(). Step keywords include
 # the space that has to follow them. `*` is a keyword of every step type, so
 # its type is unknown.
+
+#' The language of feature files without a `# language:` line: the
+#' `cucumber.language` option, or English
+#' @keywords internal
+#' @noRd
+default_language <- function() {
+  language <- getOption("cucumber.language", "en")
+  checkmate::assert_string(language, .var.name = "getOption(\"cucumber.language\")")
+  if (is.null(GHERKIN_DIALECTS[[language]])) {
+    abort(
+      paste0("Language not supported: ", language),
+      body = c(i = "The `cucumber.language` option must be a language of Gherkin, like \"fr\"."),
+      call = NULL,
+      trace = empty_trace()
+    )
+  }
+  language
+}
 
 LANGUAGE_PATTERN <- "^\\s*#\\s*language\\s*:\\s*([a-zA-Z\\-_]+)\\s*$"
 

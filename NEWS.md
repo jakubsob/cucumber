@@ -9,6 +9,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ Scenario Outline names are the outline name with placeholders replaced, without an `(Example n)` suffix. Scenarios that share a name are numbered in test results: `eating (1)`, `eating (2)`.
 - ✨ Added support for the `Rule` keyword. A `Rule` groups scenarios that illustrate one business rule, can have its own `Background` (run after the `Feature`'s one) and passes its tags to its scenarios.
 - ✨ Feature files can be written in any of the 80 languages of the official Gherkin parser, by starting them with a `# language:` line, e.g. `# language: fr` for `Fonctionnalité`, `Scénario`, `Soit`, `Quand` and `Alors`. Step definitions don't change.
+- ✨ The `cucumber.language` option sets the language of feature files without a `# language:` line, e.g. `options(cucumber.language = "fr")`.
 - ✨ Scenario Outline placeholders are replaced in Doc Strings and Data Tables as well. Examples can have a description, and `Examples:` under a `Scenario:` makes it an outline.
 - ✨ A step can have both a Data Table and a Doc String, and a Doc String can have a media type, like `"""json`.
 - ✨ `Ability:` and `Business Need:` can be used instead of `Feature:`. Empty feature files and scenarios without steps no longer fail.
