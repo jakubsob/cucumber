@@ -245,6 +245,35 @@ Feature: Parameter types
         | Given the count is 3000000000 | failed |
       And the error message includes "3000000000 is out of range for an integer"
 
+  Rule: {byte}, {short}, {long} and {double} are built in too, for feature files shared with other Cucumber implementations
+
+    @rd
+    Scenario Outline: {<type>} gives <value>
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Number
+            Given the number is <text>
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the number is {<type>}", function(x, context) {
+          expect_identical(x, <value>)
+        })
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+      Examples:
+        | type   | text       | value |
+        | byte   | -12        | -12L  |
+        | short  | 300        | 300L  |
+        | long   | 3000000000 | 3e9   |
+        | double | 1.5E3      | 1500  |
+
   Rule: Custom parameter types are defined with define_parameter_type()
 
     @rd

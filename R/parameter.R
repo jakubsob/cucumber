@@ -41,6 +41,8 @@ ANONYMOUS <- .parameter(
 #'
 #' @description
 #' Built-in parameter types are `{int}`, `{float}`, `{word}`, `{string}` and the anonymous `{}`.
+#' `{byte}` and `{short}` match and convert like `{int}`, and `{double}` like `{float}`. `{long}` matches
+#' like `{int}` but gives a double, as a long can be too big for an R integer.
 #' Define your own before the steps that use it are run, e.g. in a `setup-*.R` file.
 #'
 #' @param name
@@ -151,17 +153,10 @@ as_integer <- function(x) {
 
 set_default_parameters <- function() {
   set_parameters(.parameters())
-  define_parameter_type(
-    "int",
-    c("-?\\d+", "\\d+"),
-    as_integer,
-    prefer_for_regexp_match = TRUE
-  )
-  define_parameter_type(
-    "float",
-    "[-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?",
-    as.double
-  )
+  integer <- c("-?\\d+", "\\d+")
+  define_parameter_type("int", integer, as_integer, prefer_for_regexp_match = TRUE)
+  float <- "[-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?"
+  define_parameter_type("float", float, as.double)
   define_parameter_type("word", "[^\\s]+", as.character, use_for_snippets = FALSE)
   define_parameter_type(
     "string",
@@ -172,6 +167,11 @@ set_default_parameters <- function() {
       gsub("\\'", "'", value, fixed = TRUE)
     }
   )
+  define_parameter_type("double", float, as.double, use_for_snippets = FALSE)
+  define_parameter_type("byte", integer, as_integer, use_for_snippets = FALSE)
+  define_parameter_type("short", integer, as_integer, use_for_snippets = FALSE)
+  # A long can be too big for an R integer
+  define_parameter_type("long", integer, as.double, use_for_snippets = FALSE)
   # Built-in parameter types aren't reported in Cucumber Messages
   parameters <- get_parameters()
   for (name in names(parameters)) {

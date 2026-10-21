@@ -31,6 +31,8 @@ An object of class \code{parameter}, invisibly. Function should be called for si
 }
 \description{
 Built-in parameter types are \code{{int}}, \code{{float}}, \code{{word}}, \code{{string}} and the anonymous \code{{}}.
+\code{{byte}} and \code{{short}} match and convert like \code{{int}}, and \code{{double}} like \code{{float}}. \code{{long}} matches
+like \code{{int}} but gives a double, as a long can be too big for an R integer.
 Define your own before the steps that use it are run, e.g. in a \verb{setup-*.R} file.
 }
 \section{Specification}{
@@ -356,6 +358,62 @@ Register your own with \code{define_parameter_type()}.
     | step                          | status |
     | Given the count is 3000000000 | failed |
   And the error message includes "3000000000 is out of range for an integer"
+%</pre>
+}}
+
+\strong{Rule: \{byte\}, \{short\}, \{long\} and \{double\} are built in too, for feature files shared with other Cucumber implementations}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> \{<span class="va">&lt;type&gt;</span>\} gives <span class="va">&lt;value&gt;</span>
+  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Parameters</span>
+<span class="st">      Scenario: Number</span>
+<span class="st">        Given the number is &lt;text&gt;</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("the number is \{&lt;type&gt;\}", function(x, context) \{</span>
+<span class="st">      expect_identical(x, &lt;value&gt;)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+<span></span>
+  <span class="kw">Examples:</span>
+    <span class="op">|</span> type   <span class="op">|</span> text       <span class="op">|</span> value <span class="op">|</span>
+    <span class="op">|</span> byte   <span class="op">|</span> -12        <span class="op">|</span> -12L  <span class="op">|</span>
+    <span class="op">|</span> short  <span class="op">|</span> 300        <span class="op">|</span> 300L  <span class="op">|</span>
+    <span class="op">|</span> long   <span class="op">|</span> 3000000000 <span class="op">|</span> 3e9   <span class="op">|</span>
+    <span class="op">|</span> double <span class="op">|</span> 1.5E3      <span class="op">|</span> 1500  <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario Outline: \{<type>\} gives <value>
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Number
+        Given the number is <text>
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("the number is \{<type>\}", function(x, context) \{
+      expect_identical(x, <value>)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then it passes
+
+  Examples:
+    | type   | text       | value |
+    | byte   | -12        | -12L  |
+    | short  | 300        | 300L  |
+    | long   | 3000000000 | 3e9   |
+    | double | 1.5E3      | 1500  |
 %</pre>
 }}
 

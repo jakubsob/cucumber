@@ -33,6 +33,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ `define_parameter_type()` fails on a name that is already defined, like `int`, or that contains `{`, `}`, `(`, `)`, `\` or `/`, and on a second type with `prefer_for_regexp_match = TRUE` for the same regexp, like cucumber-expressions. Previously a second definition silently replaced the first.
 - ✨ `{string}` matches strings with escaped quotes, like `"say \"hi\""`, and passes them unescaped: `say "hi"`.
 - ✨ `define_parameter_type()` accepts several regexps and gets the `use_for_snippets` and `prefer_for_regexp_match` options.
+- ⚠️ `{byte}`, `{short}`, `{long}` and `{double}` are built-in parameter types, like in other Cucumber implementations. `{byte}` and `{short}` give integers like `{int}`, `{long}` gives a double, as a long can be too big for an R integer, and `{double}` is like `{float}`. They aren't used in snippets. A parameter type of your own with one of these names must be renamed, and a regular expression group whose regexp is `{float}`'s is ambiguous between `{float}` and `{double}`.
 
 ## Running tests
 
