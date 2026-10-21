@@ -18,6 +18,7 @@ test(
   name = NULL,
   features = NULL,
   fail_fast = FALSE,
+  retry = 0,
   ...
 )
 }
@@ -52,6 +53,9 @@ warnings.}
 Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.}
 
 \item{fail_fast}{If \code{TRUE}, skip the scenarios after the first failed scenario.}
+
+\item{retry}{How many times to run a failed scenario again, until it passes. Only
+failed scenarios are retried, not pending, undefined or ambiguous ones.}
 
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
@@ -1605,6 +1609,137 @@ The scenarios after it are reported as skipped, and their hooks don't run.
 }}
 
 Source: \code{tests/acceptance/fail_fast.feature}
+}
+
+\subsection{Retry}{
+
+A scenario that fails, like one that depends on a slow service, can be run again with \code{retry}.
+It runs up to \code{retry} more times, until it passes, and its last attempt is its result.
+Only failed scenarios are retried: pending, undefined or ambiguous steps wouldn't pass on another attempt.
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Background:</span>
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    attempts &lt;- 0</span>
+<span class="st">    given("a step that passes the second time", function(context) \{</span>
+<span class="st">      attempts &lt;&lt;- attempts + 1</span>
+<span class="st">      if (attempts &lt; 2) stop("Not yet")</span>
+<span class="st">    \})</span>
+<span class="st">    given("a step that always fails", function(context) \{</span>
+<span class="st">      stop("Never")</span>
+<span class="st">    \})</span>
+<span class="st">    given("a step that always passes", function(context) \{\})</span>
+<span class="st">    given("a pending step", function(context) \{</span>
+<span class="st">      pending()</span>
+<span class="st">    \})</span>
+<span class="st">    before(function(context, scenario) \{</span>
+<span class="st">      cat("before", scenario$name, "\\n")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Background:
+  Given a package
+  And a file named "features/setup-steps.R" with
+    """
+    attempts <- 0
+    given("a step that passes the second time", function(context) \{
+      attempts <<- attempts + 1
+      if (attempts < 2) stop("Not yet")
+    \})
+    given("a step that always fails", function(context) \{
+      stop("Never")
+    \})
+    given("a step that always passes", function(context) \{\})
+    given("a pending step", function(context) \{
+      pending()
+    \})
+    before(function(context, scenario) \{
+      cat("before", scenario$name, "\\n")
+    \})
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A failed scenario runs again until it passes
+  <span class="fu">Given</span> a file named <span class="st">"features/flaky.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Flaky</span>
+<span class="st">      Scenario: Passes</span>
+<span class="st">        Given a step that always passes</span>
+<span class="st"></span>
+<span class="st">      Scenario: Passes the second time</span>
+<span class="st">        Given a step that passes the second time</span>
+<span class="st"></span>
+<span class="st">      Scenario: Always fails</span>
+<span class="st">        Given a step that always fails</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", retry = 2, stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario               <span class="op">|</span> status <span class="op">|</span> attempts <span class="op">|</span>
+    <span class="op">|</span> Passes                 <span class="op">|</span> passed <span class="op">|</span> 1        <span class="op">|</span>
+    <span class="op">|</span> Passes the second time <span class="op">|</span> passed <span class="op">|</span> 2        <span class="op">|</span>
+    <span class="op">|</span> Always fails           <span class="op">|</span> failed <span class="op">|</span> 3        <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A failed scenario runs again until it passes
+  Given a file named "features/flaky.feature" with
+    """
+    Feature: Flaky
+      Scenario: Passes
+        Given a step that always passes
+
+      Scenario: Passes the second time
+        Given a step that passes the second time
+
+      Scenario: Always fails
+        Given a step that always fails
+    """
+  When I run
+    """
+    test("features", retry = 2, stop_on_failure = FALSE)
+    """
+  Then the scenarios have these results:
+    | scenario               | status | attempts |
+    | Passes                 | passed | 1        |
+    | Passes the second time | passed | 2        |
+    | Always fails           | failed | 3        |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The summary counts only the last attempt of a scenario
+  <span class="fu">Given</span> a file named <span class="st">"features/flaky.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Flaky</span>
+<span class="st">      Scenario: Passes the second time</span>
+<span class="st">        Given a step that passes the second time</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", retry = 1, reporter = CucumberSummaryReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"1 scenario (1 passed)"</span>
+  <span class="fu">And</span> the output includes <span class="st">"1 step (1 passed)"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: The summary counts only the last attempt of a scenario
+  Given a file named "features/flaky.feature" with
+    """
+    Feature: Flaky
+      Scenario: Passes the second time
+        Given a step that passes the second time
+    """
+  When I run
+    """
+    test("features", retry = 1, reporter = CucumberSummaryReporter$new())
+    """
+  Then the output includes "1 scenario (1 passed)"
+  And the output includes "1 step (1 passed)"
+%</pre>
+}}
+
+Source: \code{tests/acceptance/retry.feature}
 }
 }
 

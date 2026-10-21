@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Cucumber" time="0.037" tests="4" skipped="0" failures="1" errors="0" timestamp="1970-01-01T00:00:00Z">
+<testcase classname="Retry" name="Test cases that pass aren't retried" time="0.003">
+<system-out><![CDATA[
+Given a step that always passes.............................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Retry" name="Test cases that fail are retried if within the --retry limit" time="0.003">
+<system-out><![CDATA[
+Given a step that passes the second time....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Retry" name="Test cases that fail will continue to retry up to the --retry limit" time="0.003">
+<system-out><![CDATA[
+Given a step that passes the third time.....................................passed
+]]></system-out>
+</testcase>
+<testcase classname="Retry" name="Test cases won't retry after failing more than the --retry limit" time="0.003">
+<failure type="Error" message="Exception in step">
+<![CDATA[Error: Exception in step
+samples/retry/retry.feature:18]]>
+</failure>
+<system-out><![CDATA[
+Given a step that always fails..............................................failed
+]]></system-out>
+</testcase>
+</testsuite>

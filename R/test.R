@@ -34,9 +34,11 @@ run <- function(
   name = NULL,
   features = NULL,
   fail_fast = FALSE,
+  retry = 0,
   ...
 ) {
   check_reporter(reporter)
+  retry <- checkmate::assert_count(retry, coerce = TRUE)
   error <- NULL
   # An error of a reporter or of cucumber itself stops the run, see abort_run()
   broken <- FALSE
@@ -45,7 +47,7 @@ run <- function(
       withCallingHandlers(
         {
           cucumber_event(reporter, "start_run")
-          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, ...)
+          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...)
         },
         # Warnings outside scenarios, like in a before all hook. testthat keeps a
         # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
@@ -107,7 +109,7 @@ fail_test <- function(error) {
 #' Run the feature files, see `run()`
 #' @keywords internal
 #' @noRd
-run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, ...) {
+run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...) {
   withr::defer(cleanup(), testthat::teardown_env())
   check_grepl_args(...)
 
@@ -166,6 +168,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
       strict = strict,
       dry_run = dry_run,
       fail_fast = fail_fast,
+      retry = retry,
       failed = failed
     )
   }
@@ -371,6 +374,8 @@ test_cucumber_code <- function(path, ...) {
 #' @param strict If `FALSE`, pending and undefined steps don't fail the run.
 #' @param dry_run If `TRUE`, match steps to step definitions without running steps or hooks.
 #' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.
+#' @param retry How many times to run a failed scenario again, until it passes. Only
+#'   failed scenarios are retried, not pending, undefined or ambiguous ones.
 #' @param env Environment in which to run the tests, e.g. with step definitions and
 #'   code sourced into it, for a project that isn't a package.
 #'
@@ -403,7 +408,8 @@ test_cucumber_code <- function(path, ...) {
 #'   "target_specific_scenarios_by_line.feature",
 #'   "strict_mode.feature",
 #'   "dryrun_mode.feature",
-#'   "fail_fast.feature"
+#'   "fail_fast.feature",
+#'   "retry.feature"
 #' ))
 #'
 #' @importFrom testthat test_dir
@@ -427,9 +433,11 @@ test <- function(
   name = NULL,
   features = NULL,
   fail_fast = FALSE,
+  retry = 0,
   ...
 ) {
   check_reporter(reporter)
+  checkmate::assert_count(retry)
   withr::local_options(.cucumber_reporter = reporter)
 
   file <- fs::path(path, "test-__cucumber__.R")
@@ -444,6 +452,7 @@ test <- function(
         name = name,
         features = features,
         fail_fast = if (fail_fast) TRUE,
+        retry = if (retry > 0) retry,
         ...
       ),
       con = file

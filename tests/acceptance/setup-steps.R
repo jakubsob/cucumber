@@ -88,7 +88,7 @@ then("the steps and hooks have these results:", function(expected, context) {
 
 then("the scenarios have these results:", function(expected, context) {
   scenarios <- context$run$scenarios
-  actual <- tibble::tibble(scenario = scenarios$name, status = scenarios$status)
+  actual <- tibble::tibble(scenario = scenarios$name, status = scenarios$status, attempts = as.character(scenarios$attempts))
   expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
 })
 

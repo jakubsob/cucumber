@@ -18,7 +18,9 @@ A \code{cucumber_messages} object, a list with:
 \item{\code{scenarios}}{A tibble with a row per scenario that ran, each
 example of an outline being one: its \code{id}, the \code{uri}, \code{feature} and
 \code{rule} it's in, its \code{name}, \code{line}, \code{tags}, \code{status} (the worst of its
-steps' and hooks') and \code{duration} in seconds.}
+steps' and hooks'), \code{duration} in seconds and how many \code{attempts} it
+took, more than one if it was retried. A retried scenario's row and
+steps are of its last attempt.}
 \item{\code{steps}}{A tibble with a row per step and hook that ran: the
 \code{scenario_id} and \code{scenario} it ran in, its \code{keyword} (\code{Before} or
 \code{After} for a hook), \code{text} (a hook's name), \code{status}, \code{duration} in

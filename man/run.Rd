@@ -14,6 +14,7 @@ run(
   name = NULL,
   features = NULL,
   fail_fast = FALSE,
+  retry = 0,
   ...
 )
 }
@@ -39,6 +40,9 @@ files in the \code{tests/testthat} directory.}
 Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.}
 
 \item{fail_fast}{If \code{TRUE}, skip the scenarios after the first failed scenario.}
+
+\item{retry}{How many times to run a failed scenario again, until it passes. Only
+failed scenarios are retried, not pending, undefined or ambiguous ones.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

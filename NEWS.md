@@ -45,6 +45,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `test()` and `run()` get a `dry_run` argument. A dry run matches every step to a step definition and reports undefined and ambiguous steps, but runs neither steps nor hooks. Undefined and ambiguous steps don't fail a dry run: their scenarios are skipped.
 - ✨ `test()` and `run()` get `name` and `features` arguments to run only some scenarios. `name = "^Adding"` runs scenarios whose name matches a regular expression. `features = "addition.feature:12"` runs the scenario at line 12 of a feature file. The line of a Scenario Outline runs all its examples, the line of an example row runs only that example.
 - ✨ `test()` and `run()` get a `fail_fast` argument. After the first failed scenario, the remaining scenarios are skipped and their hooks don't run. With `strict = TRUE`, a scenario with a pending or undefined step counts as failed.
+- ✨ `test()` and `run()` get a `retry` argument. A failed scenario runs again, up to `retry` more times, until it passes, and its last attempt is its result. Pending, undefined and ambiguous scenarios aren't retried. Each attempt is reported, with `(attempt 2)` after the scenario's name, and the summary counts only the last attempt.
 - ✨ `test()` runs feature files from the directory set in the `cucumber.path` option when called without `path`, e.g. `options(cucumber.path = "features")`. It defaults to `"tests/acceptance"`, the previous default value.
 
 ## Hooks
@@ -77,7 +78,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Reports
 
-- ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles of its features, scenarios (each example of an outline being one) and steps and hooks, with their status, duration and error, to write a report of your own. It prints how many features and scenarios ran, by status.
+- ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles of its features, scenarios (each example of an outline being one) and steps and hooks, with their status, duration and error, to write a report of your own. It prints how many features and scenarios ran, by status. A retried scenario has the steps of its last attempt, and its `attempts` column tells how many it took.
 - ✨ `CucumberHtmlReporter` writes the official Cucumber HTML report of a run, the page Cucumber's `html` formatter writes: one file that works offline, with every feature's results, searchable and filterable by status, text and tags.
 - ✨ `CucumberJunitReporter` writes the JUnit XML report of a run, like Cucumber's official JUnit XML formatter, for CI services to show the results of the run. Each scenario is a test case, and its steps and their results are the test case's output. It replaces `testthat::JunitReporter`, which can't report a run since 3.0.0.
 - ✨ `report(file)` of every reporter reports a run after it ran, from the Cucumber Messages a `CucumberMessagesReporter` stored, e.g. `CucumberHtmlReporter$new()$report("cucumber.ndjson")`.

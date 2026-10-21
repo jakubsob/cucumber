@@ -7,6 +7,18 @@ read_ndjson <- function(path) {
   lapply(readLines(path, warn = FALSE, encoding = "UTF-8"), jsonlite::fromJSON, simplifyVector = FALSE)
 }
 
+#' The arguments a sample runs with, from its `.arguments.txt`, like
+#' `--retry 2`, as arguments of test(): `list(retry = 2)`
+sample_arguments <- function(sample) {
+  file <- fs::dir_ls(sample, glob = "*.arguments.txt")
+  if (length(file) == 0) {
+    return(list())
+  }
+  words <- strsplit(trimws(readLines(file, warn = FALSE)), "\\s+")[[1]]
+  values <- lapply(words[c(FALSE, TRUE)], utils::type.convert, as.is = TRUE)
+  rlang::set_names(values, sub("^--", "", words[c(TRUE, FALSE)]))
+}
+
 #' Run a sample in a copy of its directory, with registries of its own
 run_sample <- function(sample) {
   dir <- withr::local_tempdir()
@@ -23,7 +35,8 @@ run_sample <- function(sample) {
   withr::defer(options(rlang::set_names(vector("list", 3), options)))
   set_default_parameters()
   # Like the CCK, a run that fails is what some samples are about
-  try(test(dir, reporter = CucumberMessagesReporter$new(output), stop_on_failure = FALSE), silent = TRUE)
+  arguments <- sample_arguments(sample)
+  try(rlang::exec(test, dir, reporter = CucumberMessagesReporter$new(output), stop_on_failure = FALSE, !!!arguments), silent = TRUE)
   read_ndjson(output)
 }
 
@@ -39,7 +52,7 @@ ID_FIELDS <- c(
 # Samples whose step definitions return "pending" or "skipped". R signals
 # pending() and skip_scenario() as conditions, like the pending-exception and
 # skipped-exception samples, so their results have an exception too.
-RETURNED_STATUSES <- c("failedish-combinations", "hooks-skipped", "pending", "skipped", "skipped-failing-hook")
+RETURNED_STATUSES <- c("failedish-combinations", "hooks-skipped", "pending", "retry-pending", "skipped", "skipped-failing-hook")
 
 #' Messages without the fields that change, with their fields in alphabetical
 #' order. Ids are numbered in the order they first appear, so they still have

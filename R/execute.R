@@ -18,6 +18,7 @@ execute <- function(
   strict = TRUE,
   dry_run = FALSE,
   fail_fast = FALSE,
+  retry = 0L,
   failed = FALSE,
   pickles = create_pickles(document, feature_file = feature_file)
 ) {
@@ -36,6 +37,7 @@ execute <- function(
     strict = strict,
     dry_run = dry_run,
     fail_fast = fail_fast,
+    retry = retry,
     failed = failed
   )
 }
@@ -82,6 +84,7 @@ execute_feature <- function(
   strict = TRUE,
   dry_run = FALSE,
   fail_fast = FALSE,
+  retry = 0L,
   failed = FALSE
 ) {
   # A feature without scenarios to run isn't reported
@@ -99,6 +102,7 @@ execute_feature <- function(
     strict = strict,
     dry_run = dry_run,
     fail_fast = fail_fast,
+    retry = retry,
     failed = failed
   )
 }

@@ -12,7 +12,9 @@
 #'     \item{`scenarios`}{A tibble with a row per scenario that ran, each
 #'       example of an outline being one: its `id`, the `uri`, `feature` and
 #'       `rule` it's in, its `name`, `line`, `tags`, `status` (the worst of its
-#'       steps' and hooks') and `duration` in seconds.}
+#'       steps' and hooks'), `duration` in seconds and how many `attempts` it
+#'       took, more than one if it was retried. A retried scenario's row and
+#'       steps are of its last attempt.}
 #'     \item{`steps`}{A tibble with a row per step and hook that ran: the
 #'       `scenario_id` and `scenario` it ran in, its `keyword` (`Before` or
 #'       `After` for a hook), `text` (a hook's name), `status`, `duration` in
@@ -44,6 +46,9 @@ read_messages <- function(x) {
   pickles <- by_id(of("pickle"))
   test_cases <- by_id(of("testCase"))
   started <- by_id(of("testCaseStarted"))
+  # Only the last attempt of a retried scenario
+  retried <- vapply(Filter(\(finished) isTRUE(finished$willBeRetried), of("testCaseFinished")), \(finished) finished$testCaseStartedId, character(1))
+  started <- started[setdiff(names(started), retried)]
   hooks <- by_id(of("hook"))
 
   # From the documents: the keyword of each step, the line of each scenario
@@ -69,7 +74,7 @@ read_messages <- function(x) {
 
   # The results of each test case, in the order its steps and hooks ran
   results <- lapply(started, \(case) list())
-  for (finished in of("testStepFinished")) {
+  for (finished in Filter(\(finished) !finished$testCaseStartedId %in% retried, of("testStepFinished"))) {
     test_case <- test_cases[[started[[finished$testCaseStartedId]]$testCaseId]]
     test_step <- Find(\(step) step$id == finished$testStepId, test_case$testSteps)
     result <- finished$testStepResult
@@ -103,7 +108,8 @@ read_messages <- function(x) {
       line = locations[[key]],
       tags = list(vapply(pickle$tags, \(tag) tag$name, character(1))),
       status = case_status,
-      duration = sum(vapply(case, \(entry) entry$duration, numeric(1)))
+      duration = sum(vapply(case, \(entry) entry$duration, numeric(1))),
+      attempts = (started[[id]]$attempt %||% 0L) + 1L
     )
   })
   steps <- lapply(names(started), \(id) {
@@ -135,7 +141,7 @@ read_messages <- function(x) {
       features = rows(features, tibble::tibble(uri = character(), name = character(), description = character(), tags = list())),
       scenarios = rows(scenarios, tibble::tibble(
         id = character(), uri = character(), feature = character(), rule = character(), name = character(),
-        line = integer(), tags = list(), status = character(), duration = numeric()
+        line = integer(), tags = list(), status = character(), duration = numeric(), attempts = integer()
       )),
       steps = rows(unlist(steps, recursive = FALSE), tibble::tibble(
         scenario_id = character(), scenario = character(), keyword = character(), text = character(),

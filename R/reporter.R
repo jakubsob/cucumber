@@ -644,8 +644,10 @@ CucumberSummaryReporter <- R6::R6Class(
           self$current_scenario <- paste0(
             lineage$scenario$keyword,
             ": ",
-            pickle$name
+            pickle$name,
+            if (message$attempt > 0) paste0(" (attempt ", message$attempt + 1, ")")
           )
+          private$steps_before <- length(self$step_statuses)
           self$current_steps <- list()
           self$current_hooks <- list()
           private$on_scenario_start()
@@ -677,6 +679,11 @@ CucumberSummaryReporter <- R6::R6Class(
           }
         },
         testCaseFinished = {
+          # Only the last attempt of a scenario is counted
+          if (isTRUE(message$willBeRetried)) {
+            self$step_statuses <- self$step_statuses[seq_len(private$steps_before)]
+            return(invisible(self))
+          }
           started <- q$test_cases_started[[message$testCaseStartedId]]
           status <- tolower(
             q$most_severe_result_of(started)$status %||% "PASSED"
@@ -783,6 +790,8 @@ CucumberSummaryReporter <- R6::R6Class(
   private = list(
     query = NULL,
     feature_uri = NULL,
+    # Number of steps counted before the current attempt of a scenario
+    steps_before = 0L,
 
     finish_feature = function() {
       if (!is.null(private$feature_uri)) {

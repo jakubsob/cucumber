@@ -19,7 +19,9 @@
 #
 # - markdown: Markdown with Gherkin
 # - multiple-features-reversed: running features in reverse order
-# - retry, retry-ambiguous, retry-pending, retry-undefined: retrying
+#
+# A sample's .arguments.txt, like `--retry 2`, are the arguments of test() it
+# runs with.
 #
 # all-statuses and test-run-exception aren't test samples.
 
@@ -57,6 +59,10 @@ CCK_SAMPLES <- c(
   "pending",
   "pending-exception",
   "regular-expression",
+  "retry",
+  "retry-ambiguous",
+  "retry-pending",
+  "retry-undefined",
   "rules",
   "rules-backgrounds",
   "skipped",
