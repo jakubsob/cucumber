@@ -130,9 +130,8 @@ parameter_for_regexp <- function(source, pattern, parameters) {
   }
   if (length(preferred)) return(preferred[[1]])
   if (length(candidates)) return(candidates[[1]])
-  # Like cucumber-js, a group of no parameter type gets an unnamed one, as `{}`
-  # does, so its step match argument in Cucumber Messages has no
-  # parameterTypeName
+  # A group of no parameter type gets an unnamed one, as `{}` does, so its
+  # step match argument in Cucumber Messages has no parameterTypeName
   .parameter("", source, \(x, ...) x)
 }
 

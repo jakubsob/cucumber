@@ -230,9 +230,9 @@ SNIPPET_KEYWORDS <- c(Context = "Given", Action = "When", Outcome = "Then", Unkn
 
 #' Format a step snippet for error messages
 #'
-#' Like cucumber-js, each expression that matches the step is suggested, the
-#' first one as code and the others commented out. Parameters are named after
-#' their type, numbered when a type is used more than once: `int`, `int2`.
+#' Each expression that matches the step is suggested, the first one as code
+#' and the others commented out. Parameters are named after their type,
+#' numbered when a type is used more than once: `int`, `int2`.
 #'
 #' @param definitions The step definitions of the snippet, from
 #'   `snippet_definitions()`

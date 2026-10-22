@@ -67,10 +67,9 @@ unique_test_names <- function(names) {
 #' after a failed or skipping before hook, are skipped. Steps without exactly one
 #' definition are always reported as undefined or ambiguous.
 #'
-#' Like in cucumber-js, hooks and steps are the scenario's test steps: the
-#' scenario gets the worst of their results, and each after hook gets the worst
-#' result so far. Each test step is reported as a message when it starts and
-#' when it finishes. Before hooks after one that didn't pass are skipped.
+#' Hooks and steps are the scenario's test steps: the scenario gets the worst
+#' of their results, and each after hook gets the worst result so far. Each
+#' test step is reported as a message when it starts and when it finishes. Before hooks after one that didn't pass are skipped.
 #'
 #' With `skip_steps`, neither hooks nor step bodies run. In a dry run, undefined and
 #' ambiguous steps don't fail the scenario either: they skip it.

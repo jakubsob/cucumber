@@ -737,7 +737,7 @@ CucumberSummaryReporter <- R6::R6Class(
         cli.num_colors = self$num_colors,
         cli.unicode = self$unicode
       )
-      # Like cucumber-js, the last step definition that used each one
+      # Each undefined parameter type, with the last step definition that used it
       types <- self$undefined_parameter_types
       if (length(types) > 0) {
         cat("\n", cli::col_yellow("Undefined parameter types:"), "\n", sep = "")

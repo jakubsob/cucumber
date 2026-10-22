@@ -142,7 +142,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
     ))
     if (!is.null(after_error)) stop(after_error)
   }, add = TRUE, after = FALSE)
-  # Like in cucumber-js, every before all hook runs, but no scenario runs if one failed
+  # Every before all hook runs, but no scenario runs if one failed
   before_error <- run_test_run_hooks(get_hooks_to_run(hooks, "before_all"), reporter, test_run_started$id)
   if (!is.null(before_error)) {
     stop(before_error)
@@ -304,8 +304,8 @@ read_feature <- function(path) {
 #' Parse feature files and compile their pickles, reporting the source,
 #' document and pickles of each file
 #'
-#' Like cucumber-js, nothing runs if any feature file can't be parsed, and the
-#' errors of every file are reported.
+#' Nothing runs if any feature file can't be parsed, and the errors of every
+#' file are reported.
 #'
 #' @return A list named by path, with the `document` and the `pickles` of each file
 #' @keywords internal
