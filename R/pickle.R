@@ -4,6 +4,7 @@
 #' @param type Step type ("Context", "Action", "Outcome" or "Unknown"), And/But
 #'   take the type of the previous step
 #' @param text Step text
+#' @param line Line of the step in the feature file
 #' @param data_table Data table (tibble or NULL)
 #' @param docstring Docstring lines (character or NULL), with its media type in
 #'   the `media_type` attribute
@@ -27,6 +28,7 @@ new_pickle_step <- function(
   keyword,
   text,
   type = "Unknown",
+  line = NULL,
   data_table = NULL,
   docstring = NULL,
   argument_order = character(),
@@ -44,6 +46,7 @@ new_pickle_step <- function(
       keyword = keyword,
       type = type,
       text = text,
+      line = line,
       data_table = data_table,
       docstring = docstring,
       argument_order = argument_order,
@@ -264,6 +267,7 @@ pickle_steps <- function(background, steps, row = NULL) {
       keyword = str_trim(step$keyword),
       type = type,
       text = message$text,
+      line = step$location$line,
       data_table = if (!is.null(table)) parse_table(rows),
       docstring = if (!is.null(docstring)) new_docstring(docstring_lines(content), media_type),
       argument_order = argument_order,

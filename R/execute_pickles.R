@@ -97,7 +97,13 @@ execute_single_pickle <- function(
     # Errors of the scenario's steps and hooks are caught where they run. An
     # error that gets here is of cucumber itself, and stops the run.
     withCallingHandlers({
-      scenario <- list(name = pickle$name, tags = paste0("@", pickle$tags), uri = pickle$feature_file)
+      scenario <- list(
+        name = pickle$name,
+        tags = paste0("@", pickle$tags),
+        uri = pickle$feature_file,
+        line = pickle$source_line,
+        id = pickle$message$id
+      )
       expectations <- 0
       # Each attempt is a test case started of its own, with a new context
       for (attempt in 0:retry) {
@@ -265,7 +271,14 @@ hook_result <- function(error) {
 #' @keywords internal
 #' @noRd
 execute_step_with_hooks <- function(step, context, pickle, hooks) {
-  hook_step <- list(keyword = step$keyword, text = step$text)
+  # The step's Data Table and Doc String as its step definition gets them
+  hook_step <- drop_null(list(
+    keyword = step$keyword,
+    text = step$text,
+    line = step$line,
+    data_table = step$data_table,
+    doc_string = if (!is.null(step$docstring)) docstring_argument(step$docstring)
+  ))
   before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step)
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)

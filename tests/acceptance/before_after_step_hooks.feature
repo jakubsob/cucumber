@@ -44,6 +44,48 @@ Feature: Step hooks
     And the output doesn't include "after: the basket has 1 item"
 
   @rd
+  @rd
+  Scenario: Step hooks get where the step is, and its Data Table and Doc String
+    They get the Data Table and the Doc String as the step definition gets them.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given an empty basket
+          When I add these items
+            | item   |
+            | apple  |
+            | banana |
+          And I add a note
+            ```
+            A gift
+            ```
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_step(function(context, step) {
+        cat(step$text, "at line", step$line, "\n")
+        if (!is.null(step$data_table)) cat("items:", step$data_table$item, "\n")
+        if (!is.null(step$doc_string)) cat("note:", step$doc_string, "\n")
+      })
+      given("an empty basket", function(context) {})
+      when("I add these items", function(table, context) {})
+      when("I add a note", function(note, context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      an empty basket at line 3
+      I add these items at line 4
+      items: apple banana
+      I add a note at line 8
+      note: A gift
+      """
+
   Scenario: A failing step hook fails the step
     Given a file named "features/basket.feature" with
       """

@@ -77,6 +77,47 @@ Feature: Hooks
       """
 
   @rd
+  Scenario: Hooks get where the scenario is and its id
+    The line of an example of a Scenario Outline is the line of its row.
+    Each scenario has an id of its own.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Empty basket
+          Given an empty basket
+
+        Scenario Outline: Add <n> items
+          Given an empty basket
+
+          Examples:
+            | n |
+            | 1 |
+            | 2 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      ids <- character()
+      before(function(context, scenario) {
+        ids <<- c(ids, scenario$id)
+        cat(scenario$name, "at", paste0(basename(scenario$uri), ":", scenario$line), "\n")
+      })
+      after_all(function() cat(length(unique(ids)), "ids", "\n"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      Empty basket at basket.feature:2
+      Add 1 items at basket.feature:10
+      Add 2 items at basket.feature:11
+      3 ids
+      """
+
+  @rd
   Scenario: A named hook's errors start with its name
     Given a file named "features/basket.feature" with
       """

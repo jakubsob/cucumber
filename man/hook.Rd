@@ -26,10 +26,12 @@ after_all(hook, name = NULL)
 \item{hook}{A function that will be run.
 \itemize{
 \item \code{before()} and \code{after()} hooks get the \code{context} and the \code{scenario}: a list with
-the scenario's \code{name}, \code{tags}, \code{uri} (the feature file),
+the scenario's \code{name}, \code{tags}, \code{uri} (the feature file), \code{line} (of the scenario,
+or of the example row of an outline) and \code{id}, unique in the run,
 and in \code{after()} hooks its \code{status} and \code{error}.
 \item \code{before_step()} and \code{after_step()} hooks get the \code{context} and the \code{step}: a list with
-the step's \code{keyword} and \code{text}, and in \code{after_step()} hooks its \code{status} and \code{error}.
+the step's \code{keyword}, \code{text}, \code{line}, and its \code{data_table} and \code{doc_string} if it has
+them, as its step definition gets them, and in \code{after_step()} hooks its \code{status} and \code{error}.
 \item \code{before_all()} and \code{after_all()} hooks get no arguments, or a \code{context} to
 attach data to the report, see \link{attachments}. It isn't shared with scenarios.
 }}
@@ -191,6 +193,88 @@ use a Background instead, and keep before hooks for low-level work like starting
   And the output includes
     """
     after: failed Step "I add an item" failed
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Hooks get where the scenario is and its id
+  The line of an example of a Scenario Outline is the line of its row.
+  Each scenario has an id of its own.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Empty basket</span>
+<span class="st">        Given an empty basket</span>
+<span class="st"></span>
+<span class="st">      Scenario Outline: Add &lt;n&gt; items</span>
+<span class="st">        Given an empty basket</span>
+<span class="st"></span>
+<span class="st">        Examples:</span>
+<span class="st">          | n |</span>
+<span class="st">          | 1 |</span>
+<span class="st">          | 2 |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    ids &lt;- character()</span>
+<span class="st">    before(function(context, scenario) \{</span>
+<span class="st">      ids &lt;&lt;- c(ids, scenario$id)</span>
+<span class="st">      cat(scenario$name, "at", paste0(basename(scenario$uri), ":", scenario$line), "\\n")</span>
+<span class="st">    \})</span>
+<span class="st">    after_all(function() cat(length(unique(ids)), "ids", "\\n"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Empty basket at basket.feature:2</span>
+<span class="st">    Add 1 items at basket.feature:10</span>
+<span class="st">    Add 2 items at basket.feature:11</span>
+<span class="st">    3 ids</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Hooks get where the scenario is and its id
+  The line of an example of a Scenario Outline is the line of its row.
+  Each scenario has an id of its own.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Empty basket
+        Given an empty basket
+
+      Scenario Outline: Add <n> items
+        Given an empty basket
+
+        Examples:
+          | n |
+          | 1 |
+          | 2 |
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    ids <- character()
+    before(function(context, scenario) \{
+      ids <<- c(ids, scenario$id)
+      cat(scenario$name, "at", paste0(basename(scenario$uri), ":", scenario$line), "\\n")
+    \})
+    after_all(function() cat(length(unique(ids)), "ids", "\\n"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the output includes these lines in order:
+    """
+    Empty basket at basket.feature:2
+    Add 1 items at basket.feature:10
+    Add 2 items at basket.feature:11
+    3 ids
     """
 %</pre>
 }}
@@ -459,52 +543,86 @@ They don't run for skipped, undefined or ambiguous steps. A failing step hook fa
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A failing step hook fails the step
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Step hooks get where the step is, and its Data Table and Doc String
+  They get the Data Table and the Doc String as the step definition gets them.
+<span></span>
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>
 <span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
+<span class="st">      Scenario: Add items</span>
 <span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
+<span class="st">        When I add these items</span>
+<span class="st">          | item   |</span>
+<span class="st">          | apple  |</span>
+<span class="st">          | banana |</span>
+<span class="st">        And I add a note</span>
+<span class="st">          ```</span>
+<span class="st">          A gift</span>
+<span class="st">          ```</span>
 <span class="st">    """</span>
   <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
 <span class="st">    """</span>
-<span class="st">    after_step(function(context, step) stop("step left a mess"))</span>
+<span class="st">    before_step(function(context, step) \{</span>
+<span class="st">      cat(step$text, "at line", step$line, "\\n")</span>
+<span class="st">      if (!is.null(step$data_table)) cat("items:", step$data_table$item, "\\n")</span>
+<span class="st">      if (!is.null(step$doc_string)) cat("note:", step$doc_string, "\\n")</span>
+<span class="st">    \})</span>
 <span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add an item", function(context) stop("this step must not execute"))</span>
+<span class="st">    when("I add these items", function(table, context) \{\})</span>
+<span class="st">    when("I add a note", function(note, context) \{\})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
 <span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    test("features")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the error message includes <span class="st">"step left a mess"</span>
-  <span class="fu">And</span> the steps have these results:
-    <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> failed  <span class="op">|</span>
-    <span class="op">|</span> When I add an item    <span class="op">|</span> skipped <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A failing step hook fails the step
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    an empty basket at line 3</span>
+<span class="st">    I add these items at line 4</span>
+<span class="st">    items: apple banana</span>
+<span class="st">    I add a note at line 8</span>
+<span class="st">    note: A gift</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Step hooks get where the step is, and its Data Table and Doc String
+  They get the Data Table and the Doc String as the step definition gets them.
+
   Given a file named "features/basket.feature" with
     """
     Feature: Basket
-      Scenario: Add an item
+      Scenario: Add items
         Given an empty basket
-        When I add an item
+        When I add these items
+          | item   |
+          | apple  |
+          | banana |
+        And I add a note
+          ```
+          A gift
+          ```
     """
   And a file named "features/setup-steps.R" with
     """
-    after_step(function(context, step) stop("step left a mess"))
+    before_step(function(context, step) \{
+      cat(step$text, "at line", step$line, "\\n")
+      if (!is.null(step$data_table)) cat("items:", step$data_table$item, "\\n")
+      if (!is.null(step$doc_string)) cat("note:", step$doc_string, "\\n")
+    \})
     given("an empty basket", function(context) \{\})
-    when("I add an item", function(context) stop("this step must not execute"))
+    when("I add these items", function(table, context) \{\})
+    when("I add a note", function(note, context) \{\})
     """
   When I run
     """
-    test("features", stop_on_failure = FALSE)
+    test("features")
     """
-  Then the error message includes "step left a mess"
-  And the steps have these results:
-    | step                  | status  |
-    | Given an empty basket | failed  |
-    | When I add an item    | skipped |
+  Then the output includes these lines in order:
+    """
+    an empty basket at line 3
+    I add these items at line 4
+    items: apple banana
+    I add a note at line 8
+    note: A gift
+    """
 %</pre>
 }}
 

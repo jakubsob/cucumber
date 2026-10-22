@@ -54,9 +54,9 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Hooks
 
-- ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`. Replace `scenario_name` with `scenario$name`. The status is the worst result of the scenario's steps and of the hooks that ran before, including earlier `after()` hooks.
+- ⚠️ A hook's second argument is the scenario instead of its name: a list with its `name`, `tags`, `uri`, `line` and `id`, and in `after()` hooks its `status` and `error`. The `line` of an example of a Scenario Outline is the line of its row. Replace `scenario_name` with `scenario$name`. The status is the worst result of the scenario's steps and of the hooks that ran before, including earlier `after()` hooks.
 - ✨ Define any number of `before()` and `after()` hooks. Before hooks run in the order they are defined, after hooks in the reverse order. Previously a second hook of the same kind failed with "Hook already registered".
-- ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword` and `text`, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
+- ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword`, `text`, `line`, and its `data_table` and `doc_string` as its step definition gets them, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
 - ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run. They get no arguments, or a `context` to attach data to the report.
 - ✨ Hooks get a `tags` argument, a tag expression. The hook runs only for scenarios that match it, e.g. `before(connect_db, tags = "@db")`.
 - ✨ Hooks get a `name` argument. A named hook's errors start with its name, e.g. `Hook "Connect to the database" failed: connection refused`.

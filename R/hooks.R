@@ -85,10 +85,12 @@ name_hook <- function(hook, name) {
 #' @param hook A function that will be run.
 #'
 #'   - `before()` and `after()` hooks get the `context` and the `scenario`: a list with
-#'     the scenario's `name`, `tags`, `uri` (the feature file),
+#'     the scenario's `name`, `tags`, `uri` (the feature file), `line` (of the scenario,
+#'     or of the example row of an outline) and `id`, unique in the run,
 #'     and in `after()` hooks its `status` and `error`.
 #'   - `before_step()` and `after_step()` hooks get the `context` and the `step`: a list with
-#'     the step's `keyword` and `text`, and in `after_step()` hooks its `status` and `error`.
+#'     the step's `keyword`, `text`, `line`, and its `data_table` and `doc_string` if it has
+#'     them, as its step definition gets them, and in `after_step()` hooks its `status` and `error`.
 #'   - `before_all()` and `after_all()` hooks get no arguments, or a `context` to
 #'     attach data to the report, see [attachments]. It isn't shared with scenarios.
 #'
