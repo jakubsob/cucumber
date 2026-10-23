@@ -14,7 +14,8 @@
 #'   If `run()` is placed in a `tests/testthat/test-*.R` file and you call `testthat::test_dir` or similar,
 #'   it runs in the `tests/testthat` directory. The default value `"."` finds all feature
 #'   files in the `tests/testthat` directory.
-#' @param reporter A [CucumberReporter], or `NULL` to report nothing.
+#' @param reporter A [CucumberReporter], or `NULL`, the default, to leave the output to
+#'   testthat's reporter, which reports each scenario as a test.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'
@@ -42,7 +43,7 @@ run <- function(
   path = ".",
   filter = NULL,
   tags = NULL,
-  reporter = get_reporter(),
+  reporter = NULL,
   strict = TRUE,
   dry_run = FALSE,
   name = NULL,

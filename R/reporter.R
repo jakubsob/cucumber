@@ -1327,11 +1327,3 @@ CucumberPrettyReporter <- R6::R6Class(
     }
   )
 )
-
-#' Get reporter from options
-#'
-#' @keywords internal
-#' @noRd
-get_reporter <- function() {
-  getOption(".cucumber_reporter", default = CucumberProgressReporter$new())
-}

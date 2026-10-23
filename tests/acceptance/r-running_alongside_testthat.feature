@@ -3,6 +3,8 @@ Feature: Running scenarios alongside testthat tests
   `run()` in a `tests/testthat/test-*.R` file runs the feature files in `tests/testthat`
   as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.
   It chooses what to run like `test()`, with `filter`, `features`, `tags` and `name`.
+  testthat's reporter reports each scenario as a test, and a failed step by its text.
+  Pass a `reporter` to `run()` to report the run with cucumber's reporter too.
 
   `run()` isn't supported in a parallel testthat run, with `Config/testthat/parallel: true`: it's an error.
 
@@ -104,6 +106,23 @@ Feature: Running scenarios alongside testthat tests
       | features | calculate.feature |
       | tags     | not @slow         |
       | name     | Adding one        |
+
+  Scenario: testthat's reporter shows the step that failed
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, 3)
+      })
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+      """
+    Then the output includes 'Step "the result is 2" failed'
+    And the output doesn't include "1 scenario"
 
   Scenario: run() runs outside of a testthat run
     Given a file named "features/calculate.feature" with

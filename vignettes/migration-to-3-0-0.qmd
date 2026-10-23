@@ -455,6 +455,7 @@ after(function(context, scenario) {
 # Reporters
 
 - The default reporter, `CucumberProgressReporter`, prints one line per feature with its scenarios counted by status, like testthat's `ProgressReporter`, and prints each scenario that didn't pass. The reporter that printed each step is now `CucumberPrettyReporter`.
+- `run()` in a testthat file reports nothing of its own by default: testthat's reporter reports each scenario as a test, and a failed expectation names its step, like `Step "the result is 2" failed`. Pass a reporter to `run()` to print the run with cucumber's reporter too.
 - `CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` print like the `progress`, `progress-bar` and `summary` formatters of Cucumber.
 - Cucumber reporters aren't testthat reporters anymore, and testthat reporters can't report a cucumber run. A `CucumberReporter` gets the start and the end of the run, its warnings, and the run as [Cucumber Messages](https://github.com/cucumber/messages): each feature, scenario, step and hook, and their results.
 - `CucumberPrettyReporter` prints each step with the keyword it's written with, each scenario with its keyword, like `Example:` or `Scenario Outline:`, and summarises the run like Cucumber, counting scenarios and steps by status, e.g. `2 scenarios (1 failed, 1 passed)`.
@@ -542,6 +543,7 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 - Replace testthat reporters passed to `test()` or `run()` with cucumber's, like `CucumberSummaryReporter$new()`, or with `NULL` for no output. See [Reporters](#reporters).
 - Replace `testthat::JunitReporter` with `CucumberJunitReporter`: `test(reporter = CucumberJunitReporter$new("cucumber-junit.xml"))`.
 - Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines`, `reporter_max_table_lines` or `show_praise`. See [Reporters](#reporters).
+- Pass `reporter = CucumberProgressReporter$new()` to `run()` to print the run with cucumber's reporter, besides testthat's, as before. See [Reporters](#reporters).
 - Move snapshots from `_snaps/__cucumber__.md`, or from the snapshot file of the testthat file that calls `run()`, to the snapshot file of each feature, like `_snaps/basket.feature.md`. See [Snapshots](#snapshots).
 - Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
 - Implement pending and undefined steps, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).

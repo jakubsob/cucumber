@@ -318,7 +318,10 @@ signal_scenario_result <- function(results, result, failing) {
   }
   if (!is.null(failed_step)) {
     if (inherits(failed_step$error, "expectation")) {
-      testthat::exp_signal(failed_step$error)
+      # testthat's reporters show the error, not the steps, so it names the step
+      error <- failed_step$error
+      error$message <- paste0("Step \"", failed_step$text, "\" failed\n", error$message)
+      testthat::exp_signal(error)
     } else {
       stop(failed_step$error)
     }

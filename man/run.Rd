@@ -8,7 +8,7 @@ run(
   path = ".",
   filter = NULL,
   tags = NULL,
-  reporter = get_reporter(),
+  reporter = NULL,
   strict = TRUE,
   dry_run = FALSE,
   name = NULL,
@@ -29,7 +29,8 @@ files in the \code{tests/testthat} directory.}
 
 \item{tags}{If not NULL, run only the scenarios that match this tag expression, e.g. \code{"@smoke and not @slow"}.}
 
-\item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing.}
+\item{reporter}{A \link{CucumberReporter}, or \code{NULL}, the default, to leave the output to
+testthat's reporter, which reports each scenario as a test.}
 
 \item{strict}{If \code{FALSE}, pending and undefined steps don't fail the run.}
 
@@ -82,6 +83,8 @@ To get result and a report, use \code{cucumber::test()}, or inspect the result o
 \code{run()} in a \verb{tests/testthat/test-*.R} file runs the feature files in \code{tests/testthat}
 as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
+testthat's reporter reports each scenario as a test, and a failed step by its text.
+Pass a \code{reporter} to \code{run()} to report the run with cucumber's reporter too.
 
 \code{run()} isn't supported in a parallel testthat run, with \code{Config/testthat/parallel: true}: it's an error.
 
@@ -285,6 +288,42 @@ definitions and hooks are then cleared when it returns.
     | features | calculate.feature |
     | tags     | not @slow         |
     | name     | Adding one        |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows the step that failed
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, 3)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes 'Step <span class="st">"the result is 2"</span> failed'
+  <span class="fu">And</span> the output doesn't include <span class="st">"1 scenario"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: testthat's reporter shows the step that failed
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, 3)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+    """
+  Then the output includes 'Step "the result is 2" failed'
+  And the output doesn't include "1 scenario"
 %</pre>
 }}
 
