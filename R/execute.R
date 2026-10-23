@@ -353,12 +353,14 @@ retry_snapshot_scenario <- function(snapshots) {
 
 #' A scenario ends: like a testthat test that errors or skips, a scenario that
 #' didn't pass keeps the snapshots it didn't check, as its steps after the one
-#' that didn't pass were skipped
+#' that didn't pass were skipped. So does a scenario whose snapshots weren't
+#' checked, as on CRAN, where testthat skips the test.
+#' @param on_cran Whether a snapshot of the scenario wasn't checked, as on CRAN
 #' @keywords internal
 #' @noRd
-end_snapshot_scenario <- function(snapshots, status) {
+end_snapshot_scenario <- function(snapshots, status, on_cran = FALSE) {
   snapshotter <- snapshots$snapshotter
-  if (status != "passed") skip_snapshot_test(snapshotter, snapshotter$test)
+  if (status != "passed" || on_cran) skip_snapshot_test(snapshotter, snapshotter$test)
 }
 
 #' Tell the snapshotter a test skipped, so it keeps the test's snapshots that

@@ -535,7 +535,7 @@ given("the scenario {string} of {string} starts with {string}", function(scenari
 
 # Snapshots are taken outside of CRAN and R CMD check, and saved unless on CI, so
 # none is set, and test() runs like in the console, outside of the testthat run of these steps
-run_feature_files <- function(runner, args, context, ci = FALSE) {
+run_feature_files <- function(runner, args, context, ci = FALSE, cran = FALSE) {
   code <- if (runner == "test()") {
     sprintf('test("%s", stop_on_failure = FALSE%s)', snapshots_dir, args)
   } else {
@@ -548,7 +548,7 @@ run_feature_files <- function(runner, args, context, ci = FALSE) {
     on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
     'testthat::test_local(reporter = "silent", stop_on_failure = FALSE)'
   }
-  run_code(sprintf("withr::with_envvar(c(NOT_CRAN = NA, CI = %s, TESTTHAT = NA, `_R_CHECK_PACKAGE_NAME_` = NA), %s)", if (ci) '"true"' else "NA", code), context)
+  run_code(sprintf("withr::with_envvar(c(NOT_CRAN = %s, CI = %s, TESTTHAT = NA, `_R_CHECK_PACKAGE_NAME_` = NA), %s)", if (cran) '"false"' else "NA", if (ci) '"true"' else "NA", code), context)
 }
 
 when("I run the feature files with {string}", function(runner, context) {
@@ -557,6 +557,11 @@ when("I run the feature files with {string}", function(runner, context) {
 
 when("I run the feature files with {string} on CI", function(runner, context) {
   run_feature_files(runner, "", context, ci = TRUE)
+})
+
+# Like on CRAN, where `NOT_CRAN` isn't "true"
+when("I run the feature files with {string} on CRAN", function(runner, context) {
+  run_feature_files(runner, "", context, cran = TRUE)
 })
 
 when("I run the feature files with {string} and {word} = TRUE", function(runner, argument, context) {

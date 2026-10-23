@@ -88,6 +88,8 @@ execute_single_pickle <- function(
   snapshots = NULL
 ) {
   failed <- FALSE
+  # Whether a snapshot wasn't checked, as on CRAN
+  snapshot_on_cran <- FALSE
   # Snapshots are named after the scenario
   if (!is.null(snapshots)) start_snapshot_scenario(snapshots, glue("Scenario: {test_name}"))
   # The reporter gets the warnings before testthat, which keeps them as its results
@@ -190,7 +192,7 @@ execute_single_pickle <- function(
     }, error = \(e) if (has_restart("cucumber_abort_run")) invokeRestart("cucumber_abort_run", e))
     failing <- failing_statuses(strict, dry_run)
     failed <<- result$status %in% failing
-    if (!is.null(snapshots)) end_snapshot_scenario(snapshots, result$status)
+    if (!is.null(snapshots)) end_snapshot_scenario(snapshots, result$status, snapshot_on_cran)
     signal_scenario_result(results, result, failing)
     # testthat reports a test without expectations as skipped
     if (!skip_steps && result$status == "passed" && expectations == 0) {
@@ -199,7 +201,11 @@ execute_single_pickle <- function(
     if (skip_steps && !dry_run && result$status == "skipped") {
       testthat::skip(skip_reason)
     }
-  }, warning = \(w) cucumber_event(reporter, "add_warning", w)))
+  },
+    warning = \(w) cucumber_event(reporter, "add_warning", w),
+    # Not muffled, so testthat skips the test, as it does on CRAN
+    snapshot_on_cran = \(cnd) snapshot_on_cran <<- TRUE
+  ))
 
   invisible(failed)
 }

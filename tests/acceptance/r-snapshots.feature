@@ -413,6 +413,22 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    Scenario Outline: A snapshot isn't checked on CRAN and is kept, with <runner>
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And I run the feature files with "<runner>"
+      And the scenario "Showing the basket" of "basket.feature" snapshots "2 apples"
+      When I run the feature files with "<runner>" on CRAN
+      Then the scenarios have these results:
+        | scenario           | status |
+        | Showing the basket | passed |
+      And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+      And there is no snapshot file "_snaps/basket.feature.new.md"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
     Scenario Outline: Scenarios skipped by a before_all() hook keep their snapshots, with <runner>
       Given the steps that take snapshots
       And a file named "tests/testthat/basket.feature" with
