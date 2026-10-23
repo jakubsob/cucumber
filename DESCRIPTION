@@ -19,12 +19,13 @@ Imports:
     cli,
     fs,
     glue,
+    pkgload,
     purrr,
     R6,
     rlang,
     stringi,
     stringr,
-    testthat (>= 3.0.0),
+    testthat (>= 3.3.2),
     tibble,
     withr
 Suggests:
@@ -39,7 +40,6 @@ Suggests:
     roxygen2,
     quarto,
     pkgdown,
-    pkgload,
     muttest,
     xml2
 Config/testthat/edition: 3

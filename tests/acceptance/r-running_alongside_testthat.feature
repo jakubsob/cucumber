@@ -4,6 +4,11 @@ Feature: Running scenarios alongside testthat tests
   as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.
   It chooses what to run like `test()`, with `filter`, `features`, `tags` and `name`.
 
+  `run()` isn't supported in a parallel testthat run, with `Config/testthat/parallel: true`: it's an error.
+
+  `run()` can also run feature files outside of a testthat run, like in the console. Its step
+  definitions and hooks are then cleared when it returns.
+
   Background:
     Given a package
     And a file named "R/calculate.R" with
@@ -99,3 +104,75 @@ Feature: Running scenarios alongside testthat tests
       | features | calculate.feature |
       | tags     | not @slow         |
       | name     | Adding one        |
+
+  Scenario: run() runs outside of a testthat run
+    Given a file named "features/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one
+          Then one plus one is 2
+      """
+    And a file named "features/steps.R" with
+      """
+      then("one plus one is {int}", function(n, context) {
+        expect_equal(1 + 1, n)
+      })
+      """
+    When I run outside of a testthat run
+      """
+      source("features/steps.R")
+      run("features", reporter = CucumberSummaryReporter$new())
+      run("features", reporter = CucumberSummaryReporter$new(), strict = FALSE)
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      1 scenario \(1 passed\)
+      1 scenario \(1 undefined\)
+      """
+
+  Scenario: run() in a parallel testthat run is an error
+    When I run
+      """
+      withr::with_envvar(
+        c(TESTTHAT_IS_PARALLEL = "true"),
+        testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+      )
+      """
+    Then the output includes "`run()` isn't supported in a parallel testthat run."
+
+  Scenario: test() in a testthat file keeps the step definitions of the testthat run
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/acceptance/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one in tests/acceptance
+          Given I add one to 1
+          Then I get 2
+      """
+    And a file named "tests/acceptance/setup-steps.R" with
+      """
+      given("I add one to {int}", function(n, context) {
+        context$result <- calculate(n)
+      })
+      then("I get {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/testthat/test-1-acceptance.R" with
+      """
+      cucumber::test("../acceptance", reporter = NULL)
+      """
+    When I run
+      """
+      testthat::test_local()
+      """
+    Then it passes
+    And it ran "Scenario: Adding one"

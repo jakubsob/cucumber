@@ -369,6 +369,10 @@ cucumber::test(fail_fast = TRUE)
 
 The line of a Scenario Outline runs all its examples, the line of an example row runs only that example. With `fail_fast` and `strict = TRUE`, a scenario with a pending or undefined step counts as failed.
 
+### Snapshots
+
+Each feature file has a snapshot file of its own, next to it in `_snaps`: the snapshots of `basket.feature` are in `_snaps/basket.feature.md`, and those of `checkout/basket.feature` in `_snaps/checkout-basket.feature.md`. `test()` saved them in `_snaps/__cucumber__.md`, and `run()` in the snapshot file of the testthat file that called it, like `_snaps/acceptance.md`. Move each scenario's snapshots to the snapshot file of its feature before you run the tests, or let the run save them again: a run of every scenario deletes the old snapshot files as unused. testthat deletes `_snaps/acceptance.md` as the snapshot file of a test file without snapshots, and cucumber deletes `_snaps/__cucumber__.md`.
+
 ## Migrating from 2.2.0
 
 ### Feature files in subdirectories run
@@ -538,6 +542,7 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 - Replace testthat reporters passed to `test()` or `run()` with cucumber's, like `CucumberSummaryReporter$new()`, or with `NULL` for no output. See [Reporters](#reporters).
 - Replace `testthat::JunitReporter` with `CucumberJunitReporter`: `test(reporter = CucumberJunitReporter$new("cucumber-junit.xml"))`.
 - Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines`, `reporter_max_table_lines` or `show_praise`. See [Reporters](#reporters).
+- Move snapshots from `_snaps/__cucumber__.md`, or from the snapshot file of the testthat file that calls `run()`, to the snapshot file of each feature, like `_snaps/basket.feature.md`. See [Snapshots](#snapshots).
 - Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
 - Implement pending and undefined steps, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).
 - Write tags in `tags` arguments with their `@`, and `and`, `or` and `not` in lowercase, in `test()`, `run()` and hooks. See [Tag expressions](#tag-expressions).

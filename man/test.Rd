@@ -8,7 +8,7 @@ test(
   path = getOption("cucumber.path", "tests/acceptance"),
   filter = NULL,
   tags = NULL,
-  reporter = get_reporter(),
+  reporter = CucumberProgressReporter$new(),
   env = NULL,
   load_helpers = TRUE,
   stop_on_failure = TRUE,
@@ -71,6 +71,22 @@ It runs  tests from specifications in \code{.feature} files found in the \code{p
 
 To run Cucumber tests alongside \code{testthat} tests, see \code{cucumber::run()}.
 }
+\section{testthat's teardown environment}{
+
+\code{testthat::teardown_env()} isn't available in the \verb{setup-*.R} files \code{test()} runs: use a
+\verb{teardown-*.R} file or an \code{\link[=after_all]{after_all()}} hook to clean up after the run. When \code{test()} is
+called in a testthat test file, \code{teardown_env()} is the end of that testthat run.
+}
+
+\section{test() in a testthat file}{
+
+\code{test()} keeps the step definitions, hooks and parameter types registered before it, like by
+the setup files of the testthat run, for the test files after it. A setup file of \code{path} that
+testthat runs too, like with \code{test(".")} in a file of \code{tests/testthat}, defines its step
+definitions again rather than twice. \code{test(".")} in a file of \code{tests/testthat} tells testthat
+which snapshot files its feature files use, and is an error in a parallel testthat run.
+}
+
 \section{Good Practices}{
 
 \itemize{

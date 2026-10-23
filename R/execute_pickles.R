@@ -12,6 +12,8 @@
 #' @param fail_fast Whether to skip the scenarios after a failed scenario
 #' @param retry How many times to retry a failed scenario
 #' @param failed Whether a scenario of an earlier feature failed
+#' @param skip The skip of a before all hook, that skips every scenario, or NULL
+#' @param snapshots The snapshots of the feature, from `run_snapshots()`, or NULL
 #' @return Whether a scenario failed, invisibly
 #' @keywords internal
 #' @noRd
@@ -27,9 +29,12 @@ execute_pickles <- function(
   dry_run = FALSE,
   fail_fast = FALSE,
   retry = 0L,
-  failed = FALSE
+  failed = FALSE,
+  skip = NULL,
+  snapshots = NULL
 ) {
-  test_names <- unique_test_names(map_chr(pickles, "name"))
+  # Named in their feature, so a scenario's name doesn't depend on which scenarios run
+  test_names <- map_chr(pickles, "test_name")
   for (i in seq_along(pickles)) {
     # Skipped like in a dry run, so undefined and ambiguous steps are still reported
     pickle_failed <- execute_single_pickle(
@@ -38,27 +43,16 @@ execute_pickles <- function(
       reporter,
       test_names[[i]],
       strict = strict,
-      skip_steps = dry_run || (fail_fast && failed),
+      skip_steps = dry_run || (fail_fast && failed) || !is.null(skip),
+      skip_reason = if (!is.null(skip)) conditionMessage(skip) else "A previous scenario failed and `fail_fast = TRUE`.",
       dry_run = dry_run,
-      retry = retry
+      retry = retry,
+      snapshots = snapshots
     )
     failed <- failed || pickle_failed
   }
 
   invisible(failed)
-}
-
-#' Number the scenarios that share a name, like the rows of an outline without
-#' placeholders in its name. testthat merges the results of tests that have the
-#' same name.
-#'
-#' @keywords internal
-#' @noRd
-unique_test_names <- function(names) {
-  repeated <- names %in% names[duplicated(names)]
-  occurrence <- vapply(seq_along(names), \(i) sum(names[seq_len(i)] == names[[i]]), integer(1))
-  names[repeated] <- paste0(names[repeated], " (", occurrence[repeated], ")")
-  names
 }
 
 #' Execute a single pickle
@@ -71,8 +65,9 @@ unique_test_names <- function(names) {
 #' of their results, and each after hook gets the worst result so far. Each
 #' test step is reported as a message when it starts and when it finishes. Before hooks after one that didn't pass are skipped.
 #'
-#' With `skip_steps`, neither hooks nor step bodies run. In a dry run, undefined and
-#' ambiguous steps don't fail the scenario either: they skip it.
+#' With `skip_steps`, neither hooks nor step bodies run, and testthat skips the
+#' scenario with `skip_reason`. In a dry run, undefined and ambiguous steps
+#' don't fail the scenario either: they skip it.
 #'
 #' A failed scenario runs again, up to `retry` times, until it passes. Only its
 #' last attempt is reported to testthat.
@@ -87,10 +82,14 @@ execute_single_pickle <- function(
   test_name = pickle$name,
   strict = TRUE,
   skip_steps = FALSE,
+  skip_reason = NULL,
   dry_run = FALSE,
-  retry = 0L
+  retry = 0L,
+  snapshots = NULL
 ) {
   failed <- FALSE
+  # Snapshots are named after the scenario
+  if (!is.null(snapshots)) start_snapshot_scenario(snapshots, glue("Scenario: {test_name}"))
   # The reporter gets the warnings before testthat, which keeps them as its results
   test_that(glue("Scenario: {test_name}"), withCallingHandlers({
     # Errors of the scenario's steps and hooks are caught where they run. An
@@ -106,6 +105,7 @@ execute_single_pickle <- function(
       expectations <- 0
       # Each attempt is a test case started of its own, with a new context
       for (attempt in 0:retry) {
+        if (attempt > 0 && !is.null(snapshots)) retry_snapshot_scenario(snapshots)
         # Attachments are of the test step that runs
         test_step_id <- NULL
         .context <- new_context(\(attachment) {
@@ -188,13 +188,14 @@ execute_single_pickle <- function(
     }, error = \(e) if (has_restart("cucumber_abort_run")) invokeRestart("cucumber_abort_run", e))
     failing <- failing_statuses(strict, dry_run)
     failed <<- result$status %in% failing
+    if (!is.null(snapshots)) end_snapshot_scenario(snapshots, result$status)
     signal_scenario_result(results, result, failing)
     # testthat reports a test without expectations as skipped
     if (!skip_steps && result$status == "passed" && expectations == 0) {
       testthat::succeed()
     }
     if (skip_steps && !dry_run && result$status == "skipped") {
-      testthat::skip("A previous scenario failed and `fail_fast = TRUE`.")
+      testthat::skip(skip_reason)
     }
   }, warning = \(w) cucumber_event(reporter, "add_warning", w)))
 
@@ -260,6 +261,7 @@ hook_result <- function(error) {
   } else {
     "failed"
   }
+  if (inherits(error, "expectation_failure")) error <- variant_snapshot_hint(error)
   list(status = status, error = error, hook = TRUE)
 }
 
@@ -382,6 +384,7 @@ execute_single_step <- function(step, context, pickle = NULL) {
       step_error <<- e
     },
     expectation_failure = function(e) {
+      e <- variant_snapshot_hint(e)
       location <- step_location(step)
       if (!is.null(location)) {
         e$message <- paste0(e$message, "\n", glue("Step at: {location}"))

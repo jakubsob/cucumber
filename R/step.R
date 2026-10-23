@@ -89,11 +89,34 @@ then <- define_step
   structure(list2(...), class = "steps")
 }
 
+#' Where a definition is written: its file, line and column, or `NULL` without
+#' a source reference. A file sourced again, like a setup file that testthat
+#' and `test()` both run, defines the same definitions again.
+#' @keywords internal
+#' @noRd
+definition_place <- function(srcref) {
+  if (is.null(srcref)) {
+    return(NULL)
+  }
+  srcfile <- attr(srcref, "srcfile")
+  paste(fs::path_abs(srcfile$filename, srcfile$wd %||% "."), srcref[[1]], srcref[[5]])
+}
+
+#' Whether two definitions are written in the same place
+#' @keywords internal
+#' @noRd
+same_place <- function(srcref, other) {
+  place <- definition_place(srcref)
+  !is.null(place) && identical(place, definition_place(other))
+}
+
 #' @importFrom rlang `:=`
 register_step <- function(step) {
   assert_step(step)
   steps <- getOption(getOption(".cucumber_steps_option"), default = .steps())
-  steps <- .steps(!!!steps, !!attr(step, "description") := step)
+  # A step definition defined again where it's written replaces itself
+  again <- vapply(steps, \(other) identical(attr(other, "description"), attr(step, "description")) && same_place(attr(other, "srcref"), attr(step, "srcref")), logical(1))
+  steps <- .steps(!!!steps[!again], !!attr(step, "description") := step)
   options(list2(!!getOption(".cucumber_steps_option") := steps))
   invisible(step)
 }

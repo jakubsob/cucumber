@@ -93,11 +93,23 @@ define_parameter_type <- function(
     use_for_snippets,
     prefer_for_regexp_match
   )
+  # A parameter type defined again the same, like by a setup file loaded again, replaces itself
+  if (same_parameter_type(parameters[[name]], parameter)) parameters[[name]] <- NULL
   check_parameter_type(parameter, parameters)
   parameter$order <- next_registration()
   parameters[[name]] <- parameter
   set_parameters(parameters)
   invisible(parameter)
+}
+
+#' Whether two parameter types are defined the same, their transformers by
+#' their code, not the environment they're defined in
+#' @keywords internal
+#' @noRd
+same_parameter_type <- function(parameter, other) {
+  !is.null(parameter) &&
+    identical(parameter[c("name", "regexp", "use_for_snippets", "prefer_for_regexp_match")], other[c("name", "regexp", "use_for_snippets", "prefer_for_regexp_match")]) &&
+    identical(parameter$transformer, other$transformer, ignore.environment = TRUE)
 }
 
 #' Fail like cucumber-expressions' ParameterTypeRegistry on a parameter type

@@ -129,7 +129,7 @@ Feature: Step hooks
     Then the steps have these results:
       | step               | status |
       | When I add an item | failed |
-    And the error message includes "`skip_scenario()` can only be called in a `before()` or `after()` hook or a step."
+    And the error message includes "`skip_scenario()` can only be called in a `before_all()`, `before()` or `after()` hook or a step."
 
   Scenario: A failing after step hook fails a pending step
     Given a file named "features/basket.feature" with

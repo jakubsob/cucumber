@@ -55,11 +55,25 @@ is chosen and shown, to run them in the same order again.}
 }
 \value{
 NULL, invisibly.
-To get result and a report, use \code{cucumber::test()}, or inspect the result of \code{testthat} function call.
 }
 \description{
 Call \code{run()} in a \verb{tests/testthat/test-*.R} file to run the feature files
 alongside the package's \code{testthat} tests.
+}
+\details{
+Each \code{run()} is a run of its own: its \code{\link[=before_all]{before_all()}} and \code{\link[=after_all]{after_all()}} hooks run
+once for each \code{run()}, so twice if two test files call \code{run()}. Step definitions,
+hooks and parameter types are kept until testthat's run ends, as testthat runs the
+\verb{setup-*.R} files that define them once for all test files. Outside of a testthat run,
+like when \code{run()} is called in the console, they're kept until \code{run()} returns.
+
+\code{run()} in a parallel testthat run, with \code{Config/testthat/parallel: true}, is an error:
+testthat would delete the snapshot files of its feature files as unused.
+
+Skip scenarios in a \code{\link[=before_all]{before_all()}} or \code{\link[=before]{before()}} hook, not with \code{skip()} before \code{run()} in its
+test file: testthat deletes the snapshot files of feature files that a run of every test file
+didn't run.
+To get result and a report, use \code{cucumber::test()}, or inspect the result of \code{testthat} function call.
 }
 \section{Specification}{
 
@@ -68,6 +82,11 @@ alongside the package's \code{testthat} tests.
 \code{run()} in a \verb{tests/testthat/test-*.R} file runs the feature files in \code{tests/testthat}
 as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
+
+\code{run()} isn't supported in a parallel testthat run, with \code{Config/testthat/parallel: true}: it's an error.
+
+\code{run()} can also run feature files outside of a testthat run, like in the console. Its step
+definitions and hooks are then cleared when it returns.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
@@ -266,6 +285,156 @@ It chooses what to run like \code{test()}, with \code{filter}, \code{features}, 
     | features | calculate.feature |
     | tags     | not @slow         |
     | name     | Adding one        |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> run() runs outside of a testthat run
+  <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Calculate</span>
+<span class="st">      Scenario: Adding one</span>
+<span class="st">        Then one plus one is 2</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    then("one plus one is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(1 + 1, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run outside of a testthat run
+<span class="st">    """</span>
+<span class="st">    source("features/steps.R")</span>
+<span class="st">    run("features", reporter = CucumberSummaryReporter$new())</span>
+<span class="st">    run("features", reporter = CucumberSummaryReporter$new(), strict = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes lines matching these patterns in order:
+<span class="st">    """</span>
+<span class="st">    1 scenario \\(1 passed\\)</span>
+<span class="st">    1 scenario \\(1 undefined\\)</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: run() runs outside of a testthat run
+  Given a file named "features/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Then one plus one is 2
+    """
+  And a file named "features/steps.R" with
+    """
+    then("one plus one is \{int\}", function(n, context) \{
+      expect_equal(1 + 1, n)
+    \})
+    """
+  When I run outside of a testthat run
+    """
+    source("features/steps.R")
+    run("features", reporter = CucumberSummaryReporter$new())
+    run("features", reporter = CucumberSummaryReporter$new(), strict = FALSE)
+    """
+  Then the output includes lines matching these patterns in order:
+    """
+    1 scenario \\(1 passed\\)
+    1 scenario \\(1 undefined\\)
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> run() in a parallel testthat run is an error
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    withr::with_envvar(</span>
+<span class="st">      c(TESTTHAT_IS_PARALLEL = "true"),</span>
+<span class="st">      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
+<span class="st">    )</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"`run()` isn't supported in a parallel testthat run."</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: run() in a parallel testthat run is an error
+  When I run
+    """
+    withr::with_envvar(
+      c(TESTTHAT_IS_PARALLEL = "true"),
+      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+    )
+    """
+  Then the output includes "`run()` isn't supported in a parallel testthat run."
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> test() in a testthat file keeps the step definitions of the testthat run
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/calculate.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Calculate</span>
+<span class="st">      Scenario: Adding one in tests/acceptance</span>
+<span class="st">        Given I add one to 1</span>
+<span class="st">        Then I get 2</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I add one to \{int\}", function(n, context) \{</span>
+<span class="st">      context$result &lt;- calculate(n)</span>
+<span class="st">    \})</span>
+<span class="st">    then("I get \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-1-acceptance.R"</span> with
+<span class="st">    """</span>
+<span class="st">    cucumber::test("../acceptance", reporter = NULL)</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local()</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> it ran <span class="st">"Scenario: Adding one"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: test() in a testthat file keeps the step definitions of the testthat run
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/acceptance/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one in tests/acceptance
+        Given I add one to 1
+        Then I get 2
+    """
+  And a file named "tests/acceptance/setup-steps.R" with
+    """
+    given("I add one to \{int\}", function(n, context) \{
+      context$result <- calculate(n)
+    \})
+    then("I get \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-1-acceptance.R" with
+    """
+    cucumber::test("../acceptance", reporter = NULL)
+    """
+  When I run
+    """
+    testthat::test_local()
+    """
+  Then it passes
+  And it ran "Scenario: Adding one"
 %</pre>
 }}
 

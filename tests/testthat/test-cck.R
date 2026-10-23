@@ -29,8 +29,7 @@ run_sample <- function(sample) {
   withr::local_options(list(
     .cucumber_steps_option = options[[1]],
     .cucumber_hooks_option = options[[2]],
-    .cucumber_parameters_option = options[[3]],
-    .cucumber_reporter = NULL
+    .cucumber_parameters_option = options[[3]]
   ))
   withr::defer(options(rlang::set_names(vector("list", 3), options)))
   set_default_parameters()

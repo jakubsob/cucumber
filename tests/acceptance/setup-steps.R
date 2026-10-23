@@ -17,7 +17,7 @@ given("a package", function(context) {
 run_code <- function(code, context, catch_error = FALSE) {
   # Each test() of the code also writes its run as Cucumber Messages, read into
   # `context$run`, so the results of the run are checked whatever the reporter prints
-  test <- function(..., reporter = cucumber:::get_reporter()) {
+  test <- function(..., reporter = CucumberProgressReporter$new()) {
     messages <- tempfile(fileext = ".ndjson")
     on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
     recorder <- CucumberMessagesReporter$new(messages)
@@ -31,11 +31,7 @@ run_code <- function(code, context, catch_error = FALSE) {
     list(
       .cucumber_steps_option = .cucumber_steps_option,
       .cucumber_hooks_option = .cucumber_hooks_option,
-      .cucumber_parameters_option = .cucumber_parameters_option,
-      # Unset the outer run's reporter: nested runs demonstrate failures on purpose,
-      # so their step results must not accumulate into the outer run's summary.
-      # Unset, each nested test() gets a reporter of its own, as in a fresh session.
-      .cucumber_reporter = NULL
+      .cucumber_parameters_option = .cucumber_parameters_option
     ),
     {
       cucumber:::set_default_parameters()
@@ -69,6 +65,16 @@ run_code <- function(code, context, catch_error = FALSE) {
 when("I run", function(code, context) run_code(code, context))
 
 when("I run it and it fails", function(code, context) run_code(code, context, catch_error = TRUE))
+
+# Like in the console: no teardown environment, and the scenarios aren't
+# reported to the testthat run of these steps
+when("I run outside of a testthat run", function(code, context) {
+  rlang::with_bindings(
+    testthat::with_reporter(testthat::SilentReporter$new(), run_code(code, context)),
+    teardown_env = NULL,
+    .env = utils::getFromNamespace("the", "testthat")
+  )
+})
 
 # The steps of the last run's scenarios, and with `hooks` their hooks, in the
 # order they ran. A hook is its keyword, `Before` or `After`.
@@ -137,6 +143,19 @@ then("it passes", function(context) {
   expect_equal(sum(results$failed), 0)
   expect_equal(sum(results$skipped), 0)
   expect_true(all(results$passed > 0))
+})
+
+then("the results are of these files:", function(expected, context) {
+  results <- as.data.frame(context$result)
+  actual <- tibble::tibble(scenario = sub("^Scenario: ", "", results$test), file = results$file)
+  expect_equal(as.data.frame(actual), as.data.frame(expected))
+})
+
+# Every result of the run is a testthat skip, with this reason
+then("the results are skipped with {string}", function(reason, context) {
+  results <- unlist(lapply(context$result, `[[`, "results"), recursive = FALSE)
+  expect_true(all(vapply(results, testthat:::expectation_skip, logical(1))))
+  expect_true(all(grepl(reason, vapply(results, conditionMessage, character(1)), fixed = TRUE)))
 })
 
 then("only {string} was run", function(feature_name, context) {
@@ -421,4 +440,163 @@ then("the reference page {string} highlights the Gherkin", function(topic, table
   tokens <- paste(trimws(xml2::xml_text(spans)), "-", xml2::xml_attr(spans, "class"))
   expected <- paste(table$token, "-", table$class)
   expect_true(all(expected %in% tokens), info = paste0("Missing:\n", paste(setdiff(expected, tokens), collapse = "\n"), "\n\nTokens:\n", paste(tokens, collapse = "\n")))
+})
+
+then("the file {string} has these lines:", function(file, lines, context) {
+  expect_equal(readLines(fs::path(context$tempdir, file)), strsplit(lines, "\n")[[1]])
+})
+
+given("a package that uses the 3rd edition of testthat", function(context) {
+  fs::dir_create(context$tempdir)
+  writeLines(
+    c("Package: example", "Version: 0.1.0", "Config/testthat/edition: 3"),
+    fs::path(context$tempdir, "DESCRIPTION")
+  )
+})
+
+# Snapshots: feature files in tests/testthat, each with one scenario that
+# snapshots a value, run by test() or by run() in a testthat file
+snapshots_dir <- "tests/testthat"
+
+write_snapshot_feature <- function(file, context) {
+  feature <- context$snapshot_features[[file]]
+  steps <- c(if (!is.null(feature$before)) paste("Given", feature$before), sprintf('Then the snapshot of "%s" matches', feature$value))
+  lines <- if (grepl("[.]md$", file)) {
+    c(paste("# Feature:", file), "", paste("## Scenario:", feature$scenario), "", paste("*", steps))
+  } else {
+    c(paste("Feature:", file), paste("  Scenario:", feature$scenario), paste("   ", steps))
+  }
+  path <- fs::path(context$tempdir, snapshots_dir, file)
+  fs::dir_create(fs::path_dir(path))
+  writeLines(lines, path)
+}
+
+write_snapshot_steps <- function(context) {
+  fs::dir_create(fs::path(context$tempdir, snapshots_dir))
+  writeLines(
+    c(
+      'given("it fails", function(context) stop("Failed on purpose"))',
+      'given("it doesn\'t meet an expectation", function(context) expect_true(FALSE))',
+      'given("it fails the first time", function(context) {',
+      '  if (!file.exists("failed-once")) {',
+      '    file.create("failed-once")',
+      '    stop("Failed the first time")',
+      '  }',
+      '})',
+      'then("the snapshot of {string} matches", function(value, context) expect_snapshot(value))',
+      'then("the snapshot of {string} for {string} matches", function(value, variant, context) expect_snapshot(value, variant = variant))',
+      'then("the snapshot of the error {string} matches", function(message, context) expect_snapshot(stop(message), error = TRUE))',
+      'then("the snapshot of the temporary directory matches", function(context) {',
+      '  expect_snapshot(cat(tempdir()), transform = function(lines) sub(tempdir(), "<tempdir>", lines, fixed = TRUE))',
+      '})',
+      'then("the snapshot of the value {string} matches", function(value, context) expect_snapshot_value(value, style = "deparse"))',
+      'given("the file snapshot {string} is announced", function(name, context) announce_snapshot_file(name = name))',
+      'then("the file snapshot {string} of {string} matches", function(name, value, context) {',
+      '  file <- tempfile(fileext = ".txt")',
+      '  writeLines(value, file)',
+      '  expect_snapshot_file(file, name)',
+      '})'
+    ),
+    fs::path(context$tempdir, snapshots_dir, "setup-snapshot-steps.R")
+  )
+}
+
+given("the steps that take snapshots", function(context) write_snapshot_steps(context))
+
+given("a feature file {string} with a scenario {string} that snapshots {string}", function(file, scenario, value, context) {
+  context$snapshot_features[[file]] <- list(scenario = scenario, value = value)
+  write_snapshot_steps(context)
+  write_snapshot_feature(file, context)
+})
+
+given("the scenario {string} of {string} snapshots {string}", function(scenario, file, value, context) {
+  context$snapshot_features[[file]]$value <- value
+  write_snapshot_feature(file, context)
+})
+
+given("the scenario {string} of {string} is renamed {string}", function(scenario, file, name, context) {
+  context$snapshot_features[[file]]$scenario <- name
+  write_snapshot_feature(file, context)
+})
+
+given("the scenario {string} of {string} starts with {string}", function(scenario, file, step, context) {
+  context$snapshot_features[[file]]$before <- step
+  write_snapshot_feature(file, context)
+})
+
+# Snapshots are taken outside of CRAN and R CMD check, and saved unless on CI, so
+# none is set, and test() runs like in the console, outside of the testthat run of these steps
+run_feature_files <- function(runner, args, context, ci = FALSE) {
+  code <- if (runner == "test()") {
+    sprintf('test("%s", stop_on_failure = FALSE%s)', snapshots_dir, args)
+  } else {
+    messages <- tempfile(fileext = ".ndjson")
+    writeLines(
+      sprintf('cucumber::run(reporter = cucumber::CucumberMessagesReporter$new("%s")%s)', messages, args),
+      fs::path(context$tempdir, snapshots_dir, "test-acceptance.R")
+    )
+    # A run stopped before it started writes no messages
+    on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
+    'testthat::test_local(reporter = "silent", stop_on_failure = FALSE)'
+  }
+  run_code(sprintf("withr::with_envvar(c(NOT_CRAN = NA, CI = %s, TESTTHAT = NA, `_R_CHECK_PACKAGE_NAME_` = NA), %s)", if (ci) '"true"' else "NA", code), context)
+}
+
+when("I run the feature files with {string}", function(runner, context) {
+  run_feature_files(runner, "", context)
+})
+
+when("I run the feature files with {string} on CI", function(runner, context) {
+  run_feature_files(runner, "", context, ci = TRUE)
+})
+
+when("I run the feature files with {string} and {word} = TRUE", function(runner, argument, context) {
+  run_feature_files(runner, sprintf(", %s = TRUE", argument), context)
+})
+
+given("the file {string} is deleted", function(file, context) {
+  fs::file_delete(fs::path(context$tempdir, file))
+})
+
+when("I run the feature files with {string} and the {word} {string}", function(runner, argument, value, context) {
+  run_feature_files(runner, sprintf(', %s = "%s"', argument, value), context)
+})
+
+when("I run the feature files with {string} and {word} = {int}", function(runner, argument, value, context) {
+  run_feature_files(runner, sprintf(", %s = %d", argument, value), context)
+})
+
+then("the snapshot file {string} has {string} for {string}", function(file, value, scenario, context) {
+  dir <- fs::path(context$tempdir, snapshots_dir)
+  path <- fs::path(dir, file)
+  expect_true(fs::file_exists(path), info = paste("Snapshot files:", paste(fs::dir_ls(dir, recurse = TRUE, glob = "*.md"), collapse = ", ")))
+  lines <- readLines(path)
+  start <- match(paste("# Scenario:", scenario), lines)
+  expect_false(is.na(start), info = paste(lines, collapse = "\n"))
+  end <- c(which(startsWith(lines, "# ") & seq_along(lines) > start), length(lines) + 1)[1]
+  expect_true(sprintf('[1] "%s"', value) %in% trimws(lines[start:(end - 1)]), info = paste(lines, collapse = "\n"))
+})
+
+then("the snapshot file {string} for {string} has these lines:", function(file, scenario, expected, context) {
+  lines <- readLines(fs::path(context$tempdir, snapshots_dir, file))
+  start <- match(paste("# Scenario:", scenario), lines)
+  end <- c(which(startsWith(lines, "# ") & seq_along(lines) > start), length(lines) + 1)[1]
+  section <- trimws(lines[start:(end - 1)])
+  for (line in strsplit(expected, "\n")[[1]]) expect_true(line %in% section, info = paste(lines, collapse = "\n"))
+})
+
+then("the snapshot file {string} has {int} snapshot(s) for {string}", function(file, n, scenario, context) {
+  lines <- readLines(fs::path(context$tempdir, snapshots_dir, file))
+  start <- match(paste("# Scenario:", scenario), lines)
+  end <- c(which(startsWith(lines, "# ") & seq_along(lines) > start), length(lines) + 1)[1]
+  expect_equal(sum(trimws(lines[start:(end - 1)]) == "Code"), n, info = paste(lines, collapse = "\n"))
+})
+
+then("the snapshot file {string} has no snapshot for {string}", function(file, scenario, context) {
+  lines <- readLines(fs::path(context$tempdir, snapshots_dir, file))
+  expect_false(paste("# Scenario:", scenario) %in% lines, info = paste(lines, collapse = "\n"))
+})
+
+then("there is no snapshot file {string}", function(file, context) {
+  expect_false(fs::file_exists(fs::path(context$tempdir, snapshots_dir, file)))
 })

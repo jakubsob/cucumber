@@ -17,6 +17,20 @@
 #' @param reporter A [CucumberReporter], or `NULL` to report nothing.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
+#'
+#' @details
+#' Each `run()` is a run of its own: its [before_all()] and [after_all()] hooks run
+#' once for each `run()`, so twice if two test files call `run()`. Step definitions,
+#' hooks and parameter types are kept until testthat's run ends, as testthat runs the
+#' `setup-*.R` files that define them once for all test files. Outside of a testthat run,
+#' like when `run()` is called in the console, they're kept until `run()` returns.
+#'
+#' `run()` in a parallel testthat run, with `Config/testthat/parallel: true`, is an error:
+#' testthat would delete the snapshot files of its feature files as unused.
+#'
+#' Skip scenarios in a [before_all()] or [before()] hook, not with `skip()` before `run()` in its
+#' test file: testthat deletes the snapshot files of feature files that a run of every test file
+#' didn't run.
 #'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
 #'
 #' @eval features_rd(features = "r-running_alongside_testthat.feature")
@@ -38,6 +52,30 @@ run <- function(
   order = "defined",
   ...
 ) {
+  # Each process of a parallel run would save the snapshots of the feature files
+  # in its own snapshotter, and the main process would delete them as unused
+  if (identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {
+    abort(
+      "`run()` isn't supported in a parallel testthat run.",
+      body = c(i = "Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`."),
+      call = NULL,
+      trace = empty_trace()
+    )
+  }
+  # Step definitions and hooks are cleared at the end of testthat's run, as the
+  # setup files that registered them run once for all test files
+  cleanup_env <- tryCatch(testthat::teardown_env(), error = \(e) NULL) %||% environment()
+  run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env)
+}
+
+#' Run the feature files and report the run, see `run()`
+#' @param cleanup_env The environment whose end clears step definitions, hooks
+#'   and parameter types
+#' @param start_file A function called with each feature file before its
+#'   scenarios run, or `NULL`
+#' @keywords internal
+#' @noRd
+run_cucumber <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env, start_file = NULL) {
   check_reporter(reporter)
   retry <- checkmate::assert_count(retry, coerce = TRUE)
   order <- resolve_order(order)
@@ -49,7 +87,7 @@ run <- function(
       withCallingHandlers(
         {
           cucumber_event(reporter, "start_run")
-          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
+          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env, start_file = start_file)
         },
         # Warnings outside scenarios, like in a before all hook. testthat keeps a
         # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
@@ -111,8 +149,12 @@ fail_test <- function(error) {
 #' Run the feature files, see `run()`
 #' @keywords internal
 #' @noRd
-run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...) {
-  withr::defer(cleanup(), testthat::teardown_env())
+run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env, start_file = NULL) {
+  withr::defer(cleanup(), cleanup_env)
+  # Before anything can stop the run, or testthat would delete the snapshot
+  # files of the features as unused
+  complete <- complete_run(filter, tags, name, features, dry_run)
+  snapshots <- run_snapshots(path, find_features(path), complete)
   check_grepl_args(...)
 
   lines <- feature_lines(features, path)
@@ -142,8 +184,11 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
     ))
     if (!is.null(after_error)) stop(after_error)
   }, add = TRUE, after = FALSE)
-  # Every before all hook runs, but no scenario runs if one failed
-  before_error <- run_test_run_hooks(get_hooks_to_run(hooks, "before_all"), reporter, test_run_started$id)
+  # Every before all hook runs, but no scenario runs if one failed. One that
+  # skipped skips every scenario, like skip() at the top of a test file.
+  before_error <- run_test_run_hooks(get_hooks_to_run(hooks, "before_all"), reporter, test_run_started$id, can_skip = TRUE)
+  skip <- if (inherits(before_error, "skip")) before_error
+  if (!is.null(skip)) before_error <- NULL
   if (!is.null(before_error)) {
     stop(before_error)
   }
@@ -164,6 +209,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
   # Consecutive scenarios of a feature run in its testthat context
   files <- rle(map_chr(pickles, "feature_file"))
   for (run in split(pickles, rep(seq_along(files$lengths), files$lengths))) {
+    if (!is.null(start_file)) start_file(run[[1]]$feature_file)
     failed <- execute_feature(
       sources[[run[[1]]$feature_file]]$document,
       run,
@@ -173,9 +219,14 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
       dry_run = dry_run,
       fail_fast = fail_fast,
       retry = retry,
-      failed = failed
+      failed = failed,
+      skip = skip,
+      snapshots = snapshots$feature(run[[1]]$feature_file, map_chr(sources[[run[[1]]$feature_file]]$pickles, "test_name"))
     )
   }
+  # A run that skipped scenarios after a failed one, or all of them in a before
+  # all hook, didn't run every scenario
+  if (!(fail_fast && failed) && is.null(skip)) snapshots$finish()
 
   invisible(NULL)
 }
@@ -216,24 +267,40 @@ order_pickles <- function(pickles, order) {
 }
 
 #' Run before all or after all hooks, each reported as a test run hook. All of
-#' them run, and the first error is returned.
+#' them run, and the first error is returned, or with `can_skip` the first skip
+#' if none failed.
 #' @keywords internal
 #' @noRd
-run_test_run_hooks <- function(hooks, reporter, test_run_started_id) {
+run_test_run_hooks <- function(hooks, reporter, test_run_started_id, can_skip = FALSE) {
   first_error <- NULL
+  first_skip <- NULL
   for (hook in hooks) {
     started <- list(id = new_id(), testRunStartedId = test_run_started_id, hookId = hook$id, timestamp = timestamp())
     emit(reporter, "testRunHookStarted", started)
     context <- new_context(\(attachment) emit(reporter, "attachment", c(list(testRunHookStartedId = started$id), attachment)))
-    result <- run_hook_step(hook, context)
+    result <- withr::with_options(list(testthat.snapshotter = test_run_hook_snapshotter()), run_hook_step(hook, context, can_skip = can_skip))
     emit(reporter, "testRunHookFinished", list(
       testRunHookStartedId = started$id,
       result = test_step_result(result),
       timestamp = timestamp()
     ))
-    first_error <- first_error %||% result$error
+    if (inherits(result$error, "skip")) first_skip <- first_skip %||% result$error else first_error <- first_error %||% result$error
   }
-  first_error
+  first_error %||% first_skip
+}
+
+#' A snapshotter for before all and after all hooks: a snapshot is of a
+#' scenario, so taking one there is an error
+#' @keywords internal
+#' @noRd
+test_run_hook_snapshotter <- function() {
+  error <- \(fn) \(...) abort(paste0("`", fn, "` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook."), call = NULL)
+  list(
+    is_active = \() TRUE,
+    take_snapshot = error("testthat::expect_snapshot()"),
+    take_file_snapshot = error("testthat::expect_snapshot_file()"),
+    announce_file_snapshot = error("testthat::announce_snapshot_file()")
+  )
 }
 
 #' The feature files selected by `features` and `filter`, see `test()`
@@ -264,7 +331,8 @@ select_features <- function(path, filter, lines, ...) {
 find_features <- function(path) {
   # A symbolic link to a feature file is run too
   features <- dir_ls(path, regexp = feature_file_pattern(), type = c("file", "symlink"), recurse = TRUE)
-  features[is_file(features)]
+  # Snapshot files, like `_snaps/basket.feature.md`, aren't feature files
+  features[is_file(features) & !grepl("(^|/)_snaps/", fs::path_rel(features, path))]
 }
 
 #' Split `file:line:line` locations into a list of lines named by file. A file
@@ -376,12 +444,13 @@ cleanup <- function() {
   set_default_parameters()
 }
 
-#' @importFrom rlang call2 list2
-test_cucumber_code <- function(path, ...) {
-  # Arguments left at their default, `NULL`, are dropped, so error messages
-  # show only what was set. An empty `features` runs no scenario, so it's kept.
-  call2("run", .ns = "cucumber", path, !!!Filter(Negate(is.null), list2(...)), reporter = quote(getOption(".cucumber_reporter"))) |>
-    deparse1()
+#' Restore the step definitions, hooks and parameter types when `frame` ends
+#' @keywords internal
+#' @noRd
+local_registry <- function(frame = parent.frame()) {
+  names <- c(getOption(".cucumber_steps_option"), getOption(".cucumber_hooks_option"), getOption(".cucumber_parameters_option"))
+  registry <- lapply(rlang::set_names(names), getOption)
+  withr::defer(options(registry), frame)
 }
 
 #' Run Cucumber tests
@@ -390,6 +459,18 @@ test_cucumber_code <- function(path, ...) {
 #' It runs  tests from specifications in `.feature` files found in the `path`.
 #'
 #' To run Cucumber tests alongside `testthat` tests, see `cucumber::run()`.
+#'
+#' @section testthat's teardown environment:
+#' `testthat::teardown_env()` isn't available in the `setup-*.R` files `test()` runs: use a
+#' `teardown-*.R` file or an [after_all()] hook to clean up after the run. When `test()` is
+#' called in a testthat test file, `teardown_env()` is the end of that testthat run.
+#'
+#' @section test() in a testthat file:
+#' `test()` keeps the step definitions, hooks and parameter types registered before it, like by
+#' the setup files of the testthat run, for the test files after it. A setup file of `path` that
+#' testthat runs too, like with `test(".")` in a file of `tests/testthat`, defines its step
+#' definitions again rather than twice. `test(".")` in a file of `tests/testthat` tells testthat
+#' which snapshot files its feature files use, and is an error in a parallel testthat run.
 #'
 #' @section Good Practices:
 #'
@@ -464,8 +545,7 @@ test_cucumber_code <- function(path, ...) {
 #'   "markdown_with_gherkin.feature"
 #' ))
 #'
-#' @importFrom testthat test_dir
-#' @importFrom withr defer with_file
+#' @importFrom withr defer
 #' @importFrom fs path
 #' @importFrom checkmate test_character
 #' @importFrom rlang abort
@@ -475,7 +555,7 @@ test <- function(
   path = getOption("cucumber.path", "tests/acceptance"),
   filter = NULL,
   tags = NULL,
-  reporter = get_reporter(),
+  reporter = CucumberProgressReporter$new(),
   env = NULL,
   load_helpers = TRUE,
   stop_on_failure = TRUE,
@@ -492,39 +572,78 @@ test <- function(
   check_reporter(reporter)
   checkmate::assert_count(retry)
   order <- resolve_order(order)
-  withr::local_options(.cucumber_reporter = reporter)
+  # Before the working directory is `path`, like `features = readLines("rerun.txt")`
+  list(filter, tags, env, name, features, ...)
 
-  file <- fs::path(path, "test-__cucumber__.R")
-  with_file(file, {
-    writeLines(
-      test_cucumber_code(
-        ".",
-        filter = filter,
-        tags = tags,
-        strict = if (!strict) FALSE,
-        dry_run = if (dry_run) TRUE,
-        name = name,
-        features = features,
-        fail_fast = if (fail_fast) TRUE,
-        retry = if (retry > 0) retry,
-        order = if (order != "defined") order,
-        ...
-      ),
-      con = file
+  # What testthat::test_dir() does before it runs test files. It attaches
+  # testthat, so steps can use its expectations without `testthat::`.
+  if (!"package:testthat" %in% search()) attachNamespace("testthat")
+  # Like testthat::test_local(), so snapshots are checked, but not in a testthat
+  # run or in R CMD check, where skip_on_cran() still skips
+  if (!testthat::is_testing() && Sys.getenv("_R_CHECK_PACKAGE_NAME_") == "" && Sys.getenv("NOT_CRAN") == "") {
+    withr::local_envvar(NOT_CRAN = "true")
+  }
+  # Snapshots aren't of a testthat file that calls test(). testthat's snapshotter
+  # of `path`, like with test(".") in a file of tests/testthat, is kept to be told
+  # of the snapshot files of the features, or it deletes them at the end of its run.
+  # Its directory is relative, so it's compared before the working directory changes.
+  snapshotter <- getOption("testthat.snapshotter")
+  if (!is.null(snapshotter) && fs::path_abs(snapshotter$snap_dir) != fs::path_abs(fs::path(path, "_snaps"))) snapshotter <- NULL
+  # In a parallel run, the process that deletes the unused snapshot files can't be told
+  if (!is.null(snapshotter) && identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {
+    abort(
+      "`test()` of the directory of a parallel testthat run isn't supported.",
+      body = c(i = "Set `Config/testthat/parallel: false` in DESCRIPTION, or keep the feature files in another directory, like `test(\"../acceptance\")`."),
+      call = NULL,
+      trace = empty_trace()
     )
-    result <- withRestarts(
-      test_dir(
-        path = path,
-        filter = "^__cucumber__$",
-        # Cucumber's reporter gets the run's events from run(), testthat reports nothing
-        reporter = testthat::SilentReporter$new(),
-        env = env,
-        load_helpers = load_helpers,
-        stop_on_failure = stop_on_failure,
-        stop_on_warning = stop_on_warning
-      ),
-      cucumber_fail_test = function(error) stop(error)
-    )
-  })
+  }
+  testthat::local_test_directory(path)
+  # Like testthat::test_local(), testthat::testing_package() is the package of
+  # `path`, the default package of testthat::local_mocked_bindings()
+  package <- tryCatch(pkgload::pkg_name("."), error = \(e) NULL)
+  if (!is.null(package)) withr::local_envvar(TESTTHAT_PKG = package)
+  env <- env %||% testthat::test_env()
+  withr::local_options(topLevelEnvironment = rlang::env_parent(env))
+  withr::local_options(testthat.snapshotter = snapshotter)
+  # Before the setup files, so what they defined is cleared even if one fails,
+  # and what was defined before, like by the setup files of a testthat run that
+  # calls test(), is restored
+  local_registry()
+  if (load_helpers) testthat::source_test_helpers(".", env)
+  testthat::source_test_setup(".", env)
+  withr::defer(testthat::source_test_teardown(".", env))
+
+  lister <- testthat::ListReporter$new()
+  lister$start_file("cucumber")
+  run_error <- NULL
+  withRestarts(
+    testthat::with_reporter(lister, {
+      tryCatch(
+        run_cucumber(
+          ".", filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...,
+          cleanup_env = environment(),
+          # Like a test file, each feature file is the file of its results
+          start_file = \(feature) lister$start_file(as.character(fs::path_rel(feature, ".")))
+        ),
+        # Like an error of a test file, it's in the results
+        error = function(e) {
+          run_error <<- e
+          lister$add_result(context = NULL, test = NULL, result = testthat::new_expectation("error", conditionMessage(e)))
+          lister$end_context(NULL)
+        }
+      )
+    }),
+    cucumber_fail_test = function(error) stop(error)
+  )
+  result <- lister$get_results()
+  results <- as.data.frame(result)
+  if (stop_on_failure && (sum(results$failed) > 0 || any(results$error))) {
+    # With the error that stopped the run, like a feature file that can't be parsed
+    abort("Test failures.", parent = run_error, call = NULL, trace = empty_trace())
+  }
+  if (stop_on_warning && any(results$warning > 0)) {
+    abort("Tests generated warnings.", call = NULL, trace = empty_trace())
+  }
   invisible(result)
 }

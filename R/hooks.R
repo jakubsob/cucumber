@@ -179,7 +179,8 @@ after_all <- function(hook, name = NULL) {
 
 #' @importFrom rlang `:=` list2
 register_hook <- function(hook, name, tags = NULL, hook_name = NULL, srcref = NULL) {
-  hooks <- get_hooks()
+  # A hook defined again where it's written replaces itself
+  hooks <- Filter(\(other) !(other$name == name && same_place(other$srcref, srcref)), get_hooks())
   hook <- list(
     name = name,
     fn = hook,
@@ -232,7 +233,7 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE) {
           return(cnd)
         }
         fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
-        error_cnd(message = glue("`{fn}` can only be called in a `before()` or `after()` hook or a step."))
+        error_cnd(message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step."))
       },
       error = identity
     )

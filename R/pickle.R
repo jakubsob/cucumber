@@ -153,14 +153,27 @@ create_pickles <- function(document, feature_file = NULL) {
     }
   }
 
-  if (!is.null(feature_file)) {
-    pickles <- map(pickles, \(p) {
-      p$feature_file <- feature_file
-      p
-    })
+  # Each is named in its feature, whichever of its scenarios run
+  test_names <- unique_test_names(map_chr(pickles, "name"))
+  for (i in seq_along(pickles)) {
+    pickles[[i]]$test_name <- test_names[[i]]
+    if (!is.null(feature_file)) pickles[[i]]$feature_file <- feature_file
   }
 
   pickles
+}
+
+#' Number the scenarios that share a name, like the rows of an outline without
+#' placeholders in its name. testthat merges the results of tests that have the
+#' same name.
+#'
+#' @keywords internal
+#' @noRd
+unique_test_names <- function(names) {
+  repeated <- names %in% names[duplicated(names)]
+  occurrence <- vapply(seq_along(names), \(i) sum(names[seq_len(i)] == names[[i]]), integer(1))
+  names[repeated] <- paste0(names[repeated], " (", occurrence[repeated], ")")
+  names
 }
 
 #' A scenario's pickle, or for an outline a pickle for each row of each
