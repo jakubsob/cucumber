@@ -102,6 +102,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `report(file)` of every reporter reports a run after it ran, from the Cucumber Messages a `CucumberMessagesReporter` stored, e.g. `CucumberHtmlReporter$new()$report("cucumber.ndjson")`.
 - ✨ Steps and hooks attach data to the report with their `context`: `context$attach(data, media_type, file_name)` attaches a string or a raw vector, like a screenshot, `context$log(text)` attaches text and `context$link(url)` a link. They're reported as `attachment` Cucumber Messages, which the HTML report shows, and `CucumberPrettyReporter` prints logs and links under their step.
 - 📝 The new Reports article, `vignette("reporting")`, shows how to write the HTML report of a run, attach a screenshot and the logs of a failing shinytest2 scenario to it, and keep the report of a CI run.
+- 📝 The new article "cucumber and testthat", `vignette("testthat")`, compares cucumber with testthat side by side: where they work alike, like `setup-*.R` files, expectations and `skip()`, and where they differ, like a failed expectation stopping the step, or the snapshot file of each feature file.
 
 ## Features as documentation
 

@@ -43,6 +43,8 @@ navbar:
           href: articles/bdd.html
         - text: How it works
           href: articles/how-it-works.html
+        - text: cucumber and testthat
+          href: articles/testthat.html
         - text: Reports
           href: articles/reporting.html
         - text: -------
