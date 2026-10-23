@@ -151,6 +151,15 @@ then("the results are of these files:", function(expected, context) {
   expect_equal(as.data.frame(actual), as.data.frame(expected))
 })
 
+# The warnings of the last test() run, by scenario
+then("the scenarios have these warnings:", function(expected, context) {
+  warnings <- do.call(rbind, lapply(context$result, \(test) {
+    messages <- vapply(Filter(testthat:::expectation_warning, test$results), conditionMessage, character(1))
+    data.frame(scenario = rep(sub("^Scenario: ", "", test$test), length(messages)), warning = messages)
+  }))
+  expect_equal(warnings, as.data.frame(expected))
+})
+
 # Every result of the run is a testthat skip, with this reason
 then("the results are skipped with {string}", function(reason, context) {
   results <- unlist(lapply(context$result, `[[`, "results"), recursive = FALSE)

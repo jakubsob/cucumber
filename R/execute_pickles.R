@@ -108,9 +108,9 @@ execute_single_pickle <- function(
         if (attempt > 0 && !is.null(snapshots)) retry_snapshot_scenario(snapshots)
         # Attachments are of the test step that runs
         test_step_id <- NULL
-        .context <- new_context(\(attachment) {
+        send <- \(attachment) {
           emit(reporter, "attachment", c(list(testCaseStartedId = test_case_started$id, testStepId = test_step_id), attachment))
-        })
+        }
         test_case_started <- list(
           id = new_id(),
           testCaseId = pickle$test_case$id,
@@ -149,30 +149,32 @@ execute_single_pickle <- function(
           })
         }
 
-        # A dry run matches the steps, but runs neither hooks nor step bodies
-        for (test_step in pickle$test_case$before) {
-          run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE)
-        }
+        with_scenario_context(send, \(.context) {
+          # A dry run matches the steps, but runs neither hooks nor step bodies
+          for (test_step in pickle$test_case$before) {
+            run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE)
+          }
 
-        withCallingHandlers(for (step in pickle$steps) {
-          run_test_step(step$test_step_id, \() {
-            # Undefined and ambiguous steps already have a status from matching
-            if (skipped()) {
-              new_step_result(step, "skipped")
-            } else if (!is.null(step$status)) {
-              if (step$status == "undefined") emit_suggestion(reporter, step)
-              step
-            } else if (skipping()) {
-              new_step_result(step, "skipped")
-            } else {
-              execute_step_with_hooks(step, .context, pickle, hooks)
-            }
-          })
-        }, expectation = function(e) expectations <<- expectations + 1)
+          withCallingHandlers(for (step in pickle$steps) {
+            run_test_step(step$test_step_id, \() {
+              # Undefined and ambiguous steps already have a status from matching
+              if (skipped()) {
+                new_step_result(step, "skipped")
+              } else if (!is.null(step$status)) {
+                if (step$status == "undefined") emit_suggestion(reporter, step)
+                step
+              } else if (skipping()) {
+                new_step_result(step, "skipped")
+              } else {
+                execute_step_with_hooks(step, .context, pickle, hooks)
+              }
+            })
+          }, expectation = function(e) expectations <<- expectations + 1)
 
-        for (test_step in pickle$test_case$after) {
-          run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE)
-        }
+          for (test_step in pickle$test_case$after) {
+            run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE)
+          }
+        })
 
         result <- worst_result(results)
         # Only a failed scenario is retried: pending, undefined or ambiguous
@@ -200,6 +202,29 @@ execute_single_pickle <- function(
   }, warning = \(w) cucumber_event(reporter, "add_warning", w)))
 
   invisible(failed)
+}
+
+#' Run the test steps of a scenario with a new context that's the frame of a
+#' function: what steps and hooks defer in it, like with
+#' `withr::defer(envir = context)` or `local_mocked_bindings(.env = context)`,
+#' runs when the scenario ends, after its after hooks, like at the end of a
+#' testthat test. An error of what they deferred is a warning, as the
+#' scenario's test steps already have their results.
+#' @param send A function that reports an attachment message, see `new_context()`
+#' @param run A function of the context that runs the test steps
+#' @keywords internal
+#' @noRd
+with_scenario_context <- function(send, run) {
+  ran <- FALSE
+  rlang::try_fetch(
+    (\() {
+      run(new_context(send, environment()))
+      ran <<- TRUE
+    })(),
+    # An error of a test step is the scenario's
+    error = \(e) if (ran) warning(paste("Cleanup of the scenario failed:", conditionMessage(e)), call. = FALSE) else rlang::zap()
+  )
+  invisible()
 }
 
 #' Run a hook, timed. It passes, or gets the result of its error.

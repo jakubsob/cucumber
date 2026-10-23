@@ -41,10 +41,10 @@ NULL
 #' sending an attachment to where it's reported
 #'
 #' @param send A function that reports an attachment message
+#' @param context The environment to make the context
 #' @keywords internal
 #' @noRd
-new_context <- function(send) {
-  context <- new.env()
+new_context <- function(send, context = new.env()) {
   # The message is made before it's sent, so its errors are the step's, not the reporter's
   attach_data <- function(data, media_type = NULL, file_name = NULL) {
     message <- attachment_message(data, media_type, file_name)

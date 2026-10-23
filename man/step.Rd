@@ -581,6 +581,13 @@ Every step definition and scenario hook gets \code{context}.
 It's an environment that steps and hooks of one scenario share.
 Each scenario starts with a new, empty \code{context}.
 
+Code a step or a hook defers in \code{context} runs when the scenario ends, after its \code{after()} hooks,
+like code deferred in a testthat test runs when the test ends. Pass \code{context} to \code{withr::defer()}
+or to a \verb{local_*()} function, like \code{withr::local_options(.local_envir = context)} or
+\code{testthat::local_mocked_bindings(.env = context)}, to undo what a step changes when its scenario ends.
+Without it, the change is undone when the step ends. An error of the deferred code is a warning of the
+scenario, as its steps already have their results.
+
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
   <span class="fu">Given</span> a package
@@ -696,6 +703,168 @@ Each scenario starts with a new, empty \code{context}.
   Then it passes
   And the output includes "Add an item ends with 1 items"
   And the output includes "Look into the basket ends with 0 items"
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> What a step defers in context runs when the scenario ends
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      withr::local_options(basket.items = 1, .local_envir = context)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
+<span class="st">      expect_equal(getOption("basket.items", 0), n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Add an item          <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: What a step defers in context runs when the scenario ends
+  Given a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) \{
+      withr::local_options(basket.items = 1, .local_envir = context)
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{
+      expect_equal(getOption("basket.items", 0), n)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the scenarios have these results:
+    | scenario             | status |
+    | Add an item          | passed |
+    | Look into the basket | passed |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A function a step mocks in context stays mocked until the scenario ends
+  <span class="fu">Given</span> a file named <span class="st">"R/stock.R"</span> with
+<span class="st">    """</span>
+<span class="st">    in_stock &lt;- function() FALSE</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Apples are delivered</span>
+<span class="st">        When the apples are delivered</span>
+<span class="st">        Then apples are in stock</span>
+<span class="st"></span>
+<span class="st">      Scenario: Apples aren't delivered</span>
+<span class="st">        Then apples aren't in stock</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("the apples are delivered", function(context) \{</span>
+<span class="st">      testthat::local_mocked_bindings(in_stock = function() TRUE, .env = context)</span>
+<span class="st">    \})</span>
+<span class="st">    then("apples are in stock", function(context) \{</span>
+<span class="st">      expect_true(in_stock())</span>
+<span class="st">    \})</span>
+<span class="st">    then("apples aren't in stock", function(context) \{</span>
+<span class="st">      expect_false(in_stock())</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    pkgload::load_all(quiet = TRUE)</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario                <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Apples are delivered    <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Apples aren't delivered <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A function a step mocks in context stays mocked until the scenario ends
+  Given a file named "R/stock.R" with
+    """
+    in_stock <- function() FALSE
+    """
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Apples are delivered
+        When the apples are delivered
+        Then apples are in stock
+
+      Scenario: Apples aren't delivered
+        Then apples aren't in stock
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("the apples are delivered", function(context) \{
+      testthat::local_mocked_bindings(in_stock = function() TRUE, .env = context)
+    \})
+    then("apples are in stock", function(context) \{
+      expect_true(in_stock())
+    \})
+    then("apples aren't in stock", function(context) \{
+      expect_false(in_stock())
+    \})
+    """
+  When I run
+    """
+    pkgload::load_all(quiet = TRUE)
+    test("features")
+    """
+  Then the scenarios have these results:
+    | scenario                | status |
+    | Apples are delivered    | passed |
+    | Apples aren't delivered | passed |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> An error of what a step deferred in context is a warning of its scenario
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      withr::defer(stop("The basket is gone"), envir = context)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
+<span class="st">      succeed()</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Add an item          <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span>
+  <span class="fu">And</span> the scenarios have these warnings:
+    <span class="op">|</span> scenario    <span class="op">|</span> warning                                             <span class="op">|</span>
+    <span class="op">|</span> Add an item <span class="op">|</span> Cleanup of the scenario failed: The basket is gone <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: An error of what a step deferred in context is a warning of its scenario
+  Given a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) \{
+      withr::defer(stop("The basket is gone"), envir = context)
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{
+      succeed()
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the scenarios have these results:
+    | scenario             | status |
+    | Add an item          | passed |
+    | Look into the basket | passed |
+  And the scenarios have these warnings:
+    | scenario    | warning                                             |
+    | Add an item | Cleanup of the scenario failed: The basket is gone |
 %</pre>
 }}
 
