@@ -4,9 +4,9 @@ Feature: Running feature files like testthat runs test files
   `testthat::testing_package()`, the package `testthat::local_mocked_bindings()` mocks, after the
   `helper-*.R` and `setup-*.R` files, and before the `teardown-*.R` files. Steps can use
   testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step fails when a
-  `test_that()` test in it fails. What the setup files and
-  steps defer to `testthat::teardown_env()` runs when `test()` ends. Each feature file is the
-  file of its scenarios' results. Outside of a testthat run, like in the console, `test()` sets
+  `test_that()` test in it fails. With the 3rd edition, steps run with testthat's reproducible
+  output, like its tests. What the setup files and steps defer to `testthat::teardown_env()` runs
+  when `test()` ends. Each feature file is the file of its scenarios' results. Outside of a testthat run, like in the console, `test()` sets
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
   `skip()` in a `before_all()` hook skips every scenario, like `skip()` at the top of a test file skips its tests.
@@ -115,6 +115,41 @@ Feature: Running feature files like testthat runs test files
     Then the scenarios have these results:
       | scenario                        | status |
       | Checking that tests are running | passed |
+
+  Scenario: Steps run with testthat's reproducible output, with the 3rd edition of testthat
+    Like in a testthat test, the console is 80 characters wide, without colours, and not interactive,
+    so output and snapshots are the same wherever they run.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Config/testthat/edition: 3
+      """
+    And a file named "features/setup-output.R" with
+      """
+      then("the output is reproducible", function(context) {
+        expect_equal(getOption("width"), 80)
+        expect_equal(cli::num_ansi_colors(), 1)
+        expect_false(rlang::is_interactive())
+      })
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Showing the basket
+          Then the output is reproducible
+      """
+    When I run
+      """
+      withr::with_options(
+        list(width = 200, cli.num_colors = 256, rlang_interactive = TRUE),
+        test("features", stop_on_failure = FALSE)
+      )
+      """
+    Then the scenarios have these results:
+      | scenario           | status |
+      | Showing the basket | passed |
 
   Scenario: A step fails when a test_that() test in it fails
     Given a file named "features/setup-test.R" with

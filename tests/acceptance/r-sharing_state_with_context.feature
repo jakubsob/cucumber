@@ -86,6 +86,31 @@ Feature: Sharing state with context
       | Add an item          | passed |
       | Look into the basket | passed |
 
+  Scenario: What a step changes without context is undone when the step ends
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) {
+        withr::local_options(basket.items = 1)
+      })
+      then("the basket has {int} item(s)", function(n, context) {
+        expect_equal(getOption("basket.items", 0), n)
+      })
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item for a moment
+          When I add an item
+          Then the basket has 0 items
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario                 | status |
+      | Add an item for a moment | passed |
+
   Scenario: A function a step mocks in context stays mocked until the scenario ends
     Given a file named "R/stock.R" with
       """

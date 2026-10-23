@@ -376,6 +376,38 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    Scenario Outline: A snapshot of a scenario named with characters of more than one byte is checked, with <runner>
+      Given a feature file "basket.feature" with a scenario "Koszyk z jabłkiem" that snapshots "1 jabłko"
+      And I run the feature files with "<runner>"
+      When I run the feature files with "<runner>"
+      Then the scenarios have these results:
+        | scenario          | status |
+        | Koszyk z jabłkiem | passed |
+      And the snapshot file "_snaps/basket.feature.md" has "1 jabłko" for "Koszyk z jabłkiem"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
+    Scenario: A snapshot is checked when the test file that runs the feature file runs alone
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And a file named "tests/testthat/test-other.R" with
+        """
+        test_that("other", succeed())
+        """
+      And I run the feature files with "run()"
+      And the scenario "Showing the basket" of "basket.feature" snapshots "2 apples"
+      When I run
+        """
+        withr::with_envvar(
+          c(NOT_CRAN = "true", CI = NA, TESTTHAT = NA),
+          testthat::test_file("tests/testthat/test-acceptance.R", reporter = "silent", stop_on_failure = FALSE)
+        )
+        """
+      Then the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+      And the snapshot file "_snaps/basket.feature.new.md" has "2 apples" for "Showing the basket"
+
   Rule: A snapshot that isn't checked is kept
 
     Scenario Outline: A scenario that stops before its snapshot keeps it, when "<step>", with <runner>
