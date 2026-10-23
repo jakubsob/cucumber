@@ -385,7 +385,11 @@ execute_single_step <- function(step, context, pickle = NULL) {
 
   tryCatch(
     withCallingHandlers(
-      exec(step$matched_fn, !!!step$arguments(), context = context),
+      {
+        nested <- local_nested_tests()
+        exec(step$matched_fn, !!!step$arguments(), context = context)
+        fail_nested_tests(nested)
+      },
       error = function(e) {
         if (
           inherits(e, "expectation") ||
@@ -436,4 +440,55 @@ execute_single_step <- function(step, context, pickle = NULL) {
 
   duration <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
   new_step_result(step, status, step_error, duration)
+}
+
+#' testthat's reporter of the tests in a step, like `test_that()` in a step
+#' definition: it reports them like testthat's reporter, and keeps the names of
+#' those that failed, so the step fails too
+#' @keywords internal
+#' @noRd
+NestedTestsReporter <- R6::R6Class(
+  "NestedTestsReporter",
+  inherit = testthat::Reporter,
+  public = list(
+    reporter = NULL,
+    prefix = NULL,
+    failed = character(),
+    initialize = function(reporter, scenario) {
+      self$reporter <- reporter
+      self$.context <- reporter$.context
+      self$prefix <- paste0(scenario, " / ")
+    },
+    start_test = function(context, test) self$reporter$start_test(context, test),
+    add_result = function(context, test, result) {
+      if (inherits(result, c("expectation_failure", "expectation_error"))) {
+        self$failed <- union(self$failed, substring(test, nchar(self$prefix) + 1))
+      }
+      self$reporter$add_result(context, test, result)
+    },
+    end_test = function(context, test) self$reporter$end_test(context, test)
+  )
+)
+
+#' Report the tests in a step to a NestedTestsReporter, until `frame` ends
+#' @return The reporter, or `NULL` outside of a testthat test
+#' @keywords internal
+#' @noRd
+local_nested_tests <- function(frame = parent.frame()) {
+  the <- utils::getFromNamespace("the", "testthat")
+  if (is.null(the$reporter) || length(the$description) == 0) {
+    return(NULL)
+  }
+  nested <- NestedTestsReporter$new(the$reporter, paste(the$description, collapse = " / "))
+  rlang::local_bindings(reporter = nested, .env = the, .frame = frame)
+  nested
+}
+
+#' Fail the step if a test in it failed, see `local_nested_tests()`
+#' @keywords internal
+#' @noRd
+fail_nested_tests <- function(nested) {
+  if (length(nested$failed) > 0) {
+    testthat::fail(paste0("The test", if (length(nested$failed) > 1) "s", " ", paste0("\"", nested$failed, "\"", collapse = ", "), " in the step failed."))
+  }
 }

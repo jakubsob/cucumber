@@ -3,7 +3,8 @@ Feature: Running feature files like testthat runs test files
   in `path` as the working directory, with the testthat edition and the package of `path` as
   `testthat::testing_package()`, the package `testthat::local_mocked_bindings()` mocks, after the
   `helper-*.R` and `setup-*.R` files, and before the `teardown-*.R` files. Steps can use
-  testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. What the setup files and
+  testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step fails when a
+  `test_that()` test in it fails. What the setup files and
   steps defer to `testthat::teardown_env()` runs when `test()` ends. Each feature file is the
   file of its scenarios' results. Outside of a testthat run, like in the console, `test()` sets
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
@@ -114,6 +115,32 @@ Feature: Running feature files like testthat runs test files
     Then the scenarios have these results:
       | scenario                        | status |
       | Checking that tests are running | passed |
+
+  Scenario: A step fails when a test_that() test in it fails
+    Given a file named "features/setup-test.R" with
+      """
+      then("the basket is checked by a test", function(context) {
+        test_that("the basket is empty", expect_equal(context$items, 0))
+      })
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Checking the basket with a test
+          Given an empty basket
+          When I add an apple
+          Then the basket is checked by a test
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                                 | status |
+      | Given an empty basket                | passed |
+      | When I add an apple                  | passed |
+      | Then the basket is checked by a test | failed |
+    And the error message includes 'The test "the basket is empty" in the step failed.'
 
   Scenario: Steps use the testthat edition of the package
     Given a file named "DESCRIPTION" with
