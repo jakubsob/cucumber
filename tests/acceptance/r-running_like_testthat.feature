@@ -415,3 +415,51 @@ Feature: Running feature files like testthat runs test files
       """
       NOT_CRAN=
       """
+
+  Scenario: Scenarios run in R CMD check, with testthat::test_check() of the installed package
+    R CMD check runs `tests/testthat.R`, which calls `testthat::test_check()` in `tests`, with the installed package.
+
+    Given a file named "NAMESPACE" with
+      """
+      # Nothing is exported: the steps use the package's internal functions
+      """
+    And a file named "R/basket.R" with
+      """
+      add_apple <- function(items) items + 1
+      """
+    And a file named "tests/testthat/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Adding an apple in R CMD check
+          Given an empty basket
+          When I add an apple
+          Then the basket has 1 item
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {
+        expect_equal(testthat::testing_package(), "example")
+        context$items <- 0
+      })
+      when("I add an apple", function(context) {
+        context$items <- add_apple(context$items)
+      })
+      then("the basket has {int} item(s)", function(n, context) {
+        expect_equal(context$items, n)
+      })
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      cucumber::run()
+      """
+    When I run
+      """
+      lib <- withr::local_tempdir()
+      install.packages(normalizePath("."), lib = lib, repos = NULL, type = "source", quiet = TRUE)
+      withr::local_libpaths(lib, action = "prefix")
+      withr::local_envvar(NOT_CRAN = NA, `_R_CHECK_PACKAGE_NAME_` = "example")
+      withr::defer(unloadNamespace("example"))
+      withr::with_dir("tests", testthat::test_check("example", reporter = "silent", stop_on_failure = FALSE))
+      """
+    Then it passes
+    And it ran "Scenario: Adding an apple in R CMD check"
