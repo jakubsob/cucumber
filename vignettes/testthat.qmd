@@ -33,7 +33,7 @@ cucumber runs on testthat. A feature file is run like a testthat test file, each
 | `helper-*.R`                        | Run before the tests, unless `load_helpers = FALSE` | The same. Define steps and hooks in `setup-*.R` files instead: `devtools::load_all()` runs helper files too, which defines every step twice, making it ambiguous |
 | `setup-*.R`                         | Run before the tests                                | The same. The usual place for step definitions, hooks and parameter types. Loaded again, like by testthat and by `test(".")`, a setup file defines them again rather than twice |
 | `teardown-*.R`                      | Run after the tests                                 | The same                                                                      |
-| `teardown_env()` in a setup file    | Defers code until the run ends                      | Not available: use a `teardown-*.R` file, or an `after_all()` hook. When `test()` is called in a testthat file, it's the end of that testthat run |
+| `teardown_env()` in a setup file    | Defers code until the run ends                      | The same, also in steps and hooks. When `test()` is called in a testthat file, it's the end of `test()` |
 | `test-*.R` files                    | Run                                                 | Not run, so they can test the code the steps use, with `testthat::test_dir()` |
 | Working directory                   | The test directory                                  | The directory of the feature files, `path`                                    |
 | Files written to the test directory | None, except `_snaps`                                | None, except `_snaps`                                                         |

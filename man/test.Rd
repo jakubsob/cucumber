@@ -73,9 +73,9 @@ To run Cucumber tests alongside \code{testthat} tests, see \code{cucumber::run()
 }
 \section{testthat's teardown environment}{
 
-\code{testthat::teardown_env()} isn't available in the \verb{setup-*.R} files \code{test()} runs: use a
-\verb{teardown-*.R} file or an \code{\link[=after_all]{after_all()}} hook to clean up after the run. When \code{test()} is
-called in a testthat test file, \code{teardown_env()} is the end of that testthat run.
+Like in \code{testthat::test_dir()}, what the \verb{helper-*.R} and \verb{setup-*.R} files, steps and hooks
+defer to \code{testthat::teardown_env()}, like \code{withr::defer(DBI::dbDisconnect(con), teardown_env())},
+runs when \code{test()} ends, also when it's called in a testthat test file.
 }
 
 \section{test() in a testthat file}{

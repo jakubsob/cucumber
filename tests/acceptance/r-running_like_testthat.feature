@@ -3,8 +3,8 @@ Feature: Running feature files like testthat runs test files
   in `path` as the working directory, with the testthat edition and the package of `path` as
   `testthat::testing_package()`, the package `testthat::local_mocked_bindings()` mocks, after the
   `helper-*.R` and `setup-*.R` files, and before the `teardown-*.R` files. Steps can use
-  testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. `testthat::teardown_env()`
-  isn't available in its setup files: use a `teardown-*.R` file or an `after_all()` hook. Each feature file is the
+  testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. What the setup files and
+  steps defer to `testthat::teardown_env()` runs when `test()` ends. Each feature file is the
   file of its scenarios' results. Outside of a testthat run, like in the console, `test()` sets
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
@@ -191,6 +191,36 @@ Feature: Running feature files like testthat runs test files
       """
       after scenario
       teardown
+      """
+
+  Scenario: What setup files and steps defer to testthat::teardown_env() runs when test() ends
+    Given a file named "features/setup-log.R" with
+      """
+      withr::defer(cat("setup file deferred\n", file = "../log.txt", append = TRUE), teardown_env())
+      after(function(context, scenario) cat("after scenario\n", file = "../log.txt", append = TRUE))
+      then("the basket is put away when the tests end", function(context) {
+        withr::defer(cat("step deferred\n", file = "../log.txt", append = TRUE), teardown_env())
+        succeed()
+      })
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Putting the basket away
+          Then the basket is put away when the tests end
+      """
+    When I run outside of a testthat run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario                | status |
+      | Putting the basket away | passed |
+    And the file "log.txt" has these lines:
+      """
+      after scenario
+      step deferred
+      setup file deferred
       """
 
   Scenario: skip() in a before_all() hook skips every scenario

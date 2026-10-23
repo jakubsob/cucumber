@@ -462,9 +462,9 @@ local_registry <- function(frame = parent.frame()) {
 #' To run Cucumber tests alongside `testthat` tests, see `cucumber::run()`.
 #'
 #' @section testthat's teardown environment:
-#' `testthat::teardown_env()` isn't available in the `setup-*.R` files `test()` runs: use a
-#' `teardown-*.R` file or an [after_all()] hook to clean up after the run. When `test()` is
-#' called in a testthat test file, `teardown_env()` is the end of that testthat run.
+#' Like in `testthat::test_dir()`, what the `helper-*.R` and `setup-*.R` files, steps and hooks
+#' defer to `testthat::teardown_env()`, like `withr::defer(DBI::dbDisconnect(con), teardown_env())`,
+#' runs when `test()` ends, also when it's called in a testthat test file.
 #'
 #' @section test() in a testthat file:
 #' `test()` keeps the step definitions, hooks and parameter types registered before it, like by
@@ -607,6 +607,9 @@ test <- function(
   env <- env %||% testthat::test_env()
   withr::local_options(topLevelEnvironment = rlang::env_parent(env))
   withr::local_options(testthat.snapshotter = snapshotter)
+  # Like testthat::test_dir(), what helper and setup files and steps defer to
+  # testthat::teardown_env() runs when test() ends
+  rlang::local_bindings(teardown_env = environment(), .env = utils::getFromNamespace("the", "testthat"))
   # Before the setup files, so what they defined is cleared even if one fails,
   # and what was defined before, like by the setup files of a testthat run that
   # calls test(), is restored
