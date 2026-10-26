@@ -60,6 +60,18 @@ Feature: Rerun reporter
       | Pay with amex  | failed  |
       | Ship           | pending |
 
+  Scenario: Empty lines of a rerun file are ignored
+    Like a rerun file edited by hand, with an empty line at its end.
+
+    When I run
+      """
+      writeLines(c("basket.feature:5", "", " "), "rerun.txt")
+      test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario       | status |
+      | Remove an item | failed |
+
   Scenario: The file is empty when every scenario passed
     Given a file named "features/basket.feature" with
       """

@@ -40,7 +40,7 @@ testthat's reporter, which reports each scenario as a test.}
 
 \item{features}{If not NULL, run only these feature files, relative to \code{path}.
 Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.
-An empty vector runs no scenario.}
+An empty vector runs no scenario. Empty strings, like the empty lines of a rerun file, are ignored.}
 
 \item{fail_fast}{If \code{TRUE}, skip the scenarios after the first failed scenario.}
 

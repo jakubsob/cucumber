@@ -365,6 +365,8 @@ feature_lines <- function(features, path) {
   if (is.null(features)) {
     return(NULL)
   }
+  # Like the empty lines of a rerun file
+  features <- features[trimws(features) != ""]
   if (length(features) == 0) {
     return(list())
   }
@@ -517,7 +519,7 @@ local_registry <- function(frame = parent.frame()) {
 #' @param name If not NULL, run only the scenarios whose name matches any of these regular expressions.
 #' @param features If not NULL, run only these feature files, relative to `path`.
 #'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`.
-#'   An empty vector runs no scenario.
+#'   An empty vector runs no scenario. Empty strings, like the empty lines of a rerun file, are ignored.
 #' @param strict If `FALSE`, pending and undefined steps don't fail the run.
 #' @param dry_run If `TRUE`, match steps to step definitions without running steps or hooks.
 #' @param fail_fast If `TRUE`, skip the scenarios after the first failed scenario.

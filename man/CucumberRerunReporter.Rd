@@ -138,6 +138,32 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Empty lines of a rerun file are ignored
+  Like a rerun file edited by hand, with an empty line at its end.
+<span></span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    writeLines(c("basket.feature:5", "", " "), "rerun.txt")</span>
+<span class="st">    test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario       <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Remove an item <span class="op">|</span> failed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Empty lines of a rerun file are ignored
+  Like a rerun file edited by hand, with an empty line at its end.
+
+  When I run
+    """
+    writeLines(c("basket.feature:5", "", " "), "rerun.txt")
+    test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)
+    """
+  Then the scenarios have these results:
+    | scenario       | status |
+    | Remove an item | failed |
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> The file is empty when every scenario passed
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>
