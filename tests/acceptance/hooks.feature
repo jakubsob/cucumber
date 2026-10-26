@@ -376,16 +376,16 @@ Feature: Hooks
       """
       Error in `source_dir()`:
       ! Failed to evaluate './setup-steps.R'.
-      <caused by>
-      ! A `<hook>` hook must have <count> arguments.
+      Caused by error in `<hook>()`:
+      ! <a> `<hook>` hook must have <count> arguments.
       i <usage>
       """
 
     Examples:
-      | hook        | caused by                         | count  | usage                                    |
-      | before      | Caused by error in `before()`:      | 2      | Use `function(context, scenario)`.       |
-      | after       | Caused by error in `after()`:       | 2      | Use `function(context, scenario)`.       |
-      | before_step | Caused by error in `before_step()`: | 2      | Use `function(context, step)`.           |
-      | after_step  | Caused by error in `after_step()`:  | 2      | Use `function(context, step)`.           |
-      | before_all  | Caused by error:                    | 0 or 1 | Use `function()` or `function(context)`. |
-      | after_all   | Caused by error:                    | 0 or 1 | Use `function()` or `function(context)`. |
+      | hook        | a  | count  | usage                                    |
+      | before      | A  | 2      | Use `function(context, scenario)`.       |
+      | after       | An | 2      | Use `function(context, scenario)`.       |
+      | before_step | A  | 2      | Use `function(context, step)`.           |
+      | after_step  | An | 2      | Use `function(context, step)`.           |
+      | before_all  | A  | 0 or 1 | Use `function()` or `function(context)`. |
+      | after_all   | An | 0 or 1 | Use `function()` or `function(context)`. |

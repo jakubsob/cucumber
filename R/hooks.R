@@ -11,17 +11,20 @@ make_hook <- function(kind, arguments) {
       hook <- function(context) fn()
     }
     if (length(formals(hook)) != length(arguments)) {
+      article <- if (grepl("^[aeiou]", kind)) "An" else "A"
       abort(
         message = if (optional) {
-          glue("A `{kind}` hook must have 0 or 1 arguments.")
+          glue("{article} `{kind}` hook must have 0 or 1 arguments.")
         } else {
-          glue("A `{kind}` hook must have {length(arguments)} arguments.")
+          glue("{article} `{kind}` hook must have {length(arguments)} arguments.")
         },
         body = c(i = if (optional) {
           "Use `function()` or `function(context)`."
         } else {
           glue("Use `function({paste(arguments, collapse = ', ')})`.")
-        })
+        }),
+        # The call of before_all() and after_all(), which call this function
+        call = if (optional) rlang::caller_env() else rlang::current_env()
       )
     }
     assert_string(tags, null.ok = TRUE)
