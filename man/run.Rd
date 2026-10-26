@@ -84,7 +84,7 @@ To get result and a report, use \code{cucumber::test()}, or inspect the result o
 as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
 testthat's reporter reports each scenario as a test of the test file that calls \code{run()}, and a
-failed step by its text, at its line of the feature file.
+failed step by its text and a warning, at its line of the feature file.
 Pass a \code{reporter} to \code{run()} to report the run with cucumber's reporter too.
 
 \code{run()} isn't supported in a parallel testthat run, with \code{Config/testthat/parallel: true}: it's an error.
@@ -327,6 +327,52 @@ definitions and hooks are then cleared when it returns.
   Then the results are of these files:
     | scenario   | file              |
     | Adding one | test-acceptance.R |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows a step's warning at the line of the step
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      warning("calculate() is slow")</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "silent")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these warnings:
+    <span class="op">|</span> scenario   <span class="op">|</span> warning             <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span> calculate() is slow <span class="op">|</span>
+  <span class="fu">And</span> the scenarios warned at these locations:
+    <span class="op">|</span> scenario   <span class="op">|</span> location            <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span> calculate.feature:3 <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: testthat's reporter shows a step's warning at the line of the step
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      warning("calculate() is slow")
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "silent")
+    """
+  Then the scenarios have these warnings:
+    | scenario   | warning             |
+    | Adding one | calculate() is slow |
+  And the scenarios warned at these locations:
+    | scenario   | location            |
+    | Adding one | calculate.feature:3 |
 %</pre>
 }}
 

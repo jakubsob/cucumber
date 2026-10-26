@@ -4,7 +4,7 @@ Feature: Running scenarios alongside testthat tests
   as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.
   It chooses what to run like `test()`, with `filter`, `features`, `tags` and `name`.
   testthat's reporter reports each scenario as a test of the test file that calls `run()`, and a
-  failed step by its text, at its line of the feature file.
+  failed step by its text and a warning, at its line of the feature file.
   Pass a `reporter` to `run()` to report the run with cucumber's reporter too.
 
   `run()` isn't supported in a parallel testthat run, with `Config/testthat/parallel: true`: it's an error.
@@ -125,6 +125,28 @@ Feature: Running scenarios alongside testthat tests
     Then the results are of these files:
       | scenario   | file              |
       | Adding one | test-acceptance.R |
+
+  Scenario: testthat's reporter shows a step's warning at the line of the step
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        warning("calculate() is slow")
+        context$result <- calculate(1)
+      })
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "silent")
+      """
+    Then the scenarios have these warnings:
+      | scenario   | warning             |
+      | Adding one | calculate() is slow |
+    And the scenarios warned at these locations:
+      | scenario   | location            |
+      | Adding one | calculate.feature:3 |
 
   Scenario: testthat's reporter shows the step that failed
     Given a file named "tests/testthat/setup-steps.R" with
