@@ -24,8 +24,17 @@ Feature: Step definition arguments
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "<message>"
-    And the error message includes "Use `function(int, data_table, context)`."
+    Then the errors are
+      """
+      [error] Scenario: Add items
+      Error: Step "I add 3 items" failed
+      i Feature: basket.feature
+      i Scenario: Add items
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! <message>
+      i Use `function(int, data_table, context)`.
+      """
 
     Examples:
       | case                 | definition                               | message                                                    |

@@ -49,8 +49,9 @@ Hooks can call \code{pending()} too.
 <span class="st">    """</span>
 <span class="st">    test("features", stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the error message includes
+  <span class="fu">Then</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [failure] Scenario: Not yet implemented</span>
 <span class="st">    Step "a step that is pending" is pending: not yet implemented</span>
 <span class="st">    """</span>
   <span class="fu">And</span> the steps have these results:
@@ -73,8 +74,9 @@ Hooks can call \code{pending()} too.
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then the error message includes
+  Then the errors are
     """
+    [failure] Scenario: Not yet implemented
     Step "a step that is pending" is pending: not yet implemented
     """
   And the steps have these results:

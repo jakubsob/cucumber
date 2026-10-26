@@ -93,8 +93,15 @@ Feature: Regular expressions
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "This Regular Expression has a problem:"
-    And the error message includes "I pay {int}$"
+    Then the errors are
+      """
+      [error]
+      This Regular Expression has a problem:
+
+      I pay {int}$
+
+      Error in {min,max} interval. (U_REGEX_BAD_INTERVAL, context=`I pay {int}$`)
+      """
 
   Scenario: A character class can start with ]
     Given a package
@@ -135,11 +142,13 @@ Feature: Regular expressions
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
+      [error]
       Your Regular Expression ^I have a (red|green) cucumber$
       matches multiple parameter types with regexp red|green:
-      {colour}
-      {ripeness}
+         {colour}
+         {ripeness}
+
+      I couldn't decide which one to use. Use a Cucumber Expression instead of a Regular Expression, or make one of the parameter types preferential with `prefer_for_regexp_match = TRUE`.
       """
-    And the error message includes "with `prefer_for_regexp_match = TRUE`."

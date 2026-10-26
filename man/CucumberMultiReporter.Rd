@@ -175,7 +175,13 @@ several reporters, to show the progress of a run and write its reports at once.
 <span class="st">      CucumberHtmlReporter$new("missing/report.html")</span>
 <span class="st">    )), stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it fails with <span class="st">"Reporter `CucumberHtmlReporter` failed in `end_run()`."</span>
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error:</span>
+<span class="st">    ! Reporter `CucumberHtmlReporter` failed in `end_run()`.</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! cannot open the connection</span>
+<span class="st">    """</span>
   <span class="fu">And</span> the output includes <span class="st">"2 scenarios (1 failed, 1 passed)"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A report that can't be written fails the run
   The scenarios run, and the error names the reporter that failed when the run ended.
@@ -187,7 +193,13 @@ several reporters, to show the progress of a run and write its reports at once.
       CucumberHtmlReporter$new("missing/report.html")
     )), stop_on_failure = FALSE)
     """
-  Then it fails with "Reporter `CucumberHtmlReporter` failed in `end_run()`."
+  Then it fails with
+    """
+    Error:
+    ! Reporter `CucumberHtmlReporter` failed in `end_run()`.
+    Caused by error:
+    ! cannot open the connection
+    """
   And the output includes "2 scenarios (1 failed, 1 passed)"
 %</pre>
 }}

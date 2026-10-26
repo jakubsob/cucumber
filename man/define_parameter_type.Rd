@@ -338,8 +338,9 @@ Register your own with \code{define_parameter_type()}.
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                          <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Given the count is 3000000000 <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the scenario <span class="st">"Big number"</span> errored with
+  <span class="fu">And</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [error] Scenario: Big number</span>
 <span class="st">    Error: Step "the count is 3000000000" failed</span>
 <span class="st">    i Feature: params.feature</span>
 <span class="st">    i Scenario: Big number</span>
@@ -367,8 +368,9 @@ Register your own with \code{define_parameter_type()}.
   Then the steps have these results:
     | step                          | status |
     | Given the count is 3000000000 | failed |
-  And the scenario "Big number" errored with
+  And the errors are
     """
+    [error] Scenario: Big number
     Error: Step "the count is 3000000000" failed
     i Feature: params.feature
     i Scenario: Big number
@@ -652,8 +654,9 @@ Register your own with \code{define_parameter_type()}.
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                     <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Given the colour is blue <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the scenario <span class="st">"Colour"</span> errored with
+  <span class="fu">And</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [error] Scenario: Colour</span>
 <span class="st">    Error: Step "the colour is blue" failed</span>
 <span class="st">    i Feature: params.feature</span>
 <span class="st">    i Scenario: Colour</span>
@@ -692,8 +695,9 @@ Register your own with \code{define_parameter_type()}.
   Then the steps have these results:
     | step                     | status |
     | Given the colour is blue | failed |
-  And the scenario "Colour" errored with
+  And the errors are
     """
+    [error] Scenario: Colour
     Error: Step "the colour is blue" failed
     i Feature: params.feature
     i Scenario: Colour

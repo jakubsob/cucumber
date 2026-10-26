@@ -96,7 +96,11 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then the error message includes "the server didn't start"
+      Then the errors are
+        """
+        [error]
+        the server didn't start
+        """
       And the output includes "stop the server" once
       And no scenario ran
 
@@ -111,7 +115,11 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then the error message includes "the server didn't start"
+      Then the errors are
+        """
+        [error]
+        the server didn't start
+        """
       And the output includes "start the database" once
 
     Scenario: A failing after all hook fails the run after every scenario has run
@@ -128,7 +136,11 @@ Feature: Before all and after all hooks
         | scenario       |
         | Add an item    |
         | Remove an item |
-      And the error message includes "the server didn't stop"
+      And the errors are
+        """
+        [error]
+        the server didn't stop
+        """
 
     Scenario: After all hooks run when scenarios fail
       Given a file named "features/setup-steps.R" with
@@ -156,4 +168,8 @@ Feature: Before all and after all hooks
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then the error message includes "Hook \"Start the server\" failed: connection refused"
+      Then the errors are
+        """
+        [error]
+        Hook "Start the server" failed: connection refused
+        """

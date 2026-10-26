@@ -224,8 +224,9 @@ Feature: Running scenarios alongside testthat tests
       """
       testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
       """
-    Then the scenario "Adding one" errored with
+    Then the errors are
       """
+      [error] Scenario: Adding one
       Error: Step "I calculate" failed
       i Feature: calculate.feature
       i Scenario: Adding one

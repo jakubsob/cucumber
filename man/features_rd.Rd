@@ -1225,13 +1225,23 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 <span class="st">    """</span>
 <span class="st">    cucumber::features_rd(features = "basket.feature:13")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it fails with <span class="st">"No scenarios to document."</span></code></pre >}}
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error in `cucumber::features_rd()`:</span>
+<span class="st">    ! No scenarios to document.</span>
+<span class="st">    i Tag the scenarios with `@rd`, or select them with other arguments.</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A selection without scenarios is an error
   When I run it and it fails
     """
     cucumber::features_rd(features = "basket.feature:13")
     """
-  Then it fails with "No scenarios to document."
+  Then it fails with
+    """
+    Error in `cucumber::features_rd()`:
+    ! No scenarios to document.
+    i Tag the scenarios with `@rd`, or select them with other arguments.
+    """
 %</pre>
 }}
 

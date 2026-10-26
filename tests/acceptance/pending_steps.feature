@@ -26,8 +26,9 @@ Feature: Pending steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
+      [failure] Scenario: Not yet implemented
       Step "a step that is pending" is pending: not yet implemented
       """
     And the steps have these results:

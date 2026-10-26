@@ -157,18 +157,19 @@ Feature: Cucumber Expressions
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
+      [error]
       This Cucumber Expression has a problem at column 9:
 
       I visit /about
-      ^
+              ^
       Alternative may not be empty.
       If you did not mean to use an alternative you can use '\/' to escape the '/'
       In an R string, double each backslash: "\\/".
       """
 
-  Scenario Outline: An invalid expression is an error, <case>
+  Scenario: An invalid expression is an error, empty optional
     Given a package
     And a file named "features/expressions.feature" with
       """
@@ -178,29 +179,327 @@ Feature: Cucumber Expressions
       """
     And a file named "features/setup-steps.R" with
       """
-      given(r"[<expression>]", function(context) {})
+      given(r"[I have ()]", function(context) {})
       """
     When I run
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "This Cucumber Expression has a problem at column <column>:"
-    And the error message includes
+    Then the errors are
       """
-      <problem>
+      [error]
+      This Cucumber Expression has a problem at column 8:
+
+      I have ()
+             ^^
+      An optional must contain some text.
+      If you did not mean to use an optional you can use '\(' to escape the '('
+      In an R string, double each backslash: "\\(".
       """
 
-    Examples:
-      | case                            | expression           | column | problem                                                                            |
-      | empty optional                  | I have ()            | 8      | An optional must contain some text.                                                |
-      | parameter in an optional        | I have ({int})       | 9      | An optional may not contain a parameter type.                                      |
-      | optional in an optional         | I have ((very) big)  | 9      | An optional may not contain an other optional.                                     |
-      | alternative of only optionals   | I have (big)/(small) | 8      | An alternative may not exclusively contain optionals.                              |
-      | alternation in an optional      | I have (big/small)   | 12     | An alternation can not be used inside an optional.                                 |
-      | unmatched (                     | I have (big          | 8      | The '(' does not have a matching ')'.                                              |
-      | unmatched {                     | I have {int          | 8      | The '{' does not have a matching '}'.                                              |
-      | parameter name with parenthesis | I have {i(n)t}       | 10     | Parameter names may not contain '{', '}', '(', ')', '\\' or '/'.                   |
-      | escape of a letter              | I have \a            | 9      | Only the characters '{', '}', '(', ')', '\\', '/' and whitespace can be escaped.  |
-      | empty alternative               | a//b                 | 3      | Alternative may not be empty.                                                      |
-      | parameter types as alternatives | {int}/{int}          | 6      | Alternative may not be empty.                                                      |
-      | escaped end of line             | I have \\            | 8      | The end of line can not be escaped.                                                |
+  Scenario: An invalid expression is an error, parameter in an optional
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have ({int})]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 9:
+
+      I have ({int})
+              ^---^
+      An optional may not contain a parameter type.
+      If you did not mean to use an parameter type you can use '\{' to escape the '{'
+      In an R string, double each backslash: "\\{".
+      """
+
+  Scenario: An invalid expression is an error, optional in an optional
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have ((very) big)]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 9:
+
+      I have ((very) big)
+              ^----^
+      An optional may not contain an other optional.
+      If you did not mean to use an optional type you can use '\(' to escape the '('. For more complicated expressions consider using a regular expression instead.
+      In an R string, double each backslash: "\\(".
+      """
+
+  Scenario: An invalid expression is an error, alternative of only optionals
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have (big)/(small)]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 8:
+
+      I have (big)/(small)
+             ^---^
+      An alternative may not exclusively contain optionals.
+      If you did not mean to use an optional you can use '\(' to escape the '('
+      In an R string, double each backslash: "\\(".
+      """
+
+  Scenario: An invalid expression is an error, alternation in an optional
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have (big/small)]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 12:
+
+      I have (big/small)
+                 ^
+      An alternation can not be used inside an optional.
+      If you did not mean to use an alternation you can use '\/' to escape the '/'. Otherwise rephrase your expression or consider using a regular expression instead.
+      In an R string, double each backslash: "\\/".
+      """
+
+  Scenario: An invalid expression is an error, unmatched (
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have (big]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 8:
+
+      I have (big
+             ^
+      The '(' does not have a matching ')'.
+      If you did not intend to use optional text you can use '\(' to escape the optional text
+      In an R string, double each backslash: "\\(".
+      """
+
+  Scenario: An invalid expression is an error, unmatched {
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have {int]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 8:
+
+      I have {int
+             ^
+      The '{' does not have a matching '}'.
+      If you did not intend to use a parameter you can use '\{' to escape the a parameter
+      In an R string, double each backslash: "\\{".
+      """
+
+  Scenario: An invalid expression is an error, parameter name with parenthesis
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have {i(n)t}]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 10:
+
+      I have {i(n)t}
+               ^
+      Parameter names may not contain '{', '}', '(', ')', '\' or '/'.
+      Did you mean to use a regular expression?
+      """
+
+  Scenario: An invalid expression is an error, escape of a letter
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have \a]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 9:
+
+      I have \a
+              ^
+      Only the characters '{', '}', '(', ')', '\', '/' and whitespace can be escaped.
+      If you did mean to use an '\' you can use '\\' to escape it
+      In an R string, double each backslash: "\\\\".
+      """
+
+  Scenario: An invalid expression is an error, empty alternative
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[a//b]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 3:
+
+      a//b
+        ^
+      Alternative may not be empty.
+      If you did not mean to use an alternative you can use '\/' to escape the '/'
+      In an R string, double each backslash: "\\/".
+      """
+
+  Scenario: An invalid expression is an error, parameter types as alternatives
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[{int}/{int}]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 6:
+
+      {int}/{int}
+           ^
+      Alternative may not be empty.
+      If you did not mean to use an alternative you can use '\/' to escape the '/'
+      In an R string, double each backslash: "\\/".
+      """
+
+  Scenario: An invalid expression is an error, escaped end of line
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Invalid expression
+        Scenario: Cucumbers
+          Given I have cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[I have \]", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      This Cucumber Expression has a problem at column 8:
+
+      I have \
+             ^
+      The end of line can not be escaped.
+      You can use '\\' to escape the '\'
+      In an R string, double each backslash: "\\\\".
+      """

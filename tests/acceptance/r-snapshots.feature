@@ -37,7 +37,16 @@ Feature: Snapshots
       Then the scenarios have these results:
         | scenario           | status |
         | Showing the basket | failed |
-      And the error message includes "`expect_snapshot()` requires the 3rd edition."
+      And the errors are
+        """
+        [error] Scenario: Showing the basket
+        Error: Step "the snapshot of "1 apple" matches" failed
+        i Feature: basket.feature
+        i Scenario: Showing the basket
+        i Step defined at: setup-snapshot-steps.R:9
+        Caused by error in `edition_require()`:
+        ! `expect_snapshot()` requires the 3rd edition.
+        """
 
       Examples:
         | runner |
@@ -51,7 +60,20 @@ Feature: Snapshots
       And I run the feature files with "<runner>"
       And the scenario "Showing the basket" of "<feature>" snapshots "2 apples"
       When I run the feature files with "<runner>"
-      Then the error message includes 'testthat::snapshot_accept("<accepted>"'
+      Then the errors are
+        """
+        [failure] Scenario: Showing the basket
+        Step "the snapshot of "2 apples" matches" failed
+        Snapshot of code has changed:
+            old             | new
+        [1] Code            | Code             [1]
+        [2]   value         |   value          [2]
+        [3] Output          | Output           [3]
+        [4]   [1] "1 apple" -   [1] "2 apples" [4]
+        * Run `testthat::snapshot_accept("<accepted>")` to accept the change.
+        * Run `testthat::snapshot_review("<accepted>")` to review the change.
+        Step at: setup-snapshot-steps.R:9
+        """
       When I run
         """
         testthat::snapshot_accept("<accepted>", "tests/testthat")
@@ -82,7 +104,20 @@ Feature: Snapshots
             Then the snapshot of "2 apples" for "linux" matches
         """
       When I run the feature files with "<runner>"
-      Then the error message includes 'testthat::snapshot_accept("<accepted>"'
+      Then the errors are
+        """
+        [failure] Scenario: Showing the basket
+        Step "the snapshot of "2 apples" for "linux" matches" failed
+        Snapshot of code has changed (variant 'linux'):
+            old             | new
+        [1] Code            | Code             [1]
+        [2]   value         |   value          [2]
+        [3] Output          | Output           [3]
+        [4]   [1] "1 apple" -   [1] "2 apples" [4]
+        * Run `testthat::snapshot_accept("<accepted>")` to accept the change.
+        * Run `testthat::snapshot_review("<accepted>")` to review the change.
+        Step at: setup-snapshot-steps.R:10
+        """
       When I run
         """
         testthat::snapshot_accept("<accepted>", "tests/testthat")
@@ -147,7 +182,18 @@ Feature: Snapshots
             Then the file snapshot "basket.txt" of "2 apples" matches
         """
       When I run the feature files with "<runner>"
-      Then the error message includes 'testthat::snapshot_accept("<accepted>"'
+      Then the errors are
+        """
+        [failure] Scenario: Showing the basket
+        Step "the file snapshot "basket.txt" of "2 apples" matches" failed
+        Snapshot of `file` has changed.
+        Differences:
+            old     | new
+        [1] 1 apple - 2 apples [1]
+        * Run `testthat::snapshot_accept("<accepted>")` to accept the change.
+        * Run `testthat::snapshot_review("<accepted>")` to review the change.
+        Step at: setup-snapshot-steps.R:17
+        """
       When I run
         """
         testthat::snapshot_accept("<accepted>", "tests/testthat")
@@ -199,15 +245,21 @@ Feature: Snapshots
       Given a feature file "<first>" with a scenario "Showing the basket" that snapshots "1 apple"
       And a feature file "<second>" with a scenario "Showing the basket" that snapshots "2 apples"
       When I run the feature files with "<runner>"
-      Then the error message includes "Feature files share a snapshot file"
+      Then the errors are
+        """
+        [error]
+        <message>
+        x `<first shown>` and `<second>` save their snapshots in `_snaps/<snapshot file>`.
+        i Rename one of them.
+        """
       And there is no snapshot file "_snaps/<snapshot file>"
 
       Examples:
-        | first                   | second                  | snapshot file              | runner |
-        | basket.feature          | basket.feature.md       | basket.feature.md          | test() |
-        | basket.feature          | basket.feature.md       | basket.feature.md          | run()  |
-        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | test() |
-        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | run()  |
+        | first                   | second                  | snapshot file              | runner | message                                     | first shown    |
+        | basket.feature          | basket.feature.md       | basket.feature.md          | test() | Feature files share a snapshot file.        | basket.feature |
+        | basket.feature          | basket.feature.md       | basket.feature.md          | run()  | Error: Feature files share a snapshot file. | basket.feature |
+        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | test() | Feature files share a snapshot file.        | basket.feature |
+        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | run()  | Error: Feature files share a snapshot file. | basket.feature |
 
     Scenario Outline: A feature file in a directory named like a variant has snapshots of its own, with <runner>
       Given the steps that take snapshots
@@ -239,21 +291,48 @@ Feature: Snapshots
 
   Rule: A snapshot is of a scenario
 
-    Scenario Outline: A snapshot in a <hook> hook is an error, with <runner>
+    Scenario Outline: A snapshot in a before_all hook is an error, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
       And a file named "tests/testthat/setup-hooks.R" with
         """
-        <hook>(function(context) expect_snapshot(1))
+        before_all(function(context) expect_snapshot(1))
         """
       When I run the feature files with "<runner>"
-      Then the error message includes "`testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook."
+      Then the errors are
+        """
+        [error]
+        <message>
+        """
 
       Examples:
-        | hook       | runner |
-        | before_all | test() |
-        | before_all | run()  |
-        | after_all  | test() |
-        | after_all  | run()  |
+        | runner | message |
+        | test() | `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
+        | run()  | Error: `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
+
+    Scenario Outline: A snapshot in an after_all hook is an error, after the scenarios took theirs, with <runner>
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And a file named "tests/testthat/setup-hooks.R" with
+        """
+        after_all(function(context) expect_snapshot(1))
+        """
+      When I run the feature files with "<runner>"
+      Then the errors are
+        """
+        [warning] Scenario: Showing the basket
+        Adding new snapshot:
+        Code
+          value
+        Output
+          [1] "1 apple"
+
+        [error]
+        <message>
+        """
+
+      Examples:
+        | runner | message |
+        | test() | `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
+        | run()  | Error: `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
 
     Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
@@ -994,4 +1073,9 @@ Feature: Snapshots
           testthat::test_local(reporter = "silent", stop_on_failure = FALSE)
         )
         """
-      Then the error message includes "`test()` of the directory of a parallel testthat run isn't supported."
+      Then the errors are
+        """
+        [error]
+        Error: `test()` of the directory of a parallel testthat run isn't supported.
+        i Set `Config/testthat/parallel: false` in DESCRIPTION, or keep the feature files in another directory, like `test("../acceptance")`.
+        """

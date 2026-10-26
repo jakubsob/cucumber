@@ -143,7 +143,16 @@ Feature: Attachments
     Then the steps have these results:
       | step               | status |
       | When I add an item | failed |
-    And the error message includes "A raw vector attachment must have a `media_type`."
+    And the errors are
+      """
+      [error] Scenario: Add an item
+      Error: Step "I add an item" failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! A raw vector attachment must have a `media_type`.
+      """
 
   Scenario Outline: An attachment's <argument> must be a string
     Given a file named "features/basket.feature" with
@@ -160,8 +169,9 @@ Feature: Attachments
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the scenario "Add an item" errored with
+    Then the errors are
       """
+      [error] Scenario: Add an item
       Error: Step "I add an item" failed
       i Feature: basket.feature
       i Scenario: Add an item
@@ -193,7 +203,16 @@ Feature: Attachments
     Then the steps have these results:
       | step               | status |
       | When I add an item | failed |
-    And the error message includes "An attachment must be a string or a raw vector."
+    And the errors are
+      """
+      [error] Scenario: Add an item
+      Error: Step "I add an item" failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! An attachment must be a string or a raw vector.
+      """
 
   Scenario: The pretty reporter prints the logs and links under their step
     Other data is printed with its media type and file name.

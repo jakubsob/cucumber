@@ -281,7 +281,15 @@ Feature: Running scenarios by tag
         """
         test("features", tags = "<expression>", stop_on_failure = FALSE)
         """
-      Then the error message includes "Tag expression \"<expression>\" could not be parsed because of syntax error: <message>"
+      Then the errors are
+        """
+        [error]
+        i In index: 1.
+        Caused by error in `keep()`:
+        i In index: 1.
+        Caused by error:
+        ! Tag expression "<expression>" could not be parsed because of syntax error: <message>
+        """
 
       Examples:
         | case               | expression     | message              |
@@ -303,7 +311,15 @@ Feature: Running scenarios by tag
         """
         test("features", tags = "@a\\b", stop_on_failure = FALSE)
         """
-      Then the error message includes "could not be parsed because of syntax error: Illegal escape before \"b\"."
+      Then the errors are
+        """
+        [error]
+        i In index: 1.
+        Caused by error in `keep()`:
+        i In index: 1.
+        Caused by error:
+        ! Tag expression "@a\b" could not be parsed because of syntax error: Illegal escape before "b".
+        """
 
     Scenario: Several tag expressions are an error
       Combine them into one with `and`.

@@ -527,8 +527,9 @@ Its step definitions and hooks are cleared when it returns.
 <span class="st">    """</span>
 <span class="st">    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the scenario <span class="st">"Adding one"</span> errored with
+  <span class="fu">Then</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [error] Scenario: Adding one</span>
 <span class="st">    Error: Step "I calculate" failed</span>
 <span class="st">    i Feature: calculate.feature</span>
 <span class="st">    i Scenario: Adding one</span>
@@ -548,8 +549,9 @@ Its step definitions and hooks are cleared when it returns.
     """
     testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
     """
-  Then the scenario "Adding one" errored with
+  Then the errors are
     """
+    [error] Scenario: Adding one
     Error: Step "I calculate" failed
     i Feature: calculate.feature
     i Scenario: Adding one
@@ -713,7 +715,11 @@ Its step definitions and hooks are cleared when it returns.
 <span class="st">    source("features/steps.R")</span>
 <span class="st">    run("features")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it fails with <span class="st">"Test failures."</span>
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error:</span>
+<span class="st">    ! Test failures.</span>
+<span class="st">    """</span>
   <span class="fu">And</span> the scenarios have these results:
     <span class="op">|</span> scenario     <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Adding one   <span class="op">|</span> passed <span class="op">|</span>
@@ -745,7 +751,11 @@ Its step definitions and hooks are cleared when it returns.
     source("features/steps.R")
     run("features")
     """
-  Then it fails with "Test failures."
+  Then it fails with
+    """
+    Error:
+    ! Test failures.
+    """
   And the scenarios have these results:
     | scenario     | status |
     | Adding one   | passed |

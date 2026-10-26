@@ -27,13 +27,12 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
-      """
-    And the error message includes
-      """
-      (9:7): inconsistent cell count within the table
+      [error]
+      Can't parse feature files
+      x Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
+      x Parse error in "broken.feature" (9:7): inconsistent cell count within the table
       """
 
   Scenario: An unknown language is a parse error
@@ -52,7 +51,12 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "(1:1): Language not supported: xx"
+    Then the errors are
+      """
+      [error]
+      Can't parse feature files
+      x Parse error in "unknown.feature" (1:1): Language not supported: xx
+      """
 
   Scenario: A tag with whitespace is a parse error
     Given a file named "features/tagged.feature" with
@@ -70,7 +74,13 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "(1:1): A tag may not contain whitespace"
+    Then the errors are
+      """
+      [error]
+      Can't parse feature files
+      x Parse error in "tagged.feature" (1:1): A tag may not contain whitespace
+      x Parse error in "tagged.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got '@work in progress'
+      """
 
   Scenario: A feature file that ends too early is a parse error
     Given a file named "features/tagged.feature" with
@@ -85,7 +95,12 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "(2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment"
+    Then the errors are
+      """
+      [error]
+      Can't parse feature files
+      x Parse error in "tagged.feature" (2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment, #Empty
+      """
 
   Scenario: Parsing stops after 10 errors
     Given a file named "features/broken.feature" with
@@ -114,8 +129,22 @@ Feature: Gherkin parse failure
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "got 'junk 11'"
-    And the error message doesn't include "got 'junk 12'"
+    Then the errors are
+      """
+      [error]
+      Can't parse feature files
+      x Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 1'
+      x Parse error in "broken.feature" (5:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 2'
+      x Parse error in "broken.feature" (6:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 3'
+      x Parse error in "broken.feature" (7:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 4'
+      x Parse error in "broken.feature" (8:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 5'
+      x Parse error in "broken.feature" (9:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 6'
+      x Parse error in "broken.feature" (10:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 7'
+      x Parse error in "broken.feature" (11:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 8'
+      x Parse error in "broken.feature" (12:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 9'
+      x Parse error in "broken.feature" (13:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 10'
+      x Parse error in "broken.feature" (14:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 11'
+      """
 
   Scenario: No scenario runs when a feature file fails to parse, and every parse error is reported
     Given a file named "features/a.feature" with
@@ -141,5 +170,10 @@ Feature: Gherkin parse failure
       test("features", stop_on_failure = FALSE)
       """
     Then no scenario ran
-    And the error message includes "Parse error in \"a.feature\" (1:1)"
-    And the error message includes "Parse error in \"c.feature\" (1:1)"
+    And the errors are
+      """
+      [error]
+      Can't parse feature files
+      x Parse error in "a.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Parse Error'
+      x Parse error in "c.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Parse Error'
+      """

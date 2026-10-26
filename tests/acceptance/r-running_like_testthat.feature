@@ -205,10 +205,16 @@ Feature: Running feature files like testthat runs test files
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      `actual`: 1.0
+      [failure] Scenario: Adding an apple
+      Step "the basket has 2 items" failed
+      Expected `context$items` to equal `n`.
+      Differences:
+        `actual`: 1.0
       `expected`: 2.0
+
+      Step at: setup-steps.R:7
       """
 
   Scenario: A message of a step is shown, with the 3rd edition of testthat
@@ -275,7 +281,19 @@ Feature: Running feature files like testthat runs test files
       | Given an empty basket                | passed |
       | When I add an apple                  | passed |
       | Then the basket is checked by a test | failed |
-    And the error message includes 'The test "the basket is empty" in the step failed.'
+    And the errors are
+      """
+      [failure] Scenario: Checking the basket with a test / the basket is empty
+      Expected `context$items` to equal 0.
+      Differences:
+      1/1 mismatches
+      [1] 1 - 0 == 1
+
+      [failure] Scenario: Checking the basket with a test
+      Step "the basket is checked by a test" failed
+      The test "the basket is empty" in the step failed.
+      Step at: setup-test.R:1
+      """
     And the scenarios failed at these locations:
       | scenario                                              | location         |
       | Checking the basket with a test / the basket is empty | basket.feature:5 |
@@ -298,7 +316,17 @@ Feature: Running feature files like testthat runs test files
       | When I add an apple        | passed |
       | Then the basket has 1 item | passed |
       | After                      | failed |
-    And the error message includes 'The test "the basket is put away" in the hook failed.'
+    And the errors are
+      """
+      [failure] Scenario: Adding an apple / the basket is put away
+      Expected `context$items` to equal 0.
+      Differences:
+      1/1 mismatches
+      [1] 1 - 0 == 1
+
+      [failure] Scenario: Adding an apple
+      The test "the basket is put away" in the hook failed.
+      """
     And the scenarios failed at these locations:
       | scenario                                 | location         |
       | Adding an apple / the basket is put away | basket.feature:2 |

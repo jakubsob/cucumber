@@ -103,7 +103,11 @@ Feature: Step hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "step left a mess"
+    Then the errors are
+      """
+      [error] Scenario: Add an item
+      Error in `hook$fn(...)`: step left a mess
+      """
     And the steps have these results:
       | step                  | status  |
       | Given an empty basket | failed  |
@@ -128,7 +132,11 @@ Feature: Step hooks
     Then the steps have these results:
       | step               | status |
       | When I add an item | failed |
-    And the error message includes "`skip_scenario()` can only be called in a `before_all()`, `before()` or `after()` hook or a step."
+    And the errors are
+      """
+      [error] Scenario: Add an item
+      Error: `skip_scenario()` can only be called in a `before_all()`, `before()` or `after()` hook or a step.
+      """
 
   Scenario: A failing after step hook fails a pending step
     Given a file named "features/basket.feature" with
@@ -146,7 +154,11 @@ Feature: Step hooks
       """
       test("features", strict = FALSE, stop_on_failure = FALSE)
       """
-    Then the error message includes "step left a mess"
+    Then the errors are
+      """
+      [error] Scenario: Add an item
+      Error in `hook$fn(...)`: step left a mess
+      """
     And the steps have these results:
       | step                  | status |
       | Given an empty basket | failed |

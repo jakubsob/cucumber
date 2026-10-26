@@ -177,7 +177,11 @@ Feature: Hooks
       | step                           | status  |
       | Before Connect to the database | failed  |
       | Given an empty basket          | skipped |
-    And the error message includes "Hook \"Connect to the database\" failed: connection refused"
+    And the errors are
+      """
+      [failure] Scenario: Save the basket
+      Hook "Connect to the database" failed: connection refused
+      """
 
   @rd
   Scenario: A failing before hook skips the steps and fails the scenario
@@ -200,7 +204,11 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "no database"
+    Then the errors are
+      """
+      [failure] Scenario: Add an item
+      no database
+      """
     And the steps and hooks have these results:
       | step                  | status  |
       | Before                | failed  |
@@ -329,7 +337,11 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "the hook failed"
+    Then the errors are
+      """
+      [<kind>] Scenario: Add an item
+      <message>
+      """
     And the scenarios have these results:
       | scenario    | status |
       | Add an item | failed |
@@ -338,11 +350,11 @@ Feature: Hooks
       | Given an empty basket | <status> |
 
     Examples:
-      | hook        | argument | status  |
-      | before      | scenario | skipped |
-      | after       | scenario | passed  |
-      | before_step | step     | failed  |
-      | after_step  | step     | failed  |
+      | hook        | argument | status  | kind    | message                                  |
+      | before      | scenario | skipped | failure | the hook failed                          |
+      | after       | scenario | passed  | failure | the hook failed                          |
+      | before_step | step     | failed  | error   | Error in `hook$fn(...)`: the hook failed |
+      | after_step  | step     | failed  | error   | Error in `hook$fn(...)`: the hook failed |
 
   Scenario Outline: <hook>() with the wrong number of arguments is an error
     Given a file named "features/basket.feature" with

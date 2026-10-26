@@ -48,7 +48,15 @@ Feature: Parameter types
         """
         test("features", stop_on_failure = FALSE)
         """
-      Then the error message includes "No step found for: \"the count is +5\""
+      Then the errors are
+        """
+        [failure] Scenario: Plus sign
+        No step found for: "the count is +5"
+        i Add a step definition:
+          given("the count is {float}", function(float, context) {
+            pending()
+          })
+        """
 
     @rd
     Scenario: {float} captures a decimal number from step text
@@ -243,8 +251,9 @@ Feature: Parameter types
       Then the steps have these results:
         | step                          | status |
         | Given the count is 3000000000 | failed |
-      And the scenario "Big number" errored with
+      And the errors are
         """
+        [error] Scenario: Big number
         Error: Step "the count is 3000000000" failed
         i Feature: params.feature
         i Scenario: Big number
@@ -404,8 +413,9 @@ Feature: Parameter types
       Then the steps have these results:
         | step                     | status |
         | Given the colour is blue | failed |
-      And the scenario "Colour" errored with
+      And the errors are
         """
+        [error] Scenario: Colour
         Error: Step "the colour is blue" failed
         i Feature: params.feature
         i Scenario: Colour

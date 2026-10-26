@@ -28,17 +28,13 @@ Feature: Ambiguous steps
     Then the steps have these results:
       | step                     | status    |
       | Given the user is "John" | ambiguous |
-    And the error message includes
+    And the errors are
       """
+      [failure] Scenario: Name a user
       Multiple step definitions match: "the user is "John""
-      """
-    And the error message includes
-      """
-      "the user is {}" (setup-steps.R:1)
-      """
-    And the error message includes
-      """
-      "the user is {string}" (setup-steps.R:4)
+      i Make the step match only one of:
+      * "the user is {}" (setup-steps.R:1)
+      * "the user is {string}" (setup-steps.R:4)
       """
 
   Scenario: The same step defined twice is ambiguous
@@ -62,17 +58,13 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
+      [failure] Scenario: Add an item
       Multiple step definitions match: "I add an item"
-      """
-    And the error message includes
-      """
-      "I add an item" (setup-steps.R:1)
-      """
-    And the error message includes
-      """
-      "I add an item" (setup-steps.R:4)
+      i Make the step match only one of:
+      * "I add an item" (setup-steps.R:1)
+      * "I add an item" (setup-steps.R:4)
       """
 
   @rd
@@ -100,9 +92,13 @@ Feature: Ambiguous steps
     Then the steps have these results:
       | step                               | status    |
       | Given there is money in my account | ambiguous |
-    And the error message includes
+    And the errors are
       """
+      [failure] Scenario: Withdraw
       Multiple step definitions match: "there is money in my account"
+      i Make the step match only one of:
+      * "there is money in my account" (setup-steps.R:1)
+      * "there is money in my account" (setup-steps.R:2)
       """
 
   Scenario: {int} and {float} definitions are ambiguous for an integer
@@ -126,15 +122,11 @@ Feature: Ambiguous steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
+      [failure] Scenario: Count cucumbers
       Multiple step definitions match: "there are 12 cucumbers"
-      """
-    And the error message includes
-      """
-      "there are {int} cucumbers" (setup-steps.R:1)
-      """
-    And the error message includes
-      """
-      "there are {float} cucumbers" (setup-steps.R:4)
+      i Make the step match only one of:
+      * "there are {int} cucumbers" (setup-steps.R:1)
+      * "there are {float} cucumbers" (setup-steps.R:4)
       """

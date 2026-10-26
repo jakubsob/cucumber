@@ -59,8 +59,16 @@ Feature: Failing steps
     Then the steps have these results:
       | step                         | status |
       | Then the basket has an apple | failed |
-    And the error message includes "the number of items"
-    And the error message doesn't include "the first item"
+    And the errors are
+      """
+      [failure] Scenario: Add an item
+      Step "the basket has an apple" failed
+      Expected the number of items to equal 1.
+      Differences:
+      1/1 mismatches
+      [1] 2 - 1 == 1
+      Step at: setup-steps.R:1
+      """
 
   Scenario: A step that throws an error fails, and the other scenarios still run
     Given a file named "features/basket.feature" with
@@ -83,7 +91,16 @@ Feature: Failing steps
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes "basket is full"
+    Then the errors are
+      """
+      [error] Scenario: Add an item
+      Error: Step "I add an item" failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:2
+      Caused by error:
+      ! basket is full
+      """
     And the scenarios have these results:
       | scenario             | status |
       | Add an item          | failed |

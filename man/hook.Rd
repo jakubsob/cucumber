@@ -302,7 +302,11 @@ use a Background instead, and keep before hooks for low-level work like starting
     <span class="op">|</span> step                           <span class="op">|</span> status  <span class="op">|</span>
     <span class="op">|</span> Before Connect to the database <span class="op">|</span> failed  <span class="op">|</span>
     <span class="op">|</span> Given an empty basket          <span class="op">|</span> skipped <span class="op">|</span>
-  <span class="fu">And</span> the error message includes <span class="st">"Hook \\"</span>Connect to the database\\<span class="st">" failed: connection refused"</span></code></pre >}}
+  <span class="fu">And</span> the errors are
+<span class="st">    """</span>
+<span class="st">    [failure] Scenario: Save the basket</span>
+<span class="st">    Hook "Connect to the database" failed: connection refused</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A named hook's errors start with its name
   Given a file named "features/basket.feature" with
     """
@@ -323,7 +327,11 @@ use a Background instead, and keep before hooks for low-level work like starting
     | step                           | status  |
     | Before Connect to the database | failed  |
     | Given an empty basket          | skipped |
-  And the error message includes "Hook \\"Connect to the database\\" failed: connection refused"
+  And the errors are
+    """
+    [failure] Scenario: Save the basket
+    Hook "Connect to the database" failed: connection refused
+    """
 %</pre>
 }}
 
@@ -348,7 +356,11 @@ use a Background instead, and keep before hooks for low-level work like starting
 <span class="st">    """</span>
 <span class="st">    test("features", stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the error message includes <span class="st">"no database"</span>
+  <span class="fu">Then</span> the errors are
+<span class="st">    """</span>
+<span class="st">    [failure] Scenario: Add an item</span>
+<span class="st">    no database</span>
+<span class="st">    """</span>
   <span class="fu">And</span> the steps and hooks have these results:
     <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
     <span class="op">|</span> Before                <span class="op">|</span> failed  <span class="op">|</span>
@@ -373,7 +385,11 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then the error message includes "no database"
+  Then the errors are
+    """
+    [failure] Scenario: Add an item
+    no database
+    """
   And the steps and hooks have these results:
     | step                  | status  |
     | Before                | failed  |

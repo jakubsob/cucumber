@@ -458,8 +458,14 @@ then \code{context}, in this order.
 <span class="st">    """</span>
 <span class="st">    test("features")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it fails with <span class="st">"A step definition must have `context` as its last argument."</span>
-  <span class="fu">And</span> it fails with <span class="st">"Use `function(n, context)`."</span>
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error in `source_dir()`:</span>
+<span class="st">    ! Failed to evaluate './setup-steps.R'.</span>
+<span class="st">    Caused by error in `when()`:</span>
+<span class="st">    ! A step definition must have `context` as its last argument.</span>
+<span class="st">    i Use `function(n, context)`.</span>
+<span class="st">    """</span>
 <span></span>
   <span class="kw">Examples:</span>
     <span class="op">|</span> case             <span class="op">|</span> definition              <span class="op">|</span>
@@ -480,8 +486,14 @@ then \code{context}, in this order.
     """
     test("features")
     """
-  Then it fails with "A step definition must have `context` as its last argument."
-  And it fails with "Use `function(n, context)`."
+  Then it fails with
+    """
+    Error in `source_dir()`:
+    ! Failed to evaluate './setup-steps.R'.
+    Caused by error in `when()`:
+    ! A step definition must have `context` as its last argument.
+    i Use `function(n, context)`.
+    """
 
   Examples:
     | case             | definition              |
@@ -1505,8 +1517,16 @@ An error is shown with its backtrace, the calls of the step down to where it was
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                         <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Then the basket has an apple <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the error message includes <span class="st">"the number of items"</span>
-  <span class="fu">And</span> the error message doesn't include <span class="st">"the first item"</span></code></pre >}}
+  <span class="fu">And</span> the errors are
+<span class="st">    """</span>
+<span class="st">    [failure] Scenario: Add an item</span>
+<span class="st">    Step "the basket has an apple" failed</span>
+<span class="st">    Expected the number of items to equal 1.</span>
+<span class="st">    Differences:</span>
+<span class="st">    1/1 mismatches</span>
+<span class="st">    [1] 2 - 1 == 1</span>
+<span class="st">    Step at: setup-steps.R:1</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step stops at its first failed expectation
   Given a file named "features/basket.feature" with
     """
@@ -1529,8 +1549,16 @@ An error is shown with its backtrace, the calls of the step down to where it was
   Then the steps have these results:
     | step                         | status |
     | Then the basket has an apple | failed |
-  And the error message includes "the number of items"
-  And the error message doesn't include "the first item"
+  And the errors are
+    """
+    [failure] Scenario: Add an item
+    Step "the basket has an apple" failed
+    Expected the number of items to equal 1.
+    Differences:
+    1/1 mismatches
+    [1] 2 - 1 == 1
+    Step at: setup-steps.R:1
+    """
 %</pre>
 }}
 
@@ -1556,7 +1584,16 @@ An error is shown with its backtrace, the calls of the step down to where it was
 <span class="st">    """</span>
 <span class="st">    test("features", stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the error message includes <span class="st">"basket is full"</span>
+  <span class="fu">Then</span> the errors are
+<span class="st">    """</span>
+<span class="st">    [error] Scenario: Add an item</span>
+<span class="st">    Error: Step "I add an item" failed</span>
+<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Scenario: Add an item</span>
+<span class="st">    i Step defined at: setup-steps.R:2</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! basket is full</span>
+<span class="st">    """</span>
   <span class="fu">And</span> the scenarios have these results:
     <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Add an item          <span class="op">|</span> failed <span class="op">|</span>
@@ -1582,7 +1619,16 @@ An error is shown with its backtrace, the calls of the step down to where it was
     """
     test("features", stop_on_failure = FALSE)
     """
-  Then the error message includes "basket is full"
+  Then the errors are
+    """
+    [error] Scenario: Add an item
+    Error: Step "I add an item" failed
+    i Feature: basket.feature
+    i Scenario: Add an item
+    i Step defined at: setup-steps.R:2
+    Caused by error:
+    ! basket is full
+    """
   And the scenarios have these results:
     | scenario             | status |
     | Add an item          | failed |
@@ -1767,13 +1813,11 @@ Keep only one of them, as a step that matches several step definitions is ambigu
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                  <span class="op">|</span> status    <span class="op">|</span>
     <span class="op">|</span> Given an empty basket <span class="op">|</span> undefined <span class="op">|</span>
-  <span class="fu">And</span> the error message includes
+  <span class="fu">And</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [failure] Scenario: Start shopping</span>
 <span class="st">    No step found for: "an empty basket"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the error message includes
-<span class="st">    """</span>
-<span class="st">    Add a step definition:</span>
+<span class="st">    i Add a step definition:</span>
 <span class="st">      given("an empty basket", function(context) \{</span>
 <span class="st">        pending()</span>
 <span class="st">      \})</span>
@@ -1793,13 +1837,11 @@ Keep only one of them, as a step that matches several step definitions is ambigu
   Then the steps have these results:
     | step                  | status    |
     | Given an empty basket | undefined |
-  And the error message includes
+  And the errors are
     """
+    [failure] Scenario: Start shopping
     No step found for: "an empty basket"
-    """
-  And the error message includes
-    """
-    Add a step definition:
+    i Add a step definition:
       given("an empty basket", function(context) \{
         pending()
       \})
@@ -1823,9 +1865,11 @@ Keep only one of them, as a step that matches several step definitions is ambigu
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                                  <span class="op">|</span> status    <span class="op">|</span>
     <span class="op">|</span> Given I have 5 cucumbers in my basket <span class="op">|</span> undefined <span class="op">|</span>
-  <span class="fu">And</span> the error message includes
+  <span class="fu">And</span> the errors are
 <span class="st">    """</span>
-<span class="st">    Add a step definition:</span>
+<span class="st">    [failure] Scenario: Count cucumbers</span>
+<span class="st">    No step found for: "I have 5 cucumbers in my basket"</span>
+<span class="st">    i Add a step definition:</span>
 <span class="st">      given("I have \{int\} cucumbers in my basket", function(int, context) \{</span>
 <span class="st">      # given("I have \{float\} cucumbers in my basket", function(float, context) \{</span>
 <span class="st">        pending()</span>
@@ -1846,9 +1890,11 @@ Keep only one of them, as a step that matches several step definitions is ambigu
   Then the steps have these results:
     | step                                  | status    |
     | Given I have 5 cucumbers in my basket | undefined |
-  And the error message includes
+  And the errors are
     """
-    Add a step definition:
+    [failure] Scenario: Count cucumbers
+    No step found for: "I have 5 cucumbers in my basket"
+    i Add a step definition:
       given("I have \{int\} cucumbers in my basket", function(int, context) \{
       # given("I have \{float\} cucumbers in my basket", function(float, context) \{
         pending()
@@ -1891,17 +1937,13 @@ every matching definition, and the scenario fails.
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                     <span class="op">|</span> status    <span class="op">|</span>
     <span class="op">|</span> Given the user is <span class="st">"John"</span> <span class="op">|</span> ambiguous <span class="op">|</span>
-  <span class="fu">And</span> the error message includes
+  <span class="fu">And</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [failure] Scenario: Name a user</span>
 <span class="st">    Multiple step definitions match: "the user is "John""</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the error message includes
-<span class="st">    """</span>
-<span class="st">    "the user is \{\}" (setup-steps.R:1)</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the error message includes
-<span class="st">    """</span>
-<span class="st">    "the user is \{string\}" (setup-steps.R:4)</span>
+<span class="st">    i Make the step match only one of:</span>
+<span class="st">    * "the user is \{\}" (setup-steps.R:1)</span>
+<span class="st">    * "the user is \{string\}" (setup-steps.R:4)</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step matching two definitions fails with both definitions listed
   Given a package
@@ -1927,17 +1969,13 @@ every matching definition, and the scenario fails.
   Then the steps have these results:
     | step                     | status    |
     | Given the user is "John" | ambiguous |
-  And the error message includes
+  And the errors are
     """
+    [failure] Scenario: Name a user
     Multiple step definitions match: "the user is "John""
-    """
-  And the error message includes
-    """
-    "the user is \{\}" (setup-steps.R:1)
-    """
-  And the error message includes
-    """
-    "the user is \{string\}" (setup-steps.R:4)
+    i Make the step match only one of:
+    * "the user is \{\}" (setup-steps.R:1)
+    * "the user is \{string\}" (setup-steps.R:4)
     """
 %</pre>
 }}
@@ -1967,9 +2005,13 @@ every matching definition, and the scenario fails.
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                               <span class="op">|</span> status    <span class="op">|</span>
     <span class="op">|</span> Given there is money in my account <span class="op">|</span> ambiguous <span class="op">|</span>
-  <span class="fu">And</span> the error message includes
+  <span class="fu">And</span> the errors are
 <span class="st">    """</span>
+<span class="st">    [failure] Scenario: Withdraw</span>
 <span class="st">    Multiple step definitions match: "there is money in my account"</span>
+<span class="st">    i Make the step match only one of:</span>
+<span class="st">    * "there is money in my account" (setup-steps.R:1)</span>
+<span class="st">    * "there is money in my account" (setup-steps.R:2)</span>
 <span class="st">    """</span></code></pre >}}  
 \if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
   A Given and a Then step with the same text match the same step definitions,
@@ -1995,9 +2037,13 @@ every matching definition, and the scenario fails.
   Then the steps have these results:
     | step                               | status    |
     | Given there is money in my account | ambiguous |
-  And the error message includes
+  And the errors are
     """
+    [failure] Scenario: Withdraw
     Multiple step definitions match: "there is money in my account"
+    i Make the step match only one of:
+    * "there is money in my account" (setup-steps.R:1)
+    * "there is money in my account" (setup-steps.R:2)
     """
 %</pre>
 }}  

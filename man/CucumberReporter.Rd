@@ -293,8 +293,13 @@ testthat reporters can't.
 <span class="st">    source("broken-reporter.R")</span>
 <span class="st">    test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it fails with <span class="st">"Reporter `BrokenReporter` failed in `add_message()`."</span>
-  <span class="fu">And</span> it fails with <span class="st">"can't format the step"</span>
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error:</span>
+<span class="st">    ! Reporter `BrokenReporter` failed in `add_message()`.</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! can't format the step</span>
+<span class="st">    """</span>
   <span class="fu">And</span> the output includes <span class="st">"message: testCaseStarted"</span> once</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A reporter that fails stops the run with its error
   The scenarios after it don't run, and the error names the reporter and the event it failed in.
@@ -331,8 +336,13 @@ testthat reporters can't.
     source("broken-reporter.R")
     test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
     """
-  Then it fails with "Reporter `BrokenReporter` failed in `add_message()`."
-  And it fails with "can't format the step"
+  Then it fails with
+    """
+    Error:
+    ! Reporter `BrokenReporter` failed in `add_message()`.
+    Caused by error:
+    ! can't format the step
+    """
   And the output includes "message: testCaseStarted" once
 %</pre>
 }}
@@ -353,7 +363,12 @@ testthat reporters can't.
 <span class="st">    """</span>
 <span class="st">    test("features", reporter = testthat::ProgressReporter$new())</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it fails with <span class="st">"`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."</span></code></pre >}}
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error in `lapply()`:</span>
+<span class="st">    ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.</span>
+<span class="st">    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A testthat reporter can't report a run
   Given a file named "features/basket.feature" with
     """
@@ -369,7 +384,12 @@ testthat reporters can't.
     """
     test("features", reporter = testthat::ProgressReporter$new())
     """
-  Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."
+  Then it fails with
+    """
+    Error in `lapply()`:
+    ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
+    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
+    """
 %</pre>
 }}
 

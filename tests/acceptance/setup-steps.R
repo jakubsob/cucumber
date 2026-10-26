@@ -244,25 +244,6 @@ then("the scenario {string} is {word} with {string}", function(name, outcome, me
   expect_equal(conditionMessage(results[[1]]), message)
 })
 
-# The whole message testthat's reporter shows for the error of a scenario
-then("the scenario {string} errored with", function(name, message, context) {
-  test <- Find(\(test) test$test == paste("Scenario:", name), context$result)
-  results <- Filter(\(result) !inherits(result, "expectation_success"), test$results)
-  expect_length(results, 1)
-  expect_s3_class(results[[1]], "expectation_error")
-  expect_equal(conditionMessage(results[[1]]), message)
-})
-
-then("it fails with {string}", function(error_message, context) {
-  expect_false(is.null(context$error))
-  # Get the full error message including cli formatting
-  full_message <- paste(conditionMessage(context$error), collapse = "\n")
-  expect_true(
-    grepl(error_message, full_message, fixed = TRUE),
-    info = sprintf("Expected error to contain '%s', but got: %s", error_message, full_message)
-  )
-})
-
 # The error as R shows it, with the calls it names, to read it like a snapshot.
 # Where a call is in cucumber's code is left out, as its lines change with the code.
 shown_error <- function(error) {
@@ -284,44 +265,25 @@ then("it fails with", function(message, context) {
   expect_equal(paste(shown_error(context$error), collapse = "\n"), message)
 })
 
-extract_error_messages <- function(result) {
-  messages <- lapply(result, function(r) {
-    lapply(r$results, function(exp) {
-      if (!inherits(exp, "expectation_success") && !inherits(exp, "expectation_skip")) {
-        exp$message
-      }
-    })
-  })
-  unlist(Filter(Negate(is.null), unlist(messages, recursive = FALSE)))
+# Each failure, error and warning testthat got from the last run, in the order
+# they happened, under a header with its kind and its scenario, like
+# `[failure] Scenario: Add an item`, or only its kind outside of a scenario,
+# like the error of a feature file that can't be parsed
+shown_results <- function(result) {
+  kinds <- c(expectation_failure = "failure", expectation_error = "error", expectation_warning = "warning")
+  shown <- unlist(lapply(result, \(test) lapply(test$results, \(expectation) {
+    kind <- kinds[intersect(class(expectation), names(kinds))[1]]
+    if (is.na(kind)) return(NULL)
+    header <- paste0("[", kind, "]", if (!is.na(test$test)) paste0(" ", test$test))
+    # Without spaces at the ends of lines, which editors remove from feature files
+    lines <- strsplit(cli::ansi_strip(conditionMessage(expectation)), "\n")[[1]]
+    paste(c(header, trimws(lines, which = "right")), collapse = "\n")
+  })))
+  paste(shown, collapse = "\n\n")
 }
 
-then("the error message includes {string}", function(text, context) {
-  messages <- extract_error_messages(context$result)
-  expect_true(
-    any(vapply(messages, function(m) grepl(text, m, fixed = TRUE), logical(1))),
-    info = paste("Messages found:\n", paste(messages, collapse = "\n---\n"))
-  )
-})
-
-then("the error message doesn't include {string}", function(text, context) {
-  messages <- extract_error_messages(context$result)
-  expect_false(
-    any(vapply(messages, function(m) grepl(text, m, fixed = TRUE), logical(1))),
-    info = paste("Messages found:\n", paste(messages, collapse = "\n---\n"))
-  )
-})
-
-then("the error message includes", function(text, context) {
-  messages <- extract_error_messages(context$result)
-  # Normalize whitespace so indentation differences between the feature file
-  # and the error message don't matter
-  needle <- paste(trimws(strsplit(text, "\n")[[1]]), collapse = " ")
-  normalize <- function(s) paste(trimws(strsplit(s, "\n")[[1]]), collapse = " ")
-  found <- any(vapply(messages, function(m) grepl(needle, normalize(m), fixed = TRUE), logical(1)))
-  expect_true(
-    found,
-    info = paste0("Expected:\n", paste(text, collapse = "\n"), "\n\nIn messages:\n", paste(messages, collapse = "\n---\n"))
-  )
+then("the errors are", function(expected, context) {
+  expect_equal(shown_results(context$result), expected)
 })
 
 then("the output includes", function(text, context) {

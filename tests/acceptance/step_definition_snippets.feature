@@ -19,13 +19,11 @@ Feature: Step definition snippets
     Then the steps have these results:
       | step                  | status    |
       | Given an empty basket | undefined |
-    And the error message includes
+    And the errors are
       """
+      [failure] Scenario: Start shopping
       No step found for: "an empty basket"
-      """
-    And the error message includes
-      """
-      Add a step definition:
+      i Add a step definition:
         given("an empty basket", function(context) {
           pending()
         })
@@ -47,9 +45,11 @@ Feature: Step definition snippets
     Then the steps have these results:
       | step                                  | status    |
       | Given I have 5 cucumbers in my basket | undefined |
-    And the error message includes
+    And the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Count cucumbers
+      No step found for: "I have 5 cucumbers in my basket"
+      i Add a step definition:
         given("I have {int} cucumbers in my basket", function(int, context) {
         # given("I have {float} cucumbers in my basket", function(float, context) {
           pending()
@@ -68,9 +68,11 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Count cucumbers
+      No step found for: "I have 5 and 6 cucumbers"
+      i Add a step definition:
         given("I have {int} and {int} cucumbers", function(int, int2, context) {
         # given("I have {int} and {float} cucumbers", function(int, float, context) {
         # given("I have {float} and {int} cucumbers", function(float, int, context) {
@@ -91,9 +93,11 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Say hello
+      No step found for: "I see the message "hello world""
+      i Add a step definition:
         given("I see the message {string}", function(string, context) {
           pending()
         })
@@ -111,9 +115,11 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Show the result
+      No step found for: "the result is shown"
+      i Add a step definition:
         then("the result is shown", function(context) {
           pending()
         })
@@ -131,9 +137,11 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Mixed parameters
+      No step found for: ""Alice" has 1.5 cucumbers and "Bob" has none"
+      i Add a step definition:
         given("{string} has {float} cucumbers and {string} has none", function(string, float, string2, context) {
           pending()
         })
@@ -157,16 +165,18 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Step arguments
+      No step found for: "these people"
+      i Add a step definition:
         given("these people", function(data_table, context) {
           pending()
         })
-      """
-    And the error message includes
-      """
-      Add a step definition:
+
+      [failure] Scenario: Step arguments
+      No step found for: "I send"
+      i Add a step definition:
         when("I send", function(doc_string, context) {
           pending()
         })
@@ -183,13 +193,19 @@ Feature: Step definition snippets
           <previous> I start shopping
           <keyword> I pick a cucumber
       """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I start shopping", function(context) {})
+      """
     When I run
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Shopping
+      No step found for: "I pick a cucumber"
+      i Add a step definition:
         <function>("I pick a cucumber", function(context) {
           pending()
         })
@@ -216,9 +232,18 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Shopping
+      No step found for: "I start shopping"
+      i Add a step definition:
+        then("I start shopping", function(context) {
+          pending()
+        })
+
+      [failure] Scenario: Shopping
+      No step found for: "I pick a cucumber"
+      i Add a step definition:
         given("I pick a cucumber", function(context) {
           pending()
         })
@@ -236,9 +261,11 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Draft
+      No step found for: "I visit /about (beta) {draft}"
+      i Add a step definition:
         given("I visit \\/about \\(beta) \\{draft}", function(context) {
           pending()
         })
@@ -261,9 +288,11 @@ Feature: Step definition snippets
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the error message includes
+    Then the errors are
       """
-      Add a step definition:
+      [failure] Scenario: Pick a ball
+      No step found for: "a big red ball"
+      i Add a step definition:
         given("a big {colour} ball", function(colour, context) {
           pending()
         })
