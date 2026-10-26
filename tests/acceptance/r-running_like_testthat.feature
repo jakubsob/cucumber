@@ -617,3 +617,42 @@ Feature: Running feature files like testthat runs test files
       """
     Then it passes
     And it ran "Scenario: Adding an apple in R CMD check"
+
+  Scenario: A failed scenario fails R CMD check
+    Given a file named "NAMESPACE" with
+      """
+      """
+    And a file named "tests/testthat/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Adding an apple in R CMD check
+          Given an empty basket
+          When I add an apple
+          Then the basket has 2 items
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {
+        context$items <- 0
+      })
+      when("I add an apple", function(context) {
+        context$items <- context$items + 1
+      })
+      then("the basket has {int} item(s)", function(n, context) {
+        expect_equal(context$items, n)
+      })
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      cucumber::run()
+      """
+    When I run it and it fails
+      """
+      lib <- withr::local_tempdir()
+      install.packages(normalizePath("."), lib = lib, repos = NULL, type = "source", quiet = TRUE)
+      withr::local_libpaths(lib, action = "prefix")
+      withr::local_envvar(NOT_CRAN = NA, `_R_CHECK_PACKAGE_NAME_` = "example")
+      withr::defer(unloadNamespace("example"))
+      withr::with_dir("tests", testthat::test_check("example", reporter = "silent"))
+      """
+    Then it fails with "Test failures"
