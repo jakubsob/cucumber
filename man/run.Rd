@@ -367,6 +367,46 @@ definitions and hooks are then cleared when it returns.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows the backtrace of a step's error
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    add_one &lt;- function(x) stop("can't add one")</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- add_one(1)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes lines matching these patterns in order:
+<span class="st">    """</span>
+<span class="st">    can't add one</span>
+<span class="st">    Backtrace:</span>
+<span class="st">    add_one\\(1\\)</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: testthat's reporter shows the backtrace of a step's error
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    add_one <- function(x) stop("can't add one")
+    given("I calculate", function(context) \{
+      context$result <- add_one(1)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+    """
+  Then the output includes lines matching these patterns in order:
+    """
+    can't add one
+    Backtrace:
+    add_one\\(1\\)
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows an undefined step without a backtrace
   The step isn't code that ran, so there is no call to show.
 <span></span>

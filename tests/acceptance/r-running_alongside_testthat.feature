@@ -143,6 +143,25 @@ Feature: Running scenarios alongside testthat tests
       | scenario   | location            |
       | Adding one | calculate.feature:4 |
 
+  Scenario: testthat's reporter shows the backtrace of a step's error
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      add_one <- function(x) stop("can't add one")
+      given("I calculate", function(context) {
+        context$result <- add_one(1)
+      })
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      can't add one
+      Backtrace:
+      add_one\(1\)
+      """
+
   Scenario: testthat's reporter shows an undefined step without a backtrace
     The step isn't code that ran, so there is no call to show.
 

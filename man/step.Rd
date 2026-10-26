@@ -1412,6 +1412,7 @@ Source: \code{tests/acceptance/passing_steps.feature}
 A step fails when its step definition throws an error or a failed expectation.
 The steps after it are skipped, and the other scenarios still run.
 A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
+An error is shown with its backtrace, the calls of the step down to where it was thrown, like in a testthat test.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
@@ -1586,6 +1587,62 @@ A step stops at its first failed expectation: unlike in a testthat test, the cod
     | scenario             | status |
     | Add an item          | failed |
     | Look into the basket | passed |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> An error is shown with the backtrace of the step
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    open_basket &lt;- function() find_basket()</span>
+<span class="st">    find_basket &lt;- function() stop("basket is missing")</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      open_basket()</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes lines matching these patterns in order:
+<span class="st">    """</span>
+<span class="st">    basket is missing</span>
+<span class="st">    Backtrace:</span>
+<span class="st">    open_basket\\(\\)</span>
+<span class="st">    find_basket\\(\\)</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: An error is shown with the backtrace of the step
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    open_basket <- function() find_basket()
+    find_basket <- function() stop("basket is missing")
+    when("I add an item", function(context) \{
+      open_basket()
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the output includes lines matching these patterns in order:
+    """
+    basket is missing
+    Backtrace:
+    open_basket\\(\\)
+    find_basket\\(\\)
+    """
 %</pre>
 }}
 

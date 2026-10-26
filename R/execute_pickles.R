@@ -423,6 +423,36 @@ new_step_result <- function(step, status, error = NULL, duration = 0) {
   step
 }
 
+#' Call a step definition with its arguments, so that rlang captures the
+#' backtrace of an error in it from the step down, see `step_trace()`
+#' @keywords internal
+#' @noRd
+call_step <- function(fn, args, context) {
+  withr::local_options(rlang_trace_top_env = NULL)
+  run <- rlang::new_function(
+    rlang::pairlist2(... = ),
+    bquote({
+      options(rlang_trace_top_env = environment())
+      .(fn)(...)
+    })
+  )
+  exec(run, !!!args, context = context)
+}
+
+#' The backtrace of an error in a step: the calls of the step down to the
+#' error, like testthat's backtrace of an error in a test starts at the calls
+#' of the test's code. It's empty for an error of the step definition itself.
+#' @param trace The backtrace of the error, from `rlang::cnd_entrace()` in its
+#'   handler, so it ends where the error was thrown
+#' @keywords internal
+#' @noRd
+step_trace <- function(trace) {
+  # The first frame is the step definition's, see `call_step()`
+  trace <- trace[-1, , drop = FALSE]
+  trace$parent <- pmax(trace$parent - 1L, 0L)
+  trace
+}
+
 #' Execute a single step
 #'
 #' @keywords internal
@@ -438,7 +468,7 @@ execute_single_step <- function(step, context, pickle = NULL) {
   tryCatch(
     withCallingHandlers(
       with_nested_tests(
-        exec(step$matched_fn, !!!step$arguments(), context = context),
+        call_step(step$matched_fn, step$arguments(), context),
         "step",
         feature_srcref(pickle, step$line)
       ),
@@ -450,12 +480,13 @@ execute_single_step <- function(step, context, pickle = NULL) {
           return()
         }
 
+        trace <- step_trace(rlang::cnd_entrace(e)$trace)
         rlang::abort(
           rlang::format_error_bullets(step_error_bullets(step, pickle)),
           class = "cucumber_step_error",
           parent = e,
           call = NULL,
-          trace = empty_trace()
+          trace = trace
         )
       },
       # At the step's line, for testthat's reporters

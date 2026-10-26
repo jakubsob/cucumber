@@ -3,6 +3,7 @@ Feature: Failing steps
   A step fails when its step definition throws an error or a failed expectation.
   The steps after it are skipped, and the other scenarios still run.
   A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
+  An error is shown with its backtrace, the calls of the step down to where it was thrown, like in a testthat test.
 
   Background:
     Given a package
@@ -87,3 +88,30 @@ Feature: Failing steps
       | scenario             | status |
       | Add an item          | failed |
       | Look into the basket | passed |
+
+  Scenario: An error is shown with the backtrace of the step
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      open_basket <- function() find_basket()
+      find_basket <- function() stop("basket is missing")
+      when("I add an item", function(context) {
+        open_basket()
+      })
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      basket is missing
+      Backtrace:
+      open_basket\(\)
+      find_basket\(\)
+      """

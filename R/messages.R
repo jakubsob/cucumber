@@ -296,12 +296,19 @@ test_step_result <- function(result) {
   drop_null(list(
     status = toupper(result$status),
     duration = duration(result$duration),
-    message = if (!is.null(error)) conditionMessage(error),
+    message = if (!is.null(error)) paste(c(conditionMessage(error), if (!is.null(backtrace(error))) "Backtrace:", backtrace(error)), collapse = "\n"),
     exception = if (raised) exception_message(error)
   ))
 }
 
 exception_message <- function(error) {
   cause <- if (inherits(error, "cucumber_step_error")) error$parent else error
-  list(type = class(cause)[[1]], message = conditionMessage(cause))
+  drop_null(list(type = class(cause)[[1]], message = conditionMessage(cause), stackTrace = backtrace(error)))
+}
+
+#' An error's backtrace as plain text, or `NULL` if it has none
+#' @noRd
+backtrace <- function(error) {
+  trace <- error$trace
+  if (inherits(trace, "rlang_trace") && nrow(trace) > 0) paste(cli::ansi_strip(format(trace)), collapse = "\n")
 }
