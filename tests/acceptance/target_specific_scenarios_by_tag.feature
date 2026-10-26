@@ -304,3 +304,21 @@ Feature: Running scenarios by tag
         test("features", tags = "@a\\b", stop_on_failure = FALSE)
         """
       Then the error message includes "could not be parsed because of syntax error: Illegal escape before \"b\"."
+
+    Scenario: Several tag expressions are an error
+      Combine them into one with `and`.
+
+      Given a file named "features/tagged.feature" with
+        """
+        Feature: Tagged
+          @smoke
+          Scenario: Smoke
+            Given I have 1
+            Then I get 1
+        """
+      When I run it and it fails
+        """
+        test("features", tags = c("@smoke", "not @slow"))
+        """
+      Then it fails with "`tags` must be one tag expression."
+      And it fails with "Combine tag expressions with `and`, like `\"@smoke and not @slow\"`."

@@ -162,3 +162,18 @@ eval_tag_ast <- function(ast, tags) {
     "or" = eval_tag_ast(ast$left, tags) || eval_tag_ast(ast$right, tags)
   )
 }
+
+#' Check that `tags` of a run is one tag expression, or `NULL`
+#' @keywords internal
+#' @noRd
+check_tags <- function(tags) {
+  if (is.null(tags) || checkmate::test_string(tags)) {
+    return(invisible(tags))
+  }
+  abort(
+    "`tags` must be one tag expression.",
+    body = c(i = 'Combine tag expressions with `and`, like `"@smoke and not @slow"`.'),
+    call = NULL,
+    trace = empty_trace()
+  )
+}

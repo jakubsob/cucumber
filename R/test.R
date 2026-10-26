@@ -97,6 +97,7 @@ run <- function(
 #' @noRd
 run_cucumber <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env, start_file = NULL) {
   check_reporter(reporter)
+  check_tags(tags)
   retry <- checkmate::assert_count(retry, coerce = TRUE)
   order <- resolve_order(order)
   error <- NULL
@@ -592,6 +593,7 @@ test <- function(
   ...
 ) {
   check_reporter(reporter)
+  check_tags(tags)
   checkmate::assert_count(retry)
   order <- resolve_order(order)
   # Before the working directory is `path`, like `features = readLines("rerun.txt")`

@@ -56,6 +56,7 @@ features_rd <- function(
   ...
 ) {
   checkmate::assert_string(section, min.chars = 1)
+  check_tags(tags)
   check_grepl_args(...)
   lines <- feature_lines(features, path)
   files <- select_features(path, filter, lines, ...)
