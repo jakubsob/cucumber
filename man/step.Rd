@@ -1278,6 +1278,7 @@ Source: \code{tests/acceptance/doc_string.feature}
 
 A step passes when its step definition returns without an error.
 A scenario passes when all its steps pass, even if they have no expectations.
+testthat reports it as passed too, not skipped like an empty \code{test_that()} test.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
@@ -1332,6 +1333,74 @@ A scenario passes when all its steps pass, even if they have no expectations.
     test("features", reporter = NULL)
     """
   Then it passes
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat reports a scenario without expectations or steps as passed
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add an item</span>
+<span class="st"></span>
+<span class="st">      Scenario: Not written yet</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) \{</span>
+<span class="st">      context$basket &lt;- list()</span>
+<span class="st">    \})</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      context$basket &lt;- c(context$basket, "item")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
+<span class="st">    """</span>
+<span class="st">    run()</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "silent")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> only these scenarios ran:
+    <span class="op">|</span> scenario        <span class="op">|</span>
+    <span class="op">|</span> Add an item     <span class="op">|</span>
+    <span class="op">|</span> Not written yet <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: testthat reports a scenario without expectations or steps as passed
+  Given a file named "tests/testthat/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+        When I add an item
+
+      Scenario: Not written yet
+    """
+  And a file named "tests/testthat/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{
+      context$basket <- list()
+    \})
+    when("I add an item", function(context) \{
+      context$basket <- c(context$basket, "item")
+    \})
+    """
+  And a file named "tests/testthat/test-acceptance.R" with
+    """
+    run()
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "silent")
+    """
+  Then it passes
+  And only these scenarios ran:
+    | scenario        |
+    | Add an item     |
+    | Not written yet |
 %</pre>
 }}
 
