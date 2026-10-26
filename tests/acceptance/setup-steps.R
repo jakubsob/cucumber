@@ -160,16 +160,24 @@ then("the scenarios have these warnings:", function(expected, context) {
   expect_equal(warnings, as.data.frame(expected))
 })
 
-# Where testthat's results of the last run say each scenario failed, as `file:line`
-then("the scenarios failed at these locations:", function(expected, context) {
-  failures <- lapply(context$result, \(test) {
-    failure <- Find(\(result) inherits(result, c("expectation_failure", "expectation_error")), test$results)
-    if (is.null(failure)) return(NULL)
-    srcref <- failure$srcref
+# Where testthat's results of the last run say each scenario failed or skipped, as `file:line`
+expect_result_locations <- function(classes, expected, context) {
+  results <- lapply(context$result, \(test) {
+    result <- Find(\(result) inherits(result, classes), test$results)
+    if (is.null(result)) return(NULL)
+    srcref <- result$srcref
     location <- if (inherits(srcref, "srcref")) paste0(attr(srcref, "srcfile")$filename, ":", srcref[[1]]) else NA_character_
     data.frame(scenario = sub("^Scenario: ", "", test$test), location = location)
   })
-  expect_equal(do.call(rbind, failures), as.data.frame(expected))
+  expect_equal(do.call(rbind, results), as.data.frame(expected))
+}
+
+then("the scenarios failed at these locations:", function(expected, context) {
+  expect_result_locations(c("expectation_failure", "expectation_error"), expected, context)
+})
+
+then("the scenarios skipped at these locations:", function(expected, context) {
+  expect_result_locations("expectation_skip", expected, context)
 })
 
 # Every result of the run is a testthat skip, with this reason

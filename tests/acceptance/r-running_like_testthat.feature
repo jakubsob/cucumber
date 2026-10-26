@@ -6,8 +6,8 @@ Feature: Running feature files like testthat runs test files
   testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step fails when a
   `test_that()` test in it fails. With the 3rd edition, steps run with testthat's reproducible
   output, like its tests. What the setup files and steps defer to `testthat::teardown_env()` runs
-  when `test()` ends. Each feature file is the file of its scenarios' results, and a failure is
-  at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
+  when `test()` ends. Each feature file is the file of its scenarios' results, and a failure or a
+  skip is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
   `skip()` in a `before_all()` hook skips every scenario, like `skip()` at the top of a test file skips its tests.
@@ -299,6 +299,9 @@ Feature: Running feature files like testthat runs test files
       | scenario        | status  |
       | Adding an apple | skipped |
     And the results are skipped with "No database"
+    And the scenarios skipped at these locations:
+      | scenario        | location         |
+      | Adding an apple | basket.feature:2 |
 
   Scenario: A failed scenario is an error, unless `stop_on_failure = FALSE`
     Given a file named "features/basket.feature" with
@@ -383,6 +386,36 @@ Feature: Running feature files like testthat runs test files
       test("features", stop_on_failure = FALSE)
       """
     Then the scenarios failed at these locations:
+      | scenario            | location                   |
+      | Adding an apple     | basket.feature:4           |
+      | Paying for an apple | checkout/payment.feature:2 |
+
+  Scenario: A skip is at its line of the feature file, the line of its step or of its scenario
+    Given a file named "features/setup-hooks.R" with
+      """
+      before(function(context, scenario) {
+        if (scenario$name == "Paying for an apple") skip("The till is closed")
+      })
+      then("the basket isn't ready", function(context) skip_scenario("Not ready"))
+      """
+    And a file named "features/checkout/payment.feature" with
+      """
+      Feature: Payment
+        Scenario: Paying for an apple
+          Given an empty basket
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Adding an apple
+          Given an empty basket
+          Then the basket isn't ready
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the scenarios skipped at these locations:
       | scenario            | location                   |
       | Adding an apple     | basket.feature:4           |
       | Paying for an apple | checkout/payment.feature:2 |

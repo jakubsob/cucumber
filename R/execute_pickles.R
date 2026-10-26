@@ -199,7 +199,7 @@ execute_single_pickle <- function(
       testthat::succeed()
     }
     if (skip_steps && !dry_run && result$status == "skipped") {
-      testthat::skip(skip_reason)
+      skip_at(skip_reason, feature_srcref(pickle))
     }
   },
     warning = \(w) cucumber_event(reporter, "add_warning", w),
@@ -344,10 +344,7 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
 #' @keywords internal
 #' @noRd
 signal_scenario_result <- function(results, result, failing, pickle) {
-  location <- \(result) {
-    line <- if (isTRUE(result$hook)) pickle$source_line else result$line
-    srcref(srcfile(as.character(pickle$feature_file)), c(line, 1L, line, 1L))
-  }
+  location <- \(result) feature_srcref(pickle, if (isTRUE(result$hook)) pickle$source_line else result$line)
   failures <- Filter(\(result) result$status %in% failing, results)
   failed_step <- Find(\(result) result$status == "failed" && !isTRUE(result$hook), failures)
   # a loop, purrr would wrap the expectations testthat signals as errors
@@ -368,9 +365,28 @@ signal_scenario_result <- function(results, result, failing, pickle) {
   }
   if (length(failures) == 0 && result$status != "passed" && !is.null(result$error)) {
     # skip_scenario() or testthat::skip() keep their condition
-    if (inherits(result$error, "skip")) stop(result$error)
-    testthat::skip(conditionMessage(result$error))
+    skip <- if (inherits(result$error, "skip")) result$error else conditionMessage(result$error)
+    skip_at(skip, location(Find(\(step) identical(step$error, result$error), results)))
   }
+}
+
+#' A line of a scenario's feature file, for testthat's reporters to show a
+#' result there, like the line of an expectation in a test file
+#' @keywords internal
+#' @noRd
+feature_srcref <- function(pickle, line = pickle$source_line) {
+  # cli's links to the file need a character path, not an fs_path
+  srcref(srcfile(as.character(pickle$feature_file)), c(line, 1L, line, 1L))
+}
+
+#' Skip the scenario's testthat test at `srcref`
+#' @param skip A skip condition, or the message of a new one
+#' @keywords internal
+#' @noRd
+skip_at <- function(skip, srcref) {
+  if (!inherits(skip, "skip")) skip <- rlang::catch_cnd(testthat::skip(skip), "skip")
+  skip$srcref <- srcref
+  stop(skip)
 }
 
 new_step_result <- function(step, status, error = NULL, duration = 0) {
