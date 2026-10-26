@@ -177,6 +177,10 @@ Feature: Running feature files like testthat runs test files
       | When I add an apple                  | passed |
       | Then the basket is checked by a test | failed |
     And the error message includes 'The test "the basket is empty" in the step failed.'
+    And the scenarios failed at these locations:
+      | scenario                                              | location         |
+      | Checking the basket with a test / the basket is empty | basket.feature:5 |
+      | Checking the basket with a test                       | basket.feature:5 |
 
   Scenario: A hook fails when a test_that() test in it fails
     Given a file named "features/setup-hooks.R" with
@@ -196,6 +200,10 @@ Feature: Running feature files like testthat runs test files
       | Then the basket has 1 item | passed |
       | After                      | failed |
     And the error message includes 'The test "the basket is put away" in the hook failed.'
+    And the scenarios failed at these locations:
+      | scenario                                 | location         |
+      | Adding an apple / the basket is put away | basket.feature:2 |
+      | Adding an apple                          | basket.feature:2 |
 
   Scenario: Steps use the testthat edition of the package
     Given a file named "DESCRIPTION" with

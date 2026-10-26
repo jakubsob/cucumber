@@ -154,7 +154,7 @@ execute_single_pickle <- function(
         with_scenario_context(send, \(.context) {
           # A dry run matches the steps, but runs neither hooks nor step bodies
           for (test_step in pickle$test_case$before) {
-            run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE)
+            run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE, srcref = feature_srcref(pickle))
           }
 
           withCallingHandlers(for (step in pickle$steps) {
@@ -174,7 +174,7 @@ execute_single_pickle <- function(
           }, expectation = function(e) expectations <<- expectations + 1)
 
           for (test_step in pickle$test_case$after) {
-            run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE)
+            run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE, srcref = feature_srcref(pickle))
           }
         })
 
@@ -315,7 +315,9 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     data_table = step$data_table,
     doc_string = if (!is.null(step$docstring)) docstring_argument(step$docstring)
   ))
-  before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step)
+  # The tests in step hooks are at the step's line
+  srcref <- feature_srcref(pickle, step$line)
+  before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step, srcref = srcref)
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)
   } else {
@@ -325,7 +327,8 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     get_hooks_to_run(hooks, "after_step", pickle$tags),
     context,
     c(hook_step, list(status = step$status, error = step$error)),
-    stop_on_error = FALSE
+    stop_on_error = FALSE,
+    srcref = srcref
   )
   # The step gets the worse of its own result and the hook's
   if (!is.null(after_error)) {
@@ -375,10 +378,14 @@ signal_scenario_result <- function(results, result, failing, pickle) {
 }
 
 #' A line of a scenario's feature file, for testthat's reporters to show a
-#' result there, like the line of an expectation in a test file
+#' result there, like the line of an expectation in a test file. `NULL` for a
+#' scenario without a feature file, which testthat shows where it finds it.
 #' @keywords internal
 #' @noRd
 feature_srcref <- function(pickle, line = pickle$source_line) {
+  if (is.null(pickle$feature_file)) {
+    return(NULL)
+  }
   # cli's links to the file need a character path, not an fs_path
   srcref(srcfile(as.character(pickle$feature_file)), c(line, 1L, line, 1L))
 }
@@ -390,7 +397,7 @@ feature_srcref <- function(pickle, line = pickle$source_line) {
 #' @keywords internal
 #' @noRd
 warn_at <- function(cnd, srcref) {
-  if (!is.null(cnd$srcref)) {
+  if (is.null(srcref) || !is.null(cnd$srcref)) {
     return(invisible())
   }
   cnd$srcref <- srcref
@@ -429,7 +436,11 @@ execute_single_step <- function(step, context, pickle = NULL) {
 
   tryCatch(
     withCallingHandlers(
-      with_nested_tests(exec(step$matched_fn, !!!step$arguments(), context = context), "step"),
+      with_nested_tests(
+        exec(step$matched_fn, !!!step$arguments(), context = context),
+        "step",
+        feature_srcref(pickle, step$line)
+      ),
       error = function(e) {
         if (
           inherits(e, "expectation") ||
@@ -447,7 +458,7 @@ execute_single_step <- function(step, context, pickle = NULL) {
         )
       },
       # At the step's line, for testthat's reporters
-      warning = \(w) if (!is.null(pickle)) warn_at(rlang::cnd_entrace(w), feature_srcref(pickle, step$line))
+      warning = \(w) warn_at(rlang::cnd_entrace(w), feature_srcref(pickle, step$line))
     ),
     cucumber_pending = function(e) {
       status <<- "pending"
@@ -485,8 +496,9 @@ execute_single_step <- function(step, context, pickle = NULL) {
 }
 
 #' testthat's reporter of the tests in a step, like `test_that()` in a step
-#' definition: it reports them like testthat's reporter, and keeps the names of
-#' those that failed, so the step fails too
+#' definition: it reports them like testthat's reporter, at the line of the
+#' feature file the step or hook runs for, and keeps the names of those that
+#' failed, so the step fails too
 #' @keywords internal
 #' @noRd
 NestedTestsReporter <- R6::R6Class(
@@ -495,17 +507,21 @@ NestedTestsReporter <- R6::R6Class(
   public = list(
     reporter = NULL,
     prefix = NULL,
+    srcref = NULL,
     failed = character(),
-    initialize = function(reporter, scenario) {
+    initialize = function(reporter, scenario, srcref = NULL) {
       self$reporter <- reporter
       self$.context <- reporter$.context
       self$prefix <- paste0(scenario, " / ")
+      self$srcref <- srcref
     },
     start_test = function(context, test) self$reporter$start_test(context, test),
     add_result = function(context, test, result) {
       if (inherits(result, c("expectation_failure", "expectation_error"))) {
         self$failed <- union(self$failed, substring(test, nchar(self$prefix) + 1))
       }
+      # testthat finds the line of the test file that called run(), or none
+      if (!is.null(self$srcref)) result$srcref <- self$srcref
       self$reporter$add_result(context, test, result)
     },
     end_test = function(context, test) self$reporter$end_test(context, test)
@@ -513,15 +529,16 @@ NestedTestsReporter <- R6::R6Class(
 )
 
 #' Report the tests in a step to a NestedTestsReporter, until `frame` ends
+#' @param srcref Where the tests are in the feature file, see `feature_srcref()`
 #' @return The reporter, or `NULL` outside of a testthat test
 #' @keywords internal
 #' @noRd
-local_nested_tests <- function(frame = parent.frame()) {
+local_nested_tests <- function(srcref = NULL, frame = parent.frame()) {
   the <- utils::getFromNamespace("the", "testthat")
   if (is.null(the$reporter) || length(the$description) == 0) {
     return(NULL)
   }
-  nested <- NestedTestsReporter$new(the$reporter, paste(the$description, collapse = " / "))
+  nested <- NestedTestsReporter$new(the$reporter, paste(the$description, collapse = " / "), srcref)
   rlang::local_bindings(reporter = nested, .env = the, .frame = frame)
   nested
 }
@@ -529,10 +546,11 @@ local_nested_tests <- function(frame = parent.frame()) {
 #' Run `code`, the body of a step or a hook, and fail it if a test in it
 #' failed, see `local_nested_tests()`
 #' @param what What runs `code`: "step" or "hook"
+#' @param srcref Where the tests are in the feature file, see `feature_srcref()`
 #' @keywords internal
 #' @noRd
-with_nested_tests <- function(code, what) {
-  nested <- local_nested_tests()
+with_nested_tests <- function(code, what, srcref = NULL) {
+  nested <- local_nested_tests(srcref)
   code
   if (length(nested$failed) > 0) {
     tests <- paste0("\"", nested$failed, "\"", collapse = ", ")

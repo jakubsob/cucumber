@@ -208,15 +208,17 @@ get_hooks_to_run <- function(hooks, name, tags = character()) {
 #' first error, after hooks all run. With `can_skip`, a hook calling
 #' skip_scenario() or testthat::skip() stops the hooks and its condition is
 #' returned. Otherwise skipping is an error.
+#' @param srcref Where the tests in the hooks are in the feature file, see
+#'   `with_nested_tests()`
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
-run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE) {
+run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref = NULL) {
   first_error <- NULL
   for (hook in hooks) {
     error <- tryCatch(
       {
-        with_nested_tests(hook$fn(...), "hook")
+        with_nested_tests(hook$fn(...), "hook", srcref)
         NULL
       },
       cucumber_pending = function(cnd) {
