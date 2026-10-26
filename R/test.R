@@ -25,6 +25,8 @@
 #' hooks and parameter types are kept until testthat's run ends, as testthat runs the
 #' `setup-*.R` files that define them once for all test files. Outside of a testthat run,
 #' like when `run()` is called in the console, they're kept until `run()` returns.
+#' `run()` then attaches testthat for the steps' expectations, runs every scenario and
+#' fails with "Test failures." if one of them failed.
 #'
 #' `run()` in a parallel testthat run, with `Config/testthat/parallel: true`, is an error:
 #' testthat would delete the snapshot files of its feature files as unused.
@@ -66,7 +68,24 @@ run <- function(
   # Step definitions and hooks are cleared at the end of testthat's run, as the
   # setup files that registered them run once for all test files
   cleanup_env <- tryCatch(testthat::teardown_env(), error = \(e) NULL) %||% environment()
-  run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env)
+  if (!is.null(testthat::get_reporter())) {
+    return(run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env))
+  }
+  # Outside of a testthat run, like in the console, each scenario's test_that()
+  # would stop at its failure, so the scenarios run with a reporter of their own,
+  # like in test(), and testthat is attached for the steps' expectations
+  if (!"package:testthat" %in% search()) attachNamespace("testthat")
+  lister <- testthat::ListReporter$new()
+  lister$start_file("cucumber")
+  testthat::with_reporter(
+    lister,
+    run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env)
+  )
+  results <- as.data.frame(lister$get_results())
+  if (sum(results$failed) > 0 || any(results$error)) {
+    abort("Test failures.", call = NULL, trace = empty_trace())
+  }
+  invisible(NULL)
 }
 
 #' Run the feature files and report the run, see `run()`

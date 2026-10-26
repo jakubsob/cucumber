@@ -67,6 +67,8 @@ once for each \code{run()}, so twice if two test files call \code{run()}. Step d
 hooks and parameter types are kept until testthat's run ends, as testthat runs the
 \verb{setup-*.R} files that define them once for all test files. Outside of a testthat run,
 like when \code{run()} is called in the console, they're kept until \code{run()} returns.
+\code{run()} then attaches testthat for the steps' expectations, runs every scenario and
+fails with "Test failures." if one of them failed.
 
 \code{run()} in a parallel testthat run, with \code{Config/testthat/parallel: true}, is an error:
 testthat would delete the snapshot files of its feature files as unused.
@@ -89,8 +91,9 @@ Pass a \code{reporter} to \code{run()} to report the run with cucumber's reporte
 
 \code{run()} isn't supported in a parallel testthat run, with \code{Config/testthat/parallel: true}: it's an error.
 
-\code{run()} can also run feature files outside of a testthat run, like in the console. Its step
-definitions and hooks are then cleared when it returns.
+\code{run()} can also run feature files outside of a testthat run, like in the console. It then attaches
+testthat for the steps' expectations, runs every scenario and fails if one of them failed.
+Its step definitions and hooks are cleared when it returns.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
@@ -677,6 +680,74 @@ definitions and hooks are then cleared when it returns.
     1 scenario \\(1 passed\\)
     1 scenario \\(1 undefined\\)
     """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> run() outside of a testthat run runs every scenario, and fails if one failed
+  Steps can use testthat's expectations, as `run()` attaches testthat.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Calculate</span>
+<span class="st">      Scenario: Adding one</span>
+<span class="st">        Then one plus 1 is 2</span>
+<span class="st"></span>
+<span class="st">      Scenario: Adding two</span>
+<span class="st">        Then one plus 2 is 4</span>
+<span class="st"></span>
+<span class="st">      Scenario: Adding three</span>
+<span class="st">        Then one plus 3 is 4</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    then("one plus \{int\} is \{int\}", function(n, sum, context) \{</span>
+<span class="st">      expect_equal(1 + n, sum)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run outside of a testthat run and it fails
+<span class="st">    """</span>
+<span class="st">    source("features/steps.R")</span>
+<span class="st">    run("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it fails with <span class="st">"Test failures."</span>
+  <span class="fu">And</span> the scenarios have these results:
+    <span class="op">|</span> scenario     <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Adding one   <span class="op">|</span> passed <span class="op">|</span>
+    <span class="op">|</span> Adding two   <span class="op">|</span> failed <span class="op">|</span>
+    <span class="op">|</span> Adding three <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: run() outside of a testthat run runs every scenario, and fails if one failed
+  Steps can use testthat's expectations, as `run()` attaches testthat.
+
+  Given a file named "features/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Then one plus 1 is 2
+
+      Scenario: Adding two
+        Then one plus 2 is 4
+
+      Scenario: Adding three
+        Then one plus 3 is 4
+    """
+  And a file named "features/steps.R" with
+    """
+    then("one plus \{int\} is \{int\}", function(n, sum, context) \{
+      expect_equal(1 + n, sum)
+    \})
+    """
+  When I run outside of a testthat run and it fails
+    """
+    source("features/steps.R")
+    run("features")
+    """
+  Then it fails with "Test failures."
+  And the scenarios have these results:
+    | scenario     | status |
+    | Adding one   | passed |
+    | Adding two   | failed |
+    | Adding three | passed |
 %</pre>
 }}
 

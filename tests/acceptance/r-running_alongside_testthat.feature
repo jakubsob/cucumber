@@ -9,8 +9,9 @@ Feature: Running scenarios alongside testthat tests
 
   `run()` isn't supported in a parallel testthat run, with `Config/testthat/parallel: true`: it's an error.
 
-  `run()` can also run feature files outside of a testthat run, like in the console. Its step
-  definitions and hooks are then cleared when it returns.
+  `run()` can also run feature files outside of a testthat run, like in the console. It then attaches
+  testthat for the steps' expectations, runs every scenario and fails if one of them failed.
+  Its step definitions and hooks are cleared when it returns.
 
   Background:
     Given a package
@@ -292,6 +293,39 @@ Feature: Running scenarios alongside testthat tests
       1 scenario \(1 passed\)
       1 scenario \(1 undefined\)
       """
+
+  Scenario: run() outside of a testthat run runs every scenario, and fails if one failed
+    Steps can use testthat's expectations, as `run()` attaches testthat.
+
+    Given a file named "features/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one
+          Then one plus 1 is 2
+
+        Scenario: Adding two
+          Then one plus 2 is 4
+
+        Scenario: Adding three
+          Then one plus 3 is 4
+      """
+    And a file named "features/steps.R" with
+      """
+      then("one plus {int} is {int}", function(n, sum, context) {
+        expect_equal(1 + n, sum)
+      })
+      """
+    When I run outside of a testthat run and it fails
+      """
+      source("features/steps.R")
+      run("features")
+      """
+    Then it fails with "Test failures."
+    And the scenarios have these results:
+      | scenario     | status |
+      | Adding one   | passed |
+      | Adding two   | failed |
+      | Adding three | passed |
 
   Scenario: run() in a parallel testthat run is an error
     When I run

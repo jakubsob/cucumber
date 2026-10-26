@@ -15,14 +15,16 @@ given("a package", function(context) {
 
 # With `catch_error`, an error of the code is kept in `context$error` instead of failing the step
 run_code <- function(code, context, catch_error = FALSE) {
-  # Each test() of the code also writes its run as Cucumber Messages, read into
+  # Each test() and run() of the code also writes its run as Cucumber Messages, read into
   # `context$run`, so the results of the run are checked whatever the reporter prints
-  test <- function(..., reporter = CucumberProgressReporter$new()) {
+  record <- function(runner) function(..., reporter) {
     messages <- tempfile(fileext = ".ndjson")
     on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
     recorder <- CucumberMessagesReporter$new(messages)
-    cucumber::test(..., reporter = CucumberMultiReporter$new(purrr::compact(list(reporter, recorder))))
+    runner(..., reporter = CucumberMultiReporter$new(purrr::compact(list(reporter, recorder))))
   }
+  test <- function(..., reporter = CucumberProgressReporter$new()) record(cucumber::test)(..., reporter = reporter)
+  run <- function(..., reporter = NULL) record(cucumber::run)(..., reporter = reporter)
   x <- as.character(runif(1))
   .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)
   .cucumber_steps_option <- paste0(".cucumber_steps_", x)
@@ -66,14 +68,26 @@ when("I run", function(code, context) run_code(code, context))
 
 when("I run it and it fails", function(code, context) run_code(code, context, catch_error = TRUE))
 
-# Like in the console: no teardown environment, and the scenarios aren't
-# reported to the testthat run of these steps
-when("I run outside of a testthat run", function(code, context) {
+# Like in the console: testthat isn't attached, and there is no teardown
+# environment and no reporter, so the scenarios aren't reported to the testthat
+# run of these steps
+run_outside_testthat <- function(code, context, catch_error = FALSE) {
+  if ("package:testthat" %in% search()) {
+    detach("package:testthat")
+    on.exit(if (!"package:testthat" %in% search()) attachNamespace("testthat"))
+  }
   rlang::with_bindings(
-    testthat::with_reporter(testthat::SilentReporter$new(), run_code(code, context)),
+    run_code(code, context, catch_error),
     teardown_env = NULL,
+    reporter = NULL,
     .env = utils::getFromNamespace("the", "testthat")
   )
+}
+
+when("I run outside of a testthat run", function(code, context) run_outside_testthat(code, context))
+
+when("I run outside of a testthat run and it fails", function(code, context) {
+  run_outside_testthat(code, context, catch_error = TRUE)
 })
 
 # The steps of the last run's scenarios, and with `hooks` their hooks, in the
