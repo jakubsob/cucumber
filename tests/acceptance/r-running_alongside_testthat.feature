@@ -54,6 +54,34 @@ Feature: Running scenarios alongside testthat tests
     And it ran "Scenario: Adding one"
     And it ran "calculate adds one"
 
+  Scenario: Scenarios run when the test file that calls run() runs alone
+    Like with `devtools::test_active_file()`, the setup files next to it are run too.
+
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/testthat/test-calculate.R" with
+      """
+      test_that("calculate adds one", {
+        expect_equal(calculate(1), 2)
+      })
+      """
+    When I run
+      """
+      pkgload::load_all(quiet = TRUE)
+      testthat::test_file("tests/testthat/test-acceptance.R", reporter = "silent")
+      """
+    Then it passes
+    And only these scenarios ran:
+      | scenario   |
+      | Adding one |
+
   Scenario: Step definitions sourced into an environment are passed with `test_local(env = )`
     Given a file named "tests/testthat/steps/steps.R" with
       """

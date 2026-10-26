@@ -181,6 +181,64 @@ definitions and hooks are then cleared when it returns.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios run when the test file that calls run() runs alone
+  Like with `devtools::test_active_file()`, the setup files next to it are run too.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-calculate.R"</span> with
+<span class="st">    """</span>
+<span class="st">    test_that("calculate adds one", \{</span>
+<span class="st">      expect_equal(calculate(1), 2)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    pkgload::load_all(quiet = TRUE)</span>
+<span class="st">    testthat::test_file("tests/testthat/test-acceptance.R", reporter = "silent")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it passes
+  <span class="fu">And</span> only these scenarios ran:
+    <span class="op">|</span> scenario   <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Scenarios run when the test file that calls run() runs alone
+  Like with `devtools::test_active_file()`, the setup files next to it are run too.
+
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-calculate.R" with
+    """
+    test_that("calculate adds one", \{
+      expect_equal(calculate(1), 2)
+    \})
+    """
+  When I run
+    """
+    pkgload::load_all(quiet = TRUE)
+    testthat::test_file("tests/testthat/test-acceptance.R", reporter = "silent")
+    """
+  Then it passes
+  And only these scenarios ran:
+    | scenario   |
+    | Adding one |
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> Step definitions sourced into an environment are passed with `test_local(env = )`
   <span class="fu">Given</span> a file named <span class="st">"tests/testthat/steps/steps.R"</span> with
 <span class="st">    """</span>
