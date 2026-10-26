@@ -1,6 +1,7 @@
 Feature: Scenario Outlines
   A Scenario Outline runs once for each row of its Examples.
   The `<placeholders>` are replaced with the row's values in the scenario name, steps, Doc Strings and Data Tables.
+  A placeholder without a column of its name stays as it's written.
 
   Background:
     Given a package
@@ -174,3 +175,28 @@ Feature: Scenario Outlines
       | scenario           |
       | eating 1 cucumbers |
       | eating 2 cucumbers |
+
+  Scenario: A placeholder without a column of its name stays as it's written
+    Given a file named "features/eating.feature" with
+      """
+      Feature: Eating
+        Scenario Outline: eating <a> cucumbers
+          Given I have <a> cucumbers in <basket>
+
+          Examples:
+            | a |
+            | 1 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I have {int} cucumbers in {}", function(n, place, context) {
+        expect_equal(place, "<basket>")
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the steps have these results:
+      | scenario           | step                                 | status |
+      | eating 1 cucumbers | Given I have 1 cucumbers in <basket> | passed |
