@@ -29,6 +29,8 @@ run_code <- function(code, context, catch_error = FALSE) {
   # Each test() and run() of the code also writes its run as Cucumber Messages, read into
   # `context$run`, so the results of the run are checked whatever the reporter prints
   record <- function(runner) function(..., reporter) {
+    # A reporter that isn't cucumber's gets the error of test() or run(), not of the recorder's CucumberMultiReporter
+    if (!is.null(reporter) && !inherits(reporter, "CucumberReporter")) return(runner(..., reporter = reporter))
     messages <- tempfile(fileext = ".ndjson")
     on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
     recorder <- CucumberMessagesReporter$new(messages)

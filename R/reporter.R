@@ -134,11 +134,11 @@ cucumber_event <- function(reporter, method, ...) {
 #' Check that a reporter is a CucumberReporter, or NULL for no reporter
 #' @keywords internal
 #' @noRd
-check_reporter <- function(reporter, call = rlang::caller_env()) {
+check_reporter <- function(reporter, call = rlang::caller_env(), arg = "reporter") {
   if (!is.null(reporter) && !inherits(reporter, "CucumberReporter")) {
     rlang::abort(
       c(
-        "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing.",
+        paste0("`", arg, "` must be a `CucumberReporter`, or `NULL` to report nothing."),
         i = "testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`."
       ),
       call = call
@@ -175,7 +175,7 @@ CucumberMultiReporter <- R6::R6Class(
     #' Combine reporters
     #' @param reporters A list of `CucumberReporter`s
     initialize = function(reporters = list()) {
-      lapply(reporters, check_reporter)
+      for (i in seq_along(reporters)) check_reporter(reporters[[i]], call = NULL, arg = paste0("reporters[[", i, "]]"))
       self$reporters <- reporters
     },
 

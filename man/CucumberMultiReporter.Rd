@@ -204,6 +204,32 @@ several reporters, to show the progress of a run and write its reports at once.
 %</pre>
 }}
 
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Only cucumber's reporters can be combined
+  <span class="fu">When</span> I run it and it fails
+<span class="st">    """</span>
+<span class="st">    CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error:</span>
+<span class="st">    ! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.</span>
+<span class="st">    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Only cucumber's reporters can be combined
+  When I run it and it fails
+    """
+    CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))
+    """
+  Then it fails with
+    """
+    Error:
+    ! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.
+    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
+    """
+%</pre>
+}}
+
 Source: \code{tests/acceptance/r-reporters.feature}
 }
 }

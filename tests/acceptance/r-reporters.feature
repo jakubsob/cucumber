@@ -93,3 +93,15 @@ Feature: Reporters
       ! cannot open the connection
       """
     And the output includes "2 scenarios (1 failed, 1 passed)"
+
+  Scenario: Only cucumber's reporters can be combined
+    When I run it and it fails
+      """
+      CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))
+      """
+    Then it fails with
+      """
+      Error:
+      ! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.
+      i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
+      """

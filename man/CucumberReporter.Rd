@@ -371,7 +371,7 @@ testthat reporters can't.
 <span class="st">    """</span>
   <span class="fu">Then</span> it fails with
 <span class="st">    """</span>
-<span class="st">    Error in `lapply()`:</span>
+<span class="st">    Error:</span>
 <span class="st">    ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.</span>
 <span class="st">    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.</span>
 <span class="st">    """</span></code></pre >}}
@@ -392,7 +392,7 @@ testthat reporters can't.
     """
   Then it fails with
     """
-    Error in `lapply()`:
+    Error:
     ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
     i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
     """

@@ -173,7 +173,7 @@ Feature: Custom reporter
       """
     Then it fails with
       """
-      Error in `lapply()`:
+      Error:
       ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
       i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
       """
