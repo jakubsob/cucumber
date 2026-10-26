@@ -1342,6 +1342,7 @@ Source: \code{tests/acceptance/passing_steps.feature}
 
 A step fails when its step definition throws an error or a failed expectation.
 The steps after it are skipped, and the other scenarios still run.
+A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
@@ -1408,6 +1409,58 @@ The steps after it are skipped, and the other scenarios still run.
     | Given an empty basket      | passed  |
     | When I add an item         | failed  |
     | Then the basket has 1 item | skipped |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A step stops at its first failed expectation
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Then the basket has an apple</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    then("the basket has an apple", function(context) \{</span>
+<span class="st">      context$items &lt;- c("pear", "plum")</span>
+<span class="st">      expect_equal(length(context$items), 1, label = "the number of items")</span>
+<span class="st">      expect_equal(context$items[[1]], "apple", label = "the first item")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> step                         <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Then the basket has an apple <span class="op">|</span> failed <span class="op">|</span>
+  <span class="fu">And</span> the error message includes <span class="st">"the number of items"</span>
+  <span class="fu">And</span> the error message doesn't include <span class="st">"the first item"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A step stops at its first failed expectation
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Then the basket has an apple
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    then("the basket has an apple", function(context) \{
+      context$items <- c("pear", "plum")
+      expect_equal(length(context$items), 1, label = "the number of items")
+      expect_equal(context$items[[1]], "apple", label = "the first item")
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | step                         | status |
+    | Then the basket has an apple | failed |
+  And the error message includes "the number of items"
+  And the error message doesn't include "the first item"
 %</pre>
 }}
 

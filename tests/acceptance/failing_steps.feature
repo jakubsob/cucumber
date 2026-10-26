@@ -2,6 +2,7 @@
 Feature: Failing steps
   A step fails when its step definition throws an error or a failed expectation.
   The steps after it are skipped, and the other scenarios still run.
+  A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
 
   Background:
     Given a package
@@ -34,6 +35,31 @@ Feature: Failing steps
       | Given an empty basket      | passed  |
       | When I add an item         | failed  |
       | Then the basket has 1 item | skipped |
+
+  Scenario: A step stops at its first failed expectation
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Then the basket has an apple
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      then("the basket has an apple", function(context) {
+        context$items <- c("pear", "plum")
+        expect_equal(length(context$items), 1, label = "the number of items")
+        expect_equal(context$items[[1]], "apple", label = "the first item")
+      })
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                         | status |
+      | Then the basket has an apple | failed |
+    And the error message includes "the number of items"
+    And the error message doesn't include "the first item"
 
   Scenario: A step that throws an error fails, and the other scenarios still run
     Given a file named "features/basket.feature" with
