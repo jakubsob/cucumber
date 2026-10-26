@@ -91,12 +91,18 @@ Feature: Choosing feature files
         | Adding      |
 
     Scenario: A feature file that doesn't exist is an error
-      When I run
+      When I run it and it fails
         """
-        test("features", features = "multiplication.feature", stop_on_failure = FALSE)
+        test("features", features = c("addition.feature", "multiplication.feature"))
         """
-      Then the error message includes "Feature files not found."
-      And the error message includes "multiplication.feature"
+      Then it fails with
+        """
+        Error:
+        ! Test failures.
+        Caused by error in `feature_lines()`:
+        ! Feature files not found.
+        x ./multiplication.feature
+        """
 
   Rule: `filter` runs the feature files whose name matches a regular expression
 
@@ -129,6 +135,7 @@ Feature: Choosing feature files
         """
       Then it fails with
         """
-        Unknown argument: `fail_fst`.
+        Error:
+        ! Unknown argument: `fail_fst`.
         i Arguments of `grepl()` for `filter` can be passed in `...`: `ignore.case`, `perl`, `fixed`, `useBytes`.
         """

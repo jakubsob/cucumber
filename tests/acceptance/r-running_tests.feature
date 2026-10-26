@@ -63,11 +63,18 @@ Feature: Running tests with test()
       """
       given("a step", function(context) {})
       """
-    When I run
+    When I run it and it fails
       """
-      test("empty", stop_on_failure = FALSE)
+      test("empty")
       """
-    Then the error message includes "No feature files found."
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      Caused by error in `select_features()`:
+      ! No feature files found.
+      i Add `.feature` files describing your scenarios.
+      """
 
   Rule: A mistake in an argument is an error that names the argument
 
@@ -78,7 +85,8 @@ Feature: Running tests with test()
         """
       Then it fails with
         """
-        `path` must be a directory.
+        Error:
+        ! `path` must be a directory.
         x "missing" doesn't exist.
         """
 
@@ -89,7 +97,8 @@ Feature: Running tests with test()
         """
       Then it fails with
         """
-        <message>
+        Error:
+        ! <message>
         """
 
       Examples:
@@ -106,7 +115,8 @@ Feature: Running tests with test()
         """
       Then it fails with
         """
-        `name` must be valid regular expressions.
+        Error:
+        ! `name` must be valid regular expressions.
         x invalid regular expression '(', reason 'Missing ')''
         """
 
@@ -117,7 +127,8 @@ Feature: Running tests with test()
         """
       Then it fails with
         """
-        `filter` must be a valid regular expression.
+        Error:
+        ! `filter` must be a valid regular expression.
         x invalid regular expression '(', reason 'Missing ')''
         """
 
@@ -128,6 +139,7 @@ Feature: Running tests with test()
         """
       Then it fails with
         """
-        `features` must be paths of feature files.
+        Error:
+        ! `features` must be paths of feature files.
         i Give a path with the lines of its scenarios to run only them, like `"basket.feature:12"`.
         """

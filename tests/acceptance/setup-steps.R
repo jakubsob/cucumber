@@ -263,10 +263,25 @@ then("it fails with {string}", function(error_message, context) {
   )
 })
 
-# The whole message of the error, as it's shown, to read it like a snapshot
+# The error as R shows it, with the calls it names, to read it like a snapshot.
+# Where a call is in cucumber's code is left out, as its lines change with the code.
+shown_error <- function(error) {
+  shown <- if (inherits(error, "rlang_error")) {
+    format(error, backtrace = FALSE)
+  } else if (is.null(conditionCall(error))) {
+    paste("Error:", conditionMessage(error))
+  } else {
+    paste0("Error in ", deparse1(conditionCall(error)), ": ", conditionMessage(error))
+  }
+  lines <- strsplit(cli::ansi_strip(shown), "\n")[[1]]
+  # Without rlang's class line, `<error/rlang_error>`
+  lines <- lines[!grepl("^<error/", lines)]
+  sub(" at cucumber/R/[^ ]+:[0-9]+:[0-9]+:$", ":", lines)
+}
+
 then("it fails with", function(message, context) {
   expect_false(is.null(context$error))
-  expect_equal(cli::ansi_strip(conditionMessage(context$error)), message)
+  expect_equal(paste(shown_error(context$error), collapse = "\n"), message)
 })
 
 extract_error_messages <- function(result) {

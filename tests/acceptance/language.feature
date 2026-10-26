@@ -94,8 +94,38 @@ Feature: Language
       """
       Feature: Addition
       """
-    When I run
+    When I run it and it fails
       """
-      withr::with_options(list(cucumber.language = "klingon"), test("features", stop_on_failure = FALSE))
+      withr::with_options(list(cucumber.language = "klingon"), test("features"))
       """
-    Then the error message includes "Language not supported: klingon"
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      Caused by error in `map()`:
+      i In index: 1.
+      i With name: addition.feature.
+      Caused by error:
+      ! Language not supported: klingon
+      i The `cucumber.language` option must be a language of Gherkin, like "fr".
+      """
+
+  Scenario: A cucumber.language option that isn't a language code is an error
+    Given a file named "features/addition.feature" with
+      """
+      Feature: Addition
+      """
+    When I run it and it fails
+      """
+      withr::with_options(list(cucumber.language = c("fr", "de")), test("features"))
+      """
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      Caused by error in `map()`:
+      i In index: 1.
+      i With name: addition.feature.
+      Caused by error in `default_language()`:
+      ! Assertion on 'getOption("cucumber.language")' failed: Must have length 1.
+      """

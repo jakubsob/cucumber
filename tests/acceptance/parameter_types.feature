@@ -430,7 +430,8 @@ Feature: Parameter types
         """
       Then it fails with
         """
-        There is already a parameter type with name int
+        Error:
+        ! There is already a parameter type with name int
         """
 
     Scenario: A parameter type's name can't contain {, }, (, ), \ or /
@@ -440,7 +441,8 @@ Feature: Parameter types
         """
       Then it fails with
         """
-        Illegal character in parameter name {a/b}. Parameter names may not contain '{', '}', '(', ')', '\' or '/'
+        Error:
+        ! Illegal character in parameter name {a/b}. Parameter names may not contain '{', '}', '(', ')', '\' or '/'
         """
 
     Scenario: A parameter type must have a name
@@ -450,7 +452,18 @@ Feature: Parameter types
         """
       Then it fails with
         """
-        A parameter type must have a name, as {} is the anonymous parameter type.
+        Error:
+        ! A parameter type must have a name, as {} is the anonymous parameter type.
+        """
+
+    Scenario: A parameter type's transformer must be a function
+      When I run it and it fails
+        """
+        define_parameter_type("colour", "red|green", "as.character")
+        """
+      Then it fails with
+        """
+        Error in .parameter(name, regexp, transformer, use_for_snippets, prefer_for_regexp_match): Assertion on 'transformer' failed: Must be a function, not 'character'.
         """
 
     Scenario: A parameter type with an invalid regexp is an error
@@ -460,7 +473,8 @@ Feature: Parameter types
         """
       Then it fails with
         """
-        The regexp /(green/ of parameter type {colour} is invalid.
+        Error:
+        ! The regexp /(green/ of parameter type {colour} is invalid.
         x Incorrectly nested parentheses in regex pattern. (U_REGEX_MISMATCHED_PAREN, context=`(green`)
         """
 
@@ -471,7 +485,8 @@ Feature: Parameter types
         """
       Then it fails with
         """
-        There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}
+        Error:
+        ! There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}
         """
 
   Rule: A step definition with an undefined parameter type defines no step

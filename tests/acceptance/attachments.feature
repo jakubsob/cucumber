@@ -145,6 +145,36 @@ Feature: Attachments
       | When I add an item | failed |
     And the error message includes "A raw vector attachment must have a `media_type`."
 
+  Scenario Outline: An attachment's <argument> must be a string
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) context$attach("<html></html>", <argument> = 1))
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the scenario "Add an item" errored with
+      """
+      Error: Step "I add an item" failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:1
+      Caused by error in `attachment_message()`:
+      ! Assertion on '<argument>' failed: Must be of type 'string' (or 'NULL'), not 'double'.
+      """
+
+    Examples:
+      | argument   | example        |
+      | media_type | image/png      |
+      | file_name  | screenshot.png |
+
   Scenario: An attachment must be a string or a raw vector
     Given a file named "features/basket.feature" with
       """
