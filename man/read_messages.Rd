@@ -110,6 +110,10 @@ features, scenarios and steps. Write a report of your own from them, like a summ
 <span class="st">    """</span>
 <span class="st">    1 of 3 scenarios failed</span>
 <span class="st">    - Add items: Then the basket has 4 items</span>
+<span class="st">      Step "the basket has 4 items" failed</span>
+<span class="st">      i Feature: basket.feature</span>
+<span class="st">      i Scenario: Add items</span>
+<span class="st">      i Step defined at: setup-steps.R:2</span>
 <span class="st">      Expected `context$items` to equal `n`.</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A summary of the steps that failed, with their errors
@@ -132,6 +136,10 @@ features, scenarios and steps. Write a report of your own from them, like a summ
     """
     1 of 3 scenarios failed
     - Add items: Then the basket has 4 items
+      Step "the basket has 4 items" failed
+      i Feature: basket.feature
+      i Scenario: Add items
+      i Step defined at: setup-steps.R:2
       Expected `context$items` to equal `n`.
     """
 %</pre>

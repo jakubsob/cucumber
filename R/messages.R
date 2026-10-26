@@ -302,7 +302,7 @@ test_step_result <- function(result) {
 }
 
 exception_message <- function(error) {
-  cause <- if (inherits(error, c("cucumber_step_error", "cucumber_hook_error"))) error$parent else error
+  cause <- if (inherits(error, c("cucumber_step_error", "cucumber_step_failure", "cucumber_hook_error"))) error$parent else error
   drop_null(list(type = class(cause)[[1]], message = conditionMessage(cause), stackTrace = backtrace(error)))
 }
 

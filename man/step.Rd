@@ -1521,11 +1521,13 @@ An error is shown with its backtrace, the calls of the step down to where it was
 <span class="st">    """</span>
 <span class="st">    [failure] Scenario: Add an item</span>
 <span class="st">    Step "the basket has an apple" failed</span>
+<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Scenario: Add an item</span>
+<span class="st">    i Step defined at: setup-steps.R:1</span>
 <span class="st">    Expected the number of items to equal 1.</span>
 <span class="st">    Differences:</span>
 <span class="st">    1/1 mismatches</span>
 <span class="st">    [1] 2 - 1 == 1</span>
-<span class="st">    Step at: setup-steps.R:1</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step stops at its first failed expectation
   Given a file named "features/basket.feature" with
@@ -1553,11 +1555,13 @@ An error is shown with its backtrace, the calls of the step down to where it was
     """
     [failure] Scenario: Add an item
     Step "the basket has an apple" failed
+    i Feature: basket.feature
+    i Scenario: Add an item
+    i Step defined at: setup-steps.R:1
     Expected the number of items to equal 1.
     Differences:
     1/1 mismatches
     [1] 2 - 1 == 1
-    Step at: setup-steps.R:1
     """
 %</pre>
 }}

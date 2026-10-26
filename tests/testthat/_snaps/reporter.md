@@ -26,12 +26,13 @@
           v Given I have a value
           v When I make it wrong
           x Then it should fail
+            Step "it should fail" failed
+            i Scenario: This will fail
+            i Step defined at: test-reporter.R:55
             Expected `context$value` to equal 5.
             Differences:
               `actual`: 10.0
             `expected`:  5.0
-            
-            Step at: test-reporter.R:55
 
 # CucumberPrettyReporter / prints docstring and data table step arguments
 

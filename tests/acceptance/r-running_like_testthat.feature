@@ -209,12 +209,13 @@ Feature: Running feature files like testthat runs test files
       """
       [failure] Scenario: Adding an apple
       Step "the basket has 2 items" failed
+      i Feature: basket.feature
+      i Scenario: Adding an apple
+      i Step defined at: setup-steps.R:7
       Expected `context$items` to equal `n`.
       Differences:
         `actual`: 1.0
       `expected`: 2.0
-
-      Step at: setup-steps.R:7
       """
 
   Scenario: A message of a step is shown, with the 3rd edition of testthat
@@ -291,8 +292,10 @@ Feature: Running feature files like testthat runs test files
 
       [failure] Scenario: Checking the basket with a test
       Step "the basket is checked by a test" failed
+      i Feature: basket.feature
+      i Scenario: Checking the basket with a test
+      i Step defined at: setup-test.R:1
       The test "the basket is empty" in the step failed.
-      Step at: setup-test.R:1
       """
     And the scenarios failed at these locations:
       | scenario                                              | location         |

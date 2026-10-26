@@ -47,6 +47,10 @@ Feature: Custom report
       """
       1 of 3 scenarios failed
       - Add items: Then the basket has 4 items
+        Step "the basket has 4 items" failed
+        i Feature: basket.feature
+        i Scenario: Add items
+        i Step defined at: setup-steps.R:2
         Expected `context$items` to equal `n`.
       """
 

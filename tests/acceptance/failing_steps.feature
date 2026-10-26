@@ -63,11 +63,13 @@ Feature: Failing steps
       """
       [failure] Scenario: Add an item
       Step "the basket has an apple" failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:1
       Expected the number of items to equal 1.
       Differences:
       1/1 mismatches
       [1] 2 - 1 == 1
-      Step at: setup-steps.R:1
       """
 
   Scenario: A step that throws an error fails, and the other scenarios still run

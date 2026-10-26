@@ -144,21 +144,25 @@
         Scenario: Adding integer and float
           v When I add 1 and 1.1
           x Then the result is 5
+            Step "the result is 5" failed
+            i Feature: addition.feature
+            i Scenario: Adding integer and float
+            i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
             Differences:
               `actual`: 2.1
             `expected`: 5.0
-            
-            Step at: setup-steps-addition.R:5
         Scenario: Adding float and float
           v When I add 1.1 and 1.1
           x Then the result is 5
+            Step "the result is 5" failed
+            i Feature: addition.feature
+            i Scenario: Adding float and float
+            i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
             Differences:
               `actual`: 2.2
             `expected`: 5.0
-            
-            Step at: setup-steps-addition.R:5
       
       
       Feature: Guess the word
@@ -169,12 +173,14 @@
           v Given the Maker has started a game with the word 'silky'
           v When the Breaker joins the Maker's game
           x Then the Breaker must guess a word with 6 characters
+            Step "the Breaker must guess a word with 6 characters" failed
+            i Feature: guess_the_word.feature
+            i Scenario: Breaker joins a game
+            i Step defined at: setup-steps-guess_the_word.R:17
             Expected `nchar(context$word)` to equal `n`.
             Differences:
               `actual`: 5
             `expected`: 6
-            
-            Step at: setup-steps-guess_the_word.R:17
       
       
       --------------------------------------------------------------------------------
@@ -189,35 +195,41 @@
         Scenario: Adding integer and float
           v When I add 1 and 1.1
           x Then the result is 5
+            Step "the result is 5" failed
+            i Feature: addition.feature
+            i Scenario: Adding integer and float
+            i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
             Differences:
               `actual`: 2.1
             `expected`: 5.0
-            
-            Step at: setup-steps-addition.R:5
       
       Feature: Addition
         Scenario: Adding float and float
           v When I add 1.1 and 1.1
           x Then the result is 5
+            Step "the result is 5" failed
+            i Feature: addition.feature
+            i Scenario: Adding float and float
+            i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
             Differences:
               `actual`: 2.2
             `expected`: 5.0
-            
-            Step at: setup-steps-addition.R:5
       
       Feature: Guess the word
         Scenario: Breaker joins a game
           v Given the Maker has started a game with the word 'silky'
           v When the Breaker joins the Maker's game
           x Then the Breaker must guess a word with 6 characters
+            Step "the Breaker must guess a word with 6 characters" failed
+            i Feature: guess_the_word.feature
+            i Scenario: Breaker joins a game
+            i Step defined at: setup-steps-guess_the_word.R:17
             Expected `nchar(context$word)` to equal `n`.
             Differences:
               `actual`: 5
             `expected`: 6
-            
-            Step at: setup-steps-guess_the_word.R:17
 
 # test / error handling / should show a snippet when a step has no definition
 

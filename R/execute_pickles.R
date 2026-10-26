@@ -365,8 +365,7 @@ signal_scenario_result <- function(results, result, failing, pickle) {
     error <- failed_step$error
     error$srcref <- location(failed_step)
     if (inherits(error, "expectation")) {
-      # testthat's reporters show the error, not the steps, so it names the step
-      error$message <- paste0("Step \"", failed_step$text, "\" failed\n", error$message)
+      class(error) <- setdiff(class(error), "cucumber_step_failure")
       testthat::exp_signal(error)
     } else {
       # testthat shows the class of an error of its own class, like it doesn't
@@ -512,11 +511,13 @@ execute_single_step <- function(step, context, pickle = NULL) {
     },
     expectation_failure = function(e) {
       e <- variant_snapshot_hint(e)
-      location <- step_location(step)
-      if (!is.null(location)) {
-        e$message <- paste0(e$message, "\n", glue("Step at: {location}"))
-      }
       e$trace <- NULL
+      # Like the error of a step: which step failed, for which scenario, and
+      # where it's defined, with the failed expectation as its cause
+      cause <- e
+      e$message <- paste0(rlang::format_error_bullets(step_error_bullets(step, pickle)), "\n", e$message)
+      e$parent <- cause
+      class(e) <- c("cucumber_step_failure", class(e))
       status <<- "failed"
       step_error <<- e
     },
