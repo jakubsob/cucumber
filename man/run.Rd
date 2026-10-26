@@ -83,8 +83,8 @@ To get result and a report, use \code{cucumber::test()}, or inspect the result o
 \code{run()} in a \verb{tests/testthat/test-*.R} file runs the feature files in \code{tests/testthat}
 as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
-testthat's reporter reports each scenario as a test, and a failed step by its text, at its
-line of the feature file.
+testthat's reporter reports each scenario as a test of the test file that calls \code{run()}, and a
+failed step by its text, at its line of the feature file.
 Pass a \code{reporter} to \code{run()} to report the run with cucumber's reporter too.
 
 \code{run()} isn't supported in a parallel testthat run, with \code{Config/testthat/parallel: true}: it's an error.
@@ -289,6 +289,44 @@ definitions and hooks are then cleared when it returns.
     | features | calculate.feature |
     | tags     | not @slow         |
     | name     | Adding one        |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Each scenario is a test of the test file that calls run()
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "silent")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the results are of these files:
+    <span class="op">|</span> scenario   <span class="op">|</span> file              <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span> test-acceptance.R <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Each scenario is a test of the test file that calls run()
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "silent")
+    """
+  Then the results are of these files:
+    | scenario   | file              |
+    | Adding one | test-acceptance.R |
 %</pre>
 }}
 
