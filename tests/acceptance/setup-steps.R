@@ -446,11 +446,12 @@ then("there is no file {string}", function(file, context) {
 })
 
 after(function(context, scenario_name) {
-  # Cleanup environment if package was loaded
+  # Cleanup environment if package was loaded, attached or only its namespace,
+  # like by test() in R CMD check
   withr::with_dir(context$tempdir, {
     if (fs::file_exists("DESCRIPTION")) {
       package_name <- desc::desc_get_field("Package")
-      if (paste0("package:", package_name) %in% search()) {
+      if (paste0("package:", package_name) %in% search() || isNamespaceLoaded(package_name)) {
         pkgload::unload(package_name, quiet = TRUE)
       }
     }

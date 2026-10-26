@@ -623,12 +623,20 @@ test <- function(
   # `path`, the default package of testthat::local_mocked_bindings()
   package <- tryCatch(pkgload::pkg_name("."), error = \(e) NULL)
   if (!is.null(package)) withr::local_envvar(TESTTHAT_PKG = package)
-  env <- env %||% testthat::test_env()
+  # Like testthat::test_dir(package = ), steps see the internal functions of the
+  # package: of the loaded one, or in R CMD check of the installed one. Another
+  # installed version isn't loaded, as it may be older than the code under test.
+  has_namespace <- !is.null(package) && (
+    isNamespaceLoaded(package) ||
+      (identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), package) && requireNamespace(package, quietly = TRUE))
+  )
+  env <- env %||% if (has_namespace) testthat::test_env(package) else testthat::test_env()
   withr::local_options(topLevelEnvironment = rlang::env_parent(env))
   withr::local_options(testthat.snapshotter = snapshotter)
   # Like testthat::test_dir(), what helper and setup files and steps defer to
-  # testthat::teardown_env() runs when test() ends
-  rlang::local_bindings(teardown_env = environment(), .env = utils::getFromNamespace("the", "testthat"))
+  # testthat::teardown_env() runs when test() ends, and testthat::local_mocked_bindings()
+  # mocks in `env` too, a copy of the package's namespace
+  rlang::local_bindings(teardown_env = environment(), testing_env = env, .env = utils::getFromNamespace("the", "testthat"))
   # Before the setup files, so what they defined is cleared even if one fails,
   # and what was defined before, like by the setup files of a testthat run that
   # calls test(), is restored

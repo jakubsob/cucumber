@@ -1,7 +1,8 @@
 Feature: Running feature files like testthat runs test files
   `test()` runs the feature files in `path` the way `testthat::test_dir()` runs test files:
   in `path` as the working directory, with the testthat edition and the package of `path` as
-  `testthat::testing_package()`, the package `testthat::local_mocked_bindings()` mocks, after the
+  `testthat::testing_package()`, the package `testthat::local_mocked_bindings()` mocks and whose internal
+  functions steps see, of the loaded package or in R CMD check of the installed one, after the
   `helper-*.R` and `setup-*.R` files, and before the `teardown-*.R` files. Steps can use
   testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step or a hook fails
   when a `test_that()` test in it fails. With the 3rd edition, steps run with testthat's reproducible
@@ -703,6 +704,50 @@ Feature: Running feature files like testthat runs test files
       """
     Then it passes
     And it ran "Scenario: Adding an apple in R CMD check"
+
+  Scenario: Steps use the internal functions of the installed package, with test() in R CMD check
+    R CMD check runs the scripts in `tests`, like one that calls `test("acceptance")`, with the installed package.
+
+    Given a file named "NAMESPACE" with
+      """
+      # Nothing is exported: the steps use the package's internal functions
+      """
+    And a file named "R/basket.R" with
+      """
+      add_apple <- function(items) items + 1
+      """
+    And a file named "tests/acceptance/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Adding an apple in R CMD check
+          Given an empty basket
+          When I add an apple
+          Then the basket has 1 item
+      """
+    And a file named "tests/acceptance/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {
+        context$items <- 0
+      })
+      when("I add an apple", function(context) {
+        context$items <- add_apple(context$items)
+      })
+      then("the basket has {int} item(s)", function(n, context) {
+        expect_equal(context$items, n)
+      })
+      """
+    When I run
+      """
+      lib <- withr::local_tempdir()
+      install.packages(normalizePath("."), lib = lib, repos = NULL, type = "source", quiet = TRUE)
+      withr::local_libpaths(lib, action = "prefix")
+      withr::local_envvar(NOT_CRAN = NA, `_R_CHECK_PACKAGE_NAME_` = "example")
+      withr::defer(unloadNamespace("example"))
+      withr::with_dir("tests", test("acceptance", reporter = NULL, stop_on_failure = FALSE))
+      """
+    Then the scenarios have these results:
+      | scenario                       | status |
+      | Adding an apple in R CMD check | passed |
 
   Scenario: A failed scenario fails R CMD check
     Given a file named "NAMESPACE" with
