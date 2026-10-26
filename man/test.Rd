@@ -1496,6 +1496,7 @@ Source: \code{tests/acceptance/dryrun_mode.feature}
 
 Stop running scenarios after the first scenario that fails.
 The scenarios after it are reported as skipped, and their hooks don't run.
+With \code{retry}, a scenario fails only when its last attempt fails, so one that passes when it's retried doesn't stop the run.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>

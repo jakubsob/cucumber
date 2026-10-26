@@ -1,6 +1,7 @@
 Feature: Fail fast
   Stop running scenarios after the first scenario that fails.
   The scenarios after it are reported as skipped, and their hooks don't run.
+  With `retry`, a scenario fails only when its last attempt fails, so one that passes when it's retried doesn't stop the run.
 
   Background:
     Given a package
@@ -95,3 +96,40 @@ Feature: Fail fast
       test("features", fail_fast = TRUE, stop_on_failure = FALSE)
       """
     Then the output includes "3 scenarios (1 undefined, 2 skipped)"
+
+  Scenario: A scenario that passes when it's retried doesn't stop the run
+    Given a file named "features/a.feature" with
+      """
+      Feature: A
+        Scenario: Passes the second time
+          Given it fails the first time
+
+        Scenario: After the retry
+          Given I have 1
+          Then I get 1
+      """
+    And a file named "features/b.feature" with
+      """
+      Feature: B
+        Scenario: In the next feature file
+          Given I have 4
+          Then I get 4
+      """
+    And a file named "features/setup-flaky.R" with
+      """
+      given("it fails the first time", function(context) {
+        if (!file.exists("failed-once")) {
+          file.create("failed-once")
+          stop("Failed the first time")
+        }
+      })
+      """
+    When I run
+      """
+      test("features", fail_fast = TRUE, retry = 1, stop_on_failure = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario                 | status | attempts |
+      | Passes the second time   | passed | 2        |
+      | After the retry          | passed | 1        |
+      | In the next feature file | passed | 1        |
