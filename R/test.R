@@ -342,6 +342,7 @@ select_features <- function(path, filter, lines, ...) {
       body = c(
         i = "Add `.feature` files describing your scenarios."
       ),
+      call = NULL,
       trace = empty_trace()
     )
   }
@@ -377,7 +378,8 @@ feature_lines <- function(features, path) {
   if (length(missing) > 0) {
     abort(
       "Feature files not found.",
-      body = rlang::set_names(missing, "x"),
+      body = c(rlang::set_names(fs::path_norm(missing), "x"), i = "The paths in `features` are relative to `path`."),
+      call = NULL,
       trace = empty_trace()
     )
   }
@@ -404,7 +406,8 @@ read_feature <- function(path) {
 #' @importFrom rlang try_fetch abort
 #' @importFrom purrr map set_names walk
 parse_features <- function(paths, reporter = NULL) {
-  documents <- map(paths, \(path) {
+  # lapply(), as purrr would wrap an error, like of the `cucumber.language` option
+  documents <- lapply(paths, \(path) {
     emit(reporter, "source", source_message(path))
     document <- try_fetch(
       parse_gherkin(read_feature(path), uri = path),

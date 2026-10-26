@@ -166,8 +166,8 @@ Feature: Attachments
       i Feature: basket.feature
       i Scenario: Add an item
       i Step defined at: setup-steps.R:1
-      Caused by error in `attachment_message()`:
-      ! Assertion on '<argument>' failed: Must be of type 'string' (or 'NULL'), not 'double'.
+      Caused by error:
+      ! An attachment's `<argument>` must be a string, like "<example>".
       """
 
     Examples:

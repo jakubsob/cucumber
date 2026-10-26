@@ -463,7 +463,7 @@ Feature: Parameter types
         """
       Then it fails with
         """
-        Error in .parameter(name, regexp, transformer, use_for_snippets, prefer_for_regexp_match): Assertion on 'transformer' failed: Must be a function, not 'character'.
+        Error in define_parameter_type("colour", "red|green", "as.character"): Assertion on 'transformer' failed: Must be a function, not 'character'.
         """
 
     Scenario: A parameter type with an invalid regexp is an error

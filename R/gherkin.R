@@ -59,7 +59,9 @@ parse_gherkin <- function(lines, uri = NULL, flavour = gherkin_flavour(uri)) {
 #' @noRd
 default_language <- function() {
   language <- getOption("cucumber.language", "en")
-  checkmate::assert_string(language, .var.name = "getOption(\"cucumber.language\")")
+  if (!rlang::is_string(language)) {
+    abort("The `cucumber.language` option must be a language code, like \"fr\".", call = NULL, trace = empty_trace())
+  }
   if (is.null(GHERKIN_DIALECTS[[language]])) {
     abort(
       paste0("Language not supported: ", language),

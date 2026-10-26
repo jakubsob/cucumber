@@ -3,7 +3,6 @@
   structure(list2(...), class = "parameters")
 }
 
-#' @importFrom checkmate assert_string assert_character assert_function assert_flag
 .parameter <- function(
   name,
   regexp,
@@ -11,11 +10,6 @@
   use_for_snippets = TRUE,
   prefer_for_regexp_match = FALSE
 ) {
-  assert_string(name)
-  assert_character(regexp, min.len = 1, any.missing = FALSE)
-  assert_function(transformer)
-  assert_flag(use_for_snippets)
-  assert_flag(prefer_for_regexp_match)
   structure(
     list(
       name = name,
@@ -77,6 +71,7 @@ ANONYMOUS <- .parameter(
 #' @eval features_rd(features = "parameter_types.feature")
 #'
 #' @md
+#' @importFrom checkmate assert_string assert_character assert_function assert_flag
 #' @export
 define_parameter_type <- function(
   name,
@@ -85,6 +80,11 @@ define_parameter_type <- function(
   use_for_snippets = TRUE,
   prefer_for_regexp_match = FALSE
 ) {
+  assert_string(name)
+  assert_character(regexp, min.len = 1, any.missing = FALSE)
+  assert_function(transformer)
+  assert_flag(use_for_snippets)
+  assert_flag(prefer_for_regexp_match)
   parameters <- get_parameters()
   parameter <- .parameter(
     name,

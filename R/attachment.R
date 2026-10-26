@@ -62,8 +62,12 @@ new_context <- function(send, context = new.env()) {
 #' @keywords internal
 #' @noRd
 attachment_message <- function(data, media_type = NULL, file_name = NULL) {
-  checkmate::assert_string(media_type, null.ok = TRUE)
-  checkmate::assert_string(file_name, null.ok = TRUE)
+  if (!is.null(media_type) && !rlang::is_string(media_type)) {
+    abort("An attachment's `media_type` must be a string, like \"image/png\".", call = NULL, trace = empty_trace())
+  }
+  if (!is.null(file_name) && !rlang::is_string(file_name)) {
+    abort("An attachment's `file_name` must be a string, like \"screenshot.png\".", call = NULL, trace = empty_trace())
+  }
   if (is.raw(data)) {
     if (is.null(media_type)) {
       abort("A raw vector attachment must have a `media_type`.", call = NULL, trace = empty_trace())

@@ -102,9 +102,6 @@ Feature: Language
       """
       Error:
       ! Test failures.
-      Caused by error in `map()`:
-      i In index: 1.
-      i With name: addition.feature.
       Caused by error:
       ! Language not supported: klingon
       i The `cucumber.language` option must be a language of Gherkin, like "fr".
@@ -123,9 +120,6 @@ Feature: Language
       """
       Error:
       ! Test failures.
-      Caused by error in `map()`:
-      i In index: 1.
-      i With name: addition.feature.
-      Caused by error in `default_language()`:
-      ! Assertion on 'getOption("cucumber.language")' failed: Must have length 1.
+      Caused by error:
+      ! The `cucumber.language` option must be a language code, like "fr".
       """

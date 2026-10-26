@@ -71,7 +71,7 @@ Feature: Running tests with test()
       """
       Error:
       ! Test failures.
-      Caused by error in `select_features()`:
+      Caused by error:
       ! No feature files found.
       i Add `.feature` files describing your scenarios.
       """

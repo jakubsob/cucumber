@@ -99,9 +99,10 @@ Feature: Choosing feature files
         """
         Error:
         ! Test failures.
-        Caused by error in `feature_lines()`:
+        Caused by error:
         ! Feature files not found.
-        x ./multiplication.feature
+        x multiplication.feature
+        i The paths in `features` are relative to `path`.
         """
 
   Rule: `filter` runs the feature files whose name matches a regular expression
