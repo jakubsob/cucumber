@@ -106,7 +106,7 @@ Feature: Step hooks
     Then the errors are
       """
       [error] Scenario: Add an item
-      Error in `hook$fn(...)`: step left a mess
+      Error: step left a mess
       """
     And the steps have these results:
       | step                  | status  |
@@ -157,7 +157,7 @@ Feature: Step hooks
     Then the errors are
       """
       [error] Scenario: Add an item
-      Error in `hook$fn(...)`: step left a mess
+      Error: step left a mess
       """
     And the steps have these results:
       | step                  | status |

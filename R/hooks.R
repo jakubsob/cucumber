@@ -237,7 +237,11 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref
         fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
         error_cnd(message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step."))
       },
-      error = identity
+      # The call a hook is run with is cucumber's, not one of the hook
+      error = \(e) {
+        if (any(vapply(list(quote(hook$fn(...)), quote(hook(...))), identical, logical(1), conditionCall(e)))) e$call <- NULL
+        e
+      }
     )
     if (inherits(error, "skip")) {
       return(error)

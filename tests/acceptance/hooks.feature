@@ -350,11 +350,11 @@ Feature: Hooks
       | Given an empty basket | <status> |
 
     Examples:
-      | hook        | argument | status  | kind    | message                                  |
-      | before      | scenario | skipped | failure | the hook failed                          |
-      | after       | scenario | passed  | failure | the hook failed                          |
-      | before_step | step     | failed  | error   | Error in `hook$fn(...)`: the hook failed |
-      | after_step  | step     | failed  | error   | Error in `hook$fn(...)`: the hook failed |
+      | hook        | argument | status  | kind    | message                |
+      | before      | scenario | skipped | failure | the hook failed        |
+      | after       | scenario | passed  | failure | the hook failed        |
+      | before_step | step     | failed  | error   | Error: the hook failed |
+      | after_step  | step     | failed  | error   | Error: the hook failed |
 
   Scenario Outline: <hook>() with the wrong number of arguments is an error
     Given a file named "features/basket.feature" with

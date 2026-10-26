@@ -277,17 +277,13 @@ Feature: Running scenarios by tag
             Given I have 1
             Then I get 1
         """
-      When I run
+      When I run it and it fails
         """
-        test("features", tags = "<expression>", stop_on_failure = FALSE)
+        test("features", tags = "<expression>")
         """
-      Then the errors are
+      Then it fails with
         """
-        [error]
-        i In index: 1.
-        Caused by error in `keep()`:
-        i In index: 1.
-        Caused by error:
+        Error:
         ! Tag expression "<expression>" could not be parsed because of syntax error: <message>
         """
 
@@ -307,17 +303,13 @@ Feature: Running scenarios by tag
             Given I have 1
             Then I get 1
         """
-      When I run
+      When I run it and it fails
         """
-        test("features", tags = "@a\\b", stop_on_failure = FALSE)
+        test("features", tags = "@a\\b")
         """
-      Then the errors are
+      Then it fails with
         """
-        [error]
-        i In index: 1.
-        Caused by error in `keep()`:
-        i In index: 1.
-        Caused by error:
+        Error:
         ! Tag expression "@a\b" could not be parsed because of syntax error: Illegal escape before "b".
         """
 

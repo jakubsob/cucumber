@@ -47,7 +47,8 @@ parse_tag_expression <- function(expression) {
   syntax_error <- function(message) {
     abort(
       sprintf('Tag expression "%s" could not be parsed because of syntax error: %s', expression, message),
-      call = NULL
+      call = NULL,
+      trace = empty_trace()
     )
   }
   expect <- function(expected, actual) {
@@ -168,6 +169,8 @@ eval_tag_ast <- function(ast, tags) {
 #' @noRd
 check_tags <- function(tags) {
   if (is.null(tags) || checkmate::test_string(tags)) {
+    # Fail before the run on an invalid tag expression, not when the first scenario is matched
+    evaluate_tag_expression(tags, character())
     return(invisible(tags))
   }
   abort(
