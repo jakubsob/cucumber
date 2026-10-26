@@ -211,6 +211,28 @@ Feature: Running scenarios alongside testthat tests
       | scenario   | location            |
       | Adding one | calculate.feature:4 |
 
+  Scenario: testthat's reporter shows a step's error like an error in a test
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        stop("can't calculate")
+      })
+      then("the result is {int}", function(n, context) {})
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+      """
+    Then the scenario "Adding one" errored with
+      """
+      Error: Step "I calculate" failed
+      i Feature: calculate.feature
+      i Scenario: Adding one
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! can't calculate
+      """
+
   Scenario: testthat's reporter shows the backtrace of a step's error
     Given a file named "tests/testthat/setup-steps.R" with
       """

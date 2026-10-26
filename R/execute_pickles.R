@@ -368,6 +368,9 @@ signal_scenario_result <- function(results, result, failing, pickle) {
       error$message <- paste0("Step \"", failed_step$text, "\" failed\n", error$message)
       testthat::exp_signal(error)
     } else {
+      # testthat shows the class of an error of its own class, like it doesn't
+      # for an error in a test
+      class(error) <- setdiff(class(error), "cucumber_step_error")
       stop(error)
     }
   }

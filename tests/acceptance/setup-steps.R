@@ -219,6 +219,15 @@ then("the scenario {string} is {word} with {string}", function(name, outcome, me
   expect_equal(conditionMessage(results[[1]]), message)
 })
 
+# The whole message testthat's reporter shows for the error of a scenario
+then("the scenario {string} errored with", function(name, message, context) {
+  test <- Find(\(test) test$test == paste("Scenario:", name), context$result)
+  results <- Filter(\(result) !inherits(result, "expectation_success"), test$results)
+  expect_length(results, 1)
+  expect_s3_class(results[[1]], "expectation_error")
+  expect_equal(conditionMessage(results[[1]]), message)
+})
+
 then("it fails with {string}", function(error_message, context) {
   expect_false(is.null(context$error))
   # Get the full error message including cli formatting

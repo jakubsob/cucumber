@@ -509,6 +509,52 @@ definitions and hooks are then cleared when it returns.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows a step's error like an error in a test
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      stop("can't calculate")</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenario <span class="st">"Adding one"</span> errored with
+<span class="st">    """</span>
+<span class="st">    Error: Step "I calculate" failed</span>
+<span class="st">    i Feature: calculate.feature</span>
+<span class="st">    i Scenario: Adding one</span>
+<span class="st">    i Step defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! can't calculate</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: testthat's reporter shows a step's error like an error in a test
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      stop("can't calculate")
+    \})
+    then("the result is \{int\}", function(n, context) \{\})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+    """
+  Then the scenario "Adding one" errored with
+    """
+    Error: Step "I calculate" failed
+    i Feature: calculate.feature
+    i Scenario: Adding one
+    i Step defined at: setup-steps.R:1
+    Caused by error:
+    ! can't calculate
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows the backtrace of a step's error
   <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
 <span class="st">    """</span>
