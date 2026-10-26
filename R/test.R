@@ -99,9 +99,8 @@ run <- function(
 #' @keywords internal
 #' @noRd
 run_cucumber <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env, start_file = NULL) {
-  check_reporter(reporter)
-  check_tags(tags)
-  retry <- checkmate::assert_count(retry, coerce = TRUE)
+  check_run_args(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...)
+  retry <- as.integer(retry)
   order <- resolve_order(order)
   error <- NULL
   # An error of a reporter or of cucumber itself stops the run, see abort_run()
@@ -179,7 +178,6 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
   # files of the features as unused
   complete <- complete_run(filter, tags, name, features, dry_run)
   snapshots <- run_snapshots(path, find_features(path), complete)
-  check_grepl_args(...)
 
   lines <- feature_lines(features, path)
   features <- select_features(path, filter, lines, ...)
@@ -261,10 +259,9 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
 #' @keywords internal
 #' @noRd
 resolve_order <- function(order) {
-  checkmate::assert_string(order)
-  if (!grepl("^(defined|reverse|random(:[0-9]+)?)$", order)) {
+  if (!rlang::is_string(order) || !grepl("^(defined|reverse|random(:[0-9]+)?)$", order)) {
     abort(
-      paste0("Unknown order \"", order, "\"."),
+      paste0("Unknown order ", deparse1(order), "."),
       body = c(i = "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\"."),
       call = NULL,
       trace = empty_trace()
@@ -452,8 +449,86 @@ check_grepl_args <- function(...) {
     abort(
       paste0("Unknown argument", if (length(unknown) > 1) "s", ": ", paste0("`", unknown, "`", collapse = ", "), "."),
       body = c(i = paste0("Arguments of `grepl()` for `filter` can be passed in `...`: ", paste0("`", allowed, "`", collapse = ", "), ".")),
+      call = NULL,
       trace = empty_trace()
     )
+  }
+}
+
+#' Check the arguments of `run()` and `test()` before anything runs, so a
+#' mistake is an error that names the argument
+#' @keywords internal
+#' @noRd
+check_run_args <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...) {
+  check_reporter(reporter, call = NULL)
+  check_selection(path, filter, tags, name, features, ...)
+  check_flag(strict)
+  check_flag(dry_run)
+  check_flag(fail_fast)
+  if (!rlang::is_scalar_integerish(retry) || is.na(retry) || retry < 0) {
+    abort("`retry` must be a whole number of 0 or more, like `retry = 2`.", call = NULL, trace = empty_trace())
+  }
+}
+
+#' Check the arguments that select the scenarios, see `test()`
+#' @keywords internal
+#' @noRd
+check_selection <- function(path, filter, tags, name, features, ...) {
+  if (!rlang::is_string(path) || !dir.exists(path)) {
+    abort(
+      "`path` must be a directory.",
+      body = if (rlang::is_string(path)) c(x = paste0("\"", path, "\" doesn't exist.")),
+      call = NULL,
+      trace = empty_trace()
+    )
+  }
+  check_tags(tags)
+  check_grepl_args(...)
+  if (!is.null(filter) && !rlang::is_string(filter)) {
+    abort("`filter` must be one regular expression.", call = NULL, trace = empty_trace())
+  }
+  check_regexps(filter, "`filter` must be a valid regular expression.", ...)
+  if (!is.null(name) && !is.character(name)) {
+    abort("`name` must be regular expressions.", call = NULL, trace = empty_trace())
+  }
+  check_regexps(name, "`name` must be valid regular expressions.")
+  if (!is.null(features) && !is.character(features)) {
+    abort(
+      "`features` must be paths of feature files.",
+      body = c(i = "Give a path with the lines of its scenarios to run only them, like `\"basket.feature:12\"`."),
+      call = NULL,
+      trace = empty_trace()
+    )
+  }
+}
+
+#' Fail with `message` and the reason a regular expression is invalid
+#' @param ... Arguments of `grepl()`, like `perl = TRUE`
+#' @keywords internal
+#' @noRd
+check_regexps <- function(patterns, message, ...) {
+  problems <- unlist(lapply(patterns, \(pattern) {
+    tryCatch(
+      {
+        suppressWarnings(grepl(pattern, "", ...))
+        NULL
+      },
+      error = conditionMessage
+    )
+  }))
+  if (length(problems) > 0) {
+    abort(
+      message,
+      body = rlang::set_names(problems, "x"),
+      call = NULL,
+      trace = empty_trace()
+    )
+  }
+}
+
+check_flag <- function(x, arg = rlang::caller_arg(x)) {
+  if (!rlang::is_bool(x)) {
+    abort(paste0("`", arg, "` must be `TRUE` or `FALSE`."), call = NULL, trace = empty_trace())
   }
 }
 
@@ -595,12 +670,16 @@ test <- function(
   order = "defined",
   ...
 ) {
-  check_reporter(reporter)
-  check_tags(tags)
-  checkmate::assert_count(retry)
+  # Before the working directory is `path`, so the arguments are evaluated
+  # where test() is called, like `features = readLines("rerun.txt")`
+  check_run_args(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...)
+  check_flag(load_helpers)
+  check_flag(stop_on_failure)
+  check_flag(stop_on_warning)
+  if (!is.null(env) && !is.environment(env)) {
+    abort("`env` must be an environment, or `NULL`.", call = NULL, trace = empty_trace())
+  }
   order <- resolve_order(order)
-  # Before the working directory is `path`, like `features = readLines("rerun.txt")`
-  list(filter, tags, env, name, features, ...)
 
   # What testthat::test_dir() does before it runs test files. It attaches
   # testthat, so steps can use its expectations without `testthat::`.

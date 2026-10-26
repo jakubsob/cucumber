@@ -263,6 +263,12 @@ then("it fails with {string}", function(error_message, context) {
   )
 })
 
+# The whole message of the error, as it's shown, to read it like a snapshot
+then("it fails with", function(message, context) {
+  expect_false(is.null(context$error))
+  expect_equal(cli::ansi_strip(conditionMessage(context$error)), message)
+})
+
 extract_error_messages <- function(result) {
   messages <- lapply(result, function(r) {
     lapply(r$results, function(exp) {

@@ -127,6 +127,8 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - 🐛 `CucumberPrettyReporter` prints a step's warnings under the step. Previously they were printed above it.
 - 🐛 A failed expectation, like `expect_equal()`, in a step fails the test run. Previously testthat didn't record it, so the scenario was reported as skipped.
 - 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, as documented, e.g. `test(filter = "ADDITION", ignore.case = TRUE)`. Previously they were ignored. An argument that isn't an argument of `test()` or `grepl()`, like a misspelled `fail_fst = TRUE`, is an error.
+- 🐛 `test()`, `run()` and `features_rd()` check their arguments before anything runs, and a mistake is an error that names the argument, like ``` `dry_run` must be `TRUE` or `FALSE`. ```, ``` `name` must be valid regular expressions. ``` with the reason, or ``` `path` must be a directory. ``` for a directory that doesn't exist. It's an error even with `stop_on_failure = FALSE`. Previously it failed inside cucumber, like with `invalid argument type`, `cannot change working directory` or an error of `keep()`.
+- ⚠️ `filter` must be one regular expression. Several, like `filter = c("basket", "checkout")`, are an error, as only the first one was used. Combine them with `|`: `filter = "basket|checkout"`.
 
 # cucumber 2.2.0
 

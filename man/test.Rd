@@ -109,7 +109,7 @@ Those tests won't be run when calling \code{\link[=test]{test()}}. To run those 
 \subsection{Running tests with test()}{
 
 \code{test()} runs the feature files in \code{tests/acceptance}, or in the directory set in the \code{cucumber.path} option.
-Pass \code{path} to run another directory.
+Pass \code{path} to run another directory. A mistake in an argument is an error that names the argument.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>

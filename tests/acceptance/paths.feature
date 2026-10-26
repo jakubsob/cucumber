@@ -123,8 +123,12 @@ Feature: Choosing feature files
         | Adding   |
 
     Scenario: An argument that isn't an argument of test() or grepl() is an error
-      When I run
+      When I run it and it fails
         """
-        test("features", fail_fst = TRUE, stop_on_failure = FALSE)
+        test("features", fail_fst = TRUE)
         """
-      Then the error message includes "Unknown argument: `fail_fst`."
+      Then it fails with
+        """
+        Unknown argument: `fail_fst`.
+        i Arguments of `grepl()` for `filter` can be passed in `...`: `ignore.case`, `perl`, `fixed`, `useBytes`.
+        """

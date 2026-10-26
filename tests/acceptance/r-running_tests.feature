@@ -1,6 +1,6 @@
 Feature: Running tests with test()
   `test()` runs the feature files in `tests/acceptance`, or in the directory set in the `cucumber.path` option.
-  Pass `path` to run another directory.
+  Pass `path` to run another directory. A mistake in an argument is an error that names the argument.
 
   Background:
     Given a package
@@ -68,3 +68,66 @@ Feature: Running tests with test()
       test("empty", stop_on_failure = FALSE)
       """
     Then the error message includes "No feature files found."
+
+  Rule: A mistake in an argument is an error that names the argument
+
+    Scenario: A directory that doesn't exist is an error
+      When I run it and it fails
+        """
+        test("missing")
+        """
+      Then it fails with
+        """
+        `path` must be a directory.
+        x "missing" doesn't exist.
+        """
+
+    Scenario Outline: An argument with <case> is an error
+      When I run it and it fails
+        """
+        test("features", <argument>)
+        """
+      Then it fails with
+        """
+        <message>
+        """
+
+      Examples:
+        | case                             | argument             | message                                                         |
+        | a flag that isn't TRUE or FALSE  | dry_run = "yes"      | `dry_run` must be `TRUE` or `FALSE`.                            |
+        | a negative number of retries     | retry = -1           | `retry` must be a whole number of 0 or more, like `retry = 2`. |
+        | several filters                  | filter = c("a", "b") | `filter` must be one regular expression.                        |
+        | an env that isn't an environment | env = "features"     | `env` must be an environment, or `NULL`.                        |
+
+    Scenario: An invalid regular expression in name is an error with the reason
+      When I run it and it fails
+        """
+        test("features", name = c("^Adding", "("))
+        """
+      Then it fails with
+        """
+        `name` must be valid regular expressions.
+        x invalid regular expression '(', reason 'Missing ')''
+        """
+
+    Scenario: An invalid regular expression in filter is an error with the reason
+      When I run it and it fails
+        """
+        test("features", filter = "(")
+        """
+      Then it fails with
+        """
+        `filter` must be a valid regular expression.
+        x invalid regular expression '(', reason 'Missing ')''
+        """
+
+    Scenario: Feature files that aren't paths are an error
+      When I run it and it fails
+        """
+        test("features", features = 12)
+        """
+      Then it fails with
+        """
+        `features` must be paths of feature files.
+        i Give a path with the lines of its scenarios to run only them, like `"basket.feature:12"`.
+        """
