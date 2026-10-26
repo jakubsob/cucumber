@@ -8,6 +8,17 @@ given("a file named {string} with", function(filename, code, context) {
   writeLines(code, file)
 })
 
+# Like test() in a testthat file of a package whose tests/testthat.R has no
+# library(cucumber). The attached cucumber is restored when the scenario ends.
+given("cucumber isn't attached", function(context) {
+  attached <- as.environment("package:cucumber")
+  detach("package:cucumber")
+  withr::defer({
+    if ("package:cucumber" %in% search()) detach("package:cucumber")
+    attach(attached, name = "package:cucumber", warn.conflicts = FALSE)
+  }, envir = context)
+})
+
 given("a package", function(context) {
   fs::dir_create(context$tempdir)
   writeLines(c("Package: example", "Version: 0.1.0"), fs::path(context$tempdir, "DESCRIPTION"))

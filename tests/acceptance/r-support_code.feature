@@ -35,6 +35,20 @@ Feature: Loading step definitions and support code
       """
     Then it passes
 
+  Scenario: Setup files use cucumber's functions without library(cucumber)
+    `test()` attaches cucumber, like it attaches testthat for the steps' expectations.
+
+    Given a file named "features/setup-calculate.R" with
+      """
+      calculate <- function(x) x + 1
+      """
+    And cucumber isn't attached
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
   Scenario: Code in a helper file is available in steps
     Given a file named "features/helper-calculate.R" with
       """

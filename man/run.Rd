@@ -73,6 +73,9 @@ fails with "Test failures." if one of them failed.
 \code{run()} in a parallel testthat run, with \code{Config/testthat/parallel: true}, is an error:
 testthat would delete the snapshot files of its feature files as unused.
 
+testthat runs the \verb{setup-*.R} files before \code{run()}, so for them to define steps without
+\verb{cucumber::}, call \code{library(cucumber)} in \code{tests/testthat.R}.
+
 Skip scenarios in a \code{\link[=before_all]{before_all()}} or \code{\link[=before]{before()}} hook, not with \code{skip()} before \code{run()} in its
 test file: testthat deletes the snapshot files of feature files that a run of every test file
 didn't run.

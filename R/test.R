@@ -31,6 +31,9 @@
 #' `run()` in a parallel testthat run, with `Config/testthat/parallel: true`, is an error:
 #' testthat would delete the snapshot files of its feature files as unused.
 #'
+#' testthat runs the `setup-*.R` files before `run()`, so for them to define steps without
+#' `cucumber::`, call `library(cucumber)` in `tests/testthat.R`.
+#'
 #' Skip scenarios in a [before_all()] or [before()] hook, not with `skip()` before `run()` in its
 #' test file: testthat deletes the snapshot files of feature files that a run of every test file
 #' didn't run.
@@ -602,6 +605,9 @@ test <- function(
   # What testthat::test_dir() does before it runs test files. It attaches
   # testthat, so steps can use its expectations without `testthat::`.
   if (!"package:testthat" %in% search()) attachNamespace("testthat")
+  # And cucumber, so setup files define steps without `cucumber::`, also when
+  # test() is called as `cucumber::test()`
+  if (!"package:cucumber" %in% search()) attachNamespace("cucumber")
   # Like testthat::test_local(), so snapshots are checked, but not in a testthat
   # run or in R CMD check, where skip_on_cran() still skips
   if (!testthat::is_testing() && Sys.getenv("_R_CHECK_PACKAGE_NAME_") == "" && Sys.getenv("NOT_CRAN") == "") {
