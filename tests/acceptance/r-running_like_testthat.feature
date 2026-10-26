@@ -3,11 +3,11 @@ Feature: Running feature files like testthat runs test files
   in `path` as the working directory, with the testthat edition and the package of `path` as
   `testthat::testing_package()`, the package `testthat::local_mocked_bindings()` mocks, after the
   `helper-*.R` and `setup-*.R` files, and before the `teardown-*.R` files. Steps can use
-  testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step fails when a
-  `test_that()` test in it fails. With the 3rd edition, steps run with testthat's reproducible
+  testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step or a hook fails
+  when a `test_that()` test in it fails. With the 3rd edition, steps run with testthat's reproducible
   output, like its tests. What the setup files and steps defer to `testthat::teardown_env()` runs
-  when `test()` ends. Each feature file is the file of its scenarios' results, and a failure or a
-  skip is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
+  when `test()` ends. Each feature file is the file of its scenarios' results, and a failure, a skip
+  or a warning is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
   `skip()` in a `before_all()` hook skips every scenario, like `skip()` at the top of a test file skips its tests.
@@ -177,6 +177,25 @@ Feature: Running feature files like testthat runs test files
       | When I add an apple                  | passed |
       | Then the basket is checked by a test | failed |
     And the error message includes 'The test "the basket is empty" in the step failed.'
+
+  Scenario: A hook fails when a test_that() test in it fails
+    Given a file named "features/setup-hooks.R" with
+      """
+      after(function(context, scenario) {
+        test_that("the basket is put away", expect_equal(context$items, 0))
+      })
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps and hooks have these results:
+      | step                       | status |
+      | Given an empty basket      | passed |
+      | When I add an apple        | passed |
+      | Then the basket has 1 item | passed |
+      | After                      | failed |
+    And the error message includes 'The test "the basket is put away" in the hook failed.'
 
   Scenario: Steps use the testthat edition of the package
     Given a file named "DESCRIPTION" with
@@ -386,6 +405,43 @@ Feature: Running feature files like testthat runs test files
       test("features", stop_on_failure = FALSE)
       """
     Then the scenarios failed at these locations:
+      | scenario            | location                   |
+      | Adding an apple     | basket.feature:4           |
+      | Paying for an apple | checkout/payment.feature:2 |
+
+  Scenario: A warning is at its line of the feature file, the line of its step or of its scenario
+    Given a file named "features/setup-hooks.R" with
+      """
+      before(function(context, scenario) {
+        if (scenario$name == "Paying for an apple") warning("The till is slow")
+      })
+      then("the basket is heavy", function(context) {
+        warning("The basket is heavy")
+        succeed()
+      })
+      """
+    And a file named "features/checkout/payment.feature" with
+      """
+      Feature: Payment
+        Scenario: Paying for an apple
+          Given an empty basket
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Adding an apple
+          Given an empty basket
+          Then the basket is heavy
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the scenarios have these warnings:
+      | scenario            | warning             |
+      | Adding an apple     | The basket is heavy |
+      | Paying for an apple | The till is slow    |
+    And the scenarios warned at these locations:
       | scenario            | location                   |
       | Adding an apple     | basket.feature:4           |
       | Paying for an apple | checkout/payment.feature:2 |

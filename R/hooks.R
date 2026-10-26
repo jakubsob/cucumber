@@ -216,7 +216,7 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE) {
   for (hook in hooks) {
     error <- tryCatch(
       {
-        hook$fn(...)
+        with_nested_tests(hook$fn(...), "hook")
         NULL
       },
       cucumber_pending = function(cnd) {

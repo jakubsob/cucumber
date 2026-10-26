@@ -93,7 +93,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ Cucumber reporters are no longer testthat reporters, and testthat reporters, like `testthat::JunitReporter`, can't be passed to `test()` or `run()`: they get an error. A `CucumberReporter` gets only cucumber's events: `start_run()`, `end_run(error)` with the error that stopped the run, `add_message()` and `add_warning()` replace testthat's `start_reporter()`, `end_reporter()`, `start_test()`, `end_test()` and `add_result()`. Use `reporter = NULL` to report nothing.
 - ⚠️ `run()` reports nothing of its own by default, `reporter = NULL`: testthat's reporter reports each scenario as a test, and a failed expectation names its step, like `Step "the result is 2" failed`. Previously `CucumberProgressReporter` printed the run too, between the lines of testthat's reporter. Pass a reporter to `run()` to print the run with cucumber's reporter as well, e.g. `run(reporter = CucumberProgressReporter$new())`.
 - ✨ An error of a reporter stops the run with an error naming the reporter and the event it failed in, like ``Reporter `MyReporter` failed in `add_message()`.``, even with `stop_on_failure = FALSE`. Previously testthat reported it as the failure of the scenario, and the run went on with the reporter missing events.
-- ✨ testthat's reporters show a scenario's failure or skip at its line of the feature file, like `Failure ('basket.feature:4:1')`: the line of the step that failed or skipped, or of the scenario for a hook, or when all scenarios are skipped, like by a `before_all()` hook. Previously they showed the line of the test file that called `run()`, like `test-acceptance.R:1:1`.
+- ✨ testthat's reporters show a scenario's failure, skip or warning at its line of the feature file, like `Failure ('basket.feature:4:1')`: the line of the step that failed, skipped or warned, or of the scenario for a hook, or when all scenarios are skipped, like by a `before_all()` hook. Previously they showed the line of the test file that called `run()`, like `test-acceptance.R:1:1`.
 
 ## Reports
 
@@ -117,7 +117,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Bug fixes
 
-- 🐛 A step fails when a `test_that()` test in it fails, with `The test "<name>" in the step failed.` Previously the step and its scenario passed, while testthat reported the test in it as failed.
+- 🐛 A step or a hook fails when a `test_that()` test in it fails, with `The test "<name>" in the step failed.` Previously the step or the hook and its scenario passed, while testthat reported the test in it as failed.
 - 🐛 A scenario whose steps pass without calling any `expect_*()` function is reported as passed. Previously testthat reported it as skipped ("empty test"), e.g. in `JunitReporter` output.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.
 - 🐛 Defining a step without `context` as its last argument is an error that says so and the function to use, e.g. `Use \`function(n, context)\``. Previously it was a checkmate assertion error, `Must be a subset of {'n'}`.

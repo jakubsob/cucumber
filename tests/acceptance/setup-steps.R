@@ -180,6 +180,10 @@ then("the scenarios skipped at these locations:", function(expected, context) {
   expect_result_locations("expectation_skip", expected, context)
 })
 
+then("the scenarios warned at these locations:", function(expected, context) {
+  expect_result_locations("expectation_warning", expected, context)
+})
+
 # Every result of the run is a testthat skip, with this reason
 then("the results are skipped with {string}", function(reason, context) {
   results <- unlist(lapply(context$result, `[[`, "results"), recursive = FALSE)

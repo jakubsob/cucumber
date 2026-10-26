@@ -202,7 +202,11 @@ execute_single_pickle <- function(
       skip_at(skip_reason, feature_srcref(pickle))
     }
   },
-    warning = \(w) cucumber_event(reporter, "add_warning", w),
+    # A warning of a hook, or of what a step or a hook deferred, is at the scenario's line
+    warning = \(w) {
+      cucumber_event(reporter, "add_warning", w)
+      warn_at(rlang::cnd_entrace(w), feature_srcref(pickle))
+    },
     # Not muffled, so testthat skips the test, as it does on CRAN
     snapshot_on_cran = \(cnd) snapshot_on_cran <<- TRUE
   ))
@@ -379,6 +383,21 @@ feature_srcref <- function(pickle, line = pickle$source_line) {
   srcref(srcfile(as.character(pickle$feature_file)), c(line, 1L, line, 1L))
 }
 
+#' Signal a warning again at `srcref`, for testthat's reporters to show it
+#' there, unless it already has a place, like a warning of a step. Called with
+#' `rlang::cnd_entrace()` of the warning in its handler, so the backtrace ends
+#' where it was signalled, not where it's signalled again.
+#' @keywords internal
+#' @noRd
+warn_at <- function(cnd, srcref) {
+  if (!is.null(cnd$srcref)) {
+    return(invisible())
+  }
+  cnd$srcref <- srcref
+  warning(cnd)
+  tryInvokeRestart("muffleWarning")
+}
+
 #' Skip the scenario's testthat test at `srcref`
 #' @param skip A skip condition, or the message of a new one
 #' @keywords internal
@@ -410,11 +429,7 @@ execute_single_step <- function(step, context, pickle = NULL) {
 
   tryCatch(
     withCallingHandlers(
-      {
-        nested <- local_nested_tests()
-        exec(step$matched_fn, !!!step$arguments(), context = context)
-        fail_nested_tests(nested)
-      },
+      with_nested_tests(exec(step$matched_fn, !!!step$arguments(), context = context), "step"),
       error = function(e) {
         if (
           inherits(e, "expectation") ||
@@ -430,7 +445,9 @@ execute_single_step <- function(step, context, pickle = NULL) {
           call = NULL,
           trace = empty_trace()
         )
-      }
+      },
+      # At the step's line, for testthat's reporters
+      warning = \(w) if (!is.null(pickle)) warn_at(rlang::cnd_entrace(w), feature_srcref(pickle, step$line))
     ),
     cucumber_pending = function(e) {
       status <<- "pending"
@@ -509,11 +526,16 @@ local_nested_tests <- function(frame = parent.frame()) {
   nested
 }
 
-#' Fail the step if a test in it failed, see `local_nested_tests()`
+#' Run `code`, the body of a step or a hook, and fail it if a test in it
+#' failed, see `local_nested_tests()`
+#' @param what What runs `code`: "step" or "hook"
 #' @keywords internal
 #' @noRd
-fail_nested_tests <- function(nested) {
+with_nested_tests <- function(code, what) {
+  nested <- local_nested_tests()
+  code
   if (length(nested$failed) > 0) {
-    testthat::fail(paste0("The test", if (length(nested$failed) > 1) "s", " ", paste0("\"", nested$failed, "\"", collapse = ", "), " in the step failed."))
+    tests <- paste0("\"", nested$failed, "\"", collapse = ", ")
+    testthat::fail(paste0("The test", if (length(nested$failed) > 1) "s", " ", tests, " in the ", what, " failed."))
   }
 }
