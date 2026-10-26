@@ -230,6 +230,31 @@ Feature: Hooks
       can't close the database
       """
 
+  Scenario Outline: An after hook gets the status of a scenario with a step that is <case>, strict = <strict>
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) cat("after:", scenario$status, "\n"))
+      <definitions>
+      """
+    When I run
+      """
+      test("features", strict = <strict>, stop_on_failure = FALSE)
+      """
+    Then the output includes "after: <case>"
+
+    Examples:
+      | case      | strict | definitions                                                                                   |
+      | undefined | TRUE   |                                                                                               |
+      | undefined | FALSE  |                                                                                               |
+      | ambiguous | TRUE   | when("I add an item", function(context) {}); when("I add an {word}", function(w, context) {}) |
+      | ambiguous | FALSE  | when("I add an item", function(context) {}); when("I add an {word}", function(w, context) {}) |
+
   Scenario: An after hook gets the result of the after hooks that ran before it
     Given a file named "features/basket.feature" with
       """
