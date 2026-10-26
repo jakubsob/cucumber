@@ -357,7 +357,8 @@ signal_scenario_result <- function(results, result, failing, pickle) {
   # a loop, purrr would wrap the expectations testthat signals as errors
   for (failure in failures) {
     if (identical(failure, failed_step)) next
-    testthat::fail(conditionMessage(failure$error), srcref = location(failure))
+    # The backtrace of the failure's error, not of the code that reports it
+    testthat::fail(conditionMessage(failure$error), srcref = location(failure), trace = failure$error$trace %||% empty_trace())
   }
   if (!is.null(failed_step)) {
     error <- failed_step$error

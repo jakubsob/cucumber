@@ -143,6 +143,22 @@ Feature: Running scenarios alongside testthat tests
       | scenario   | location            |
       | Adding one | calculate.feature:4 |
 
+  Scenario: testthat's reporter shows an undefined step without a backtrace
+    The step isn't code that ran, so there is no call to show.
+
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+      """
+    Then the output includes 'No step found for: "the result is 2"'
+    And the output doesn't include "Backtrace"
+
   Scenario: run() runs outside of a testthat run
     Given a file named "features/calculate.feature" with
       """

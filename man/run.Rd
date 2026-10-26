@@ -367,6 +367,40 @@ definitions and hooks are then cleared when it returns.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows an undefined step without a backtrace
+  The step isn't code that ran, so there is no call to show.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes 'No step found for: <span class="st">"the result is 2"</span>'
+  <span class="fu">And</span> the output doesn't include <span class="st">"Backtrace"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: testthat's reporter shows an undefined step without a backtrace
+  The step isn't code that ran, so there is no call to show.
+
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+    """
+  Then the output includes 'No step found for: "the result is 2"'
+  And the output doesn't include "Backtrace"
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> run() runs outside of a testthat run
   <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
 <span class="st">    """</span>
