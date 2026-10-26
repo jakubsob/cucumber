@@ -320,5 +320,9 @@ Feature: Running scenarios by tag
         """
         test("features", tags = c("@smoke", "not @slow"))
         """
-      Then it fails with "`tags` must be one tag expression."
-      And it fails with "Combine tag expressions with `and`, like `\"@smoke and not @slow\"`."
+      Then it fails with
+        """
+        Error:
+        ! `tags` must be one tag expression.
+        i Combine tag expressions with `and`, like `"@smoke and not @slow"`.
+        """

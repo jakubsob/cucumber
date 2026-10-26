@@ -360,14 +360,20 @@ Feature: Hooks
       """
       test("features")
       """
-    Then it fails with "A `<hook>` hook must have <count> arguments."
-    And it fails with "<usage>"
+    Then it fails with
+      """
+      Error in `source_dir()`:
+      ! Failed to evaluate './setup-steps.R'.
+      <caused by>
+      ! A `<hook>` hook must have <count> arguments.
+      i <usage>
+      """
 
     Examples:
-      | hook        | count  | usage                                      |
-      | before      | 2      | Use `function(context, scenario)`.         |
-      | after       | 2      | Use `function(context, scenario)`.         |
-      | before_step | 2      | Use `function(context, step)`.             |
-      | after_step  | 2      | Use `function(context, step)`.             |
-      | before_all  | 0 or 1 | Use `function()` or `function(context)`.   |
-      | after_all   | 0 or 1 | Use `function()` or `function(context)`.   |
+      | hook        | caused by                         | count  | usage                                    |
+      | before      | Caused by error in `before()`:      | 2      | Use `function(context, scenario)`.       |
+      | after       | Caused by error in `after()`:       | 2      | Use `function(context, scenario)`.       |
+      | before_step | Caused by error in `before_step()`: | 2      | Use `function(context, step)`.           |
+      | after_step  | Caused by error in `after_step()`:  | 2      | Use `function(context, step)`.           |
+      | before_all  | Caused by error:                    | 0 or 1 | Use `function()` or `function(context)`. |
+      | after_all   | Caused by error:                    | 0 or 1 | Use `function()` or `function(context)`. |

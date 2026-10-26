@@ -567,4 +567,9 @@ Feature: Scenarios as documentation
       """
       cucumber::features_rd(features = "basket.feature:13")
       """
-    Then it fails with "No scenarios to document."
+    Then it fails with
+      """
+      Error in `cucumber::features_rd()`:
+      ! No scenarios to document.
+      i Tag the scenarios with `@rd`, or select them with other arguments.
+      """

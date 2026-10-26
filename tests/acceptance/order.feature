@@ -79,4 +79,9 @@ Feature: Order
       """
       test("features", order = "shuffled")
       """
-    Then it fails with "Unknown order \"shuffled\"."
+    Then it fails with
+      """
+      Error:
+      ! Unknown order "shuffled".
+      i Use "defined", "reverse", "random" or "random:<seed>", like "random:1234".
+      """

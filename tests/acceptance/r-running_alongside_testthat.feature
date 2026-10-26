@@ -320,7 +320,11 @@ Feature: Running scenarios alongside testthat tests
       source("features/steps.R")
       run("features")
       """
-    Then it fails with "Test failures."
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      """
     And the scenarios have these results:
       | scenario     | status |
       | Adding one   | passed |

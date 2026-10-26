@@ -49,8 +49,14 @@ Feature: Step definition arguments
       """
       test("features")
       """
-    Then it fails with "A step definition must have `context` as its last argument."
-    And it fails with "Use `function(n, context)`."
+    Then it fails with
+      """
+      Error in `source_dir()`:
+      ! Failed to evaluate './setup-steps.R'.
+      Caused by error in `when()`:
+      ! A step definition must have `context` as its last argument.
+      i Use `function(n, context)`.
+      """
 
     Examples:
       | case             | definition              |

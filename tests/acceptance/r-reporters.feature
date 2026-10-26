@@ -85,5 +85,11 @@ Feature: Reporters
         CucumberHtmlReporter$new("missing/report.html")
       )), stop_on_failure = FALSE)
       """
-    Then it fails with "Reporter `CucumberHtmlReporter` failed in `end_run()`."
+    Then it fails with
+      """
+      Error:
+      ! Reporter `CucumberHtmlReporter` failed in `end_run()`.
+      Caused by error:
+      ! cannot open the connection
+      """
     And the output includes "2 scenarios (1 failed, 1 passed)"

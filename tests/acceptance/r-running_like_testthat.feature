@@ -456,7 +456,11 @@ Feature: Running feature files like testthat runs test files
       """
       test("features")
       """
-    Then it fails with "Test failures"
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      """
     When I run
       """
       test("features", stop_on_failure = FALSE)
@@ -482,7 +486,11 @@ Feature: Running feature files like testthat runs test files
       """
       test("features", stop_on_warning = TRUE)
       """
-    Then it fails with "Tests generated warnings"
+    Then it fails with
+      """
+      Error:
+      ! Tests generated warnings.
+      """
 
   Scenario: Each feature file is the file of its scenarios' results
     Given a file named "features/checkout/payment.feature" with
@@ -603,8 +611,14 @@ Feature: Running feature files like testthat runs test files
       """
       test("features", reporter = NULL, filter = "checkout")
       """
-    Then it fails with "Test failures"
-    And it fails with "No feature files found"
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      Caused by error:
+      ! No feature files found.
+      i Add `.feature` files describing your scenarios.
+      """
 
   Scenario: test() in a testthat run, like in R CMD check, leaves NOT_CRAN as it is
     Given a file named "tests/acceptance/basket.feature" with
@@ -786,4 +800,8 @@ Feature: Running feature files like testthat runs test files
       withr::defer(unloadNamespace("example"))
       withr::with_dir("tests", testthat::test_check("example", reporter = "silent"))
       """
-    Then it fails with "Test failures"
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      """

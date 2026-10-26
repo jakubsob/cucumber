@@ -144,8 +144,13 @@ Feature: Custom reporter
       source("broken-reporter.R")
       test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
       """
-    Then it fails with "Reporter `BrokenReporter` failed in `add_message()`."
-    And it fails with "can't format the step"
+    Then it fails with
+      """
+      Error:
+      ! Reporter `BrokenReporter` failed in `add_message()`.
+      Caused by error:
+      ! can't format the step
+      """
     And the output includes "message: testCaseStarted" once
 
   Scenario: A testthat reporter can't report a run
@@ -163,4 +168,9 @@ Feature: Custom reporter
       """
       test("features", reporter = testthat::ProgressReporter$new())
       """
-    Then it fails with "`reporter` must be a `CucumberReporter`, or `NULL` to report nothing."
+    Then it fails with
+      """
+      Error in `lapply()`:
+      ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
+      i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
+      """
