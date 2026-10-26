@@ -11,6 +11,7 @@ Feature: Running feature files like testthat runs test files
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
   `skip()` in a `before_all()` hook skips every scenario, like `skip()` at the top of a test file skips its tests.
+  `skip()` in a setup or helper file stops the run instead, like in `testthat::test_dir()`.
   `test()` writes no test file into `path`, and doesn't run its `test-*.R` files: they can test the
   code the steps use, with `testthat::test_dir()`.
 
@@ -396,6 +397,21 @@ Feature: Running feature files like testthat runs test files
     And the scenarios skipped at these locations:
       | scenario        | location         |
       | Adding an apple | basket.feature:2 |
+
+  Scenario: skip() in a setup file stops the run, like in testthat
+    Given a file named "features/setup-skip.R" with
+      """
+      skip("No database")
+      """
+    When I run
+      """
+      reason <- tryCatch(test("features"), skip = conditionMessage)
+      writeLines(reason, "reason.txt")
+      """
+    Then the file "reason.txt" has these lines:
+      """
+      Reason: No database
+      """
 
   Scenario: A failed scenario is an error, unless `stop_on_failure = FALSE`
     Given a file named "features/basket.feature" with
