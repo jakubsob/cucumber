@@ -512,6 +512,9 @@ NestedTestsReporter <- R6::R6Class(
     initialize = function(reporter, scenario, srcref = NULL) {
       self$reporter <- reporter
       self$.context <- reporter$.context
+      # testthat formats the output of expectations, like the colours of
+      # their differences, for the reporter it reports to
+      for (field in c("width", "unicode", "crayon", "rstudio", "hyperlinks")) self[[field]] <- reporter[[field]]
       self$prefix <- paste0(scenario, " / ")
       self$srcref <- srcref
     },

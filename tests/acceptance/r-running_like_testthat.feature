@@ -152,6 +152,33 @@ Feature: Running feature files like testthat runs test files
       | scenario           | status |
       | Showing the basket | passed |
 
+  Scenario: The differences of a failed expectation are coloured only where the reporter prints colours
+    Like in a testthat test, so a report without colours shows the differences as plain text.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Config/testthat/edition: 3
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Adding an apple
+          Given an empty basket
+          When I add an apple
+          Then the basket has 2 items
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the error message includes
+      """
+      `actual`: 1.0
+      `expected`: 2.0
+      """
+
   Scenario: A step fails when a test_that() test in it fails
     Given a file named "features/setup-test.R" with
       """
