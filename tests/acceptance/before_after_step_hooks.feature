@@ -44,7 +44,6 @@ Feature: Step hooks
     And the output doesn't include "after: the basket has 1 item"
 
   @rd
-  @rd
   Scenario: Step hooks get where the step is, and its Data Table and Doc String
     They get the Data Table and the Doc String as the step definition gets them.
 
