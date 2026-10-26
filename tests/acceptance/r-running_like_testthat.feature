@@ -5,7 +5,7 @@ Feature: Running feature files like testthat runs test files
   `helper-*.R` and `setup-*.R` files, and before the `teardown-*.R` files. Steps can use
   testthat's expectations, and `testthat::is_testing()` is `TRUE` in them. A step or a hook fails
   when a `test_that()` test in it fails. With the 3rd edition, steps run with testthat's reproducible
-  output, like its tests. What the setup files and steps defer to `testthat::teardown_env()` runs
+  output, like its tests, and their messages are shown, while the 2nd edition hides them. What the setup files and steps defer to `testthat::teardown_env()` runs
   when `test()` ends. Each feature file is the file of its scenarios' results, and a failure, a skip
   or a warning is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
   `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
@@ -178,6 +178,46 @@ Feature: Running feature files like testthat runs test files
       `actual`: 1.0
       `expected`: 2.0
       """
+
+  Scenario: A message of a step is shown, with the 3rd edition of testthat
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Config/testthat/edition: 3
+      """
+    And a file named "features/setup-message.R" with
+      """
+      then("the basket is weighed", function(context) message("Weighing the basket"))
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Weighing the basket
+          Then the basket is weighed
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes "Weighing the basket"
+
+  Scenario: A message of a step is hidden, with the 2nd edition of testthat
+    Given a file named "features/setup-message.R" with
+      """
+      then("the basket is weighed", function(context) message("Weighing the basket"))
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Weighing the basket
+          Then the basket is weighed
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output doesn't include "Weighing the basket"
 
   Scenario: A step fails when a test_that() test in it fails
     Given a file named "features/setup-test.R" with
