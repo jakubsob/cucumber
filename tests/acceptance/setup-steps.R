@@ -160,6 +160,18 @@ then("the scenarios have these warnings:", function(expected, context) {
   expect_equal(warnings, as.data.frame(expected))
 })
 
+# Where testthat's results of the last run say each scenario failed, as `file:line`
+then("the scenarios failed at these locations:", function(expected, context) {
+  failures <- lapply(context$result, \(test) {
+    failure <- Find(\(result) inherits(result, c("expectation_failure", "expectation_error")), test$results)
+    if (is.null(failure)) return(NULL)
+    srcref <- failure$srcref
+    location <- if (inherits(srcref, "srcref")) paste0(attr(srcref, "srcfile")$filename, ":", srcref[[1]]) else NA_character_
+    data.frame(scenario = sub("^Scenario: ", "", test$test), location = location)
+  })
+  expect_equal(do.call(rbind, failures), as.data.frame(expected))
+})
+
 # Every result of the run is a testthat skip, with this reason
 then("the results are skipped with {string}", function(reason, context) {
   results <- unlist(lapply(context$result, `[[`, "results"), recursive = FALSE)

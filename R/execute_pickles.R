@@ -193,7 +193,7 @@ execute_single_pickle <- function(
     failing <- failing_statuses(strict, dry_run)
     failed <<- result$status %in% failing
     if (!is.null(snapshots)) end_snapshot_scenario(snapshots, result$status, snapshot_on_cran)
-    signal_scenario_result(results, result, failing)
+    signal_scenario_result(results, result, failing, pickle)
     # testthat reports a test without expectations as skipped
     if (!skip_steps && result$status == "passed" && expectations == 0) {
       testthat::succeed()
@@ -337,24 +337,33 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
 #' signalled last, as it ends the test. A scenario that didn't fail but didn't
 #' pass either is skipped with the reason of its worst result.
 #'
+#' Each failure is at its line of the feature file, so testthat's reporters
+#' show it like the line of a failed expectation in a test file: a step's at
+#' the step's line, a hook's at the scenario's.
+#'
 #' @keywords internal
 #' @noRd
-signal_scenario_result <- function(results, result, failing) {
+signal_scenario_result <- function(results, result, failing, pickle) {
+  location <- \(result) {
+    line <- if (isTRUE(result$hook)) pickle$source_line else result$line
+    srcref(srcfile(as.character(pickle$feature_file)), c(line, 1L, line, 1L))
+  }
   failures <- Filter(\(result) result$status %in% failing, results)
   failed_step <- Find(\(result) result$status == "failed" && !isTRUE(result$hook), failures)
   # a loop, purrr would wrap the expectations testthat signals as errors
   for (failure in failures) {
     if (identical(failure, failed_step)) next
-    testthat::fail(conditionMessage(failure$error))
+    testthat::fail(conditionMessage(failure$error), srcref = location(failure))
   }
   if (!is.null(failed_step)) {
-    if (inherits(failed_step$error, "expectation")) {
+    error <- failed_step$error
+    error$srcref <- location(failed_step)
+    if (inherits(error, "expectation")) {
       # testthat's reporters show the error, not the steps, so it names the step
-      error <- failed_step$error
       error$message <- paste0("Step \"", failed_step$text, "\" failed\n", error$message)
       testthat::exp_signal(error)
     } else {
-      stop(failed_step$error)
+      stop(error)
     }
   }
   if (length(failures) == 0 && result$status != "passed" && !is.null(result$error)) {
