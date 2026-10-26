@@ -1,5 +1,5 @@
 Feature: Scenario Outlines
-  A Scenario Outline runs once for each row of its Examples.
+  A Scenario Outline runs once for each row of its Examples, so Examples with only a header row run nothing.
   The `<placeholders>` are replaced with the row's values in the scenario name, steps, Doc Strings and Data Tables.
   A placeholder without a column of its name stays as it's written.
 
@@ -200,3 +200,28 @@ Feature: Scenario Outlines
     Then the steps have these results:
       | scenario           | step                                 | status |
       | eating 1 cucumbers | Given I have 1 cucumbers in <basket> | passed |
+
+  Scenario: Examples with only a header row run no scenario
+    Given a file named "features/eating.feature" with
+      """
+      Feature: Eating
+        Scenario Outline: eating <a> cucumbers
+          Given I have <a>
+
+          Examples:
+            | a |
+
+        Scenario: drinking
+          Given I have 3
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I have {int}", function(n, context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then only these scenarios ran:
+      | scenario |
+      | drinking |
