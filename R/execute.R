@@ -153,7 +153,7 @@ run_snapshots <- function(path, features, complete, frame = parent.frame()) {
   force(frame)
   dir <- fs::path(path, "_snaps")
   files <- snapshot_file(features, path)
-  check_snapshot_files(features, files)
+  check_snapshot_files(fs::path_rel(features, path), files)
   outer <- getOption("testthat.snapshotter")
   # testthat's snapshotter cleans up only its own directory, so the run cleans
   # up the snapshots of feature files elsewhere, like `run("../acceptance")`
@@ -192,6 +192,7 @@ complete_run <- function(filter, tags, name, features, dry_run) {
 
 #' Two feature files can't save their snapshots in the same file, like
 #' `basket.feature` and `basket.feature.md`
+#' @param features The feature files, relative to the directory of the run
 #' @param files The snapshot file of each feature, from `snapshot_file()`
 #' @keywords internal
 #' @noRd
@@ -202,7 +203,7 @@ check_snapshot_files <- function(features, files) {
   }
   body <- vapply(shared, \(file) {
     paste0(
-      paste0("`", fs::path_file(features[files == file]), "`", collapse = " and "),
+      paste0("`", features[files == file], "`", collapse = " and "),
       " save their snapshots in `_snaps/", file, ".md`."
     )
   }, character(1))

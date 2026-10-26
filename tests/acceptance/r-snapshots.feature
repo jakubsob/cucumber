@@ -249,17 +249,17 @@ Feature: Snapshots
         """
         [error]
         <message>
-        x `<first shown>` and `<second>` save their snapshots in `_snaps/<snapshot file>`.
+        x `<first>` and `<second>` save their snapshots in `_snaps/<snapshot file>`.
         i Rename one of them.
         """
       And there is no snapshot file "_snaps/<snapshot file>"
 
       Examples:
-        | first                   | second                  | snapshot file              | runner | message                                     | first shown    |
-        | basket.feature          | basket.feature.md       | basket.feature.md          | test() | Feature files share a snapshot file.        | basket.feature |
-        | basket.feature          | basket.feature.md       | basket.feature.md          | run()  | Error: Feature files share a snapshot file. | basket.feature |
-        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | test() | Feature files share a snapshot file.        | basket.feature |
-        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | run()  | Error: Feature files share a snapshot file. | basket.feature |
+        | first                    | second                  | snapshot file               | runner | message                                   |
+        | basket.feature          | basket.feature.md       | basket.feature.md          | test() | Feature files share a snapshot file.        |
+        | basket.feature          | basket.feature.md       | basket.feature.md          | run()  | Error: Feature files share a snapshot file. |
+        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | test() | Feature files share a snapshot file.        |
+        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | run()  | Error: Feature files share a snapshot file. |
 
     Scenario Outline: A feature file in a directory named like a variant has snapshots of its own, with <runner>
       Given the steps that take snapshots
