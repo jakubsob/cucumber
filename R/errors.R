@@ -30,7 +30,7 @@ srcref_location <- function(src) {
 hook_error <- function(hook, error, pickle = NULL) {
   info <- if (is.null(hook$hook_name)) glue("Hook `{hook$name}()` failed") else glue("Hook \"{hook$hook_name}\" failed")
   if (!is.null(pickle$feature_file))
-    info <- c(info, i = glue("Feature: {basename(pickle$feature_file)}"))
+    info <- c(info, i = glue("Feature: {feature_path(pickle$feature_file)}"))
   if (!is.null(pickle$name))
     info <- c(info, i = glue("Scenario: {pickle$name}"))
   location <- srcref_location(hook$srcref)
@@ -44,10 +44,18 @@ hook_error <- function(hook, error, pickle = NULL) {
   )
 }
 
+#' Where a feature file is, relative to the working directory of the run, like
+#' `checkout/basket.feature`, so feature files of the same name are told apart
+#' @keywords internal
+#' @noRd
+feature_path <- function(file) {
+  as.character(fs::path_rel(file, "."))
+}
+
 step_error_bullets <- function(step, pickle) {
   info <- c(glue("Step \"{step$text}\" failed"))
   if (!is.null(pickle$feature_file))
-    info <- c(info, i = glue("Feature: {basename(pickle$feature_file)}"))
+    info <- c(info, i = glue("Feature: {feature_path(pickle$feature_file)}"))
   if (!is.null(pickle$name))
     info <- c(info, i = glue("Scenario: {pickle$name}"))
   location <- step_location(step)

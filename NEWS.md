@@ -121,7 +121,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 ## Bug fixes
 
-- 🐛 testthat's reporters show a step's error like an error in a test, starting with `Error: Step "<text>" failed`. Previously it started with the error's classes, `<cucumber_step_error/rlang_error/error/condition>`.
+- 🐛 testthat's reporters show a step's error like an error in a test, starting with `Error: Step "<text>" failed`. Previously it started with the error's classes, `<cucumber_step_error/rlang_error/error/condition>`. The error of a step or a hook names the feature file with its directory, like `Feature: checkout/basket.feature`, so feature files of the same name are told apart.
 - 🐛 A step or a hook fails when a `test_that()` test in it fails, with `The test "<name>" in the step failed.` Previously the step or the hook and its scenario passed, while testthat reported the test in it as failed.
 - 🐛 A scenario whose steps pass without calling any `expect_*()` function is reported as passed. Previously testthat reported it as skipped ("empty test"), e.g. in `JunitReporter` output.
 - 🐛 A step definition with the wrong number of arguments fails the step with an error that says how many arguments the step passes and the function to use, e.g. `Use \`function(int, data_table, context)\``. Previously it failed with `unused argument`. A step definition with `...` gets the step's arguments by position.

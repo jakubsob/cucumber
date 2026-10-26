@@ -64,7 +64,7 @@ Feature: Snapshots
         """
         [failure] Scenario: Showing the basket
         Step "the snapshot of "2 apples" matches" failed
-        i Feature: <file name>
+        i Feature: <feature>
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:9
         Snapshot of code has changed:
@@ -84,11 +84,11 @@ Feature: Snapshots
       And there is no snapshot file "<snapshot file>.new.md"
 
       Examples:
-        | feature                 | accepted                | snapshot file                  | runner | file name      |
-        | basket.feature          | basket.feature          | _snaps/basket.feature          | test() | basket.feature |
-        | basket.feature          | basket.feature          | _snaps/basket.feature          | run()  | basket.feature |
-        | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | test() | basket.feature |
-        | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | run()  | basket.feature |
+        | feature                 | accepted                | snapshot file                   | runner |
+        | basket.feature          | basket.feature          | _snaps/basket.feature          | test() |
+        | basket.feature          | basket.feature          | _snaps/basket.feature          | run()  |
+        | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | test() |
+        | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | run()  |
 
     Scenario Outline: A changed variant snapshot of <feature> is accepted with snapshot_accept("<accepted>"), with <runner>
       Given the steps that take snapshots
@@ -110,7 +110,7 @@ Feature: Snapshots
         """
         [failure] Scenario: Showing the basket
         Step "the snapshot of "2 apples" for "linux" matches" failed
-        i Feature: <file name>
+        i Feature: <feature>
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:10
         Snapshot of code has changed (variant 'linux'):
@@ -130,11 +130,11 @@ Feature: Snapshots
       And there is no snapshot file "_snaps/<accepted>.new.md"
 
       Examples:
-        | feature                 | accepted                      | runner | file name      |
-        | basket.feature          | linux/basket.feature          | test() | basket.feature |
-        | basket.feature          | linux/basket.feature          | run()  | basket.feature |
-        | checkout/basket.feature | linux/checkout-basket.feature | test() | basket.feature |
-        | checkout/basket.feature | linux/checkout-basket.feature | run()  | basket.feature |
+        | feature                 | accepted                      | runner |
+        | basket.feature          | linux/basket.feature          | test() |
+        | basket.feature          | linux/basket.feature          | run()  |
+        | checkout/basket.feature | linux/checkout-basket.feature | test() |
+        | checkout/basket.feature | linux/checkout-basket.feature | run()  |
 
     Scenario Outline: A changed snapshot of <feature> is reviewed with snapshot_review("<reviewed>"), with <runner>
       Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
@@ -190,7 +190,7 @@ Feature: Snapshots
         """
         [failure] Scenario: Showing the basket
         Step "the file snapshot "basket.txt" of "2 apples" matches" failed
-        i Feature: <file name>
+        i Feature: <feature>
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:17
         Snapshot of `file` has changed.
@@ -211,11 +211,11 @@ Feature: Snapshots
       And there is no file "tests/testthat/_snaps/<accepted>basket.new.txt"
 
       Examples:
-        | feature                    | accepted                    | runner | file name      |
-        | checkout/basket.feature    | checkout-basket.feature/    | test() | basket.feature |
-        | checkout/basket.feature    | checkout-basket.feature/    | run()  | basket.feature |
-        | shop/checkout/cart.feature | shop-checkout-cart.feature/ | test() | cart.feature   |
-        | shop/checkout/cart.feature | shop-checkout-cart.feature/ | run()  | cart.feature   |
+        | feature                    | accepted                    | runner |
+        | checkout/basket.feature    | checkout-basket.feature/    | test() |
+        | checkout/basket.feature    | checkout-basket.feature/    | run()  |
+        | shop/checkout/cart.feature | shop-checkout-cart.feature/ | test() |
+        | shop/checkout/cart.feature | shop-checkout-cart.feature/ | run()  |
 
   Rule: Each feature file has a snapshot file of its own
 
