@@ -153,12 +153,41 @@ set_parameters <- function(parameters) {
   options(list2(!!getOption(".cucumber_parameters_option") := parameters))
 }
 
+#' Transform the text a parameter matched with its parameter type's transformer.
+#' Its error says which parameter type failed, with the backtrace of the
+#' transformer, like the error of a step, see `call_step()`.
+#' @param text The text the parameter matched
+#' @param values The text of each of its capture groups, or `text`
+#' @keywords internal
+#' @noRd
+transform_parameter <- function(parameter, text, values) {
+  withr::local_options(rlang_trace_top_env = NULL)
+  run <- rlang::new_function(
+    rlang::pairlist2(... = ),
+    bquote({
+      options(rlang_trace_top_env = environment())
+      .(parameter$transformer)(...)
+    })
+  )
+  withCallingHandlers(
+    exec(run, !!!as.list(values)),
+    error = function(e) {
+      abort(
+        glue("Parameter type {{{parameter$name}}} failed to transform {encodeString(text, quote = '\"')}."),
+        parent = e,
+        call = NULL,
+        trace = rlang::cnd_entrace(e)$trace
+      )
+    }
+  )
+}
+
 #' Convert text to an integer, failing instead of returning NA when it's out of range
 #' @noRd
 as_integer <- function(x) {
   value <- suppressWarnings(as.integer(x))
   if (is.na(value) && !is.na(x)) {
-    abort(glue("{x} is out of range for an integer"), trace = empty_trace())
+    abort("It's out of the range of an R integer.", call = NULL, trace = empty_trace())
   }
   value
 }

@@ -139,10 +139,7 @@ match_single_step <- function(
     params <- Map(
       \(group, parameter) {
         children <- which(groups == group)
-        exec(
-          parameter$transformer,
-          !!!as.list(values[if (length(children)) children else group])
-        )
+        transform_parameter(parameter, values[group], values[if (length(children)) children else group])
       },
       which(groups == 0),
       attr(pattern, "parameters")

@@ -243,7 +243,17 @@ Feature: Parameter types
       Then the steps have these results:
         | step                          | status |
         | Given the count is 3000000000 | failed |
-      And the error message includes "3000000000 is out of range for an integer"
+      And the scenario "Big number" errored with
+        """
+        Error: Step "the count is 3000000000" failed
+        i Feature: params.feature
+        i Scenario: Big number
+        i Step defined at: setup-steps.R:1
+        Caused by error:
+        ! Parameter type {int} failed to transform "3000000000".
+        Caused by error:
+        ! It's out of the range of an R integer.
+        """
 
   Rule: {byte}, {short}, {long} and {double} are built in too, for feature files shared with other Cucumber implementations
 
@@ -370,6 +380,48 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
+
+    @rd
+    Scenario: A transformer's error fails the step and names the parameter type
+      The error is shown with the backtrace of the transformer.
+
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Colour
+            Given the colour is blue
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        check_colour <- function(x) stop("Unknown colour: ", x)
+        define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))
+        given("the colour is {colour}", function(colour, context) {})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the steps have these results:
+        | step                     | status |
+        | Given the colour is blue | failed |
+      And the scenario "Colour" errored with
+        """
+        Error: Step "the colour is blue" failed
+        i Feature: params.feature
+        i Scenario: Colour
+        i Step defined at: setup-steps.R:3
+        Caused by error:
+        ! Parameter type {colour} failed to transform "blue".
+        Caused by error in `check_colour()`:
+        ! Unknown colour: blue
+        """
+      And the output includes lines matching these patterns in order:
+        """
+        Unknown colour: blue
+        ^Backtrace:$
+        1\. .*check_colour\(x\)
+        """
+      And the output doesn't include "test_that"
 
     Scenario: A parameter type can't be defined twice
       When I run it and it fails

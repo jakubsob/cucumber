@@ -338,7 +338,17 @@ Register your own with \code{define_parameter_type()}.
   <span class="fu">Then</span> the steps have these results:
     <span class="op">|</span> step                          <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Given the count is 3000000000 <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the error message includes <span class="st">"3000000000 is out of range for an integer"</span></code></pre >}}
+  <span class="fu">And</span> the scenario <span class="st">"Big number"</span> errored with
+<span class="st">    """</span>
+<span class="st">    Error: Step "the count is 3000000000" failed</span>
+<span class="st">    i Feature: params.feature</span>
+<span class="st">    i Scenario: Big number</span>
+<span class="st">    i Step defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! Parameter type \{int\} failed to transform "3000000000".</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! It's out of the range of an R integer.</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: \{int\} fails on a value too big for an R integer
   Given a file named "features/params.feature" with
     """
@@ -357,7 +367,17 @@ Register your own with \code{define_parameter_type()}.
   Then the steps have these results:
     | step                          | status |
     | Given the count is 3000000000 | failed |
-  And the error message includes "3000000000 is out of range for an integer"
+  And the scenario "Big number" errored with
+    """
+    Error: Step "the count is 3000000000" failed
+    i Feature: params.feature
+    i Scenario: Big number
+    i Step defined at: setup-steps.R:1
+    Caused by error:
+    ! Parameter type \{int\} failed to transform "3000000000".
+    Caused by error:
+    ! It's out of the range of an R integer.
+    """
 %</pre>
 }}
 
@@ -606,6 +626,90 @@ Register your own with \code{define_parameter_type()}.
     test("features")
     """
   Then it passes
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A transformer's error fails the step and names the parameter type
+  The error is shown with the backtrace of the transformer.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Parameters</span>
+<span class="st">      Scenario: Colour</span>
+<span class="st">        Given the colour is blue</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    check_colour &lt;- function(x) stop("Unknown colour: ", x)</span>
+<span class="st">    define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))</span>
+<span class="st">    given("the colour is \{colour\}", function(colour, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> step                     <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Given the colour is blue <span class="op">|</span> failed <span class="op">|</span>
+  <span class="fu">And</span> the scenario <span class="st">"Colour"</span> errored with
+<span class="st">    """</span>
+<span class="st">    Error: Step "the colour is blue" failed</span>
+<span class="st">    i Feature: params.feature</span>
+<span class="st">    i Scenario: Colour</span>
+<span class="st">    i Step defined at: setup-steps.R:3</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! Parameter type \{colour\} failed to transform "blue".</span>
+<span class="st">    Caused by error in `check_colour()`:</span>
+<span class="st">    ! Unknown colour: blue</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes lines matching these patterns in order:
+<span class="st">    """</span>
+<span class="st">    Unknown colour: blue</span>
+<span class="st">    ^Backtrace:$</span>
+<span class="st">    1\\. .*check_colour\\(x\\)</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"test_that"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A transformer's error fails the step and names the parameter type
+  The error is shown with the backtrace of the transformer.
+
+  Given a file named "features/params.feature" with
+    """
+    Feature: Parameters
+      Scenario: Colour
+        Given the colour is blue
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    check_colour <- function(x) stop("Unknown colour: ", x)
+    define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))
+    given("the colour is \{colour\}", function(colour, context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | step                     | status |
+    | Given the colour is blue | failed |
+  And the scenario "Colour" errored with
+    """
+    Error: Step "the colour is blue" failed
+    i Feature: params.feature
+    i Scenario: Colour
+    i Step defined at: setup-steps.R:3
+    Caused by error:
+    ! Parameter type \{colour\} failed to transform "blue".
+    Caused by error in `check_colour()`:
+    ! Unknown colour: blue
+    """
+  And the output includes lines matching these patterns in order:
+    """
+    Unknown colour: blue
+    ^Backtrace:$
+    1\\. .*check_colour\\(x\\)
+    """
+  And the output doesn't include "test_that"
 %</pre>
 }}
 
