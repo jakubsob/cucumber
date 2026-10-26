@@ -118,6 +118,36 @@ Feature: Running feature files like testthat runs test files
       | scenario                        | status |
       | Checking that tests are running | passed |
 
+  Scenario Outline: A step checks a condition with <expectation>(), which doesn't reach the scenario
+    Given a file named "features/setup-condition.R" with
+      """
+      then("the basket is checked", function(context) {
+        <expectation>(<signal>)
+      })
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Checking the basket
+          Then the basket is checked
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario            | status |
+      | Checking the basket | passed |
+    And the scenarios have these warnings:
+      | scenario | warning |
+    And the output doesn't include "The basket"
+
+    Examples:
+      | expectation    | signal                         |
+      | expect_error   | stop("The basket is full")     |
+      | expect_warning | warning("The basket is heavy") |
+      | expect_message | message("The basket is light") |
+
   Scenario: Steps run with testthat's reproducible output, with the 3rd edition of testthat
     Like in a testthat test, the console is 80 characters wide, without colours, and not interactive,
     so output and snapshots are the same wherever they run.
