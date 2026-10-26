@@ -385,7 +385,7 @@ Source: \code{tests/acceptance/hooks.feature}
 \subsection{Tagged hooks}{
 
 A hook with \code{tags} runs only for the scenarios that match its tag expression,
-like \code{before(connect, tags = "@db")}.
+like \code{before(connect, tags = "@db")}. A step hook with \code{tags} runs only for the steps of those scenarios.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
