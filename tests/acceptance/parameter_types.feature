@@ -428,21 +428,51 @@ Feature: Parameter types
         """
         define_parameter_type("int", "\\d+", as.integer)
         """
-      Then it fails with "There is already a parameter type with name int"
+      Then it fails with
+        """
+        There is already a parameter type with name int
+        """
 
     Scenario: A parameter type's name can't contain {, }, (, ), \ or /
       When I run it and it fails
         """
         define_parameter_type("a/b", "x", as.character)
         """
-      Then it fails with "Illegal character in parameter name {a/b}."
+      Then it fails with
+        """
+        Illegal character in parameter name {a/b}. Parameter names may not contain '{', '}', '(', ')', '\' or '/'
+        """
+
+    Scenario: A parameter type must have a name
+      When I run it and it fails
+        """
+        define_parameter_type("", "x", as.character)
+        """
+      Then it fails with
+        """
+        A parameter type must have a name, as {} is the anonymous parameter type.
+        """
+
+    Scenario: A parameter type with an invalid regexp is an error
+      When I run it and it fails
+        """
+        define_parameter_type("colour", c("red", "(green"), as.character)
+        """
+      Then it fails with
+        """
+        The regexp /(green/ of parameter type {colour} is invalid.
+        x Incorrectly nested parentheses in regex pattern. (U_REGEX_MISMATCHED_PAREN, context=`(green`)
+        """
 
     Scenario: Only one parameter type with the same regexp can be preferred for regular expressions
       When I run it and it fails
         """
         define_parameter_type("count", "-?\\d+", as.integer, prefer_for_regexp_match = TRUE)
         """
-      Then it fails with "There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}"
+      Then it fails with
+        """
+        There can only be one preferential parameter type per regexp. The regexp /-?\d+/ is used for two preferential parameter types, {int} and {count}
+        """
 
   Rule: A step definition with an undefined parameter type defines no step
     The run goes on: the steps it would match are undefined, and the

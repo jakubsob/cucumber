@@ -124,8 +124,31 @@ check_parameter_type <- function(parameter, parameters) {
       "Parameter names may not contain '{', '}', '(', ')', '\\' or '/'"
     ))
   }
+  # cucumber-expressions says "There is already a parameter type with name ",
+  # as the anonymous parameter type is named ""
+  if (parameter$name == "") {
+    fail("A parameter type must have a name, as {} is the anonymous parameter type.")
+  }
   if (!is.null(parameters[[parameter$name]])) {
     fail(paste0("There is already a parameter type with name ", parameter$name))
+  }
+  for (regexp in parameter$regexp) {
+    problem <- tryCatch(
+      {
+        stringi::stri_detect_regex("", regexp)
+        NULL
+      },
+      error = conditionMessage
+    )
+    if (!is.null(problem)) {
+      abort(
+        paste0("The regexp /", regexp, "/ of parameter type {", parameter$name, "} is invalid."),
+        body = c(x = problem),
+        class = "cucumber_expression_error",
+        call = NULL,
+        trace = empty_trace()
+      )
+    }
   }
   if (parameter$prefer_for_regexp_match) {
     for (existing in parameters) {
