@@ -53,7 +53,9 @@ Hooks don't run in a dry run.
 
 \code{before()} and \code{after()} run code before and after each scenario, like opening and closing a connection.
 Define as many as you need: before hooks run in the order they are defined,
-after hooks in the reverse order. Where a hook is defined has no impact on what scenarios it runs for.
+after hooks in the reverse order. Hooks of several files are defined in the order the files are loaded:
+the \verb{helper-*.R} files, then the \verb{setup-*.R} files, each in alphabetical order.
+Where a hook is defined has no impact on what scenarios it runs for.
 Give a hook a \code{name} to find it in error messages.
 A failing before hook skips the scenario's steps and fails it. After hooks run even when the scenario failed,
 and a failing after hook fails it.

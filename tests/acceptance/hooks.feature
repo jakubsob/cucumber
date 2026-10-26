@@ -1,7 +1,9 @@
 Feature: Hooks
   `before()` and `after()` run code before and after each scenario, like opening and closing a connection.
   Define as many as you need: before hooks run in the order they are defined,
-  after hooks in the reverse order. Where a hook is defined has no impact on what scenarios it runs for.
+  after hooks in the reverse order. Hooks of several files are defined in the order the files are loaded:
+  the `helper-*.R` files, then the `setup-*.R` files, each in alphabetical order.
+  Where a hook is defined has no impact on what scenarios it runs for.
   Give a hook a `name` to find it in error messages.
   A failing before hook skips the scenario's steps and fails it. After hooks run even when the scenario failed,
   and a failing after hook fails it.
@@ -40,6 +42,43 @@ Feature: Hooks
       step
       after 2
       after 1
+      """
+
+  Scenario: Hooks of several files run in the order the files are loaded
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-b.R" with
+      """
+      before(function(context, scenario) cat("before setup-b\n"))
+      after(function(context, scenario) cat("after setup-b\n"))
+      """
+    And a file named "features/setup-a.R" with
+      """
+      before(function(context, scenario) cat("before setup-a\n"))
+      after(function(context, scenario) cat("after setup-a\n"))
+      given("an empty basket", function(context) {})
+      """
+    And a file named "features/helper-z.R" with
+      """
+      before(function(context, scenario) cat("before helper-z\n"))
+      after(function(context, scenario) cat("after helper-z\n"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      before helper-z
+      before setup-a
+      before setup-b
+      after setup-b
+      after setup-a
+      after helper-z
       """
 
   @rd
