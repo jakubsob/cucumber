@@ -99,7 +99,7 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        Hook `before_all()` failed
+        Error: Hook `before_all()` failed
         i Hook defined at: setup-steps.R:1
         Caused by error:
         ! the server didn't start
@@ -121,7 +121,7 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        Hook `before_all()` failed
+        Error: Hook `before_all()` failed
         i Hook defined at: setup-steps.R:1
         Caused by error:
         ! the server didn't start
@@ -145,7 +145,7 @@ Feature: Before all and after all hooks
       And the errors are
         """
         [error]
-        Hook `after_all()` failed
+        Error: Hook `after_all()` failed
         i Hook defined at: setup-steps.R:1
         Caused by error:
         ! the server didn't stop
@@ -180,7 +180,7 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        Hook "Start the server" failed
+        Error: Hook "Start the server" failed
         i Hook defined at: setup-steps.R:1
         Caused by error:
         ! connection refused

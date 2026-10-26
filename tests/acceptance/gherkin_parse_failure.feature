@@ -30,7 +30,7 @@ Feature: Gherkin parse failure
     Then the errors are
       """
       [error]
-      Can't parse feature files
+      Error: Can't parse feature files
       x Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
       x Parse error in "broken.feature" (9:7): inconsistent cell count within the table
       """
@@ -54,7 +54,7 @@ Feature: Gherkin parse failure
     Then the errors are
       """
       [error]
-      Can't parse feature files
+      Error: Can't parse feature files
       x Parse error in "unknown.feature" (1:1): Language not supported: xx
       """
 
@@ -77,7 +77,7 @@ Feature: Gherkin parse failure
     Then the errors are
       """
       [error]
-      Can't parse feature files
+      Error: Can't parse feature files
       x Parse error in "tagged.feature" (1:1): A tag may not contain whitespace
       x Parse error in "tagged.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got '@work in progress'
       """
@@ -98,7 +98,7 @@ Feature: Gherkin parse failure
     Then the errors are
       """
       [error]
-      Can't parse feature files
+      Error: Can't parse feature files
       x Parse error in "tagged.feature" (2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment, #Empty
       """
 
@@ -132,7 +132,7 @@ Feature: Gherkin parse failure
     Then the errors are
       """
       [error]
-      Can't parse feature files
+      Error: Can't parse feature files
       x Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 1'
       x Parse error in "broken.feature" (5:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 2'
       x Parse error in "broken.feature" (6:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 3'
@@ -173,7 +173,7 @@ Feature: Gherkin parse failure
     And the errors are
       """
       [error]
-      Can't parse feature files
+      Error: Can't parse feature files
       x Parse error in "a.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Parse Error'
       x Parse error in "c.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Parse Error'
       """

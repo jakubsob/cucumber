@@ -756,7 +756,9 @@ test <- function(
         # Like an error of a test file, it's in the results
         error = function(e) {
           run_error <<- e
-          lister$add_result(context = NULL, test = NULL, result = testthat::new_expectation("error", conditionMessage(e)))
+          # Shown like testthat shows the error of a test file, as `run()` shows it
+          header <- if (is.null(conditionCall(e))) "Error: " else paste0("Error in `", deparse1(conditionCall(e)), "`: ")
+          lister$add_result(context = NULL, test = NULL, result = testthat::new_expectation("error", paste0(header, conditionMessage(e))))
           lister$end_context(NULL)
         }
       )

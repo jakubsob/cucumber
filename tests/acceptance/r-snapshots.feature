@@ -254,18 +254,18 @@ Feature: Snapshots
       Then the errors are
         """
         [error]
-        <message>
+        Error: Feature files share a snapshot file.
         x `<first>` and `<second>` save their snapshots in `_snaps/<snapshot file>`.
         i Rename one of them.
         """
       And there is no snapshot file "_snaps/<snapshot file>"
 
       Examples:
-        | first                    | second                  | snapshot file               | runner | message                                   |
-        | basket.feature          | basket.feature.md       | basket.feature.md          | test() | Feature files share a snapshot file.        |
-        | basket.feature          | basket.feature.md       | basket.feature.md          | run()  | Error: Feature files share a snapshot file. |
-        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | test() | Feature files share a snapshot file.        |
-        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | run()  | Error: Feature files share a snapshot file. |
+        | first                   | second                  | snapshot file              | runner |
+        | basket.feature          | basket.feature.md       | basket.feature.md          | test() |
+        | basket.feature          | basket.feature.md       | basket.feature.md          | run()  |
+        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | test() |
+        | checkout/basket.feature | checkout-basket.feature | checkout-basket.feature.md | run()  |
 
     Scenario Outline: A feature file in a directory named like a variant has snapshots of its own, with <runner>
       Given the steps that take snapshots
@@ -307,16 +307,16 @@ Feature: Snapshots
       Then the errors are
         """
         [error]
-        <headline>
+        Error: Hook `before_all()` failed
         i Hook defined at: setup-hooks.R:1
         Caused by error:
         ! `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook.
         """
 
       Examples:
-        | runner | headline                        |
-        | test() | Hook `before_all()` failed        |
-        | run()  | Error: Hook `before_all()` failed |
+        | runner |
+        | test() |
+        | run()  |
 
     Scenario Outline: A snapshot in an after_all hook is an error, after the scenarios took theirs, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
@@ -335,16 +335,16 @@ Feature: Snapshots
           [1] "1 apple"
 
         [error]
-        <headline>
+        Error: Hook `after_all()` failed
         i Hook defined at: setup-hooks.R:1
         Caused by error:
         ! `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook.
         """
 
       Examples:
-        | runner | headline                        |
-        | test() | Hook `after_all()` failed        |
-        | run()  | Error: Hook `after_all()` failed |
+        | runner |
+        | test() |
+        | run()  |
 
     Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"

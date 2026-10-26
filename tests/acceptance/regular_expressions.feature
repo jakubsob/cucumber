@@ -96,7 +96,7 @@ Feature: Regular expressions
     Then the errors are
       """
       [error]
-      This Regular Expression has a problem:
+      Error: This Regular Expression has a problem:
 
       I pay {int}$
 
@@ -145,7 +145,7 @@ Feature: Regular expressions
     Then the errors are
       """
       [error]
-      Your Regular Expression ^I have a (red|green) cucumber$
+      Error: Your Regular Expression ^I have a (red|green) cucumber$
       matches multiple parameter types with regexp red|green:
          {colour}
          {ripeness}
