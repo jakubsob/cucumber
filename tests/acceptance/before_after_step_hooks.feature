@@ -106,7 +106,12 @@ Feature: Step hooks
     Then the errors are
       """
       [error] Scenario: Add an item
-      Error: step left a mess
+      Error: Hook `after_step()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! step left a mess
       """
     And the steps have these results:
       | step                  | status  |
@@ -157,7 +162,12 @@ Feature: Step hooks
     Then the errors are
       """
       [error] Scenario: Add an item
-      Error: step left a mess
+      Error: Hook `after_step()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! step left a mess
       """
     And the steps have these results:
       | step                  | status |

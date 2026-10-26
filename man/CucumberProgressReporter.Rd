@@ -230,7 +230,10 @@ Elsewhere, like in CI, it's printed once the feature finishes.
   <span class="fu">Then</span> the output includes
 <span class="st">    """</span>
 <span class="st">    Error:</span>
-<span class="st">    the server didn't start</span>
+<span class="st">    Hook `before_all()` failed</span>
+<span class="st">    i Hook defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! the server didn't start</span>
 <span class="st">    """</span>
   <span class="fu">And</span> the output includes
 <span class="st">    """</span>
@@ -249,7 +252,10 @@ Elsewhere, like in CI, it's printed once the feature finishes.
   Then the output includes
     """
     Error:
-    the server didn't start
+    Hook `before_all()` failed
+    i Hook defined at: setup-steps.R:1
+    Caused by error:
+    ! the server didn't start
     """
   And the output includes
     """

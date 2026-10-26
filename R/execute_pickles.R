@@ -154,7 +154,7 @@ execute_single_pickle <- function(
         with_scenario_context(send, \(.context) {
           # A dry run matches the steps, but runs neither hooks nor step bodies
           for (test_step in pickle$test_case$before) {
-            run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE, srcref = feature_srcref(pickle))
+            run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle)
           }
 
           withCallingHandlers(for (step in pickle$steps) {
@@ -174,7 +174,7 @@ execute_single_pickle <- function(
           }, expectation = function(e) expectations <<- expectations + 1)
 
           for (test_step in pickle$test_case$after) {
-            run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE, srcref = feature_srcref(pickle))
+            run_hook(test_step, skip_steps, .context, c(scenario, worst_result(results)), can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle)
           }
         })
 
@@ -317,7 +317,7 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
   ))
   # The tests in step hooks are at the step's line
   srcref <- feature_srcref(pickle, step$line)
-  before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step, srcref = srcref)
+  before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step, srcref = srcref, pickle = pickle)
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)
   } else {
@@ -328,7 +328,8 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     context,
     c(hook_step, list(status = step$status, error = step$error)),
     stop_on_error = FALSE,
-    srcref = srcref
+    srcref = srcref,
+    pickle = pickle
   )
   # The step gets the worse of its own result and the hook's
   if (!is.null(after_error)) {
@@ -370,7 +371,7 @@ signal_scenario_result <- function(results, result, failing, pickle) {
     } else {
       # testthat shows the class of an error of its own class, like it doesn't
       # for an error in a test
-      class(error) <- setdiff(class(error), "cucumber_step_error")
+      class(error) <- setdiff(class(error), c("cucumber_step_error", "cucumber_hook_error"))
       stop(error)
     }
   }

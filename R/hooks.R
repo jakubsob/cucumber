@@ -31,7 +31,7 @@ make_hook <- function(kind, arguments) {
     assert_string(name, null.ok = TRUE)
     # Fail at registration on an invalid tag expression
     evaluate_tag_expression(tags, character())
-    register_hook(name_hook(hook, name), kind, tags, hook_name = name, srcref = srcref)
+    register_hook(hook, kind, tags, hook_name = name, srcref = srcref)
     invisible(hook)
   }
 }
@@ -61,21 +61,6 @@ skip_scenario <- function(message = "Skipped") {
   ))
 }
 
-#' Prefix the errors of a named hook with its name
-#' @keywords internal
-#' @noRd
-name_hook <- function(hook, name) {
-  if (is.null(name)) {
-    return(hook)
-  }
-  function(...) {
-    tryCatch(hook(...), error = function(e) {
-      e$message <- paste0("Hook \"", name, "\" failed: ", e$message)
-      stop(e)
-    })
-  }
-}
-
 #' Hooks
 #'
 #' @description
@@ -100,7 +85,7 @@ name_hook <- function(hook, name) {
 #' @param tags A tag expression, e.g. `"@db and not @slow"`.
 #'   The hook runs only for scenarios that match it. If `NULL`, it runs for every scenario.
 #'
-#' @param name A name for the hook, shown in its error messages, e.g. `Hook "Connect to the database" failed: ...`.
+#' @param name A name for the hook, shown in its error messages, e.g. `Hook "Connect to the database" failed`.
 #'
 #' @eval features_rd(features = c(
 #'   "hooks.feature",
@@ -213,10 +198,12 @@ get_hooks_to_run <- function(hooks, name, tags = character()) {
 #' returned. Otherwise skipping is an error.
 #' @param srcref Where the tests in the hooks are in the feature file, see
 #'   `with_nested_tests()`
+#' @param pickle The scenario the hooks run for, named in their errors, or
+#'   `NULL` for before all and after all hooks
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
-run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref = NULL) {
+run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref = NULL, pickle = NULL) {
   first_error <- NULL
   for (hook in hooks) {
     error <- tryCatch(
@@ -240,10 +227,13 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref
         fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
         error_cnd(message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step."))
       },
-      # The call a hook is run with is cucumber's, not one of the hook
       error = \(e) {
-        if (any(vapply(list(quote(hook$fn(...)), quote(hook(...))), identical, logical(1), conditionCall(e)))) e$call <- NULL
-        e
+        # A failed expectation is reported as it is, like in a step
+        if (inherits(e, "expectation")) return(e)
+        # The call a hook is run with is cucumber's, not one of the hook, like
+        # `fn()` of a before all or after all hook without arguments
+        if (any(vapply(list(quote(hook$fn(...)), quote(fn())), identical, logical(1), conditionCall(e)))) e$call <- NULL
+        hook_error(hook, e, pickle)
       }
     )
     if (inherits(error, "skip")) {

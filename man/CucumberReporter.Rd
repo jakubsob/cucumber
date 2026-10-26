@@ -230,7 +230,10 @@ testthat reporters can't.
   <span class="fu">Then</span> the output includes these lines in order:
 <span class="st">    """</span>
 <span class="st">    start run</span>
-<span class="st">    end run: the server didn't start</span>
+<span class="st">    end run: Hook `before_all()` failed</span>
+<span class="st">    i Hook defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! the server didn't start</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A reporter gets the error that stopped the run
   Given a file named "features/basket.feature" with
@@ -252,7 +255,10 @@ testthat reporters can't.
   Then the output includes these lines in order:
     """
     start run
-    end run: the server didn't start
+    end run: Hook `before_all()` failed
+    i Hook defined at: setup-steps.R:1
+    Caused by error:
+    ! the server didn't start
     """
 %</pre>
 }}

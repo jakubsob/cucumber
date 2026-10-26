@@ -180,7 +180,12 @@ Feature: Hooks
     And the errors are
       """
       [failure] Scenario: Save the basket
-      Hook "Connect to the database" failed: connection refused
+      Hook "Connect to the database" failed
+      i Feature: basket.feature
+      i Scenario: Save the basket
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! connection refused
       """
 
   @rd
@@ -207,7 +212,12 @@ Feature: Hooks
     Then the errors are
       """
       [failure] Scenario: Add an item
-      no database
+      Hook `before()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! no database
       """
     And the steps and hooks have these results:
       | step                  | status  |
@@ -236,8 +246,12 @@ Feature: Hooks
       """
       v Given an empty basket
       Error:
-      can't close the database
-
+      Hook `after()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! can't close the database
       """
     And the output includes
       """
@@ -247,7 +261,12 @@ Feature: Hooks
       Scenario: Add an item
       v Given an empty basket
       Error:
-      can't close the database
+      Hook `after()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! can't close the database
       """
     And the steps and hooks have these results:
       | step                  | status |
@@ -274,7 +293,12 @@ Feature: Hooks
       """
       ! basket is broken
       Error:
-      can't close the database
+      Hook `after()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! can't close the database
       """
 
   Scenario Outline: An after hook gets the status of a scenario with a step that is <case>, strict = <strict>
@@ -319,7 +343,15 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the output includes "after: failed can't close the database"
+    Then the output includes
+      """
+      after: failed Hook `after()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:2
+      Caused by error:
+      ! can't close the database
+      """
 
   Scenario Outline: A failing <hook>() hook fails the scenario
     Given a file named "features/basket.feature" with
@@ -340,7 +372,12 @@ Feature: Hooks
     Then the errors are
       """
       [<kind>] Scenario: Add an item
-      <message>
+      <headline>
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! the hook failed
       """
     And the scenarios have these results:
       | scenario    | status |
@@ -350,11 +387,11 @@ Feature: Hooks
       | Given an empty basket | <status> |
 
     Examples:
-      | hook        | argument | status  | kind    | message                |
-      | before      | scenario | skipped | failure | the hook failed        |
-      | after       | scenario | passed  | failure | the hook failed        |
-      | before_step | step     | failed  | error   | Error: the hook failed |
-      | after_step  | step     | failed  | error   | Error: the hook failed |
+      | hook        | argument | status  | kind    | headline                           |
+      | before      | scenario | skipped | failure | Hook `before()` failed             |
+      | after       | scenario | passed  | failure | Hook `after()` failed              |
+      | before_step | step     | failed  | error   | Error: Hook `before_step()` failed |
+      | after_step  | step     | failed  | error   | Error: Hook `after_step()` failed  |
 
   Scenario Outline: <hook>() with the wrong number of arguments is an error
     Given a file named "features/basket.feature" with

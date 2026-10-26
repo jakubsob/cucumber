@@ -39,7 +39,7 @@ attach data to the report, see \link{attachments}. It isn't shared with scenario
 \item{tags}{A tag expression, e.g. \code{"@db and not @slow"}.
 The hook runs only for scenarios that match it. If \code{NULL}, it runs for every scenario.}
 
-\item{name}{A name for the hook, shown in its error messages, e.g. \verb{Hook "Connect to the database" failed: ...}.}
+\item{name}{A name for the hook, shown in its error messages, e.g. \verb{Hook "Connect to the database" failed}.}
 }
 \description{
 Hooks run code at points of a run, typically for setup and teardown: \code{before()} and \code{after()}
@@ -305,7 +305,12 @@ use a Background instead, and keep before hooks for low-level work like starting
   <span class="fu">And</span> the errors are
 <span class="st">    """</span>
 <span class="st">    [failure] Scenario: Save the basket</span>
-<span class="st">    Hook "Connect to the database" failed: connection refused</span>
+<span class="st">    Hook "Connect to the database" failed</span>
+<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Scenario: Save the basket</span>
+<span class="st">    i Hook defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! connection refused</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A named hook's errors start with its name
   Given a file named "features/basket.feature" with
@@ -330,7 +335,12 @@ use a Background instead, and keep before hooks for low-level work like starting
   And the errors are
     """
     [failure] Scenario: Save the basket
-    Hook "Connect to the database" failed: connection refused
+    Hook "Connect to the database" failed
+    i Feature: basket.feature
+    i Scenario: Save the basket
+    i Hook defined at: setup-steps.R:1
+    Caused by error:
+    ! connection refused
     """
 %</pre>
 }}
@@ -359,7 +369,12 @@ use a Background instead, and keep before hooks for low-level work like starting
   <span class="fu">Then</span> the errors are
 <span class="st">    """</span>
 <span class="st">    [failure] Scenario: Add an item</span>
-<span class="st">    no database</span>
+<span class="st">    Hook `before()` failed</span>
+<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Scenario: Add an item</span>
+<span class="st">    i Hook defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! no database</span>
 <span class="st">    """</span>
   <span class="fu">And</span> the steps and hooks have these results:
     <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
@@ -388,7 +403,12 @@ use a Background instead, and keep before hooks for low-level work like starting
   Then the errors are
     """
     [failure] Scenario: Add an item
-    no database
+    Hook `before()` failed
+    i Feature: basket.feature
+    i Scenario: Add an item
+    i Hook defined at: setup-steps.R:1
+    Caused by error:
+    ! no database
     """
   And the steps and hooks have these results:
     | step                  | status  |

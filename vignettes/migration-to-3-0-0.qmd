@@ -412,7 +412,7 @@ Before, a failed expectation in a step, like `expect_equal()`, wasn't recorded b
 - `before()` and `after()` hooks get the scenario: a list with its `name`, `tags` and `uri`, and in `after()` hooks its `status` and `error`.
 - Define any number of hooks of each kind. Before hooks run in the order they are defined, after hooks in the reverse order.
 - Hooks get a `tags` argument, a tag expression. The hook runs only for scenarios that match it.
-- Hooks get a `name` argument. A named hook's errors start with its name, e.g. `Hook "Connect to the database" failed: connection refused`.
+- Hooks get a `name` argument. A named hook's errors start with its name, e.g. `Hook "Connect to the database" failed`.
 - `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword` and `text`, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
 - `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run.
 - A `before()` hook skips its scenario by calling `skip_scenario()`. The rest of the before hooks and the scenario's steps are skipped, and `after()` hooks get `"skipped"` as the scenario's `status`.

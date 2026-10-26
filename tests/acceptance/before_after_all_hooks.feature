@@ -99,7 +99,10 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        the server didn't start
+        Hook `before_all()` failed
+        i Hook defined at: setup-steps.R:1
+        Caused by error:
+        ! the server didn't start
         """
       And the output includes "stop the server" once
       And no scenario ran
@@ -118,7 +121,10 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        the server didn't start
+        Hook `before_all()` failed
+        i Hook defined at: setup-steps.R:1
+        Caused by error:
+        ! the server didn't start
         """
       And the output includes "start the database" once
 
@@ -139,7 +145,10 @@ Feature: Before all and after all hooks
       And the errors are
         """
         [error]
-        the server didn't stop
+        Hook `after_all()` failed
+        i Hook defined at: setup-steps.R:1
+        Caused by error:
+        ! the server didn't stop
         """
 
     Scenario: After all hooks run when scenarios fail
@@ -171,5 +180,8 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        Hook "Start the server" failed: connection refused
+        Hook "Start the server" failed
+        i Hook defined at: setup-steps.R:1
+        Caused by error:
+        ! connection refused
         """

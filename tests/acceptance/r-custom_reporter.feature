@@ -106,7 +106,10 @@ Feature: Custom reporter
     Then the output includes these lines in order:
       """
       start run
-      end run: the server didn't start
+      end run: Hook `before_all()` failed
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! the server didn't start
       """
 
   Scenario: A reporter that fails stops the run with its error

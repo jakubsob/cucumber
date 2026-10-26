@@ -23,6 +23,27 @@ srcref_location <- function(src) {
   )
 }
 
+#' The error of a hook, like the error of a step: which hook failed, for which
+#' scenario, and where it's defined, caused by the hook's error
+#' @keywords internal
+#' @noRd
+hook_error <- function(hook, error, pickle = NULL) {
+  info <- if (is.null(hook$hook_name)) glue("Hook `{hook$name}()` failed") else glue("Hook \"{hook$hook_name}\" failed")
+  if (!is.null(pickle$feature_file))
+    info <- c(info, i = glue("Feature: {basename(pickle$feature_file)}"))
+  if (!is.null(pickle$name))
+    info <- c(info, i = glue("Scenario: {pickle$name}"))
+  location <- srcref_location(hook$srcref)
+  if (!is.null(location))
+    info <- c(info, i = glue("Hook defined at: {location}"))
+  rlang::error_cnd(
+    class = "cucumber_hook_error",
+    message = rlang::format_error_bullets(info),
+    parent = error,
+    trace = empty_trace()
+  )
+}
+
 step_error_bullets <- function(step, pickle) {
   info <- c(glue("Step \"{step$text}\" failed"))
   if (!is.null(pickle$feature_file))

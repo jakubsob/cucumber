@@ -98,7 +98,12 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 <span class="st">    """</span>
 <span class="st">    Scenario: Add an item</span>
 <span class="st">    Error:</span>
-<span class="st">    The shop is closed</span>
+<span class="st">    Hook `before()` failed</span>
+<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Scenario: Add an item</span>
+<span class="st">    i Hook defined at: setup-steps.R:1</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! The shop is closed</span>
 <span class="st">    - Given an empty basket</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A hook's error is printed where the hook runs
@@ -121,7 +126,12 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     """
     Scenario: Add an item
     Error:
-    The shop is closed
+    Hook `before()` failed
+    i Feature: basket.feature
+    i Scenario: Add an item
+    i Hook defined at: setup-steps.R:1
+    Caused by error:
+    ! The shop is closed
     - Given an empty basket
     """
 %</pre>

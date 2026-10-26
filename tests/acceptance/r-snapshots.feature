@@ -301,13 +301,16 @@ Feature: Snapshots
       Then the errors are
         """
         [error]
-        <message>
+        <headline>
+        i Hook defined at: setup-hooks.R:1
+        Caused by error:
+        ! `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook.
         """
 
       Examples:
-        | runner | message |
-        | test() | `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
-        | run()  | Error: `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
+        | runner | headline                        |
+        | test() | Hook `before_all()` failed        |
+        | run()  | Error: Hook `before_all()` failed |
 
     Scenario Outline: A snapshot in an after_all hook is an error, after the scenarios took theirs, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
@@ -326,13 +329,16 @@ Feature: Snapshots
           [1] "1 apple"
 
         [error]
-        <message>
+        <headline>
+        i Hook defined at: setup-hooks.R:1
+        Caused by error:
+        ! `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook.
         """
 
       Examples:
-        | runner | message |
-        | test() | `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
-        | run()  | Error: `testthat::expect_snapshot()` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook. |
+        | runner | headline                        |
+        | test() | Hook `after_all()` failed        |
+        | run()  | Error: Hook `after_all()` failed |
 
     Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"

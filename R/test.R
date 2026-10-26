@@ -137,7 +137,11 @@ run_cucumber <- function(path, filter, tags, reporter, strict, dry_run, name, fe
     }
   }
   if (broken) fail_test(error)
-  if (!is.null(error)) stop(error)
+  if (!is.null(error)) {
+    # testthat shows the class of an error of its own class, like of a failing before all hook
+    class(error) <- setdiff(class(error), "cucumber_hook_error")
+    stop(error)
+  }
   invisible(NULL)
 }
 

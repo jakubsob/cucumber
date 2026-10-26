@@ -109,7 +109,10 @@ Feature: Progress reporter
     Then the output includes
       """
       Error:
-      the server didn't start
+      Hook `before_all()` failed
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! the server didn't start
       """
     And the output includes
       """

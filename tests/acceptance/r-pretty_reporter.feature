@@ -49,7 +49,12 @@ Feature: Pretty reporter
       """
       Scenario: Add an item
       Error:
-      The shop is closed
+      Hook `before()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! The shop is closed
       - Given an empty basket
       """
 
