@@ -398,7 +398,8 @@ feature_lines <- function(features, path) {
     return(list())
   }
   files <- sub("(:[0-9]+)*$", "", features)
-  files <- ifelse(fs::is_absolute_path(files), files, fs::path(path, files))
+  # Without the `./` of `path = "."`, like the feature files found in `path`
+  files <- ifelse(fs::is_absolute_path(files), files, fs::path_norm(fs::path(path, files)))
   missing <- unique(files[!file_exists(files)])
   if (length(missing) > 0) {
     abort(

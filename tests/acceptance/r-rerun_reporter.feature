@@ -59,6 +59,18 @@ Feature: Rerun reporter
       | Pay with amex  | failed  |
       | Ship           | pending |
 
+  Scenario: A run of the scenarios of a rerun file writes the same rerun file
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+      test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "rerun-2.txt" has these lines:
+      """
+      basket.feature:5:14
+      checkout.feature:2
+      """
+
   Scenario: A scenario that passed when retried isn't in the file
     Given a file named "features/basket.feature" with
       """

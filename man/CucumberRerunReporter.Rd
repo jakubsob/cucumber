@@ -136,6 +136,32 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A run of the scenarios of a rerun file writes the same rerun file
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)</span>
+<span class="st">    test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the file <span class="st">"rerun-2.txt"</span> has these lines:
+<span class="st">    """</span>
+<span class="st">    basket.feature:5:14</span>
+<span class="st">    checkout.feature:2</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A run of the scenarios of a rerun file writes the same rerun file
+  When I run
+    """
+    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+    test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)
+    """
+  Then the file "rerun-2.txt" has these lines:
+    """
+    basket.feature:5:14
+    checkout.feature:2
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that passed when retried isn't in the file
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>
