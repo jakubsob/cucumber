@@ -211,8 +211,7 @@ Pass \code{path} to run another directory. A mistake in an argument is an error 
 <span class="st">    """</span>
   <span class="fu">Then</span> only these scenarios ran:
     <span class="op">|</span> scenario           <span class="op">|</span>
-    <span class="op">|</span> Adding in features <span class="op">|</span>
-  <span class="fu">And</span> the output includes <span class="st">"1 scenario (1 passed)"</span></code></pre >}}
+    <span class="op">|</span> Adding in features <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Feature files are run from the directory set in the cucumber.path option
   When I run
     """
@@ -221,7 +220,6 @@ Pass \code{path} to run another directory. A mistake in an argument is an error 
   Then only these scenarios ran:
     | scenario           |
     | Adding in features |
-  And the output includes "1 scenario (1 passed)"
 %</pre>
 }}
 
@@ -1241,7 +1239,10 @@ after them are skipped. Ambiguous steps fail either way.
   <span class="fu">Then</span> the scenarios have these results:
     <span class="op">|</span> scenario            <span class="op">|</span> status  <span class="op">|</span>
     <span class="op">|</span> Implemented         <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> Not yet implemented <span class="op">|</span> pending <span class="op">|</span></code></pre >}}
+    <span class="op">|</span> Not yet implemented <span class="op">|</span> pending <span class="op">|</span>
+  <span class="fu">And</span> the scenarios skipped at these locations:
+    <span class="op">|</span> scenario            <span class="op">|</span> location        <span class="op">|</span>
+    <span class="op">|</span> Not yet implemented <span class="op">|</span> mixed.feature:7 <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A pending step skips the scenario when not strict
   Given a file named "features/mixed.feature" with
     """
@@ -1273,6 +1274,9 @@ after them are skipped. Ambiguous steps fail either way.
     | scenario            | status  |
     | Implemented         | passed  |
     | Not yet implemented | pending |
+  And the scenarios skipped at these locations:
+    | scenario            | location        |
+    | Not yet implemented | mixed.feature:7 |
 %</pre>
 }}
 
@@ -1294,7 +1298,10 @@ after them are skipped. Ambiguous steps fail either way.
 <span class="st">    """</span>
   <span class="fu">Then</span> the scenarios have these results:
     <span class="op">|</span> scenario    <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Add an item <span class="op">|</span> undefined <span class="op">|</span></code></pre >}}
+    <span class="op">|</span> Add an item <span class="op">|</span> undefined <span class="op">|</span>
+  <span class="fu">And</span> the scenarios skipped at these locations:
+    <span class="op">|</span> scenario    <span class="op">|</span> location         <span class="op">|</span>
+    <span class="op">|</span> Add an item <span class="op">|</span> basket.feature:3 <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An undefined step skips the scenario when not strict
   Given a file named "features/basket.feature" with
     """
@@ -1313,6 +1320,9 @@ after them are skipped. Ambiguous steps fail either way.
   Then the scenarios have these results:
     | scenario    | status    |
     | Add an item | undefined |
+  And the scenarios skipped at these locations:
+    | scenario    | location         |
+    | Add an item | basket.feature:3 |
 %</pre>
 }}
 
@@ -1584,7 +1594,12 @@ With \code{retry}, a scenario fails only when its last attempt fails, so one tha
 <span class="st">    """</span>
 <span class="st">    test("features", fail_fast = TRUE, stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"4 scenarios (1 failed, 2 skipped, 1 passed)"</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario                 <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Passing                  <span class="op">|</span> passed  <span class="op">|</span>
+    <span class="op">|</span> Failing                  <span class="op">|</span> failed  <span class="op">|</span>
+    <span class="op">|</span> After the failure        <span class="op">|</span> skipped <span class="op">|</span>
+    <span class="op">|</span> In the next feature file <span class="op">|</span> skipped <span class="op">|</span>
   <span class="fu">And</span> the output includes <span class="st">"before Failing"</span>
   <span class="fu">And</span> the output doesn't include <span class="st">"before After the failure"</span>
   <span class="fu">And</span> the output doesn't include <span class="st">"before In the next feature file"</span></code></pre >}}
@@ -1593,7 +1608,12 @@ With \code{retry}, a scenario fails only when its last attempt fails, so one tha
     """
     test("features", fail_fast = TRUE, stop_on_failure = FALSE)
     """
-  Then the output includes "4 scenarios (1 failed, 2 skipped, 1 passed)"
+  Then the scenarios have these results:
+    | scenario                 | status  |
+    | Passing                  | passed  |
+    | Failing                  | failed  |
+    | After the failure        | skipped |
+    | In the next feature file | skipped |
   And the output includes "before Failing"
   And the output doesn't include "before After the failure"
   And the output doesn't include "before In the next feature file"
@@ -1616,7 +1636,11 @@ With \code{retry}, a scenario fails only when its last attempt fails, so one tha
 <span class="st">    """</span>
 <span class="st">    test("features", fail_fast = TRUE, stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"3 scenarios (1 undefined, 2 skipped)"</span></code></pre >}}
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario                 <span class="op">|</span> status    <span class="op">|</span>
+    <span class="op">|</span> Undefined                <span class="op">|</span> undefined <span class="op">|</span>
+    <span class="op">|</span> After the undefined step <span class="op">|</span> skipped   <span class="op">|</span>
+    <span class="op">|</span> In the next feature file <span class="op">|</span> skipped   <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An undefined step fails fast in strict mode
   Given a file named "features/a.feature" with
     """
@@ -1632,7 +1656,11 @@ With \code{retry}, a scenario fails only when its last attempt fails, so one tha
     """
     test("features", fail_fast = TRUE, stop_on_failure = FALSE)
     """
-  Then the output includes "3 scenarios (1 undefined, 2 skipped)"
+  Then the scenarios have these results:
+    | scenario                 | status    |
+    | Undefined                | undefined |
+    | After the undefined step | skipped   |
+    | In the next feature file | skipped   |
 %</pre>
 }}
 

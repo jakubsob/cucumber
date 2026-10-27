@@ -36,7 +36,11 @@ Feature: Reporters
         CucumberJunitReporter$new("report.xml")
       )))
       """
-    Then the output includes "1 failed"
+    Then the output includes
+      """
+      2 scenarios (1 failed, 1 passed)
+      4 steps (1 failed, 3 passed)
+      """
     And the HTML report "report.html" shows these steps:
       | step                  | status |
       | Given an empty basket | passed |
@@ -73,7 +77,11 @@ Feature: Reporters
       test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
       CucumberProgressReporter$new()$report("cucumber.ndjson")
       """
-    Then the output includes "1 failed"
+    Then the output includes
+      """
+      2 scenarios (1 failed, 1 passed)
+      4 steps (1 failed, 3 passed)
+      """
 
   Scenario Outline: A report is written into directories that don't exist yet
     When I run

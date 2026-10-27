@@ -46,7 +46,12 @@ Feature: Fail fast
       """
       test("features", fail_fast = TRUE, stop_on_failure = FALSE)
       """
-    Then the output includes "4 scenarios (1 failed, 2 skipped, 1 passed)"
+    Then the scenarios have these results:
+      | scenario                 | status  |
+      | Passing                  | passed  |
+      | Failing                  | failed  |
+      | After the failure        | skipped |
+      | In the next feature file | skipped |
     And the output includes "before Failing"
     And the output doesn't include "before After the failure"
     And the output doesn't include "before In the next feature file"
@@ -76,8 +81,12 @@ Feature: Fail fast
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the output includes "4 scenarios (1 failed, 3 passed)"
-    And the output includes "before In the next feature file"
+    Then the scenarios have these results:
+      | scenario                 | status |
+      | Passing                  | passed |
+      | Failing                  | failed |
+      | After the failure        | passed |
+      | In the next feature file | passed |
 
   @rd
   Scenario: An undefined step fails fast in strict mode
@@ -95,7 +104,11 @@ Feature: Fail fast
       """
       test("features", fail_fast = TRUE, stop_on_failure = FALSE)
       """
-    Then the output includes "3 scenarios (1 undefined, 2 skipped)"
+    Then the scenarios have these results:
+      | scenario                 | status    |
+      | Undefined                | undefined |
+      | After the undefined step | skipped   |
+      | In the next feature file | skipped   |
 
   Scenario: A pending step doesn't fail fast with strict = FALSE
     Given a file named "features/a.feature" with

@@ -524,6 +524,10 @@ then("the file {string} has these lines:", function(file, lines, context) {
   expect_equal(readLines(fs::path(context$tempdir, file)), strsplit(lines, "\n")[[1]])
 })
 
+then("the file {string} is empty", function(file, context) {
+  expect_equal(readLines(fs::path(context$tempdir, file)), character())
+})
+
 given("a package that uses the 3rd edition of testthat", function(context) {
   fs::dir_create(context$tempdir)
   writeLines(

@@ -67,9 +67,8 @@ Register your own with \code{define_parameter_type()}.
 <span class="st">    given("the count is \{int\}", function(n, context) \{</span>
 <span class="st">      context$value &lt;- n</span>
 <span class="st">    \})</span>
-<span class="st">    then("I verify the count is \{int\}", function(n, context) \{</span>
-<span class="st">      expect_equal(context$value, n)</span>
-<span class="st">      expect_true(is.integer(context$value))</span>
+<span class="st">    then("I verify the count is 42", function(context) \{</span>
+<span class="st">      expect_identical(context$value, 42L)</span>
 <span class="st">    \})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
@@ -90,9 +89,8 @@ Register your own with \code{define_parameter_type()}.
     given("the count is \{int\}", function(n, context) \{
       context$value <- n
     \})
-    then("I verify the count is \{int\}", function(n, context) \{
-      expect_equal(context$value, n)
-      expect_true(is.integer(context$value))
+    then("I verify the count is 42", function(context) \{
+      expect_identical(context$value, 42L)
     \})
     """
   When I run
@@ -117,9 +115,8 @@ Register your own with \code{define_parameter_type()}.
 <span class="st">    given("the price is \{float\}", function(price, context) \{</span>
 <span class="st">      context$price &lt;- price</span>
 <span class="st">    \})</span>
-<span class="st">    then("I verify the price is \{float\}", function(price, context) \{</span>
-<span class="st">      expect_equal(context$price, price)</span>
-<span class="st">      expect_true(is.double(context$price))</span>
+<span class="st">    then("I verify the price is 3.99", function(context) \{</span>
+<span class="st">      expect_identical(context$price, 3.99)</span>
 <span class="st">    \})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
@@ -140,9 +137,8 @@ Register your own with \code{define_parameter_type()}.
     given("the price is \{float\}", function(price, context) \{
       context$price <- price
     \})
-    then("I verify the price is \{float\}", function(price, context) \{
-      expect_equal(context$price, price)
-      expect_true(is.double(context$price))
+    then("I verify the price is 3.99", function(context) \{
+      expect_identical(context$price, 3.99)
     \})
     """
   When I run
@@ -283,8 +279,8 @@ Register your own with \code{define_parameter_type()}.
 <span class="st">    given("the colour is \{word\}", function(colour, context) \{</span>
 <span class="st">      context$colour &lt;- colour</span>
 <span class="st">    \})</span>
-<span class="st">    then("I verify the colour is \{word\}", function(colour, context) \{</span>
-<span class="st">      expect_equal(context$colour, colour)</span>
+<span class="st">    then("I verify the colour is red", function(context) \{</span>
+<span class="st">      expect_identical(context$colour, "red")</span>
 <span class="st">    \})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
@@ -305,8 +301,8 @@ Register your own with \code{define_parameter_type()}.
     given("the colour is \{word\}", function(colour, context) \{
       context$colour <- colour
     \})
-    then("I verify the colour is \{word\}", function(colour, context) \{
-      expect_equal(context$colour, colour)
+    then("I verify the colour is red", function(context) \{
+      expect_identical(context$colour, "red")
     \})
     """
   When I run

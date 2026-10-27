@@ -1103,7 +1103,7 @@ The step definition gets it as one string, after the step's parameters.
 <span class="st">      context$message &lt;- message</span>
 <span class="st">    \})</span>
 <span class="st">    then("the message is \{string\}", function(expected, context) \{</span>
-<span class="st">      expect_equal(context$message[[1]], expected)</span>
+<span class="st">      expect_identical(context$message, expected)</span>
 <span class="st">    \})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
@@ -1128,7 +1128,7 @@ The step definition gets it as one string, after the step's parameters.
       context$message <- message
     \})
     then("the message is \{string\}", function(expected, context) \{
-      expect_equal(context$message[[1]], expected)
+      expect_identical(context$message, expected)
     \})
     """
   When I run

@@ -692,6 +692,8 @@ Its step definitions and hooks are cleared when it returns.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> run() runs outside of a testthat run
+  The first run passes, and the second finds no step definition, as the first one cleared them when it returned.
+<span></span>
   <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
 <span class="st">    """</span>
 <span class="st">    Feature: Calculate</span>
@@ -707,15 +709,15 @@ Its step definitions and hooks are cleared when it returns.
   <span class="fu">When</span> I run outside of a testthat run
 <span class="st">    """</span>
 <span class="st">    source("features/steps.R")</span>
-<span class="st">    run("features", reporter = CucumberSummaryReporter$new())</span>
-<span class="st">    run("features", reporter = CucumberSummaryReporter$new(), strict = FALSE)</span>
+<span class="st">    run("features")</span>
+<span class="st">    run("features", strict = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes lines matching these patterns in order:
-<span class="st">    """</span>
-<span class="st">    1 scenario \\(1 passed\\)</span>
-<span class="st">    1 scenario \\(1 undefined\\)</span>
-<span class="st">    """</span></code></pre >}}
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario   <span class="op">|</span> status    <span class="op">|</span>
+    <span class="op">|</span> Adding one <span class="op">|</span> undefined <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: run() runs outside of a testthat run
+  The first run passes, and the second finds no step definition, as the first one cleared them when it returned.
+
   Given a file named "features/calculate.feature" with
     """
     Feature: Calculate
@@ -731,14 +733,12 @@ Its step definitions and hooks are cleared when it returns.
   When I run outside of a testthat run
     """
     source("features/steps.R")
-    run("features", reporter = CucumberSummaryReporter$new())
-    run("features", reporter = CucumberSummaryReporter$new(), strict = FALSE)
+    run("features")
+    run("features", strict = FALSE)
     """
-  Then the output includes lines matching these patterns in order:
-    """
-    1 scenario \\(1 passed\\)
-    1 scenario \\(1 undefined\\)
-    """
+  Then the scenarios have these results:
+    | scenario   | status    |
+    | Adding one | undefined |
 %</pre>
 }}
 
@@ -824,19 +824,29 @@ Its step definitions and hooks are cleared when it returns.
 <span class="st">    """</span>
 <span class="st">    withr::with_envvar(</span>
 <span class="st">      c(TESTTHAT_IS_PARALLEL = "true"),</span>
-<span class="st">      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)</span>
+<span class="st">      testthat::test_local(reporter = "silent", stop_on_failure = FALSE)</span>
 <span class="st">    )</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"`run()` isn't supported in a parallel testthat run."</span></code></pre >}}
+  <span class="fu">Then</span> the errors are
+<span class="st">    """</span>
+<span class="st">    [error]</span>
+<span class="st">    Error: `run()` isn't supported in a parallel testthat run.</span>
+<span class="st">    i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: run() in a parallel testthat run is an error
   When I run
     """
     withr::with_envvar(
       c(TESTTHAT_IS_PARALLEL = "true"),
-      testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+      testthat::test_local(reporter = "silent", stop_on_failure = FALSE)
     )
     """
-  Then the output includes "`run()` isn't supported in a parallel testthat run."
+  Then the errors are
+    """
+    [error]
+    Error: `run()` isn't supported in a parallel testthat run.
+    i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.
+    """
 %</pre>
 }}
 

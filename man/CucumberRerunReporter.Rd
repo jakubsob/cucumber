@@ -90,9 +90,8 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   <span class="fu">When</span> I run
 <span class="st">    """</span>
 <span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    cat(readLines("rerun.txt"), sep = "\\n")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
+  <span class="fu">Then</span> the file <span class="st">"rerun.txt"</span> has these lines:
 <span class="st">    """</span>
 <span class="st">    basket.feature:5:14</span>
 <span class="st">    checkout.feature:2</span>
@@ -101,9 +100,8 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   When I run
     """
     test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
-    cat(readLines("rerun.txt"), sep = "\\n")
     """
-  Then the output includes
+  Then the file "rerun.txt" has these lines:
     """
     basket.feature:5:14
     checkout.feature:2
@@ -159,9 +157,8 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   <span class="fu">When</span> I run
 <span class="st">    """</span>
 <span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)</span>
-<span class="st">    cat(readLines("rerun.txt"), sep = "\\n")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
+  <span class="fu">Then</span> the file <span class="st">"rerun.txt"</span> has these lines:
 <span class="st">    """</span>
 <span class="st">    basket.feature:5</span>
 <span class="st">    checkout.feature:2</span>
@@ -187,9 +184,8 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   When I run
     """
     test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)
-    cat(readLines("rerun.txt"), sep = "\\n")
     """
-  Then the output includes
+  Then the file "rerun.txt" has these lines:
     """
     basket.feature:5
     checkout.feature:2
@@ -202,7 +198,6 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   <span class="fu">When</span> I run
 <span class="st">    """</span>
 <span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)</span>
-<span class="st">    cat(readLines("rerun.txt"), sep = "\\n")</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> the scenarios have these results:
     <span class="op">|</span> scenario       <span class="op">|</span> status  <span class="op">|</span>
@@ -211,7 +206,7 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
     <span class="op">|</span> Pay with visa  <span class="op">|</span> skipped <span class="op">|</span>
     <span class="op">|</span> Pay with amex  <span class="op">|</span> skipped <span class="op">|</span>
     <span class="op">|</span> Ship           <span class="op">|</span> skipped <span class="op">|</span>
-  <span class="fu">And</span> the output includes
+  <span class="fu">And</span> the file <span class="st">"rerun.txt"</span> has these lines:
 <span class="st">    """</span>
 <span class="st">    basket.feature:5:13:14</span>
 <span class="st">    checkout.feature:2</span>
@@ -220,7 +215,6 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   When I run
     """
     test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)
-    cat(readLines("rerun.txt"), sep = "\\n")
     """
   Then the scenarios have these results:
     | scenario       | status  |
@@ -229,7 +223,7 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
     | Pay with visa  | skipped |
     | Pay with amex  | skipped |
     | Ship           | skipped |
-  And the output includes
+  And the file "rerun.txt" has these lines:
     """
     basket.feature:5:13:14
     checkout.feature:2
@@ -278,9 +272,8 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   <span class="fu">When</span> I run
 <span class="st">    """</span>
 <span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))</span>
-<span class="st">    cat(length(readLines("rerun.txt")), "lines")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"0 lines"</span></code></pre >}}
+  <span class="fu">Then</span> the file <span class="st">"rerun.txt"</span> is empty</code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The file is empty when every scenario passed
   Given a file named "features/basket.feature" with
     """
@@ -295,9 +288,8 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
   When I run
     """
     test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
-    cat(length(readLines("rerun.txt")), "lines")
     """
-  Then the output includes "0 lines"
+  Then the file "rerun.txt" is empty
 %</pre>
 }}
 

@@ -56,7 +56,6 @@ Feature: Running tests with test()
     Then only these scenarios ran:
       | scenario           |
       | Adding in features |
-    And the output includes "1 scenario (1 passed)"
 
   Scenario: A directory without feature files is an error
     Given a file named "empty/setup-steps.R" with

@@ -70,7 +70,11 @@ several reporters, to show the progress of a run and write its reports at once.
 <span class="st">      CucumberJunitReporter$new("report.xml")</span>
 <span class="st">    )))</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"1 failed"</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    2 scenarios (1 failed, 1 passed)</span>
+<span class="st">    4 steps (1 failed, 3 passed)</span>
+<span class="st">    """</span>
   <span class="fu">And</span> the HTML report <span class="st">"report.html"</span> shows these steps:
     <span class="op">|</span> step                  <span class="op">|</span> status <span class="op">|</span>
     <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span>
@@ -93,7 +97,11 @@ several reporters, to show the progress of a run and write its reports at once.
       CucumberJunitReporter$new("report.xml")
     )))
     """
-  Then the output includes "1 failed"
+  Then the output includes
+    """
+    2 scenarios (1 failed, 1 passed)
+    4 steps (1 failed, 3 passed)
+    """
   And the HTML report "report.html" shows these steps:
     | step                  | status |
     | Given an empty basket | passed |
@@ -153,14 +161,22 @@ several reporters, to show the progress of a run and write its reports at once.
 <span class="st">    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)</span>
 <span class="st">    CucumberProgressReporter$new()$report("cucumber.ndjson")</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"1 failed"</span></code></pre >}}
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    2 scenarios (1 failed, 1 passed)</span>
+<span class="st">    4 steps (1 failed, 3 passed)</span>
+<span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A stored run is printed again
   When I run
     """
     test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
     CucumberProgressReporter$new()$report("cucumber.ndjson")
     """
-  Then the output includes "1 failed"
+  Then the output includes
+    """
+    2 scenarios (1 failed, 1 passed)
+    4 steps (1 failed, 3 passed)
+    """
 %</pre>
 }}
 

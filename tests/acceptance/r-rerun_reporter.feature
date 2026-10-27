@@ -40,9 +40,8 @@ Feature: Rerun reporter
     When I run
       """
       test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
-      cat(readLines("rerun.txt"), sep = "\n")
       """
-    Then the output includes
+    Then the file "rerun.txt" has these lines:
       """
       basket.feature:5:14
       checkout.feature:2
@@ -81,9 +80,8 @@ Feature: Rerun reporter
     When I run
       """
       test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)
-      cat(readLines("rerun.txt"), sep = "\n")
       """
-    Then the output includes
+    Then the file "rerun.txt" has these lines:
       """
       basket.feature:5
       checkout.feature:2
@@ -93,7 +91,6 @@ Feature: Rerun reporter
     When I run
       """
       test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)
-      cat(readLines("rerun.txt"), sep = "\n")
       """
     Then the scenarios have these results:
       | scenario       | status  |
@@ -102,7 +99,7 @@ Feature: Rerun reporter
       | Pay with visa  | skipped |
       | Pay with amex  | skipped |
       | Ship           | skipped |
-    And the output includes
+    And the file "rerun.txt" has these lines:
       """
       basket.feature:5:13:14
       checkout.feature:2
@@ -134,9 +131,8 @@ Feature: Rerun reporter
     When I run
       """
       test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
-      cat(length(readLines("rerun.txt")), "lines")
       """
-    Then the output includes "0 lines"
+    Then the file "rerun.txt" is empty
 
   Scenario: No scenario runs again when every scenario passed
     Given a file named "features/basket.feature" with

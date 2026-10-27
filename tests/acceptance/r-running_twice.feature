@@ -138,7 +138,7 @@ Feature: Running tests more than once
     And a file named "features/setup-steps.R" with
       """
       define_parameter_type(name = "number", regexp = "\\d+", transformer = as.numeric)
-      before(function(context, scenario) cat("before the scenario\n"))
+      before(function(context, scenario) {})
       given("I calculate {number}", function(x, context) {
         context$result <- x + 1
       })
@@ -151,8 +151,8 @@ Feature: Running tests more than once
       source("features/setup-steps.R", keep.source = TRUE)
       test("features")
       """
-    Then the steps have these results:
+    Then the steps and hooks have these results:
       | step                 | status |
+      | Before               | passed |
       | Given I calculate 1  | passed |
       | Then the result is 2 | passed |
-    And the output includes "before the scenario" once

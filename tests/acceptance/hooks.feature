@@ -293,36 +293,20 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the output includes
-      """
-      v Given an empty basket
-      Error:
-      Hook `after()` failed
-      i Feature: basket.feature
-      i Scenario: Add an item
-      i Hook defined at: setup-steps.R:1
-      Caused by error:
-      ! can't close the database
-      """
-    And the output includes
-      """
-      Failures
-
-      Feature: Basket
-      Scenario: Add an item
-      v Given an empty basket
-      Error:
-      Hook `after()` failed
-      i Feature: basket.feature
-      i Scenario: Add an item
-      i Hook defined at: setup-steps.R:1
-      Caused by error:
-      ! can't close the database
-      """
-    And the steps and hooks have these results:
+    Then the steps and hooks have these results:
       | step                  | status |
       | Given an empty basket | passed |
       | After                 | failed |
+    And the errors are
+      """
+      [error] Scenario: Add an item
+      Error: Hook `after()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! can't close the database
+      """
 
   Scenario: A failing after hook is reported after a failing step
     Given a file named "features/basket.feature" with
@@ -340,7 +324,11 @@ Feature: Hooks
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the output includes
+    Then the steps and hooks have these results:
+      | step                  | status |
+      | Given an empty basket | failed |
+      | After                 | failed |
+    And the output includes
       """
       ! basket is broken
       Error:

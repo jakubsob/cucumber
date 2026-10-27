@@ -297,6 +297,8 @@ Feature: Running scenarios alongside testthat tests
     And the output doesn't include "Backtrace"
 
   Scenario: run() runs outside of a testthat run
+    The first run passes, and the second finds no step definition, as the first one cleared them when it returned.
+
     Given a file named "features/calculate.feature" with
       """
       Feature: Calculate
@@ -312,14 +314,12 @@ Feature: Running scenarios alongside testthat tests
     When I run outside of a testthat run
       """
       source("features/steps.R")
-      run("features", reporter = CucumberSummaryReporter$new())
-      run("features", reporter = CucumberSummaryReporter$new(), strict = FALSE)
+      run("features")
+      run("features", strict = FALSE)
       """
-    Then the output includes lines matching these patterns in order:
-      """
-      1 scenario \(1 passed\)
-      1 scenario \(1 undefined\)
-      """
+    Then the scenarios have these results:
+      | scenario   | status    |
+      | Adding one | undefined |
 
   Scenario: run() outside of a testthat run runs every scenario, and fails if one failed
     Steps can use testthat's expectations, as `run()` attaches testthat.
@@ -363,10 +363,15 @@ Feature: Running scenarios alongside testthat tests
       """
       withr::with_envvar(
         c(TESTTHAT_IS_PARALLEL = "true"),
-        testthat::test_local(reporter = "summary", stop_on_failure = FALSE)
+        testthat::test_local(reporter = "silent", stop_on_failure = FALSE)
       )
       """
-    Then the output includes "`run()` isn't supported in a parallel testthat run."
+    Then the errors are
+      """
+      [error]
+      Error: `run()` isn't supported in a parallel testthat run.
+      i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.
+      """
 
   Scenario: test() in a testthat file keeps the step definitions of the testthat run
     Given a file named "tests/testthat/setup-steps.R" with
