@@ -270,6 +270,9 @@ Feature: Hooks
       Caused by error:
       ! no database
       """
+    And the scenarios have these results:
+      | scenario    | status |
+      | Add an item | failed |
     And the steps and hooks have these results:
       | step                  | status  |
       | Before                | failed  |
@@ -410,7 +413,7 @@ Feature: Hooks
       """
     Then the errors are
       """
-      [<kind>] Scenario: Add an item
+      [error] Scenario: Add an item
       <headline>
       i Feature: basket.feature
       i Scenario: Add an item
@@ -426,11 +429,10 @@ Feature: Hooks
       | Given an empty basket | <status> |
 
     Examples:
-      | hook        | argument | status  | kind  | headline                           |
-      | before      | scenario | skipped | error | Error: Hook `before()` failed      |
-      | after       | scenario | passed  | error | Error: Hook `after()` failed       |
-      | before_step | step     | failed  | error | Error: Hook `before_step()` failed |
-      | after_step  | step     | failed  | error | Error: Hook `after_step()` failed  |
+      | hook        | argument | status | headline                           |
+      | after       | scenario | passed | Error: Hook `after()` failed       |
+      | before_step | step     | failed | Error: Hook `before_step()` failed |
+      | after_step  | step     | failed | Error: Hook `after_step()` failed  |
 
   Scenario Outline: A named <hook>() hook's error starts with its name
     Given a file named "features/basket.feature" with

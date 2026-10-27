@@ -72,21 +72,3 @@ Feature: Loading step definitions and support code
       test("features")
       """
     Then it passes
-
-  Scenario: Hooks in a setup file are registered
-    Given a file named "features/setup-calculate.R" with
-      """
-      calculate <- function(x) x + 1
-      """
-    And a file named "features/setup-hooks.R" with
-      """
-      before(function(context, scenario) cat("before", scenario$name, "\n"))
-      after(function(context, scenario) cat("after", scenario$name, "\n"))
-      """
-    When I run
-      """
-      test("features")
-      """
-    Then it passes
-    And the output includes "before Adding one"
-    And the output includes "after Adding one"

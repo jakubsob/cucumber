@@ -376,6 +376,9 @@ use a Background instead, and keep before hooks for low-level work like starting
 <span class="st">    Caused by error:</span>
 <span class="st">    ! no database</span>
 <span class="st">    """</span>
+  <span class="fu">And</span> the scenarios have these results:
+    <span class="op">|</span> scenario    <span class="op">|</span> status <span class="op">|</span>
+    <span class="op">|</span> Add an item <span class="op">|</span> failed <span class="op">|</span>
   <span class="fu">And</span> the steps and hooks have these results:
     <span class="op">|</span> step                  <span class="op">|</span> status  <span class="op">|</span>
     <span class="op">|</span> Before                <span class="op">|</span> failed  <span class="op">|</span>
@@ -410,6 +413,9 @@ use a Background instead, and keep before hooks for low-level work like starting
     Caused by error:
     ! no database
     """
+  And the scenarios have these results:
+    | scenario    | status |
+    | Add an item | failed |
   And the steps and hooks have these results:
     | step                  | status  |
     | Before                | failed  |
