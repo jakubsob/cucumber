@@ -698,6 +698,32 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    Scenario Outline: Snapshots are saved in the order of the scenarios in the feature file, whatever the order they run in, with <runner>
+      Given the steps that take snapshots
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the snapshot of "1 apple" matches
+
+          Scenario: Showing an empty basket
+            Then the snapshot of "nothing" matches
+
+          Scenario: Showing a full basket
+            Then the snapshot of "10 apples" matches
+        """
+      When I run the feature files with "<runner>" and the order "reverse"
+      Then the snapshot file "_snaps/basket.feature.md" has the scenarios in this order:
+        | scenario                |
+        | Showing the basket      |
+        | Showing an empty basket |
+        | Showing a full basket   |
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
     Scenario Outline: A retried scenario's snapshots are of its last attempt, with <runner>
       Given the steps that take snapshots
       And a file named "tests/testthat/basket.feature" with

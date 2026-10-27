@@ -686,6 +686,11 @@ then("the snapshot file {string} has {int} snapshot(s) for {string}", function(f
   expect_equal(sum(trimws(lines[start:(end - 1)]) == "Code"), n, info = paste(lines, collapse = "\n"))
 })
 
+then("the snapshot file {string} has the scenarios in this order:", function(file, expected, context) {
+  lines <- readLines(fs::path(context$tempdir, snapshots_dir, file))
+  expect_equal(sub("^# Scenario: ", "", grep("^# Scenario: ", lines, value = TRUE)), expected$scenario)
+})
+
 then("the snapshot file {string} has no snapshot for {string}", function(file, scenario, context) {
   lines <- readLines(fs::path(context$tempdir, snapshots_dir, file))
   expect_false(paste("# Scenario:", scenario) %in% lines, info = paste(lines, collapse = "\n"))

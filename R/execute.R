@@ -304,6 +304,13 @@ local_feature_snapshots <- function(dir, file, outer, frame, test_names) {
         for (test in kept) snapshotter$new_snaps$snaps[[variant]][[test]] <- changed$snaps[[variant]][[test]]
         if (length(kept) > 0) snapshotter$variants_changed <- union(snapshotter$variants_changed, variant)
       }
+      # In the order of the scenarios in the feature file, whatever the order they ran in
+      tests <- paste("Scenario:", test_names)
+      for (snaps in list(snapshotter$cur_snaps, snapshotter$new_snaps)) {
+        for (variant in names(snaps$snaps)) {
+          snaps$snaps[[variant]] <- snaps$snaps[[variant]][order(match(names(snaps$snaps[[variant]]), tests))]
+        }
+      }
       snapshotter$end_file()
       # The files expect_snapshot_file() took are kept too. Like in testthat,
       # those of scenarios that didn't take them, like ones that didn't run,
