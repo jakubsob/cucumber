@@ -314,7 +314,7 @@ truncate_lines <- function(lines, max_lines) {
   )
 }
 
-#' Order of step statuses from the worst to the best, as in Cucumber summaries
+#' Print the error of a hook or of the run, labelled by its status
 #'
 #' @keywords internal
 #' @noRd
@@ -335,6 +335,7 @@ print_warning <- function(message) {
   }
 }
 
+# Order of step statuses from the worst to the best, as in Cucumber summaries
 STEP_STATUSES <- c("failed", "ambiguous", "undefined", "pending", "skipped", "passed")
 
 status_color <- function(status) {

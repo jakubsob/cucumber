@@ -22,7 +22,8 @@ Call \code{skip_scenario()} in a step or a \code{before()} hook to skip the rest
 for example when a service it needs is down. The scenario is reported as skipped with its reason,
 and after hooks still run and get \code{"skipped"} as its status.
 In an \code{after()} hook, it skips only that hook, and the scenario is skipped unless it failed.
-Calling it in any other hook is an error. \code{testthat::skip()} does the same.
+In a \code{before_all()} hook, it skips every scenario of the run. Calling it in a \code{before_step()}, \code{after_step()}
+or \code{after_all()} hook is an error of the hook. \code{testthat::skip()} does the same.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
