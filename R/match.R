@@ -195,8 +195,6 @@ check_arity <- function(formals, types, argument_names) {
   if ("..." %in% names(formals) || (expected >= required && expected <= length(formals))) {
     return(invisible())
   }
-  # A regular expression's capture group or `{}` has no type name to use
-  types[make.names(types) != types] <- "arg"
   args <- paste(c(snippet_argument_names(types), argument_names, "context"), collapse = ", ")
   abort(
     glue(
@@ -226,10 +224,15 @@ docstring_argument <- function(lines) {
 STEP_ARGUMENT_NAMES <- c(data_table = "data_table", docstring = "doc_string")
 
 #' Name arguments after their parameter types, numbered when a type is used
-#' more than once: `int`, `int2`
+#' more than once: `int`, `int2`. A type's name is made a valid R name, like
+#' `iso_date` for `{iso-date}`, and one that has no name, like `{}` or a
+#' regular expression's capture group, or is the name of the step's other
+#' arguments, like `context`, is `arg`.
 #' @keywords internal
 #' @noRd
 snippet_argument_names <- function(types) {
+  types[types %in% c("", "context", STEP_ARGUMENT_NAMES)] <- "arg"
+  types <- make.names(gsub("[^[:alnum:]_.]", "_", types))
   uses <- vapply(seq_along(types), \(i) sum(types[seq_len(i)] == types[[i]]), integer(1))
   ifelse(uses == 1, types, paste0(types, uses))
 }

@@ -271,6 +271,33 @@ Feature: Step definition snippets
         })
       """
 
+  Scenario: A snippet's arguments are valid R names, other than those of the step's other arguments
+    Given a package
+    And a file named "features/calendar.feature" with
+      """
+      Feature: Calendar
+        Scenario: Plan a meeting
+          Given a meeting on 2024-01-31 in the office
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      define_parameter_type("iso-date", "\\d{4}-\\d{2}-\\d{2}", as.Date)
+      define_parameter_type("context", "office|home", as.character)
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [failure] Scenario: Plan a meeting
+      No step found for: "a meeting on 2024-01-31 in the office"
+      i Add a step definition:
+        given("a meeting on {iso-date} in the {context}", function(iso_date, arg, context) {
+          pending()
+        })
+      """
+
   Scenario: A step that starts with ^ or ends with $ gets a regular expression snippet of its text
     A step description that starts with `^` or ends with `$` is a regular expression, and a Cucumber Expression can't escape them.
 

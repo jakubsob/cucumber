@@ -118,6 +118,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 - ⚠️ Snippets for undefined steps are generated like in Cucumber: parameters in the order they appear in the step, one suggestion per matching parameter type, custom parameter types used, `data_table` and `doc_string` arguments, and repeated parameter names `string`, `string2`.
 - 🐛 Snippets escape `(`, `{` and `/`, so the snippet matches the step it was generated for. A step that starts with `^` or ends with `$` gets a regular expression of its text as its snippet, like `when("^I pay 5\\$$", ...)`, as a step description like that is a regular expression.
+- 🐛 A snippet's arguments are valid R names: `iso_date` for a parameter type `{iso-date}`, and `arg` for one named like the step's other arguments, like `{context}`.
 - 🐛 The snippet for an undefined first step written with `*` uses `given()`. Previously it suggested `step()`, which doesn't exist.
 
 ## Bug fixes
