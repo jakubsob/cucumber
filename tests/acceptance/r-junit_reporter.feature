@@ -32,6 +32,12 @@ Feature: JUnit reporter
         Scenario: Skip
           Given the basket isn't ready
 
+        Scenario: Undefined
+          When I empty the basket
+
+        Scenario: Ambiguous
+          When I check the basket
+
         Rule: Items are counted
           Scenario Outline: Add <n> items
             When I add <n> items
@@ -48,6 +54,8 @@ Feature: JUnit reporter
       when("I pay", function(context) pending())
       given("the basket isn't ready", function(context) skip_scenario("Not ready"))
       when("I add {int} items", function(n, context) {})
+      when("I check the basket", function(context) {})
+      when("I check the {word}", function(thing, context) {})
       """
     When I run
       """
@@ -59,8 +67,32 @@ Feature: JUnit reporter
       | Basket    | Remove an item                                              | failure | The basket is empty           |
       | Basket    | Pay                                                         | failure | Step "I pay" is pending: TODO |
       | Basket    | Skip                                                        | skipped |                               |
+      | Basket    | Undefined                                                   | failure |                               |
+      | Basket    | Ambiguous                                                   | failure |                               |
       | Basket    | Items are counted - Add <n> items - Few - #1.1: Add 1 items | passed  |                               |
       | Basket    | Items are counted - Add <n> items - Few - #1.2: Add 2 items | passed  |                               |
+
+  Scenario: A failed before_all() or after_all() hook is a failed test case
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_all(function() {})
+      after_all(function() stop("The server didn't stop"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+      """
+    Then the JUnit report "report.xml" has these test cases:
+      | result  | message                |
+      | failure | The server didn't stop |
+      | passed  |                        |
 
   Scenario: A test case's output is its steps and their results
     Given a file named "features/basket.feature" with

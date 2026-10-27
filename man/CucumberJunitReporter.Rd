@@ -54,6 +54,12 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
 <span class="st">      Scenario: Skip</span>
 <span class="st">        Given the basket isn't ready</span>
 <span class="st"></span>
+<span class="st">      Scenario: Undefined</span>
+<span class="st">        When I empty the basket</span>
+<span class="st"></span>
+<span class="st">      Scenario: Ambiguous</span>
+<span class="st">        When I check the basket</span>
+<span class="st"></span>
 <span class="st">      Rule: Items are counted</span>
 <span class="st">        Scenario Outline: Add &lt;n&gt; items</span>
 <span class="st">          When I add &lt;n&gt; items</span>
@@ -70,6 +76,8 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
 <span class="st">    when("I pay", function(context) pending())</span>
 <span class="st">    given("the basket isn't ready", function(context) skip_scenario("Not ready"))</span>
 <span class="st">    when("I add \{int\} items", function(n, context) \{\})</span>
+<span class="st">    when("I check the basket", function(context) \{\})</span>
+<span class="st">    when("I check the \{word\}", function(thing, context) \{\})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
 <span class="st">    """</span>
@@ -81,6 +89,8 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
     <span class="op">|</span> Basket    <span class="op">|</span> Remove an item                                              <span class="op">|</span> failure <span class="op">|</span> The basket is empty           <span class="op">|</span>
     <span class="op">|</span> Basket    <span class="op">|</span> Pay                                                         <span class="op">|</span> failure <span class="op">|</span> Step <span class="st">"I pay"</span> is pending: TODO <span class="op">|</span>
     <span class="op">|</span> Basket    <span class="op">|</span> Skip                                                        <span class="op">|</span> skipped <span class="op">|</span>                               <span class="op">|</span>
+    <span class="op">|</span> Basket    <span class="op">|</span> Undefined                                                   <span class="op">|</span> failure <span class="op">|</span>                               <span class="op">|</span>
+    <span class="op">|</span> Basket    <span class="op">|</span> Ambiguous                                                   <span class="op">|</span> failure <span class="op">|</span>                               <span class="op">|</span>
     <span class="op">|</span> Basket    <span class="op">|</span> Items are counted - Add <span class="va">&lt;n&gt;</span> items - Few - #1.1: Add 1 items <span class="op">|</span> passed  <span class="op">|</span>                               <span class="op">|</span>
     <span class="op">|</span> Basket    <span class="op">|</span> Items are counted - Add <span class="va">&lt;n&gt;</span> items - Few - #1.2: Add 2 items <span class="op">|</span> passed  <span class="op">|</span>                               <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each scenario is a test case, with its result
@@ -103,6 +113,12 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
       Scenario: Skip
         Given the basket isn't ready
 
+      Scenario: Undefined
+        When I empty the basket
+
+      Scenario: Ambiguous
+        When I check the basket
+
       Rule: Items are counted
         Scenario Outline: Add <n> items
           When I add <n> items
@@ -119,6 +135,8 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
     when("I pay", function(context) pending())
     given("the basket isn't ready", function(context) skip_scenario("Not ready"))
     when("I add \{int\} items", function(n, context) \{\})
+    when("I check the basket", function(context) \{\})
+    when("I check the \{word\}", function(thing, context) \{\})
     """
   When I run
     """
@@ -130,8 +148,56 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
     | Basket    | Remove an item                                              | failure | The basket is empty           |
     | Basket    | Pay                                                         | failure | Step "I pay" is pending: TODO |
     | Basket    | Skip                                                        | skipped |                               |
+    | Basket    | Undefined                                                   | failure |                               |
+    | Basket    | Ambiguous                                                   | failure |                               |
     | Basket    | Items are counted - Add <n> items - Few - #1.1: Add 1 items | passed  |                               |
     | Basket    | Items are counted - Add <n> items - Few - #1.2: Add 2 items | passed  |                               |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A failed before_all() or after_all() hook is a failed test case
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before_all(function() \{\})</span>
+<span class="st">    after_all(function() stop("The server didn't stop"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
+    <span class="op">|</span> result  <span class="op">|</span> message                <span class="op">|</span>
+    <span class="op">|</span> failure <span class="op">|</span> The server didn't stop <span class="op">|</span>
+    <span class="op">|</span> passed  <span class="op">|</span>                        <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A failed before_all() or after_all() hook is a failed test case
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before_all(function() \{\})
+    after_all(function() stop("The server didn't stop"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+    """
+  Then the JUnit report "report.xml" has these test cases:
+    | result  | message                |
+    | failure | The server didn't stop |
+    | passed  |                        |
 %</pre>
 }}
 
