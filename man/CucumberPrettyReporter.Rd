@@ -455,6 +455,60 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 %</pre>
 }}
 
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Data Table cells are printed escaped, as they are written
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add items</span>
+<span class="st">        Given these items</span>
+<span class="st">          | item     | note |</span>
+<span class="st">          | a\\|b     | x\\\\y |</span>
+<span class="st">          | cucumber | 1\\n2 |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("these items", function(data_table, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    v Given these items</span>
+<span class="st">    | item     | note |</span>
+<span class="st">    | a\\|b     | x\\\\y |</span>
+<span class="st">    | cucumber | 1\\n2 |</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Data Table cells are printed escaped, as they are written
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        Given these items
+          | item     | note |
+          | a\\|b     | x\\\\y |
+          | cucumber | 1\\n2 |
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("these items", function(data_table, context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes
+    """
+    v Given these items
+    | item     | note |
+    | a\\|b     | x\\\\y |
+    | cucumber | 1\\n2 |
+    """
+%</pre>
+}}
+
 Source: \code{tests/acceptance/r-pretty_reporter.feature}
 }
 }

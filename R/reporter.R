@@ -293,20 +293,19 @@ bold_label <- function(x) {
   paste0(cli::style_bold(substr(x, 1, colon)), substr(x, colon + 1, nchar(x)))
 }
 
-#' Render a data table's rows as aligned Gherkin pipe rows
+#' Render a data table's rows as aligned Gherkin pipe rows, with their cells
+#' escaped as they are written
 #'
 #' @param rows List of character vectors, one per row, the first one being the header
 #' @keywords internal
 #' @noRd
 format_data_table <- function(rows) {
-  cells <- do.call(rbind, rows)
+  escape <- \(x) gsub("\n", "\\n", gsub("|", "\\|", gsub("\\", "\\\\", x, fixed = TRUE), fixed = TRUE), fixed = TRUE)
+  cells <- do.call(rbind, lapply(rows, escape))
   widths <- apply(cells, 2, \(col) max(nchar(col)))
   apply(cells, 1, \(row) {
-    padded <- mapply(
-      \(cell, w) formatC(cell, width = w, flag = "-"),
-      row,
-      widths
-    )
+    # Not formatC(), which counts a backslash as two characters
+    padded <- paste0(row, strrep(" ", widths - nchar(row)))
     paste0("| ", paste(padded, collapse = " | "), " |")
   })
 }

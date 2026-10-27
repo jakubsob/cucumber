@@ -212,3 +212,29 @@ Feature: Pretty reporter
       | tomato   |
       ... and 1 more line(s)
       """
+
+  Scenario: Data Table cells are printed escaped, as they are written
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given these items
+            | item     | note |
+            | a\|b     | x\\y |
+            | cucumber | 1\n2 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("these items", function(data_table, context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given these items
+      | item     | note |
+      | a\|b     | x\\y |
+      | cucumber | 1\n2 |
+      """
