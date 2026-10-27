@@ -1,7 +1,7 @@
 # Markdown with Gherkin: a `.feature.md` file is Markdown whose headers are
 # the Feature, Rule, Background, Scenario and Examples, whose list items
 # starting with a step keyword are steps, and whose code blocks are Doc
-# Strings. Any other Markdown is a description. Its lines are classified by
+# Strings. Any other Markdown is ignored. Its lines are classified by
 # these token matchers instead of TOKEN_MATCHERS, ported from
 # GherkinInMarkdownTokenMatcher.ts of the official parser, and parsed by the
 # same state machine, see gherkin_flavours().

@@ -9,7 +9,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ Scenario Outline names are the outline name with placeholders replaced, without an `(Example n)` suffix. Scenarios that share a name are numbered in test results: `eating (1)`, `eating (2)`.
 - ✨ Added support for the `Rule` keyword. A `Rule` groups scenarios that illustrate one business rule, can have its own `Background` (run after the `Feature`'s one) and passes its tags to its scenarios.
 - ✨ Feature files can be written in any of the 80 languages of the official Gherkin parser, by starting them with a `# language:` line, e.g. `# language: fr` for `Fonctionnalité`, `Scénario`, `Soit`, `Quand` and `Alors`. Step definitions don't change.
-- ✨ Markdown with Gherkin: `.feature.md` files run like feature files. Their headers are the Feature, Rule, Background, Scenario and Examples, their list items that start with a step keyword are steps, their code blocks are Doc Strings and their tables indented 2 to 5 spaces are Data Tables and Examples. Tags are in backticks, and the rest of the Markdown is a description. `features_rd()` puts their scenarios in help pages too.
+- ✨ Markdown with Gherkin: `.feature.md` files run like feature files. Their headers are the Feature, Rule, Background, Scenario and Examples, their list items that start with a step keyword are steps, their code blocks are Doc Strings and their tables indented 2 to 5 spaces are Data Tables and Examples. Tags are in backticks, and the rest of the Markdown is ignored, like in Cucumber. `features_rd()` puts their scenarios in help pages too.
 - ✨ The `cucumber.language` option sets the language of feature files without a `# language:` line, e.g. `options(cucumber.language = "fr")`.
 - ✨ Scenario Outline placeholders are replaced in Doc Strings and Data Tables as well. Examples can have a description, and `Examples:` under a `Scenario:` makes it an outline.
 - ✨ A step can have both a Data Table and a Doc String, and a Doc String can have a media type, like `"""json`.
@@ -44,7 +44,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 ## Running tests
 
 - ⚠️ `test()` and `run()` find feature files in subdirectories of `path` too, like Cucumber's default `features/**/*.feature`. Previously only the files directly in `path` ran. Symbolic links to feature files are run too.
-- ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped.
+- ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Steps after a step that didn't pass are reported as skipped, except undefined and ambiguous steps, which keep their status, like in Cucumber.
 - ⚠️ Undefined and ambiguous steps no longer stop the run. They fail their scenario, and the other scenarios still run, so every missing step's snippet is shown.
 - ⚠️ Undefined and ambiguous steps after a step or a `before()` hook that skipped the scenario are skipped, so they no longer fail it.
 - ⚠️ `pending()` gives the step a `pending` status and fails the scenario. Previously the scenario was skipped. Run with `strict = FALSE` to skip scenarios with pending or undefined steps instead.

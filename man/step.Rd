@@ -1495,6 +1495,62 @@ An error is shown with its backtrace, the calls of the step down to where it was
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Undefined and ambiguous steps after a failing step keep their status
+  Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        When I add an item</span>
+<span class="st">        Then the basket is checked</span>
+<span class="st">        And the basket is synced twice</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I add an item", function(context) stop("the basket is full"))</span>
+<span class="st">    then("the basket is synced \{word\}", function(word, context) \{\})</span>
+<span class="st">    then("the basket is synced \{\}", function(x, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> step                           <span class="op">|</span> status    <span class="op">|</span>
+    <span class="op">|</span> When I add an item             <span class="op">|</span> failed    <span class="op">|</span>
+    <span class="op">|</span> Then the basket is checked     <span class="op">|</span> undefined <span class="op">|</span>
+    <span class="op">|</span> And the basket is synced twice <span class="op">|</span> ambiguous <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Undefined and ambiguous steps after a failing step keep their status
+  Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+        Then the basket is checked
+        And the basket is synced twice
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) stop("the basket is full"))
+    then("the basket is synced \{word\}", function(word, context) \{\})
+    then("the basket is synced \{\}", function(x, context) \{\})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the steps have these results:
+    | step                           | status    |
+    | When I add an item             | failed    |
+    | Then the basket is checked     | undefined |
+    | And the basket is synced twice | ambiguous |
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A step stops at its first failed expectation
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>

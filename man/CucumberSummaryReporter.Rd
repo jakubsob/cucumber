@@ -114,6 +114,66 @@ Feature: Basket
 %</pre>
 }}
 
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's error is printed in the summary where the hook ran
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) stop("The shop is closed"))</span>
+<span class="st">    after(function(context, scenario) stop("The till is broken"))</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Failures</span>
+<span class="st">    Scenario: Add an item</span>
+<span class="st">    Hook `before()` failed</span>
+<span class="st">    ! The shop is closed</span>
+<span class="st">    - Given an empty basket</span>
+<span class="st">    Hook `after()` failed</span>
+<span class="st">    ! The till is broken</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A hook's error is printed in the summary where the hook ran
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) stop("The shop is closed"))
+    after(function(context, scenario) stop("The till is broken"))
+    given("an empty basket", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
+    """
+  Then the output includes these lines in order:
+    """
+    Failures
+    Scenario: Add an item
+    Hook `before()` failed
+    ! The shop is closed
+    - Given an empty basket
+    Hook `after()` failed
+    ! The till is broken
+    """
+%</pre>
+}}
+
 Source: \code{tests/acceptance/r-summary_reporter.feature}
 }
 }

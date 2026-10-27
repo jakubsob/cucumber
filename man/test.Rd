@@ -1904,7 +1904,7 @@ Source: \code{tests/acceptance/order.feature}
 A \code{.feature.md} file is a Markdown document with Gherkin in it, which reads well wherever Markdown is
 rendered. Its headers are the Feature, Rule, Background, Scenario and Examples, its list items that start
 with a step keyword are steps, its code blocks are Doc Strings and its tables indented 2 to 5 spaces are
-Data Tables and Examples. Tags are in backticks. The rest of the Markdown is a description.
+Data Tables and Examples. Tags are in backticks. The rest of the Markdown is ignored.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>

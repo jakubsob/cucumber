@@ -37,6 +37,33 @@ Feature: Failing steps
       | When I add an item         | failed  |
       | Then the basket has 1 item | skipped |
 
+  Scenario: Undefined and ambiguous steps after a failing step keep their status
+    Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+          Then the basket is checked
+          And the basket is synced twice
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) stop("the basket is full"))
+      then("the basket is synced {word}", function(word, context) {})
+      then("the basket is synced {}", function(x, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                           | status    |
+      | When I add an item             | failed    |
+      | Then the basket is checked     | undefined |
+      | And the basket is synced twice | ambiguous |
+
   Scenario: A step stops at its first failed expectation
     Given a file named "features/basket.feature" with
       """
