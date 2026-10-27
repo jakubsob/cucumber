@@ -362,6 +362,59 @@ Feature: Running scenarios alongside testthat tests
       | Adding two   | failed |
       | Adding three | passed |
 
+  Rule: Outside of a testthat run, run() reports the run with CucumberProgressReporter
+
+    As there is no testthat reporter to show it. Pass `reporter = NULL` to report nothing.
+
+    @rd
+    Scenario: run() outside of a testthat run shows which step failed
+      Given a file named "features/calculate.feature" with
+        """
+        Feature: Calculate
+          Scenario: Adding one
+            Then one plus 1 is 3
+        """
+      And a file named "features/steps.R" with
+        """
+        then("one plus {int} is {int}", function(n, sum, context) {
+          expect_equal(1 + n, sum)
+        })
+        """
+      When I run outside of a testthat run and it fails
+        """
+        source("features/steps.R")
+        run("features")
+        """
+      Then the output includes these lines in order:
+        """
+        Scenario: Adding one
+        x Then one plus 1 is 3
+        Step "one plus 1 is 3" failed
+        """
+
+    Scenario: run() outside of a testthat run with reporter = NULL reports nothing
+      Given a file named "features/calculate.feature" with
+        """
+        Feature: Calculate
+          Scenario: Adding one
+            Then one plus 1 is 2
+        """
+      And a file named "features/steps.R" with
+        """
+        then("one plus {int} is {int}", function(n, sum, context) {
+          expect_equal(1 + n, sum)
+        })
+        """
+      When I run outside of a testthat run
+        """
+        source("features/steps.R")
+        run("features", reporter = NULL)
+        """
+      Then the scenarios have these results:
+        | scenario   | status |
+        | Adding one | passed |
+      And the output doesn't include "Calculate"
+
   @rd
   Scenario: run() in a parallel testthat run is an error
     When I run

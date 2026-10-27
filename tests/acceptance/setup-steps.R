@@ -37,7 +37,7 @@ run_code <- function(code, context, catch_error = FALSE) {
     runner(..., reporter = CucumberMultiReporter$new(purrr::compact(list(reporter, recorder))))
   }
   test <- function(..., reporter = CucumberProgressReporter$new()) record(cucumber::test)(..., reporter = reporter)
-  run <- function(..., reporter = NULL) record(cucumber::run)(..., reporter = reporter)
+  run <- function(..., reporter = eval(formals(cucumber::run)$reporter, asNamespace("cucumber"))) record(cucumber::run)(..., reporter = reporter)
   x <- as.character(runif(1))
   .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)
   .cucumber_steps_option <- paste0(".cucumber_steps_", x)

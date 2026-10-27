@@ -14,8 +14,10 @@
 #'   If `run()` is placed in a `tests/testthat/test-*.R` file and you call `testthat::test_dir` or similar,
 #'   it runs in the `tests/testthat` directory. The default value `"."` finds all feature
 #'   files in the `tests/testthat` directory.
-#' @param reporter A [CucumberReporter], or `NULL`, the default, to leave the output to
-#'   testthat's reporter, which reports each scenario as a test.
+#' @param reporter A [CucumberReporter], or `NULL` to report nothing of its own. In a testthat
+#'   run, it defaults to `NULL`, leaving the output to testthat's reporter, which reports each
+#'   scenario as a test. Outside of one, like in the console, it defaults to
+#'   [CucumberProgressReporter], as there is no testthat reporter to show the run.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return NULL, invisibly.
 #'
@@ -25,8 +27,8 @@
 #' hooks and parameter types are kept until testthat's run ends, as testthat runs the
 #' `setup-*.R` files that define them once for all test files. Outside of a testthat run,
 #' like when `run()` is called in the console, they're kept until `run()` returns.
-#' `run()` then attaches testthat for the steps' expectations, runs every scenario and
-#' fails with "Test failures." if one of them failed.
+#' `run()` then attaches testthat for the steps' expectations, runs every scenario, reports
+#' them with [CucumberProgressReporter] and fails with "Test failures." if one of them failed.
 #'
 #' `run()` in a parallel testthat run, with `Config/testthat/parallel: true`, is an error:
 #' testthat would delete the snapshot files of its feature files as unused.
@@ -48,7 +50,7 @@ run <- function(
   path = ".",
   filter = NULL,
   tags = NULL,
-  reporter = NULL,
+  reporter = if (is.null(testthat::get_reporter())) CucumberProgressReporter$new(),
   strict = TRUE,
   dry_run = FALSE,
   name = NULL,
@@ -58,6 +60,8 @@ run <- function(
   order = "defined",
   ...
 ) {
+  # Before the reporter of the scenarios outside of a testthat run is set
+  force(reporter)
   # Each process of a parallel run would save the snapshots of the feature files
   # in its own snapshotter, and the main process would delete them as unused
   if (identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {

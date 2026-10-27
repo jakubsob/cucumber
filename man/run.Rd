@@ -8,7 +8,7 @@ run(
   path = ".",
   filter = NULL,
   tags = NULL,
-  reporter = NULL,
+  reporter = if (is.null(testthat::get_reporter())) CucumberProgressReporter$new(),
   strict = TRUE,
   dry_run = FALSE,
   name = NULL,
@@ -29,8 +29,10 @@ files in the \code{tests/testthat} directory.}
 
 \item{tags}{If not NULL, run only the scenarios that match this tag expression, e.g. \code{"@smoke and not @slow"}.}
 
-\item{reporter}{A \link{CucumberReporter}, or \code{NULL}, the default, to leave the output to
-testthat's reporter, which reports each scenario as a test.}
+\item{reporter}{A \link{CucumberReporter}, or \code{NULL} to report nothing of its own. In a testthat
+run, it defaults to \code{NULL}, leaving the output to testthat's reporter, which reports each
+scenario as a test. Outside of one, like in the console, it defaults to
+\link{CucumberProgressReporter}, as there is no testthat reporter to show the run.}
 
 \item{strict}{If \code{FALSE}, pending and undefined steps don't fail the run.}
 
@@ -68,8 +70,8 @@ once for each \code{run()}, so twice if two test files call \code{run()}. Step d
 hooks and parameter types are kept until testthat's run ends, as testthat runs the
 \verb{setup-*.R} files that define them once for all test files. Outside of a testthat run,
 like when \code{run()} is called in the console, they're kept until \code{run()} returns.
-\code{run()} then attaches testthat for the steps' expectations, runs every scenario and
-fails with "Test failures." if one of them failed.
+\code{run()} then attaches testthat for the steps' expectations, runs every scenario, reports
+them with \link{CucumberProgressReporter} and fails with "Test failures." if one of them failed.
 
 \code{run()} in a parallel testthat run, with \code{Config/testthat/parallel: true}, is an error:
 testthat would delete the snapshot files of its feature files as unused.
@@ -410,6 +412,62 @@ Its step definitions and hooks are cleared when it returns.
     | Adding one   | passed |
     | Adding two   | failed |
     | Adding three | passed |
+%</pre>
+}}
+
+\strong{Rule: Outside of a testthat run, run() reports the run with CucumberProgressReporter}
+
+As there is no testthat reporter to show it. Pass \code{reporter = NULL} to report nothing.
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> run() outside of a testthat run shows which step failed
+  <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Calculate</span>
+<span class="st">      Scenario: Adding one</span>
+<span class="st">        Then one plus 1 is 3</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    then("one plus \{int\} is \{int\}", function(n, sum, context) \{</span>
+<span class="st">      expect_equal(1 + n, sum)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run outside of a testthat run and it fails
+<span class="st">    """</span>
+<span class="st">    source("features/steps.R")</span>
+<span class="st">    run("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Scenario: Adding one</span>
+<span class="st">    x Then one plus 1 is 3</span>
+<span class="st">    Step "one plus 1 is 3" failed</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: run() outside of a testthat run shows which step failed
+  Given a file named "features/calculate.feature" with
+    """
+    Feature: Calculate
+      Scenario: Adding one
+        Then one plus 1 is 3
+    """
+  And a file named "features/steps.R" with
+    """
+    then("one plus \{int\} is \{int\}", function(n, sum, context) \{
+      expect_equal(1 + n, sum)
+    \})
+    """
+  When I run outside of a testthat run and it fails
+    """
+    source("features/steps.R")
+    run("features")
+    """
+  Then the output includes these lines in order:
+    """
+    Scenario: Adding one
+    x Then one plus 1 is 3
+    Step "one plus 1 is 3" failed
+    """
 %</pre>
 }}
 
