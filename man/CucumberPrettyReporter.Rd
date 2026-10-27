@@ -83,6 +83,11 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 <span class="st">    v Given a basket with 1 items</span>
 <span class="st">    v When I remove 1 items</span>
 <span class="st">    v Then the basket has 0 items</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    2 scenarios (2 passed)</span>
+<span class="st">    9 steps (9 passed)</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Each step is printed with the keyword it's written with, under its scenario and Rule
   Given a file named "features/basket.feature" with
@@ -135,6 +140,11 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     v Given a basket with 1 items
     v When I remove 1 items
     v Then the basket has 0 items
+    """
+  And the output includes
+    """
+    2 scenarios (2 passed)
+    9 steps (9 passed)
     """
 %</pre>
 }}

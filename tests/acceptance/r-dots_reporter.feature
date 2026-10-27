@@ -61,3 +61,32 @@ Feature: Dots reporter
       """
     And the output includes "The basket is empty"
     And the output doesn't include "Scenario: Add an item"
+
+  Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Statuses
+        Scenario: Pending
+          Given a pending step
+
+        Scenario: Undefined
+          Given an undefined step
+
+        Scenario: Ambiguous
+          Given the ambiguous step
+      """
+    And a file named "features/setup-statuses.R" with
+      """
+      before(function(context, scenario) {})
+      given("a pending step", function(context) pending())
+      given("the ambiguous step", function(context) {})
+      given("the {word} step", function(word, context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      .P.U.A
+      """

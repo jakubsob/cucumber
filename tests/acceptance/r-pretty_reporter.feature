@@ -59,6 +59,11 @@ Feature: Pretty reporter
       v When I remove 1 items
       v Then the basket has 0 items
       """
+    And the output includes
+      """
+      2 scenarios (2 passed)
+      9 steps (9 passed)
+      """
 
   Scenario: A step's warnings are printed under it
     Given a file named "features/basket.feature" with
