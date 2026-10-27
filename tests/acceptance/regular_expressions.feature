@@ -149,7 +149,7 @@ Feature: Regular expressions
       """
     Then it passes
 
-  Scenario: A group with the regexp of two parameter types is an error unless one is preferred
+  Scenario: A group with the regexp of two parameter types is an error
     Given a package
     And a file named "features/basket.feature" with
       """
@@ -174,6 +174,55 @@ Feature: Regular expressions
       matches multiple parameter types with regexp red|green:
          {colour}
          {ripeness}
+
+      I couldn't decide which one to use. Use a Cucumber Expression instead of a Regular Expression, or make one of the parameter types preferential with `prefer_for_regexp_match = TRUE`.
+      """
+
+  Scenario: A group with the regexp of two parameter types is converted by the preferred one
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Colours
+          Given I have a red cucumber
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      define_parameter_type("colour", "red|green", \(x) paste("colour", x))
+      define_parameter_type("ripeness", "red|green", \(x) paste("ripeness", x), prefer_for_regexp_match = TRUE)
+      given("^I have a (red|green) cucumber$", function(ripeness, context) {
+        expect_equal(ripeness, "ripeness red")
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+
+  Scenario: A group with the regexp of {float} is an error, as {double} has the same regexp
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Price
+          Given the price is 1.5
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given(r"[^the price is ([-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?)$]", function(price, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error]
+      Error: Your Regular Expression ^the price is ([-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?)$
+      matches multiple parameter types with regexp [-+]?(?:[0-9]+(?:[.][0-9]+)?|[.][0-9]+)(?:[E][-+]?[0-9]+)?:
+         {float}
+         {double}
 
       I couldn't decide which one to use. Use a Cucumber Expression instead of a Regular Expression, or make one of the parameter types preferential with `prefer_for_regexp_match = TRUE`.
       """
