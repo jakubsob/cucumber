@@ -160,6 +160,13 @@ then("the attachments are:", function(expected, context) {
   expect_equal(as.data.frame(run_attachments(context)[names(expected)]), as.data.frame(expected))
 })
 
+# How many messages of each type the last run wrote, of the types in the table
+then("the messages have these types and quantities:", function(expected, context) {
+  types <- vapply(context$run$envelopes, names, character(1))
+  actual <- vapply(expected$type, \(type) as.character(sum(types == type)), character(1), USE.NAMES = FALSE)
+  expect_equal(actual, expected$count)
+})
+
 then("no scenario ran", function(context) {
   expect_equal(nrow(context$run$scenarios), 0)
 })

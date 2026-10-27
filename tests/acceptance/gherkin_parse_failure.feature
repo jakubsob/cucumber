@@ -177,3 +177,50 @@ Feature: Gherkin parse failure
       x Parse error in "a.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Parse Error'
       x Parse error in "c.feature" (1:1): expected: #EOF, #Language, #TagLine, #FeatureLine, #Comment, #Empty, got 'Parse Error'
       """
+
+  Scenario: Parse errors are written as Cucumber Messages, with the documents that were parsed
+    Given a file named "features/a.feature" with
+      """
+      Feature: A
+        Scenario: A step
+          Given a step
+      """
+    And a file named "features/broken.feature" with
+      """
+      Parse error
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the messages have these types and quantities:
+      | type            | count |
+      | source          | 2     |
+      | gherkinDocument | 1     |
+      | pickle          | 1     |
+      | parseError      | 1     |
+    And no scenario ran
+
+  Scenario: Reporters write their reports of a run whose feature files can't be parsed
+    Given a file named "features/broken.feature" with
+      """
+      Feature: Broken
+        Scenario: A step
+          Given a step
+          Parse error
+      """
+    When I run
+      """
+      test("features", reporter = CucumberMultiReporter$new(list(
+        CucumberHtmlReporter$new("report.html"),
+        CucumberJunitReporter$new("report.xml"),
+        CucumberRerunReporter$new("rerun.txt")
+      )), stop_on_failure = FALSE)
+      """
+    Then there is a file "report.html"
+    And there is a file "report.xml"
+    And the file "rerun.txt" is empty
