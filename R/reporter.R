@@ -433,11 +433,17 @@ print_step_error <- function(step) {
 
 #' Print a scenario that didn't pass, with its steps and the hooks that didn't pass
 #'
+#' @param number Its number in the summary, which shows where the scenario is
+#'   instead of its feature
 #' @keywords internal
 #' @noRd
-print_failure <- function(failure) {
-  cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
-  cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
+print_failure <- function(failure, number = NULL) {
+  if (is.null(number)) {
+    cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
+    cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
+  } else {
+    cat("\n", number, ") ", bold_label(failure$scenario), cli::col_grey(paste0(" # ", failure$location)), "\n", sep = "")
+  }
   # Each hook is printed where it ran, after the steps before it
   print_hooks <- function(steps) {
     for (hook in Filter(\(hook) hook$after_steps == steps, failure$hooks)) {
@@ -504,21 +510,25 @@ reported_step <- function(q, pickle_step, result) {
 #' [CucumberPrettyReporter].
 #'
 #' ```
+#' Failures:
+#'
+#' 1) Scenario: Remove an item # basket.feature:6
+#'     ✔ Given a basket with 2 apples
+#'     ✖ When I remove 3 apples
+#'     Error:
+#'       Can't remove more apples than there are.
+#'
 #' ────────────────────────────────────────────────────────────────────────
 #' Summary
 #'   2 scenarios (1 failed, 1 passed)
 #'   6 steps (1 failed, 5 passed)
 #'   0m00.153s (executing steps: 0m00.121s)
 #' ────────────────────────────────────────────────────────────────────────
-#'
-#' Failures
-#'
-#' Feature: Basket
-#'   Scenario: Remove an item
-#'     ✔ Given a basket with 2 apples
-#'     ✖ When I remove 3 apples
-#'       Error: Can't remove more apples than there are.
 #' ```
+#'
+#' The scenarios that failed, are ambiguous or undefined are listed under
+#' Failures, those that are pending and the failed attempts of retried
+#' scenarios under Warnings.
 #'
 #' @examples
 #' \dontrun{
@@ -553,8 +563,12 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field current_hooks Results of the current scenario's hooks that failed, are pending or skipped it
     current_hooks = NULL,
 
-    #' @field failures Recorded failures for the end-of-run summary
+    #' @field failures The scenarios that didn't pass or skip, printed as they finish by some reporters
     failures = NULL,
+
+    #' @field issues The scenarios listed in the summary: those that didn't pass or skip, and the
+    #'   failed attempts of retried scenarios, in the order they finished
+    issues = NULL,
 
     #' @field undefined_parameter_types Parameter types used by step definitions but not defined
     undefined_parameter_types = NULL,
@@ -581,6 +595,7 @@ CucumberSummaryReporter <- R6::R6Class(
       self$scenario_statuses <- character()
       self$current_steps <- list()
       self$failures <- list()
+      self$issues <- list()
       private$query <- new_query()
       # ponytail: capture real color support now, before testthat runs. During a
       # test, output is sunk and cli auto-detects 0 colors; forcing this captured
@@ -679,10 +694,10 @@ CucumberSummaryReporter <- R6::R6Class(
             private$on_feature_start()
           }
           self$current_rule <- if (!is.null(lineage$rule)) paste0(lineage$rule$keyword, ": ", lineage$rule$name)
+          private$scenario_name <- paste0(lineage$scenario$keyword, ": ", pickle$name)
+          private$attempt <- message$attempt
           self$current_scenario <- paste0(
-            lineage$scenario$keyword,
-            ": ",
-            pickle$name,
+            private$scenario_name,
             if (message$attempt > 0) paste0(" (attempt ", message$attempt + 1, ")")
           )
           private$steps_before <- length(self$step_statuses)
@@ -718,26 +733,32 @@ CucumberSummaryReporter <- R6::R6Class(
           }
         },
         testCaseFinished = {
-          # Only the last attempt of a scenario is counted
-          if (isTRUE(message$willBeRetried)) {
-            self$step_statuses <- self$step_statuses[seq_len(private$steps_before)]
-            return(invisible(self))
-          }
           started <- q$test_cases_started[[message$testCaseStartedId]]
           status <- tolower(
             q$most_severe_result_of(started)$status %||% "PASSED"
           )
+          pickle <- q$pickle_of(started)
+          failure <- list(
+            feature = self$current_feature,
+            scenario = self$current_scenario,
+            location = paste0(pickle$uri, ":", pickle$location$line),
+            status = status,
+            steps = self$current_steps,
+            hooks = self$current_hooks
+          )
+          # Only the last attempt of a scenario is counted. A failed one
+          # that will be retried is a warning of the summary.
+          if (isTRUE(message$willBeRetried)) {
+            self$step_statuses <- self$step_statuses[seq_len(private$steps_before)]
+            failure$scenario <- paste0(private$scenario_name, " (attempt ", private$attempt + 1, ", retried)")
+            failure$retried <- TRUE
+            self$issues <- c(self$issues, list(failure))
+            return(invisible(self))
+          }
           self$scenario_statuses <- c(self$scenario_statuses, status)
           if (!status %in% c("passed", "skipped")) {
-            self$failures <- c(
-              self$failures,
-              list(list(
-                feature = self$current_feature,
-                scenario = self$current_scenario,
-                steps = self$current_steps,
-                hooks = self$current_hooks
-              ))
-            )
+            self$failures <- c(self$failures, list(failure))
+            self$issues <- c(self$issues, list(failure))
           }
           private$on_scenario_end(status)
         },
@@ -772,12 +793,6 @@ CucumberSummaryReporter <- R6::R6Class(
         cli.num_colors = self$num_colors,
         cli.unicode = self$unicode
       )
-      # Each undefined parameter type, with the last step definition that used it
-      types <- self$undefined_parameter_types
-      if (length(types) > 0) {
-        cat("\n", cli::col_yellow("Undefined parameter types:"), "\n", sep = "")
-        cat(sprintf("- \"%s\" e.g. `%s`\n", names(types), types), sep = "")
-      }
       cat("\n")
       cat(cli::rule(), "\n", sep = "")
       cat(cli::style_bold("Summary"), "\n", sep = "")
@@ -812,16 +827,36 @@ CucumberSummaryReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Print the scenarios that didn't pass
+    #' Print each undefined parameter type, with the last step definition that used it
+    print_undefined_parameter_types = function() {
+      withr::local_options(
+        cli.num_colors = self$num_colors,
+        cli.unicode = self$unicode
+      )
+      types <- self$undefined_parameter_types
+      if (length(types) > 0) {
+        cat("\n", cli::col_yellow("Undefined parameter types:"), "\n", sep = "")
+        cat(sprintf("- \"%s\" e.g. `%s`\n", names(types), types), sep = "")
+      }
+      invisible(self)
+    },
+
+    #' @description
+    #' Print the scenarios that didn't pass, numbered and with where they are:
+    #' under Failures those that failed, are ambiguous or undefined, under
+    #' Warnings those that are pending and the failed attempts that were retried
     print_failures = function() {
       withr::local_options(
         cli.num_colors = self$num_colors,
         cli.unicode = self$unicode
       )
-      if (length(self$failures) > 0) {
-        cat("\n", cli::style_bold("Failures"), "\n", sep = "")
-        for (failure in self$failures) {
-          print_failure(failure)
+      warning <- vapply(self$issues, \(issue) isTRUE(issue$retried) || issue$status == "pending", logical(1))
+      for (title in c("Failures", "Warnings")) {
+        issues <- self$issues[if (title == "Failures") !warning else warning]
+        if (length(issues) == 0) next
+        cat("\n", cli::style_bold(paste0(title, ":")), "\n", sep = "")
+        for (i in seq_along(issues)) {
+          print_failure(issues[[i]], number = i)
         }
       }
       invisible(self)
@@ -835,14 +870,18 @@ CucumberSummaryReporter <- R6::R6Class(
       # A run stopped by an error of a reporter has no testRunFinished
       private$finish_feature()
       self$print_run_error(error)
-      self$print_counts()
+      self$print_undefined_parameter_types()
       self$print_failures()
+      self$print_counts()
       invisible(self)
     }
   ),
   private = list(
     query = NULL,
     feature_uri = NULL,
+    # The current scenario's keyword and name, and its attempt
+    scenario_name = NULL,
+    attempt = 0L,
     # Number of steps counted before the current attempt of a scenario
     steps_before = 0L,
 
@@ -1175,6 +1214,7 @@ CucumberProgressBarReporter <- R6::R6Class(
       self$clear()
       self$live <- NULL
       self$print_run_error(error)
+      self$print_undefined_parameter_types()
       self$print_counts()
       invisible(self)
     }

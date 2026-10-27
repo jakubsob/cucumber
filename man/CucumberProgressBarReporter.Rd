@@ -173,6 +173,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressBarRepor
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures'><code>cucumber::CucumberSummaryReporter$print_failures()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures_since"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures_since'><code>cucumber::CucumberSummaryReporter$print_failures_since()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_run_error"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_run_error'><code>cucumber::CucumberSummaryReporter$print_run_error()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_undefined_parameter_types"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_undefined_parameter_types'><code>cucumber::CucumberSummaryReporter$print_undefined_parameter_types()</code></a></span></li>
 </ul>
 </details>
 }}

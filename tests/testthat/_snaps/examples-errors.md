@@ -16,17 +16,9 @@
               })
       
       
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 undefined)
-        1 step (1 undefined)
-        <duration> (executing steps: <duration>)
-      --------------------------------------------------------------------------------
+      Failures:
       
-      Failures
-      
-      Feature: Add
-        Scenario: Add
+      1) Scenario: Add # add.feature:2
           U Given I have 1
             No step found for: "I have 1"
             i Add a step definition:
@@ -34,6 +26,13 @@
               # given("I have {float}", function(float, context) {
                 pending()
               })
+      
+      --------------------------------------------------------------------------------
+      Summary
+        1 scenario (1 undefined)
+        1 step (1 undefined)
+        <duration> (executing steps: <duration>)
+      --------------------------------------------------------------------------------
 
 # test / error handling / should throw an error if no test files are found
 
@@ -72,17 +71,9 @@
           - Then the result is 3
       
       
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 failed)
-        3 steps (1 failed, 1 skipped, 1 passed)
-        <duration> (executing steps: <duration>)
-      --------------------------------------------------------------------------------
+      Failures:
       
-      Failures
-      
-      Feature: Addition
-        Scenario: Adding two numbers
+      1) Scenario: Adding two numbers # addition.feature:2
           v Given I have 1 and 2
           x When I add them
           Error: 
@@ -93,6 +84,13 @@
             Caused by error:
             ! Addition service is unavailable
           - Then the result is 3
+      
+      --------------------------------------------------------------------------------
+      Summary
+        1 scenario (1 failed)
+        3 steps (1 failed, 1 skipped, 1 passed)
+        <duration> (executing steps: <duration>)
+      --------------------------------------------------------------------------------
 
 # test / error handling / should run after hook, even after error in step
 
@@ -117,17 +115,9 @@
             Warning in after hook, even after error in a step.
       
       
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 failed)
-        1 step (1 failed)
-        <duration> (executing steps: <duration>)
-      --------------------------------------------------------------------------------
+      Failures:
       
-      Failures
-      
-      Feature: Hooks
-        Scenario: After hook is executed even when a step throws an error
+      1) Scenario: After hook is executed even when a step throws an error # hooks.feature:2
           x When I start the scenario with error
           Error: 
             Step "I start the scenario with error" failed
@@ -136,6 +126,13 @@
             i Step defined at: setup-steps.R:9
             Caused by error:
             ! Unexpected error!
+      
+      --------------------------------------------------------------------------------
+      Summary
+        1 scenario (1 failed)
+        1 step (1 failed)
+        <duration> (executing steps: <duration>)
+      --------------------------------------------------------------------------------
 
 # test / error handling / should report failure with `testthat::test_dir`
 
@@ -193,17 +190,9 @@
             `expected`: 6
       
       
-      --------------------------------------------------------------------------------
-      Summary
-        5 scenarios (3 failed, 2 passed)
-        11 steps (3 failed, 8 passed)
-        <duration> (executing steps: <duration>)
-      --------------------------------------------------------------------------------
+      Failures:
       
-      Failures
-      
-      Feature: Addition
-        Scenario: Adding integer and float
+      1) Scenario: Adding integer and float # addition.feature:5
           v When I add 1 and 1.1
           x Then the result is 5
           Error: 
@@ -216,8 +205,7 @@
               `actual`: 2.1
             `expected`: 5.0
       
-      Feature: Addition
-        Scenario: Adding float and float
+      2) Scenario: Adding float and float # addition.feature:8
           v When I add 1.1 and 1.1
           x Then the result is 5
           Error: 
@@ -230,8 +218,7 @@
               `actual`: 2.2
             `expected`: 5.0
       
-      Feature: Guess the word
-        Scenario: Breaker joins a game
+      3) Scenario: Breaker joins a game # guess_the_word.feature:5
           v Given the Maker has started a game with the word 'silky'
           v When the Breaker joins the Maker's game
           x Then the Breaker must guess a word with 6 characters
@@ -244,6 +231,13 @@
             Differences:
               `actual`: 5
             `expected`: 6
+      
+      --------------------------------------------------------------------------------
+      Summary
+        5 scenarios (3 failed, 2 passed)
+        11 steps (3 failed, 8 passed)
+        <duration> (executing steps: <duration>)
+      --------------------------------------------------------------------------------
 
 # test / error handling / should show a snippet when a step has no definition
 
@@ -264,17 +258,9 @@
           - Then the result is 3
       
       
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 undefined)
-        3 steps (1 undefined, 1 skipped, 1 passed)
-        <duration> (executing steps: <duration>)
-      --------------------------------------------------------------------------------
+      Failures:
       
-      Failures
-      
-      Feature: Addition
-        Scenario: Adding two numbers
+      1) Scenario: Adding two numbers # addition.feature:2
           v Given I have 1 and 2
           U When I add them
             No step found for: "I add them"
@@ -283,6 +269,13 @@
                 pending()
               })
           - Then the result is 3
+      
+      --------------------------------------------------------------------------------
+      Summary
+        1 scenario (1 undefined)
+        3 steps (1 undefined, 1 skipped, 1 passed)
+        <duration> (executing steps: <duration>)
+      --------------------------------------------------------------------------------
 
 # test / error handling / should show an error when a step has duplicate definitions
 
@@ -303,17 +296,9 @@
           - Then the result is 3
       
       
-      --------------------------------------------------------------------------------
-      Summary
-        1 scenario (1 ambiguous)
-        3 steps (1 ambiguous, 1 skipped, 1 passed)
-        <duration> (executing steps: <duration>)
-      --------------------------------------------------------------------------------
+      Failures:
       
-      Failures
-      
-      Feature: Addition
-        Scenario: Adding two numbers
+      1) Scenario: Adding two numbers # addition.feature:2
           v Given I have 1 and 2
           A When I add them
           Error: 
@@ -322,6 +307,13 @@
             * "I add them" (setup-steps.R:6)
             * "I add them" (setup-steps.R:10)
           - Then the result is 3
+      
+      --------------------------------------------------------------------------------
+      Summary
+        1 scenario (1 ambiguous)
+        3 steps (1 ambiguous, 1 skipped, 1 passed)
+        <duration> (executing steps: <duration>)
+      --------------------------------------------------------------------------------
 
 # test / error handling / should show an error when a feature file is invalid
 

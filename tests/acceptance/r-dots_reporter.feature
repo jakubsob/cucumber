@@ -52,10 +52,9 @@ Feature: Dots reporter
       """
     Then the output includes
       """
-      Failures
+      Failures:
 
-      Feature: Basket
-      Scenario: Remove an item
+      1) Scenario: Remove an item # basket.feature:7
       v Given an empty basket
       x When I remove 1 item
       """

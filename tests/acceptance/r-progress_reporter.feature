@@ -89,8 +89,8 @@ Feature: Progress reporter
       Scenario: Remove an item
       x When I remove 1 item
       x |  1     1      1 | Basket
-      Failures
-      Scenario: Remove an item
+      Failures:
+      1) Scenario: Remove an item # basket.feature:6
       x When I remove 1 item
       """
     And the output includes "x When I remove 1 item" 2 times

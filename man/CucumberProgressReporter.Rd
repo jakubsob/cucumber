@@ -191,8 +191,8 @@ Elsewhere, like in CI, it's printed once the feature finishes.
 <span class="st">    Scenario: Remove an item</span>
 <span class="st">    x When I remove 1 item</span>
 <span class="st">    x |  1     1      1 | Basket</span>
-<span class="st">    Failures</span>
-<span class="st">    Scenario: Remove an item</span>
+<span class="st">    Failures:</span>
+<span class="st">    1) Scenario: Remove an item # basket.feature:6</span>
 <span class="st">    x When I remove 1 item</span>
 <span class="st">    """</span>
   <span class="fu">And</span> the output includes <span class="st">"x When I remove 1 item"</span> 2 times</code></pre >}}
@@ -206,8 +206,8 @@ Elsewhere, like in CI, it's printed once the feature finishes.
     Scenario: Remove an item
     x When I remove 1 item
     x |  1     1      1 | Basket
-    Failures
-    Scenario: Remove an item
+    Failures:
+    1) Scenario: Remove an item # basket.feature:6
     x When I remove 1 item
     """
   And the output includes "x When I remove 1 item" 2 times
@@ -351,6 +351,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures'><code>cucumber::CucumberSummaryReporter$print_failures()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures_since"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures_since'><code>cucumber::CucumberSummaryReporter$print_failures_since()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_run_error"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_run_error'><code>cucumber::CucumberSummaryReporter$print_run_error()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_undefined_parameter_types"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_undefined_parameter_types'><code>cucumber::CucumberSummaryReporter$print_undefined_parameter_types()</code></a></span></li>
 </ul>
 </details>
 }}

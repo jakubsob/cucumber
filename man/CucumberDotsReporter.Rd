@@ -119,10 +119,9 @@ scenarios that didn't pass.
 <span class="st">    """</span>
   <span class="fu">Then</span> the output includes
 <span class="st">    """</span>
-<span class="st">    Failures</span>
+<span class="st">    Failures:</span>
 <span class="st"></span>
-<span class="st">    Feature: Basket</span>
-<span class="st">    Scenario: Remove an item</span>
+<span class="st">    1) Scenario: Remove an item # basket.feature:7</span>
 <span class="st">    v Given an empty basket</span>
 <span class="st">    x When I remove 1 item</span>
 <span class="st">    """</span>
@@ -135,10 +134,9 @@ scenarios that didn't pass.
     """
   Then the output includes
     """
-    Failures
+    Failures:
 
-    Feature: Basket
-    Scenario: Remove an item
+    1) Scenario: Remove an item # basket.feature:7
     v Given an empty basket
     x When I remove 1 item
     """
@@ -242,6 +240,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberDotsReporter$new
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures'><code>cucumber::CucumberSummaryReporter$print_failures()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_failures_since"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_failures_since'><code>cucumber::CucumberSummaryReporter$print_failures_since()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_run_error"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_run_error'><code>cucumber::CucumberSummaryReporter$print_run_error()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="print_undefined_parameter_types"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-print_undefined_parameter_types'><code>cucumber::CucumberSummaryReporter$print_undefined_parameter_types()</code></a></span></li>
 </ul>
 </details>
 }}

@@ -9,27 +9,34 @@ the end of the run too:
 \link{CucumberProgressReporter}, \link{CucumberProgressBarReporter} and
 \link{CucumberPrettyReporter}.
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{────────────────────────────────────────────────────────────────────────
+\if{html}{\out{<div class="sourceCode">}}\preformatted{Failures:
+
+1) Scenario: Remove an item # basket.feature:6
+    ✔ Given a basket with 2 apples
+    ✖ When I remove 3 apples
+    Error:
+      Can't remove more apples than there are.
+
+────────────────────────────────────────────────────────────────────────
 Summary
   2 scenarios (1 failed, 1 passed)
   6 steps (1 failed, 5 passed)
   0m00.153s (executing steps: 0m00.121s)
 ────────────────────────────────────────────────────────────────────────
-
-Failures
-
-Feature: Basket
-  Scenario: Remove an item
-    ✔ Given a basket with 2 apples
-    ✖ When I remove 3 apples
-      Error: Can't remove more apples than there are.
 }\if{html}{\out{</div>}}
+
+The scenarios that failed, are ambiguous or undefined are listed under
+Failures, those that are pending and the failed attempts of retried
+scenarios under Warnings.
 }
 \section{Specification}{
 
 \subsection{Summary reporter}{
 
-\code{CucumberSummaryReporter} prints only the summary of the run: the scenarios and steps counted by status, how long the run took, and the scenarios that didn't pass.
+\code{CucumberSummaryReporter} prints only the summary of the run: the scenarios that didn't pass, numbered
+and with where they are, then the scenarios and steps counted by status and how long the run took.
+Scenarios that failed, are ambiguous or undefined are Failures. Pending scenarios, and failed attempts of
+retried scenarios, are Warnings.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> Only the summary is printed
@@ -57,20 +64,21 @@ Feature: Basket
 <span class="st">    """</span>
   <span class="fu">Then</span> the output includes
 <span class="st">    """</span>
+<span class="st">    Failures:</span>
+<span class="st"></span>
+<span class="st">    1) Scenario: Remove an item # basket.feature:6</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    x When I remove 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    x When I remove 1 item</span>
 <span class="st">    Summary</span>
 <span class="st">    2 scenarios (1 failed, 1 passed)</span>
 <span class="st">    4 steps (1 failed, 3 passed)</span>
 <span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Failures</span>
-<span class="st"></span>
-<span class="st">    Feature: Basket</span>
-<span class="st">    Scenario: Remove an item</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    """</span>
   <span class="fu">And</span> the output doesn't include <span class="st">"Scenario: Add an item"</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"Feature: Basket"</span>
   <span class="fu">And</span> the output doesn't include <span class="st">"...."</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Only the summary is printed
   Given a package
@@ -97,21 +105,96 @@ Feature: Basket
     """
   Then the output includes
     """
+    Failures:
+
+    1) Scenario: Remove an item # basket.feature:6
+    v Given an empty basket
+    x When I remove 1 item
+    """
+  And the output includes these lines in order:
+    """
+    x When I remove 1 item
     Summary
     2 scenarios (1 failed, 1 passed)
     4 steps (1 failed, 3 passed)
     """
-  And the output includes
-    """
-    Failures
-
-    Feature: Basket
-    Scenario: Remove an item
-    v Given an empty basket
-    x When I remove 1 item
-    """
   And the output doesn't include "Scenario: Add an item"
+  And the output doesn't include "Feature: Basket"
   And the output doesn't include "...."
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Pending scenarios and failed attempts that were retried are warnings
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Pay</span>
+<span class="st">        Given I pay</span>
+<span class="st"></span>
+<span class="st">      Scenario: Sync</span>
+<span class="st">        When I sync</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    attempts &lt;- 0</span>
+<span class="st">    given("I pay", function(context) pending())</span>
+<span class="st">    when("I sync", function(context) \{</span>
+<span class="st">      attempts &lt;&lt;- attempts + 1</span>
+<span class="st">      if (attempts == 1) stop("The server is busy")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new(), retry = 1, stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Warnings:</span>
+<span class="st">    1) Scenario: Pay # basket.feature:2</span>
+<span class="st">    P Given I pay</span>
+<span class="st">    2) Scenario: Sync (attempt 1, retried) # basket.feature:5</span>
+<span class="st">    x When I sync</span>
+<span class="st">    Summary</span>
+<span class="st">    2 scenarios (1 pending, 1 passed)</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output doesn't include <span class="st">"Failures:"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Pending scenarios and failed attempts that were retried are warnings
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Pay
+        Given I pay
+
+      Scenario: Sync
+        When I sync
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    attempts <- 0
+    given("I pay", function(context) pending())
+    when("I sync", function(context) \{
+      attempts <<- attempts + 1
+      if (attempts == 1) stop("The server is busy")
+    \})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberSummaryReporter$new(), retry = 1, stop_on_failure = FALSE)
+    """
+  Then the output includes these lines in order:
+    """
+    Warnings:
+    1) Scenario: Pay # basket.feature:2
+    P Given I pay
+    2) Scenario: Sync (attempt 1, retried) # basket.feature:5
+    x When I sync
+    Summary
+    2 scenarios (1 pending, 1 passed)
+    """
+  And the output doesn't include "Failures:"
 %</pre>
 }}
 
@@ -218,8 +301,8 @@ Feature: Basket
 <span class="st">    """</span>
   <span class="fu">Then</span> the output includes these lines in order:
 <span class="st">    """</span>
-<span class="st">    Failures</span>
-<span class="st">    Scenario: Add an item</span>
+<span class="st">    Failures:</span>
+<span class="st">    1) Scenario: Add an item # basket.feature:2</span>
 <span class="st">    Hook `before()` failed</span>
 <span class="st">    ! The shop is closed</span>
 <span class="st">    - Given an empty basket</span>
@@ -246,8 +329,8 @@ Feature: Basket
     """
   Then the output includes these lines in order:
     """
-    Failures
-    Scenario: Add an item
+    Failures:
+    1) Scenario: Add an item # basket.feature:2
     Hook `before()` failed
     ! The shop is closed
     - Given an empty basket
@@ -287,7 +370,10 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 
 \item{\code{current_hooks}}{Results of the current scenario's hooks that failed, are pending or skipped it}
 
-\item{\code{failures}}{Recorded failures for the end-of-run summary}
+\item{\code{failures}}{The scenarios that didn't pass or skip, printed as they finish by some reporters}
+
+\item{\code{issues}}{The scenarios listed in the summary: those that didn't pass or skip, and the
+failed attempts of retried scenarios, in the order they finished}
 
 \item{\code{undefined_parameter_types}}{Parameter types used by step definitions but not defined}
 
@@ -315,6 +401,7 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 \item \href{#method-CucumberSummaryReporter-add_warning}{\code{CucumberSummaryReporter$add_warning()}}
 \item \href{#method-CucumberSummaryReporter-print_run_error}{\code{CucumberSummaryReporter$print_run_error()}}
 \item \href{#method-CucumberSummaryReporter-print_counts}{\code{CucumberSummaryReporter$print_counts()}}
+\item \href{#method-CucumberSummaryReporter-print_undefined_parameter_types}{\code{CucumberSummaryReporter$print_undefined_parameter_types()}}
 \item \href{#method-CucumberSummaryReporter-print_failures}{\code{CucumberSummaryReporter$print_failures()}}
 \item \href{#method-CucumberSummaryReporter-end_run}{\code{CucumberSummaryReporter$end_run()}}
 \item \href{#method-CucumberSummaryReporter-clone}{\code{CucumberSummaryReporter$clone()}}
@@ -463,10 +550,22 @@ Print the scenarios and steps counted by status
 
 }
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberSummaryReporter-print_undefined_parameter_types"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-print_undefined_parameter_types}{}}}
+\subsection{Method \code{print_undefined_parameter_types()}}{
+Print each undefined parameter type, with the last step definition that used it
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$print_undefined_parameter_types()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CucumberSummaryReporter-print_failures"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberSummaryReporter-print_failures}{}}}
 \subsection{Method \code{print_failures()}}{
-Print the scenarios that didn't pass
+Print the scenarios that didn't pass, numbered and with where they are:
+under Failures those that failed, are ambiguous or undefined, under
+Warnings those that are pending and the failed attempts that were retried
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$print_failures()}\if{html}{\out{</div>}}
 }
