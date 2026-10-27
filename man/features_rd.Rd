@@ -1358,27 +1358,53 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A selection without scenarios is an error
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A selection of scenarios that aren't tagged is an error
   <span class="fu">When</span> I run it and it fails
 <span class="st">    """</span>
 <span class="st">    cucumber::features_rd(features = "basket.feature:13")</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> it fails with
 <span class="st">    """</span>
-<span class="st">    Error in `cucumber::features_rd()`:</span>
+<span class="st">    Error:</span>
 <span class="st">    ! No scenarios to document.</span>
-<span class="st">    i Tag the scenarios with `@rd`, or select them with other arguments.</span>
+<span class="st">    i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.</span>
 <span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A selection without scenarios is an error
+\if{text,latex}{\preformatted{Scenario: A selection of scenarios that aren't tagged is an error
   When I run it and it fails
     """
     cucumber::features_rd(features = "basket.feature:13")
     """
   Then it fails with
     """
-    Error in `cucumber::features_rd()`:
+    Error:
     ! No scenarios to document.
-    i Tag the scenarios with `@rd`, or select them with other arguments.
+    i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A selection without scenarios is an error
+  <span class="fu">When</span> I run it and it fails
+<span class="st">    """</span>
+<span class="st">    cucumber::features_rd(features = "basket.feature:14", tags = NULL)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> it fails with
+<span class="st">    """</span>
+<span class="st">    Error:</span>
+<span class="st">    ! No scenarios to document.</span>
+<span class="st">    i Select scenarios with `features`, `filter` or `name`.</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A selection without scenarios is an error
+  When I run it and it fails
+    """
+    cucumber::features_rd(features = "basket.feature:14", tags = NULL)
+    """
+  Then it fails with
+    """
+    Error:
+    ! No scenarios to document.
+    i Select scenarios with `features`, `filter` or `name`.
     """
 %</pre>
 }}

@@ -629,14 +629,26 @@ Feature: Scenarios as documentation
       | "<card>"          | st    |
       | \|                | op    |
 
-  Scenario: A selection without scenarios is an error
+  Scenario: A selection of scenarios that aren't tagged is an error
     When I run it and it fails
       """
       cucumber::features_rd(features = "basket.feature:13")
       """
     Then it fails with
       """
-      Error in `cucumber::features_rd()`:
+      Error:
       ! No scenarios to document.
-      i Tag the scenarios with `@rd`, or select them with other arguments.
+      i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.
+      """
+
+  Scenario: A selection without scenarios is an error
+    When I run it and it fails
+      """
+      cucumber::features_rd(features = "basket.feature:14", tags = NULL)
+      """
+    Then it fails with
+      """
+      Error:
+      ! No scenarios to document.
+      i Select scenarios with `features`, `filter` or `name`.
       """

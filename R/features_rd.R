@@ -67,7 +67,12 @@ features_rd <- function(
   if (length(rd) == 0) {
     abort(
       "No scenarios to document.",
-      body = c(i = paste0("Tag the scenarios with `", tags %||% "@rd", "`, or select them with other arguments.")),
+      body = c(i = if (is.null(tags)) {
+        "Select scenarios with `features`, `filter` or `name`."
+      } else {
+        paste0("Tag the scenarios with `", tags, "`, or select them whatever their tags with `tags = NULL`.")
+      }),
+      call = NULL,
       trace = empty_trace()
     )
   }
