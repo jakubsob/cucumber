@@ -264,8 +264,14 @@ SNIPPET_BODY <- "  pending()\n})"
 #' @importFrom glue glue
 snippet_definitions <- function(keyword, description, parameters, argument_names = character()) {
   fn <- tolower(keyword)
+  generated <- generate_expressions(description, parameters)
+  # A Cucumber Expression that starts with `^` or ends with `$` is read as a
+  # regular expression, and can't escape them, so the step's text is one
+  if (is_regular_expression(generated[[1]]$expression)) {
+    generated <- list(list(expression = paste0("^", escape_regex(description), "$"), parameters = list()))
+  }
   vapply(
-    generate_expressions(description, parameters),
+    generated,
     \(generated) {
       types <- vapply(generated$parameters, \(p) p$name, character(1))
       args <- paste(c(snippet_argument_names(types), argument_names, "context"), collapse = ", ")

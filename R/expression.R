@@ -438,6 +438,14 @@ parse_expression <- function(expression) {
   parse_expression(1)$ast[[1]]
 }
 
+#' Escape text to match it literally in a regular expression
+#' @keywords internal
+#' @noRd
+#' @importFrom stringr str_replace_all
+escape_regex <- function(text) {
+  str_replace_all(text, "([\\\\^\\[({$.|?*+})\\]])", "\\\\\\1")
+}
+
 #' Rewrite a Cucumber Expression as a regular expression
 #'
 #' @return An anchored regular expression with the parameter type of each
@@ -458,7 +466,7 @@ cucumber_expression_to_regex <- function(expression, parameters) {
   rewrite <- function(node) {
     switch(
       node$type,
-      text = str_replace_all(node$text, "([\\\\^\\[({$.|?*+})\\]])", "\\\\\\1"),
+      text = escape_regex(node$text),
       optional = {
         types <- types_of(node)
         if (any(types == "parameter")) {

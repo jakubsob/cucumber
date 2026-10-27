@@ -271,6 +271,67 @@ Feature: Step definition snippets
         })
       """
 
+  Scenario: A step that starts with ^ or ends with $ gets a regular expression snippet of its text
+    A step description that starts with `^` or ends with `$` is a regular expression, and a Cucumber Expression can't escape them.
+
+    Given a package
+    And a file named "features/symbols.feature" with
+      """
+      Feature: Symbols
+        Scenario: Caret
+          Given ^ is a caret
+        Scenario: Price
+          When I pay 5$
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [failure] Scenario: Caret
+      No step found for: "^ is a caret"
+      i Add a step definition:
+        given("^\\^ is a caret$", function(context) {
+          pending()
+        })
+
+      [failure] Scenario: Price
+      No step found for: "I pay 5$"
+      i Add a step definition:
+        when("^I pay 5\\$$", function(context) {
+          pending()
+        })
+      """
+
+  Scenario: The regular expression snippet matches its step
+    Given a package
+    And a file named "features/symbols.feature" with
+      """
+      Feature: Symbols
+        Scenario: Caret
+          Given ^ is a caret
+        Scenario: Price
+          When I pay 5$
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("^\\^ is a caret$", function(context) {
+        pending()
+      })
+      when("^I pay 5\\$$", function(context) {
+        pending()
+      })
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step               | status  |
+      | Given ^ is a caret | pending |
+      | When I pay 5$      | pending |
+
   Scenario: A snippet uses custom parameter types, unless they aren't for snippets
     Given a package
     And a file named "features/balls.feature" with
