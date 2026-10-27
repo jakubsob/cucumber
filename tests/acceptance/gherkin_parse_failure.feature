@@ -102,7 +102,7 @@ Feature: Gherkin parse failure
       x Parse error in "tagged.feature" (2:0): unexpected end of file, expected: #TagLine, #FeatureLine, #Comment, #Empty
       """
 
-  Scenario: Parsing stops after 10 errors
+  Scenario: Parsing stops at the 11th error
     Given a file named "features/broken.feature" with
       """
       Feature: Broken

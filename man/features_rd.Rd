@@ -574,7 +574,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios selected by name, whatever their tags
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios selected by name, whatever their tags, with tags = NULL
   <span class="fu">Given</span> a file named <span class="st">"R/remove.R"</span> with
 <span class="st">    """</span>
 <span class="st">    #' Remove items from a basket</span>
@@ -593,7 +593,7 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 <span class="st">      Then the basket is empty</span>
 <span class="st">    """</span>
   <span class="fu">And</span> the help page <span class="st">"remove"</span> doesn't include <span class="st">"Scenario: Add an item"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios selected by name, whatever their tags
+\if{text,latex}{\preformatted{Scenario: Scenarios selected by name, whatever their tags, with tags = NULL
   Given a file named "R/remove.R" with
     """
     #' Remove items from a basket

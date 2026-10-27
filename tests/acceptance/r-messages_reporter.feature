@@ -64,7 +64,7 @@ Feature: Messages reporter
       {"testRunFinished":
       """
 
-  Scenario: Each step's result is written when it finishes
+  Scenario: Each step's result is written as a testStepFinished message
     Given a file named "features/setup-steps.R" with
       """
       given("an empty basket", function(context) {})
@@ -91,8 +91,7 @@ Feature: Messages reporter
         CucumberPrettyReporter$new(),
         CucumberMessagesReporter$new("messages.ndjson")
       )))
-      messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
-      cat(length(messages), "messages\n")
+      cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\n")
       """
     Then the output includes
       """
@@ -101,4 +100,4 @@ Feature: Messages reporter
       v When I add 2 apples
       v Then the basket has 2 items
       """
-    And the output includes "21 messages"
+    And the output includes "1 scenario written"

@@ -148,7 +148,7 @@ like the HTML, JUnit and JSON formatters.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step's result is written when it finishes
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step's result is written as a testStepFinished message
   <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
 <span class="st">    """</span>
 <span class="st">    given("an empty basket", function(context) \{\})</span>
@@ -167,7 +167,7 @@ like the HTML, JUnit and JSON formatters.
 <span class="st">    PENDING</span>
 <span class="st">    UNDEFINED</span>
 <span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each step's result is written when it finishes
+\if{text,latex}{\preformatted{Scenario: Each step's result is written as a testStepFinished message
   Given a file named "features/setup-steps.R" with
     """
     given("an empty basket", function(context) \{\})
@@ -197,8 +197,7 @@ like the HTML, JUnit and JSON formatters.
 <span class="st">      CucumberPrettyReporter$new(),</span>
 <span class="st">      CucumberMessagesReporter$new("messages.ndjson")</span>
 <span class="st">    )))</span>
-<span class="st">    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)</span>
-<span class="st">    cat(length(messages), "messages\\n")</span>
+<span class="st">    cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\\n")</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> the output includes
 <span class="st">    """</span>
@@ -207,7 +206,7 @@ like the HTML, JUnit and JSON formatters.
 <span class="st">    v When I add 2 apples</span>
 <span class="st">    v Then the basket has 2 items</span>
 <span class="st">    """</span>
-  <span class="fu">And</span> the output includes <span class="st">"21 messages"</span></code></pre >}}
+  <span class="fu">And</span> the output includes <span class="st">"1 scenario written"</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: The run is written as messages and its progress is printed
   When I run
     """
@@ -215,8 +214,7 @@ like the HTML, JUnit and JSON formatters.
       CucumberPrettyReporter$new(),
       CucumberMessagesReporter$new("messages.ndjson")
     )))
-    messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
-    cat(length(messages), "messages\\n")
+    cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\\n")
     """
   Then the output includes
     """
@@ -225,7 +223,7 @@ like the HTML, JUnit and JSON formatters.
     v When I add 2 apples
     v Then the basket has 2 items
     """
-  And the output includes "21 messages"
+  And the output includes "1 scenario written"
 %</pre>
 }}
 

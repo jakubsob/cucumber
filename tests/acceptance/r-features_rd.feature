@@ -249,7 +249,7 @@ Feature: Scenarios as documentation
       """
     And the help page "add" doesn't include "| 2 |"
 
-  Scenario: Scenarios selected by name, whatever their tags
+  Scenario: Scenarios selected by name, whatever their tags, with tags = NULL
     Given a file named "R/remove.R" with
       """
       #' Remove items from a basket
