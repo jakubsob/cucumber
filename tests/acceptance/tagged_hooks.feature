@@ -58,6 +58,41 @@ Feature: Tagged hooks
     Then the output includes "connect for Save the basket"
     And the output includes "connect for Add an item"
 
+  Scenario: A tagged hook runs for the scenarios of a Rule or of Examples with the tag
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        @db
+        Rule: Saved baskets
+          Scenario: Save the basket
+            Given an empty basket
+
+        Rule: Items
+          Scenario Outline: Add <item>
+            Given an empty basket
+
+            @db
+            Examples: Saved
+              | item  |
+              | apple |
+
+            Examples: Not saved
+              | item |
+              | pear |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) cat("connect for", scenario$name, "\n"), tags = "@db")
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes "connect for Save the basket"
+    And the output includes "connect for Add apple"
+    And the output doesn't include "connect for Add pear"
+
   Scenario Outline: A tagged <hook>() hook runs only for the steps of scenarios that match the tag expression
     Given a file named "features/basket.feature" with
       """
