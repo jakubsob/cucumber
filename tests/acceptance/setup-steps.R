@@ -166,6 +166,7 @@ then("no scenario ran", function(context) {
 
 then("it passes", function(context) {
   results <- as.data.frame(context$result)
+  expect_gt(nrow(results), 0)
   expect_equal(sum(results$error), 0)
   expect_equal(sum(results$failed), 0)
   expect_equal(sum(results$skipped), 0)
