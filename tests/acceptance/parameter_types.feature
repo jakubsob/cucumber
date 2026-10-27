@@ -106,6 +106,25 @@ Feature: Parameter types
         """
       Then it passes
 
+    Scenario: {float} matches only a dot as the decimal point
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Not a decimal point
+            Given the price is 3x99
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the price is {float}", function(price, context) {})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the steps have these results:
+        | step                    | status    |
+        | Given the price is 3x99 | undefined |
+
     Scenario: {float} captures a number with an exponent
       Given a file named "features/params.feature" with
         """

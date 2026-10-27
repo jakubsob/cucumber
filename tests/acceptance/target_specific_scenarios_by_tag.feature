@@ -293,6 +293,9 @@ Feature: Running scenarios by tag
         | missing operand  | @a and      | Expected operand.  |
         | unmatched (      | ( @a and @b | Unmatched (.       |
         | unmatched )      | @a )        | Unmatched ).       |
+        | AND in capitals  | @a AND @b   | Expected operator. |
+        | OR in capitals   | @a OR @b    | Expected operator. |
+        | NOT in capitals  | NOT @a      | Expected operator. |
 
     Scenario: A backslash before anything but a parenthesis, a backslash or whitespace is an error
       Given a file named "features/tagged.feature" with

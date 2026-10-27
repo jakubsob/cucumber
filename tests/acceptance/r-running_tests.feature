@@ -107,6 +107,41 @@ Feature: Running tests with test()
         | several filters                  | filter = c("a", "b") | `filter` must be one regular expression.                       |
         | an env that isn't an environment | env = "features"     | `env` must be an environment, or `NULL`.                       |
 
+    Scenario Outline: A mistake in an argument of <function>() is an error
+      When I run it and it fails
+        """
+        <function>("features", filter = c("a", "b"))
+        """
+      Then it fails with
+        """
+        Error:
+        ! `filter` must be one regular expression.
+        """
+
+      Examples:
+        | function    |
+        | test        |
+        | run         |
+        | features_rd |
+
+    Scenario Outline: A mistake in <argument> is an error even with stop_on_failure = FALSE
+      Nothing runs, so there are no results to report.
+
+      When I run it and it fails
+        """
+        test("features", <argument> = <value>, stop_on_failure = FALSE)
+        """
+      Then it fails with
+        """
+        Error:
+        ! <message>
+        """
+
+      Examples:
+        | argument | value       | message                                                                                    |
+        | dry_run  | "yes"       | `dry_run` must be `TRUE` or `FALSE`.                                                       |
+        | tags     | "@a AND @b" | Tag expression "@a AND @b" could not be parsed because of syntax error: Expected operator. |
+
     Scenario: An invalid regular expression in name is an error with the reason
       When I run it and it fails
         """

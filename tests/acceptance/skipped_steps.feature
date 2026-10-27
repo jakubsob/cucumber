@@ -106,6 +106,31 @@ Feature: Skipped steps
       | Then the basket is synced      | skipped |
       | And the basket is synced twice | skipped |
 
+  Scenario: Undefined and ambiguous steps after a before hook that skipped the scenario are skipped
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Then the basket is synced
+          And the basket is synced twice
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) skip_scenario("the API is down"))
+      then("the basket is synced {word}", function(word, context) {})
+      then("the basket is synced {}", function(x, context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    And the steps and hooks have these results:
+      | step                           | status  |
+      | Before                         | skipped |
+      | Then the basket is synced      | skipped |
+      | And the basket is synced twice | skipped |
+
   @rd
   Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
     Given a file named "features/basket.feature" with
