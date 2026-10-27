@@ -133,6 +133,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - 🐛 `test()`, `run()` and `features_rd()` check their arguments before anything runs, and a mistake is an error that names the argument, like ``` `dry_run` must be `TRUE` or `FALSE`. ```, ``` `name` must be valid regular expressions. ``` with the reason, or ``` `path` must be a directory. ``` for a directory that doesn't exist. It's an error even with `stop_on_failure = FALSE`. Previously it failed inside cucumber, like with `invalid argument type`, `cannot change working directory` or an error of `keep()`.
 - ⚠️ `filter` must be one regular expression. Several, like `filter = c("basket", "checkout")`, are an error, as only the first one was used. Combine them with `|`: `filter = "basket|checkout"`.
 - 🐛 A pending hook's message names the hook, like ``Hook `before()` is pending: <reason>``, or `Hook "<name>" is pending` for a named hook. `skip()` or `skip_scenario()` in a hook that can't skip, like `after_all()` or `before_step()`, is an error of the hook, like its other errors: ``Hook `after_all()` failed`` and where the hook is defined. Previously the messages didn't say which hook.
+- 🐛 A `test_that()` test after `run()` in a test file is reported in the test file's context. Previously testthat reported it in the context of the last feature `run()` ran, like `Feature: Basket`.
 
 # cucumber 2.2.0
 

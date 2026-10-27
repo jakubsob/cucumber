@@ -395,6 +395,60 @@ Its step definitions and hooks are cleared when it returns.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A test after run() in its test file isn't reported as a test of the last feature
+  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("I calculate", function(context) \{</span>
+<span class="st">      context$result &lt;- calculate(1)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
+<span class="st">      expect_equal(context$result, n)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
+<span class="st">    """</span>
+<span class="st">    run()</span>
+<span class="st">    test_that("calculate adds one", \{</span>
+<span class="st">      expect_equal(calculate(1), 2)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    testthat::test_local(reporter = "silent")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> testthat reports the tests in these contexts:
+    <span class="op">|</span> test                 <span class="op">|</span> context            <span class="op">|</span>
+    <span class="op">|</span> Scenario: Adding one <span class="op">|</span> Feature: Calculate <span class="op">|</span>
+    <span class="op">|</span> calculate adds one   <span class="op">|</span>                    <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A test after run() in its test file isn't reported as a test of the last feature
+  Given a file named "tests/testthat/setup-steps.R" with
+    """
+    given("I calculate", function(context) \{
+      context$result <- calculate(1)
+    \})
+    then("the result is \{int\}", function(n, context) \{
+      expect_equal(context$result, n)
+    \})
+    """
+  And a file named "tests/testthat/test-acceptance.R" with
+    """
+    run()
+    test_that("calculate adds one", \{
+      expect_equal(calculate(1), 2)
+    \})
+    """
+  When I run
+    """
+    testthat::test_local(reporter = "silent")
+    """
+  Then testthat reports the tests in these contexts:
+    | test                 | context            |
+    | Scenario: Adding one | Feature: Calculate |
+    | calculate adds one   |                    |
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows a step's warning at the line of the step
   <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
 <span class="st">    """</span>

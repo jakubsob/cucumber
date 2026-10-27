@@ -155,6 +155,32 @@ Feature: Running scenarios alongside testthat tests
       | scenario   | file              |
       | Adding one | test-acceptance.R |
 
+  Scenario: A test after run() in its test file isn't reported as a test of the last feature
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) {
+        context$result <- calculate(1)
+      })
+      then("the result is {int}", function(n, context) {
+        expect_equal(context$result, n)
+      })
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run()
+      test_that("calculate adds one", {
+        expect_equal(calculate(1), 2)
+      })
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "silent")
+      """
+    Then testthat reports the tests in these contexts:
+      | test                 | context            |
+      | Scenario: Adding one | Feature: Calculate |
+      | calculate adds one   |                    |
+
   Scenario: testthat's reporter shows a step's warning at the line of the step
     Given a file named "tests/testthat/setup-steps.R" with
       """

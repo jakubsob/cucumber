@@ -198,6 +198,15 @@ then("testthat counts these results of the scenarios:", function(expected, conte
   expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
 })
 
+# The testthat context of each test of the last run, empty for a test without one
+then("testthat reports the tests in these contexts:", function(expected, context) {
+  actual <- tibble::tibble(
+    test = vapply(context$result, \(test) test$test, character(1)),
+    context = vapply(context$result, \(test) test$context %||% "", character(1))
+  )
+  expect_equal(as.data.frame(actual), as.data.frame(expected))
+})
+
 # Where testthat's results of the last run say each scenario failed or skipped, as `file:line`
 expect_result_locations <- function(classes, expected, context) {
   results <- lapply(context$result, \(test) {

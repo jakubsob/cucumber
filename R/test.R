@@ -72,6 +72,14 @@ run <- function(
   # setup files that registered them run once for all test files
   cleanup_env <- tryCatch(testthat::teardown_env(), error = \(e) NULL) %||% environment()
   if (!is.null(testthat::get_reporter())) {
+    # Each feature's scenarios run in its context. The tests after run() in the
+    # test file are in the test file's context again.
+    tests_reporter <- testthat::get_reporter()
+    test_file_context <- tests_reporter$.context
+    on.exit({
+      tests_reporter$end_context_if_started()
+      if (!is.null(test_file_context)) tests_reporter$.start_context(test_file_context)
+    })
     return(run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env))
   }
   # Outside of a testthat run, like in the console, each scenario's test_that()
