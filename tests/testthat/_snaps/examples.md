@@ -19,6 +19,7 @@
       Summary
         2 scenarios (2 passed)
         5 steps (5 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run multiple features
@@ -60,6 +61,7 @@
       Summary
         7 scenarios (7 passed)
         15 steps (15 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run with box
@@ -88,6 +90,7 @@
       Summary
         4 scenarios (4 passed)
         8 steps (8 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run with shinytest2
@@ -112,6 +115,7 @@
       Summary
         2 scenarios (2 passed)
         6 steps (6 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run a Scenario with Given, When, Then, And, But keywords
@@ -157,6 +161,7 @@
       Summary
         3 scenarios (3 passed)
         26 steps (26 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run a Scenario with a Table
@@ -183,6 +188,7 @@
       Summary
         1 scenario (1 passed)
         3 steps (3 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run a Scenario with a docstring
@@ -216,6 +222,7 @@
       Summary
         1 scenario (1 passed)
         4 steps (4 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run a Scenario with comments
@@ -239,6 +246,7 @@
       Summary
         2 scenarios (2 passed)
         3 steps (3 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run before and after hooks
@@ -262,6 +270,7 @@
       Summary
         1 scenario (1 passed)
         2 steps (2 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run a Scenario with custom parameters
@@ -288,6 +297,7 @@
       Summary
         2 scenarios (2 passed)
         8 steps (8 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run a Scenario with snapshot test
@@ -310,6 +320,7 @@
       Summary
         1 scenario (1 passed)
         2 steps (2 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should work with an arbitrary test directory
@@ -333,6 +344,7 @@
       Summary
         2 scenarios (2 passed)
         5 steps (5 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should report success with `testthat::test_dir`
@@ -368,6 +380,7 @@
       Summary
         5 scenarios (5 passed)
         11 steps (11 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should work with loading steps from setup files
@@ -388,6 +401,7 @@
       Summary
         1 scenario (1 passed)
         3 steps (3 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should work with Scenario Outline
@@ -426,6 +440,7 @@
       Summary
         6 scenarios (6 passed)
         16 steps (16 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / shouldn't run testthat test files
@@ -449,6 +464,7 @@
       Summary
         2 scenarios (2 passed)
         5 steps (5 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should work with testthat filtering
@@ -472,6 +488,7 @@
       Summary
         2 scenarios (2 passed)
         5 steps (5 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 
 # test / should run tests with custom loading of steps and support code
@@ -494,5 +511,6 @@
       Summary
         2 scenarios (2 passed)
         5 steps (5 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
 

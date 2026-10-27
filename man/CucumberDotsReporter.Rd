@@ -13,6 +13,7 @@ Prints one character for each step and hook as it finishes, then the summary of
 Summary
   3 scenarios (1 failed, 2 passed)
   9 steps (1 failed, 2 skipped, 6 passed)
+  0m00.153s (executing steps: 0m00.121s)
 ────────────────────────────────────────────────────────────────────────
 }\if{html}{\out{</div>}}
 }

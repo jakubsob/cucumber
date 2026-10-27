@@ -13,6 +13,7 @@ the end of the run too:
 Summary
   2 scenarios (1 failed, 1 passed)
   6 steps (1 failed, 5 passed)
+  0m00.153s (executing steps: 0m00.121s)
 ────────────────────────────────────────────────────────────────────────
 
 Failures
@@ -28,7 +29,7 @@ Feature: Basket
 
 \subsection{Summary reporter}{
 
-\code{CucumberSummaryReporter} prints only the summary of the run: the scenarios and steps counted by status, and the scenarios that didn't pass.
+\code{CucumberSummaryReporter} prints only the summary of the run: the scenarios and steps counted by status, how long the run took, and the scenarios that didn't pass.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> Only the summary is printed
@@ -111,6 +112,52 @@ Feature: Basket
     """
   And the output doesn't include "Scenario: Add an item"
   And the output doesn't include "...."
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The summary ends with how long the run took, and how long its steps took
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Wait for the basket</span>
+<span class="st">        When I wait</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I wait", function(context) Sys.sleep(0.2))</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes lines matching these patterns in order:
+<span class="st">    """</span>
+<span class="st">    ^1 step \\(1 passed\\)$</span>
+<span class="st">    ^0m00\\.[2-9][0-9]\{2\}s \\(executing steps: 0m00\\.[2-9][0-9]\{2\}s\\)$</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: The summary ends with how long the run took, and how long its steps took
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Wait for the basket
+        When I wait
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I wait", function(context) Sys.sleep(0.2))
+    """
+  When I run
+    """
+    test("features", reporter = CucumberSummaryReporter$new())
+    """
+  Then the output includes lines matching these patterns in order:
+    """
+    ^1 step \\(1 passed\\)$
+    ^0m00\\.[2-9][0-9]\{2\}s \\(executing steps: 0m00\\.[2-9][0-9]\{2\}s\\)$
+    """
 %</pre>
 }}
 

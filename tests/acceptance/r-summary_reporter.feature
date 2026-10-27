@@ -1,6 +1,6 @@
 @rd
 Feature: Summary reporter
-  `CucumberSummaryReporter` prints only the summary of the run: the scenarios and steps counted by status, and the scenarios that didn't pass.
+  `CucumberSummaryReporter` prints only the summary of the run: the scenarios and steps counted by status, how long the run took, and the scenarios that didn't pass.
 
   Scenario: Only the summary is printed
     Given a package
@@ -42,6 +42,28 @@ Feature: Summary reporter
       """
     And the output doesn't include "Scenario: Add an item"
     And the output doesn't include "...."
+
+  Scenario: The summary ends with how long the run took, and how long its steps took
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Wait for the basket
+          When I wait
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I wait", function(context) Sys.sleep(0.2))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new())
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      ^1 step \(1 passed\)$
+      ^0m00\.[2-9][0-9]{2}s \(executing steps: 0m00\.[2-9][0-9]{2}s\)$
+      """
 
   Scenario: A run without scenarios counts no scenarios and no steps
     Given a package

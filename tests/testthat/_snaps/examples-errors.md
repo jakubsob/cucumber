@@ -20,6 +20,7 @@
       Summary
         1 scenario (1 undefined)
         1 step (1 undefined)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
       
       Failures
@@ -75,6 +76,7 @@
       Summary
         1 scenario (1 failed)
         3 steps (1 failed, 1 skipped, 1 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
       
       Failures
@@ -119,6 +121,7 @@
       Summary
         1 scenario (1 failed)
         1 step (1 failed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
       
       Failures
@@ -194,6 +197,7 @@
       Summary
         5 scenarios (3 failed, 2 passed)
         11 steps (3 failed, 8 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
       
       Failures
@@ -264,6 +268,7 @@
       Summary
         1 scenario (1 undefined)
         3 steps (1 undefined, 1 skipped, 1 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
       
       Failures
@@ -302,6 +307,7 @@
       Summary
         1 scenario (1 ambiguous)
         3 steps (1 ambiguous, 1 skipped, 1 passed)
+        <duration> (executing steps: <duration>)
       --------------------------------------------------------------------------------
       
       Failures

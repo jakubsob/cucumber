@@ -7,7 +7,9 @@
       # Remove test timing information
       stringr::str_remove_all("\\s\\[\\d+.\\d+s\\]") |>
       # Remove test run duration
-      stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss")
+      stringr::str_remove_all("Duration:\\s\\d+.\\d+\\ss") |>
+      # Mask the durations of the summary
+      stringr::str_replace_all("\\d+m\\d{2}\\.\\d{3}s", "<duration>")
   }
 )
 

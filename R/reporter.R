@@ -387,6 +387,15 @@ format_status_counts <- function(statuses, noun) {
   paste0(label, " (", paste(parts, collapse = ", "), ")")
 }
 
+#' A duration in milliseconds, like `0m01.234s`
+#'
+#' @keywords internal
+#' @noRd
+format_duration <- function(millis) {
+  millis <- floor(millis)
+  sprintf("%dm%02d.%03ds", millis %/% 60000, (millis %/% 1000) %% 60, millis %% 1000)
+}
+
 #' Print a step: its status symbol, keyword and text
 #'
 #' @keywords internal
@@ -499,6 +508,7 @@ reported_step <- function(q, pickle_step, result) {
 #' Summary
 #'   2 scenarios (1 failed, 1 passed)
 #'   6 steps (1 failed, 5 passed)
+#'   0m00.153s (executing steps: 0m00.121s)
 #' ────────────────────────────────────────────────────────────────────────
 #'
 #' Failures
@@ -783,6 +793,20 @@ CucumberSummaryReporter <- R6::R6Class(
         "\n",
         sep = ""
       )
+      q <- private$query
+      # A run stopped before it finished has no duration
+      if (!is.null(q$test_run_finished)) {
+        steps <- unlist(lapply(unlist(q$test_steps_finished, recursive = FALSE), \(finished) {
+          duration <- finished$testStepResult$duration
+          duration$seconds * 1000 + duration$nanos / 1e6
+        }))
+        cat(
+          "  ",
+          format_duration(millis_between(q$test_run_started$timestamp, q$test_run_finished$timestamp)),
+          " (executing steps: ", format_duration(sum(steps)), ")\n",
+          sep = ""
+        )
+      }
       cat(cli::rule(), "\n", sep = "")
       invisible(self)
     },
@@ -864,6 +888,7 @@ DOTS_CHARACTERS <- c(
 #' Summary
 #'   3 scenarios (1 failed, 2 passed)
 #'   9 steps (1 failed, 2 skipped, 6 passed)
+#'   0m00.153s (executing steps: 0m00.121s)
 #' ────────────────────────────────────────────────────────────────────────
 #' ```
 #'
