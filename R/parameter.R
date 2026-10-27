@@ -6,7 +6,7 @@
 .parameter <- function(
   name,
   regexp,
-  transformer,
+  transformer = \(x, ...) x,
   use_for_snippets = TRUE,
   prefer_for_regexp_match = FALSE
 ) {
@@ -47,6 +47,7 @@ ANONYMOUS <- .parameter(
 #'  A function that will transform the parameter from a string to the desired type.
 #'  If `regexp` has capture groups, the transformer gets the text of each of them as a separate argument
 #'  instead of the whole match. Use non-capturing groups, `(?:...)`, to pass the whole match.
+#'  Defaults to passing the text as it is, the text of the first capture group if `regexp` has any.
 #' @param use_for_snippets
 #'  Whether to use this parameter type in snippets suggested for undefined steps.
 #' @param prefer_for_regexp_match
@@ -76,7 +77,7 @@ ANONYMOUS <- .parameter(
 define_parameter_type <- function(
   name,
   regexp,
-  transformer,
+  transformer = \(x, ...) x,
   use_for_snippets = TRUE,
   prefer_for_regexp_match = FALSE
 ) {

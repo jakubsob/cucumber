@@ -7,7 +7,7 @@
 define_parameter_type(
   name,
   regexp,
-  transformer,
+  transformer = function(x, ...) x,
   use_for_snippets = TRUE,
   prefer_for_regexp_match = FALSE
 )
@@ -19,7 +19,8 @@ define_parameter_type(
 
 \item{transformer}{A function that will transform the parameter from a string to the desired type.
 If \code{regexp} has capture groups, the transformer gets the text of each of them as a separate argument
-instead of the whole match. Use non-capturing groups, \verb{(?:...)}, to pass the whole match.}
+instead of the whole match. Use non-capturing groups, \verb{(?:...)}, to pass the whole match.
+Defaults to passing the text as it is, the text of the first capture group if \code{regexp} has any.}
 
 \item{use_for_snippets}{Whether to use this parameter type in snippets suggested for undefined steps.}
 

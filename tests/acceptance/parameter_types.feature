@@ -362,6 +362,26 @@ Feature: Parameter types
         """
       Then it passes
 
+    Scenario: A custom parameter type without a transformer passes the text as it is
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Custom parameter
+            Given the direction is north
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        define_parameter_type(name = "direction", regexp = "north|south|east|west")
+        given("the direction is {direction}", function(dir, context) {
+          expect_identical(dir, "north")
+        })
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
     Scenario: A parameter type can be defined in a file loaded after the steps that use it
       Setup files are loaded in alphabetical order, so `setup-steps.R` is loaded before `setup-types.R`.
 
