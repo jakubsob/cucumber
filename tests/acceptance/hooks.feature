@@ -387,11 +387,11 @@ Feature: Hooks
       | Given an empty basket | <status> |
 
     Examples:
-      | hook        | argument | status  | kind    | headline                           |
-      | before      | scenario | skipped | error   | Error: Hook `before()` failed      |
-      | after       | scenario | passed  | error   | Error: Hook `after()` failed       |
-      | before_step | step     | failed  | error   | Error: Hook `before_step()` failed |
-      | after_step  | step     | failed  | error   | Error: Hook `after_step()` failed  |
+      | hook        | argument | status  | kind  | headline                           |
+      | before      | scenario | skipped | error | Error: Hook `before()` failed      |
+      | after       | scenario | passed  | error | Error: Hook `after()` failed       |
+      | before_step | step     | failed  | error | Error: Hook `before_step()` failed |
+      | after_step  | step     | failed  | error | Error: Hook `after_step()` failed  |
 
   Scenario Outline: <hook>() with the wrong number of arguments is an error
     Given a file named "features/basket.feature" with

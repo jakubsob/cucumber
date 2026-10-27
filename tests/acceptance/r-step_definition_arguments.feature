@@ -37,10 +37,10 @@ Feature: Step definition arguments
       """
 
     Examples:
-      | case                 | definition                               | message                                                    |
-      | missing parameter    | function(context) {}                    | The step definition has 1 argument, but the step passes 3.  |
-      | missing Data Table   | function(n, context) {}                 | The step definition has 2 arguments, but the step passes 3. |
-      | extra argument       | function(n, table, extra, context) {}   | The step definition has 4 arguments, but the step passes 3. |
+      | case               | definition                            | message                                                     |
+      | missing parameter  | function(context) {}                  | The step definition has 1 argument, but the step passes 3.  |
+      | missing Data Table | function(n, context) {}               | The step definition has 2 arguments, but the step passes 3. |
+      | extra argument     | function(n, table, extra, context) {} | The step definition has 4 arguments, but the step passes 3. |
 
   @rd
   Scenario Outline: A step definition without `context` as its last argument is an error, <case>

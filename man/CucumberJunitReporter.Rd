@@ -210,7 +210,7 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
 <span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> name           <span class="op">|</span> result  <span class="op">|</span> message                                 <span class="op">|</span>
+    <span class="op">|</span> name           <span class="op">|</span> result  <span class="op">|</span> message                               <span class="op">|</span>
     <span class="op">|</span> Remove an item <span class="op">|</span> failure <span class="op">|</span> The basket is &amp;#27;[31mempty&amp;#27;[39m <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An error with characters XML doesn't allow is written as the message of the failure
   An error can have characters XML doesn't allow, like the escape character of the colors of
@@ -232,7 +232,7 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
     test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
     """
   Then the JUnit report "report.xml" has these test cases:
-    | name           | result  | message                                 |
+    | name           | result  | message                               |
     | Remove an item | failure | The basket is &#27;[31mempty&#27;[39m |
 %</pre>
 }}

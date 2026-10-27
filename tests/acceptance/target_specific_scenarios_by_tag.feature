@@ -288,11 +288,11 @@ Feature: Running scenarios by tag
         """
 
       Examples:
-        | case               | expression     | message              |
-        | missing operator   | @a @b          | Expected operator.   |
-        | missing operand    | @a and         | Expected operand.    |
-        | unmatched (        | ( @a and @b    | Unmatched (.         |
-        | unmatched )        | @a )           | Unmatched ).         |
+        | case             | expression  | message            |
+        | missing operator | @a @b       | Expected operator. |
+        | missing operand  | @a and      | Expected operand.  |
+        | unmatched (      | ( @a and @b | Unmatched (.       |
+        | unmatched )      | @a )        | Unmatched ).       |
 
     Scenario: A backslash before anything but a parenthesis, a backslash or whitespace is an error
       Given a file named "features/tagged.feature" with

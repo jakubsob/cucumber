@@ -167,5 +167,5 @@ Feature: Sharing state with context
       | Add an item          | passed |
       | Look into the basket | passed |
     And the scenarios have these warnings:
-      | scenario    | warning                                             |
+      | scenario    | warning                                            |
       | Add an item | Cleanup of the scenario failed: The basket is gone |

@@ -906,7 +906,7 @@ scenario, as its steps already have their results.
     <span class="op">|</span> Add an item          <span class="op">|</span> passed <span class="op">|</span>
     <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span>
   <span class="fu">And</span> the scenarios have these warnings:
-    <span class="op">|</span> scenario    <span class="op">|</span> warning                                             <span class="op">|</span>
+    <span class="op">|</span> scenario    <span class="op">|</span> warning                                            <span class="op">|</span>
     <span class="op">|</span> Add an item <span class="op">|</span> Cleanup of the scenario failed: The basket is gone <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An error of what a step deferred in context is a warning of its scenario
   Given a file named "features/setup-steps.R" with
@@ -927,7 +927,7 @@ scenario, as its steps already have their results.
     | Add an item          | passed |
     | Look into the basket | passed |
   And the scenarios have these warnings:
-    | scenario    | warning                                             |
+    | scenario    | warning                                            |
     | Add an item | Cleanup of the scenario failed: The basket is gone |
 %</pre>
 }}

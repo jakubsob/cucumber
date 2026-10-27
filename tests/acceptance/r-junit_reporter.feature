@@ -108,7 +108,7 @@ Feature: JUnit reporter
       test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
       """
     Then the JUnit report "report.xml" has these test cases:
-      | name           | result  | message                                 |
+      | name           | result  | message                               |
       | Remove an item | failure | The basket is &#27;[31mempty&#27;[39m |
 
   Scenario: The report is written to cucumber-junit.xml by default

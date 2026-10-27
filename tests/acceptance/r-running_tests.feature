@@ -102,11 +102,11 @@ Feature: Running tests with test()
         """
 
       Examples:
-        | case                             | argument             | message                                                         |
-        | a flag that isn't TRUE or FALSE  | dry_run = "yes"      | `dry_run` must be `TRUE` or `FALSE`.                            |
+        | case                             | argument             | message                                                        |
+        | a flag that isn't TRUE or FALSE  | dry_run = "yes"      | `dry_run` must be `TRUE` or `FALSE`.                           |
         | a negative number of retries     | retry = -1           | `retry` must be a whole number of 0 or more, like `retry = 2`. |
-        | several filters                  | filter = c("a", "b") | `filter` must be one regular expression.                        |
-        | an env that isn't an environment | env = "features"     | `env` must be an environment, or `NULL`.                        |
+        | several filters                  | filter = c("a", "b") | `filter` must be one regular expression.                       |
+        | an env that isn't an environment | env = "features"     | `env` must be an environment, or `NULL`.                       |
 
     Scenario: An invalid regular expression in name is an error with the reason
       When I run it and it fails

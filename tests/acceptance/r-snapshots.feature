@@ -84,7 +84,7 @@ Feature: Snapshots
       And there is no snapshot file "<snapshot file>.new.md"
 
       Examples:
-        | feature                 | accepted                | snapshot file                   | runner |
+        | feature                 | accepted                | snapshot file                  | runner |
         | basket.feature          | basket.feature          | _snaps/basket.feature          | test() |
         | basket.feature          | basket.feature          | _snaps/basket.feature          | run()  |
         | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | test() |
@@ -225,15 +225,15 @@ Feature: Snapshots
       Then the snapshot file "<snapshot file>" has "1 apple" for "Showing the basket"
 
       Examples:
-        | feature                  | snapshot file                      | runner |
-        | basket.feature           | _snaps/basket.feature.md          | test() |
-        | basket.feature           | _snaps/basket.feature.md          | run()  |
-        | checkout/basket.feature  | _snaps/checkout-basket.feature.md | test() |
-        | checkout/basket.feature  | _snaps/checkout-basket.feature.md | run()  |
+        | feature                    | snapshot file                        | runner |
+        | basket.feature             | _snaps/basket.feature.md             | test() |
+        | basket.feature             | _snaps/basket.feature.md             | run()  |
+        | checkout/basket.feature    | _snaps/checkout-basket.feature.md    | test() |
+        | checkout/basket.feature    | _snaps/checkout-basket.feature.md    | run()  |
         | shop/checkout/cart.feature | _snaps/shop-checkout-cart.feature.md | test() |
         | shop/checkout/cart.feature | _snaps/shop-checkout-cart.feature.md | run()  |
-        | basket.feature.md        | _snaps/basket.feature.md          | test() |
-        | basket.feature.md        | _snaps/basket.feature.md          | run()  |
+        | basket.feature.md          | _snaps/basket.feature.md             | test() |
+        | basket.feature.md          | _snaps/basket.feature.md             | run()  |
 
     Scenario Outline: Feature files of the same name in different directories don't share snapshots, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
@@ -435,7 +435,7 @@ Feature: Snapshots
       And the snapshot file "_snaps/basket.feature.new.md" has "2 apples" for "Showing the basket"
 
       Examples:
-        | first   | second |
+        | first  | second |
         | test() | test() |
         | run()  | run()  |
         | test() | run()  |
@@ -934,15 +934,15 @@ Feature: Snapshots
         """
 
       Examples:
-        | selection                       | runner |
-        | the filter "basket"             | test() |
-        | the filter "basket"             | run()  |
-        | the name "Showing"              | test() |
-        | the name "Showing"              | run()  |
-        | the features "basket.feature"   | test() |
-        | the features "basket.feature"   | run()  |
-        | dry_run = TRUE                  | test() |
-        | dry_run = TRUE                  | run()  |
+        | selection                     | runner |
+        | the filter "basket"           | test() |
+        | the filter "basket"           | run()  |
+        | the name "Showing"            | test() |
+        | the name "Showing"            | run()  |
+        | the features "basket.feature" | test() |
+        | the features "basket.feature" | run()  |
+        | dry_run = TRUE                | test() |
+        | dry_run = TRUE                | run()  |
 
     Scenario Outline: Snapshot files are kept by a run() that stops before it starts, with <selection>, with <runner>
       Given I run the feature files with "<runner>"
@@ -957,11 +957,11 @@ Feature: Snapshots
         """
 
       Examples:
-        | selection                        | runner |
-        | the features "missing.feature"   | test() |
-        | the features "missing.feature"   | run()  |
-        | the filter "nothing matches"     | test() |
-        | the filter "nothing matches"     | run()  |
+        | selection                      | runner |
+        | the features "missing.feature" | test() |
+        | the features "missing.feature" | run()  |
+        | the filter "nothing matches"   | test() |
+        | the filter "nothing matches"   | run()  |
 
     Scenario Outline: Snapshot files of the scenarios skipped by `fail_fast` are kept, with <runner>
       Given I run the feature files with "<runner>"

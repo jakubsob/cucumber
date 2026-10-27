@@ -56,11 +56,11 @@ show them, like the HTML report. The pretty reporter prints them under their ste
 <span class="st">    test("features")</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> the attachments are:
-    <span class="op">|</span> step                <span class="op">|</span> media_type                <span class="op">|</span> body                       <span class="op">|</span> encoding <span class="op">|</span> file_name   <span class="op">|</span>
-    <span class="op">|</span> When I add an item  <span class="op">|</span> application/json          <span class="op">|</span> \{<span class="st">"items"</span>: 1\}               <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span>
-    <span class="op">|</span> When I add an item  <span class="op">|</span> application/octet-stream  <span class="op">|</span> AQID                       <span class="op">|</span> BASE64   <span class="op">|</span> basket.bin <span class="op">|</span>
-    <span class="op">|</span> When I add an item  <span class="op">|</span> text/x.cucumber.log+plain <span class="op">|</span> Added an item              <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span>
-    <span class="op">|</span> When I add an item  <span class="op">|</span> text/uri-list             <span class="op">|</span> https://example.com/basket <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span></code></pre >}}
+    <span class="op">|</span> step               <span class="op">|</span> media_type                <span class="op">|</span> body                       <span class="op">|</span> encoding <span class="op">|</span> file_name  <span class="op">|</span>
+    <span class="op">|</span> When I add an item <span class="op">|</span> application/json          <span class="op">|</span> \{<span class="st">"items"</span>: 1\}               <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span>
+    <span class="op">|</span> When I add an item <span class="op">|</span> application/octet-stream  <span class="op">|</span> AQID                       <span class="op">|</span> BASE64   <span class="op">|</span> basket.bin <span class="op">|</span>
+    <span class="op">|</span> When I add an item <span class="op">|</span> text/x.cucumber.log+plain <span class="op">|</span> Added an item              <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span>
+    <span class="op">|</span> When I add an item <span class="op">|</span> text/uri-list             <span class="op">|</span> https://example.com/basket <span class="op">|</span> IDENTITY <span class="op">|</span>            <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A step attaches data, a log and a link
   Given a file named "features/basket.feature" with
     """
@@ -82,11 +82,11 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     test("features")
     """
   Then the attachments are:
-    | step                | media_type                | body                       | encoding | file_name   |
-    | When I add an item  | application/json          | \{"items": 1\}               | IDENTITY |            |
-    | When I add an item  | application/octet-stream  | AQID                       | BASE64   | basket.bin |
-    | When I add an item  | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
-    | When I add an item  | text/uri-list             | https://example.com/basket | IDENTITY |            |
+    | step               | media_type                | body                       | encoding | file_name  |
+    | When I add an item | application/json          | \{"items": 1\}               | IDENTITY |            |
+    | When I add an item | application/octet-stream  | AQID                       | BASE64   | basket.bin |
+    | When I add an item | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
+    | When I add an item | text/uri-list             | https://example.com/basket | IDENTITY |            |
 %</pre>
 }}
 

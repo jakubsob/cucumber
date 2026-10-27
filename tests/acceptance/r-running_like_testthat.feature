@@ -380,8 +380,8 @@ Feature: Running feature files like testthat runs test files
       test("features")
       """
     Then the scenarios have these results:
-      | scenario              | status |
-      | Checking the package  | passed |
+      | scenario             | status |
+      | Checking the package | passed |
 
   Scenario: Helper files aren't run with `load_helpers = FALSE`
     Given a file named "features/helper-basket.R" with

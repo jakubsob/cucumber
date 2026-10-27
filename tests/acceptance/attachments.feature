@@ -29,11 +29,11 @@ Feature: Attachments
       test("features")
       """
     Then the attachments are:
-      | step                | media_type                | body                       | encoding | file_name   |
-      | When I add an item  | application/json          | {"items": 1}               | IDENTITY |            |
-      | When I add an item  | application/octet-stream  | AQID                       | BASE64   | basket.bin |
-      | When I add an item  | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
-      | When I add an item  | text/uri-list             | https://example.com/basket | IDENTITY |            |
+      | step               | media_type                | body                       | encoding | file_name  |
+      | When I add an item | application/json          | {"items": 1}               | IDENTITY |            |
+      | When I add an item | application/octet-stream  | AQID                       | BASE64   | basket.bin |
+      | When I add an item | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
+      | When I add an item | text/uri-list             | https://example.com/basket | IDENTITY |            |
 
   @rd
   Scenario: A step attaches images
