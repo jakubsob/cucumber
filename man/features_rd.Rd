@@ -990,12 +990,14 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 }}    
 
 \if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Names of features and Rules are shown as written
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Names and descriptions of features and Rules are shown as written
   <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/discounts.feature"</span> with
 <span class="st">    """</span>
 <span class="st">    Feature: Discounts of \{percent\}\%</span>
+<span class="st">      A discount is \{percent\}\% of the total, a `\{float\}`.</span>
 <span class="st"></span>
 <span class="st">      Rule: \{int\} items get 10\% off</span>
+<span class="st">        Each \{item\} counts, a `\{word\}`.</span>
 <span class="st"></span>
 <span class="st">        @rd</span>
 <span class="st">        Scenario: Order 3 items</span>
@@ -1017,14 +1019,20 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 <span class="st">    """</span>
 <span class="st">    Discounts of \{percent\}\%:</span>
 <span class="st"></span>
+<span class="st">    A discount is \{percent\}\% of the total, a '\{float\}'.</span>
+<span class="st"></span>
 <span class="st">    *Rule: \{int\} items get 10\% off*</span>
+<span class="st"></span>
+<span class="st">    Each \{item\} counts, a '\{word\}'.</span>
 <span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Names of features and Rules are shown as written
+\if{text,latex}{\preformatted{Scenario: Names and descriptions of features and Rules are shown as written
   Given a file named "tests/acceptance/discounts.feature" with
     """
     Feature: Discounts of \{percent\}\%
+      A discount is \{percent\}\% of the total, a `\{float\}`.
 
       Rule: \{int\} items get 10\% off
+        Each \{item\} counts, a `\{word\}`.
 
         @rd
         Scenario: Order 3 items
@@ -1046,7 +1054,11 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
     """
     Discounts of \{percent\}\%:
 
+    A discount is \{percent\}\% of the total, a '\{float\}'.
+
     *Rule: \{int\} items get 10\% off*
+
+    Each \{item\} counts, a '\{word\}'.
     """
 %</pre>
 }}

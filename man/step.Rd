@@ -34,7 +34,7 @@ Provide a description that matches steps in feature files and the implementation
 
 Step descriptions are Cucumber Expressions:
 text in parentheses is optional, words separated by "/" are alternatives,
-"{}" matches anything, and all other text is matched literally.
+"\{\}" matches anything, and all other text is matched literally.
 An invalid expression is an error pointing at the problem.
 
 \if{html}{\out{

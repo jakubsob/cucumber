@@ -185,18 +185,18 @@ unselected_rows <- function(examples, selected) {
 }
 
 #' Escape the braces of markdown text, which Rd would read as a group. roxygen
-#' escapes the rest.
+#' escapes the rest, and the braces of code spans.
 #' @keywords internal
 #' @noRd
 escape_braces <- function(x) {
-  gsub("([{}])", "\\\\\\1", x)
+  gsub("`[^`]*`(*SKIP)(*FAIL)|([{}])", "\\\\\\1", x, perl = TRUE)
 }
 
 description_rd <- function(description) {
   if (!nzchar(description)) {
     return(NULL)
   }
-  c(trimws(strsplit(description, "\n")[[1]]), "")
+  c(escape_braces(trimws(strsplit(description, "\n")[[1]])), "")
 }
 
 #' The lines of a document's tokens that pandoc's highlighting classes are for

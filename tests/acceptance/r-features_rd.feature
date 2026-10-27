@@ -450,12 +450,14 @@ Feature: Scenarios as documentation
         Then the price is £430
       """
 
-  Scenario: Names of features and Rules are shown as written
+  Scenario: Names and descriptions of features and Rules are shown as written
     Given a file named "tests/acceptance/discounts.feature" with
       """
       Feature: Discounts of {percent}%
+        A discount is {percent}% of the total, a `{float}`.
 
         Rule: {int} items get 10% off
+          Each {item} counts, a `{word}`.
 
           @rd
           Scenario: Order 3 items
@@ -477,7 +479,11 @@ Feature: Scenarios as documentation
       """
       Discounts of {percent}%:
 
+      A discount is {percent}% of the total, a '{float}'.
+
       *Rule: {int} items get 10% off*
+
+      Each {item} counts, a '{word}'.
       """
 
   Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written
