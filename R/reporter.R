@@ -430,12 +430,17 @@ print_step_error <- function(step) {
 print_failure <- function(failure) {
   cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
   cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
-  for (step in failure$steps) {
-    print_step(step)
-    print_step_error(step)
+  # Each hook is printed where it ran, after the steps before it
+  print_hooks <- function(steps) {
+    for (hook in Filter(\(hook) hook$after_steps == steps, failure$hooks)) {
+      print_error(hook$error, hook$status)
+    }
   }
-  for (hook in failure$hooks) {
-    print_error(hook$error, hook$status)
+  print_hooks(0)
+  for (i in seq_along(failure$steps)) {
+    print_step(failure$steps[[i]])
+    print_step_error(failure$steps[[i]])
+    print_hooks(i)
   }
 }
 
@@ -696,7 +701,8 @@ CucumberSummaryReporter <- R6::R6Class(
           } else if (!is.null(result$message)) {
             hook <- list(
               status = tolower(result$status),
-              error = result$message
+              error = result$message,
+              after_steps = length(self$current_steps)
             )
             self$current_hooks <- c(self$current_hooks, list(hook))
             private$on_hook_end(hook)

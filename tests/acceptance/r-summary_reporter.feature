@@ -42,3 +42,32 @@ Feature: Summary reporter
       """
     And the output doesn't include "Scenario: Add an item"
     And the output doesn't include "...."
+
+  Scenario: A hook's error is printed in the summary where the hook ran
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) stop("The shop is closed"))
+      after(function(context, scenario) stop("The till is broken"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      Failures
+      Scenario: Add an item
+      Hook `before()` failed
+      ! The shop is closed
+      - Given an empty basket
+      Hook `after()` failed
+      ! The till is broken
+      """
