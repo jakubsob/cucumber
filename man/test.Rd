@@ -51,6 +51,7 @@ warnings.}
 \item{name}{If not NULL, run only the scenarios whose name matches any of these regular expressions.}
 
 \item{features}{If not NULL, run only these feature files, relative to \code{path}.
+A directory runs the feature files in it and its subdirectories.
 Add \verb{:line} to run only the scenario at that line, e.g. \code{"addition.feature:12"}.
 An empty vector runs no scenario. Empty strings, like the empty lines of a rerun file, are ignored.}
 

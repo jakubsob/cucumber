@@ -30,7 +30,7 @@ Defaults to the \code{cucumber.rd_tags} option, or \code{"@rd"} if it's not set.
 are documented.}
 
 \item{features}{If not NULL, only these feature files are documented. Relative paths are
-relative to \code{path}. Add \verb{:line} to select only the scenario at that line, e.g.
+relative to \code{path}. A directory selects the feature files in it and its subdirectories. Add \verb{:line} to select only the scenario at that line, e.g.
 \code{"addition.feature:12"}. The line of an example row selects only that example.}
 
 \item{section}{Name of the section. Defaults to the \code{cucumber.rd_section} option, or

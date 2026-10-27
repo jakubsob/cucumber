@@ -80,6 +80,16 @@ Feature: Choosing feature files
         | Adding      |
         | Subtracting |
 
+    Scenario: A listed directory runs the feature files in it and its subdirectories
+      When I run
+        """
+        test("features", features = "math")
+        """
+      Then only these scenarios ran:
+        | scenario    |
+        | Subtracting |
+        | Dividing    |
+
     Scenario: The listed feature files run in the order they are listed
       When I run
         """

@@ -403,6 +403,10 @@ feature_lines <- function(features, path) {
   lines <- regmatches(features, regexpr("(:[0-9]+)*$", features)) |>
     strsplit(":") |>
     lapply(\(x) as.integer(x[x != ""]))
+  # A directory runs all the feature files in it, whatever its lines
+  expanded <- lapply(files, \(file) if (fs::is_dir(file)) find_features(file) else file)
+  lines <- rep(ifelse(fs::is_dir(files), list(integer()), lines), lengths(expanded))
+  files <- unlist(expanded, use.names = FALSE)
   # A factor keeps the files in the order they're given
   lapply(split(lines, factor(files, unique(files))), \(x) unique(unlist(x, use.names = FALSE)))
 }
@@ -617,6 +621,7 @@ local_registry <- function(frame = parent.frame()) {
 #' @param tags If not NULL, run only the scenarios that match this tag expression, e.g. `"@smoke and not @slow"`.
 #' @param name If not NULL, run only the scenarios whose name matches any of these regular expressions.
 #' @param features If not NULL, run only these feature files, relative to `path`.
+#'   A directory runs the feature files in it and its subdirectories.
 #'   Add `:line` to run only the scenario at that line, e.g. `"addition.feature:12"`.
 #'   An empty vector runs no scenario. Empty strings, like the empty lines of a rerun file, are ignored.
 #' @param strict If `FALSE`, pending and undefined steps don't fail the run.
