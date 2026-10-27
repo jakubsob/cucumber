@@ -150,3 +150,67 @@ Feature: Markdown with Gherkin
       | scenario       | status |
       | Add an item    | passed |
       | Remove an item | passed |
+
+  Scenario: A Rule and a Background are headers too
+    Given a file named "features/basket.feature.md" with
+      """
+      # Feature: Basket
+
+      ## Background:
+
+      * Given an empty basket
+
+      ## Rule: Items are counted
+
+      ### Background:
+
+      * When I add 1 apples
+
+      ### Scenario: Add an apple
+
+      * Then the basket has 1 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {
+        context$items <- 0
+      })
+      when("I add {int} apples", function(n, context) {
+        context$items <- context$items + n
+      })
+      then("the basket has {int} items", function(n, context) {
+        expect_equal(context$items, n)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the steps have these results:
+      | scenario     | step                        | status |
+      | Add an apple | Given an empty basket       | passed |
+      | Add an apple | When I add 1 apples         | passed |
+      | Add an apple | Then the basket has 1 items | passed |
+
+  Scenario: The cucumber.language option sets the language of Markdown documents
+    A Markdown document has no `# language:` line, as it would be a header.
+
+    Given a file named "features/panier.feature.md" with
+      """
+      # Fonctionnalité: Panier
+
+      ## Scénario: Ajouter une pomme
+
+      * Soit un panier vide
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("un panier vide", function(context) {})
+      """
+    When I run
+      """
+      withr::with_options(list(cucumber.language = "fr"), test("features"))
+      """
+    Then the steps have these results:
+      | scenario          | step                | status |
+      | Ajouter une pomme | Soit un panier vide | passed |
