@@ -29,6 +29,33 @@ Feature: Pretty reporter
       the basket is dusty
       """
 
+  Scenario: A step's error is printed under it, after its warnings
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {
+        warning("the basket is dusty")
+        stop("the basket is broken")
+      })
+      """
+    When I run it and it fails
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      x Given an empty basket
+      Warning:
+      the basket is dusty
+      Error:
+      Step "an empty basket" failed
+      """
+
   Scenario: A hook's error is printed where the hook runs
     Given a file named "features/basket.feature" with
       """

@@ -402,6 +402,10 @@ print_step_error <- function(step) {
     return(invisible())
   }
   color <- status_color(step$status %||% "passed")
+  # Messages of pending, undefined and skipped steps say what they are
+  if (step$status %in% c("failed", "ambiguous")) {
+    cat("    ", color(cli::style_bold("Error: ")), "\n", sep = "")
+  }
   for (line in strsplit(step$error, "\n")[[1]]) {
     cat("      ", color(line), "\n", sep = "")
   }

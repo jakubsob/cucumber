@@ -26,6 +26,7 @@
           v Given I have a value
           v When I make it wrong
           x Then it should fail
+          Error: 
             Step "it should fail" failed
             i Scenario: This will fail
             i Step defined at: test-reporter.R:55

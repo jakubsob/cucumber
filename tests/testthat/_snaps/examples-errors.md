@@ -61,6 +61,7 @@
         Scenario: Adding two numbers
           v Given I have 1 and 2
           x When I add them
+          Error: 
             Step "I add them" failed
             i Feature: addition.feature
             i Scenario: Adding two numbers
@@ -82,6 +83,7 @@
         Scenario: Adding two numbers
           v Given I have 1 and 2
           x When I add them
+          Error: 
             Step "I add them" failed
             i Feature: addition.feature
             i Scenario: Adding two numbers
@@ -102,6 +104,7 @@
           Warning: 
             Warning in before hook.
           x When I start the scenario with error
+          Error: 
             Step "I start the scenario with error" failed
             i Feature: hooks.feature
             i Scenario: After hook is executed even when a step throws an error
@@ -123,6 +126,7 @@
       Feature: Hooks
         Scenario: After hook is executed even when a step throws an error
           x When I start the scenario with error
+          Error: 
             Step "I start the scenario with error" failed
             i Feature: hooks.feature
             i Scenario: After hook is executed even when a step throws an error
@@ -144,6 +148,7 @@
         Scenario: Adding integer and float
           v When I add 1 and 1.1
           x Then the result is 5
+          Error: 
             Step "the result is 5" failed
             i Feature: addition.feature
             i Scenario: Adding integer and float
@@ -155,6 +160,7 @@
         Scenario: Adding float and float
           v When I add 1.1 and 1.1
           x Then the result is 5
+          Error: 
             Step "the result is 5" failed
             i Feature: addition.feature
             i Scenario: Adding float and float
@@ -173,6 +179,7 @@
           v Given the Maker has started a game with the word 'silky'
           v When the Breaker joins the Maker's game
           x Then the Breaker must guess a word with 6 characters
+          Error: 
             Step "the Breaker must guess a word with 6 characters" failed
             i Feature: guess_the_word.feature
             i Scenario: Breaker joins a game
@@ -195,6 +202,7 @@
         Scenario: Adding integer and float
           v When I add 1 and 1.1
           x Then the result is 5
+          Error: 
             Step "the result is 5" failed
             i Feature: addition.feature
             i Scenario: Adding integer and float
@@ -208,6 +216,7 @@
         Scenario: Adding float and float
           v When I add 1.1 and 1.1
           x Then the result is 5
+          Error: 
             Step "the result is 5" failed
             i Feature: addition.feature
             i Scenario: Adding float and float
@@ -222,6 +231,7 @@
           v Given the Maker has started a game with the word 'silky'
           v When the Breaker joins the Maker's game
           x Then the Breaker must guess a word with 6 characters
+          Error: 
             Step "the Breaker must guess a word with 6 characters" failed
             i Feature: guess_the_word.feature
             i Scenario: Breaker joins a game
@@ -280,6 +290,7 @@
         Scenario: Adding two numbers
           v Given I have 1 and 2
           A When I add them
+          Error: 
             Multiple step definitions match: "I add them"
             i Make the step match only one of:
             * "I add them" (setup-steps.R:6)
@@ -299,6 +310,7 @@
         Scenario: Adding two numbers
           v Given I have 1 and 2
           A When I add them
+          Error: 
             Multiple step definitions match: "I add them"
             i Make the step match only one of:
             * "I add them" (setup-steps.R:6)
