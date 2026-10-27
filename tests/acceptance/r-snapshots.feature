@@ -939,6 +939,8 @@ Feature: Snapshots
         | the filter "basket"           | run()  |
         | the name "Showing"            | test() |
         | the name "Showing"            | run()  |
+        | the tags "@basket"            | test() |
+        | the tags "@basket"            | run()  |
         | the features "basket.feature" | test() |
         | the features "basket.feature" | run()  |
         | dry_run = TRUE                | test() |
