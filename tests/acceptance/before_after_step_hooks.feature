@@ -145,6 +145,27 @@ Feature: Step hooks
       | Given an empty basket | failed  |
       | When I add an item    | skipped |
 
+  Scenario: A failing before step hook fails the step without running it
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_step(function(context, step) stop("no basket"))
+      given("an empty basket", function(context) cat("the step ran\n"))
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                  | status |
+      | Given an empty basket | failed |
+    And the output doesn't include "the step ran"
+
   Scenario: A step hook can't skip the scenario
     Given a file named "features/basket.feature" with
       """
@@ -204,3 +225,85 @@ Feature: Step hooks
     And the steps have these results:
       | step                  | status |
       | Given an empty basket | failed |
+
+  Scenario: Step hooks don't run for undefined and ambiguous steps
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Undefined
+          Given a step nobody defined
+        Scenario: Ambiguous
+          Given I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_step(function(context, step) cat("before:", step$text, "\n"))
+      after_step(function(context, step) cat("after:", step$text, "\n"))
+      given("I add an item", function(context) {})
+      given("I add an {word}", function(thing, context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                        | status    |
+      | Given a step nobody defined | undefined |
+      | Given I add an item         | ambiguous |
+    And the output doesn't include "before:"
+    And the output doesn't include "after:"
+
+  Scenario: Step hooks share the scenario's context with its steps and hooks
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) context$log <- "before")
+      before_step(function(context, step) context$log <- c(context$log, "before step"))
+      after_step(function(context, step) context$log <- c(context$log, "after step"))
+      after(function(context, scenario) cat(context$log, sep = "\n"))
+      given("an empty basket", function(context) context$log <- c(context$log, "step"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      before
+      before step
+      step
+      after step
+      """
+
+  Scenario: Before step hooks run in definition order and after step hooks in reverse order
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_step(function(context, step) cat("before step 1\n"))
+      before_step(function(context, step) cat("before step 2\n"))
+      after_step(function(context, step) cat("after step 1\n"))
+      after_step(function(context, step) cat("after step 2\n"))
+      given("an empty basket", function(context) cat("step\n"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      before step 1
+      before step 2
+      step
+      after step 2
+      after step 1
+      """
