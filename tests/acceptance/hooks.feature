@@ -179,8 +179,8 @@ Feature: Hooks
       | Given an empty basket          | skipped |
     And the errors are
       """
-      [failure] Scenario: Save the basket
-      Hook "Connect to the database" failed
+      [error] Scenario: Save the basket
+      Error: Hook "Connect to the database" failed
       i Feature: basket.feature
       i Scenario: Save the basket
       i Hook defined at: setup-steps.R:1
@@ -211,8 +211,8 @@ Feature: Hooks
       """
     Then the errors are
       """
-      [failure] Scenario: Add an item
-      Hook `before()` failed
+      [error] Scenario: Add an item
+      Error: Hook `before()` failed
       i Feature: basket.feature
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
@@ -388,8 +388,8 @@ Feature: Hooks
 
     Examples:
       | hook        | argument | status  | kind    | headline                           |
-      | before      | scenario | skipped | failure | Hook `before()` failed             |
-      | after       | scenario | passed  | failure | Hook `after()` failed              |
+      | before      | scenario | skipped | error   | Error: Hook `before()` failed      |
+      | after       | scenario | passed  | error   | Error: Hook `after()` failed       |
       | before_step | step     | failed  | error   | Error: Hook `before_step()` failed |
       | after_step  | step     | failed  | error   | Error: Hook `after_step()` failed  |
 

@@ -304,8 +304,8 @@ use a Background instead, and keep before hooks for low-level work like starting
     <span class="op">|</span> Given an empty basket          <span class="op">|</span> skipped <span class="op">|</span>
   <span class="fu">And</span> the errors are
 <span class="st">    """</span>
-<span class="st">    [failure] Scenario: Save the basket</span>
-<span class="st">    Hook "Connect to the database" failed</span>
+<span class="st">    [error] Scenario: Save the basket</span>
+<span class="st">    Error: Hook "Connect to the database" failed</span>
 <span class="st">    i Feature: basket.feature</span>
 <span class="st">    i Scenario: Save the basket</span>
 <span class="st">    i Hook defined at: setup-steps.R:1</span>
@@ -334,8 +334,8 @@ use a Background instead, and keep before hooks for low-level work like starting
     | Given an empty basket          | skipped |
   And the errors are
     """
-    [failure] Scenario: Save the basket
-    Hook "Connect to the database" failed
+    [error] Scenario: Save the basket
+    Error: Hook "Connect to the database" failed
     i Feature: basket.feature
     i Scenario: Save the basket
     i Hook defined at: setup-steps.R:1
@@ -368,8 +368,8 @@ use a Background instead, and keep before hooks for low-level work like starting
 <span class="st">    """</span>
   <span class="fu">Then</span> the errors are
 <span class="st">    """</span>
-<span class="st">    [failure] Scenario: Add an item</span>
-<span class="st">    Hook `before()` failed</span>
+<span class="st">    [error] Scenario: Add an item</span>
+<span class="st">    Error: Hook `before()` failed</span>
 <span class="st">    i Feature: basket.feature</span>
 <span class="st">    i Scenario: Add an item</span>
 <span class="st">    i Hook defined at: setup-steps.R:1</span>
@@ -402,8 +402,8 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
   Then the errors are
     """
-    [failure] Scenario: Add an item
-    Hook `before()` failed
+    [error] Scenario: Add an item
+    Error: Hook `before()` failed
     i Feature: basket.feature
     i Scenario: Add an item
     i Hook defined at: setup-steps.R:1

@@ -357,8 +357,9 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
 
 #' Report a scenario's result to testthat
 #'
-#' Each result with a failing status is a failure. A failed step's error is
-#' signalled last, as it ends the test. A scenario that didn't fail but didn't
+#' Each result with a failing status is a failure, and a hook's error is an
+#' error, like an error in a test. A failed step's error is signalled last, as
+#' it ends the test. A scenario that didn't fail but didn't
 #' pass either is skipped with the reason of its worst result.
 #'
 #' Each failure is at its line of the feature file, so testthat's reporters
@@ -375,7 +376,13 @@ signal_scenario_result <- function(results, result, failing, pickle) {
   for (failure in failures) {
     if (identical(failure, failed_step)) next
     # The backtrace of the failure's error, not of the code that reports it
-    testthat::fail(conditionMessage(failure$error), srcref = location(failure), trace = failure$error$trace %||% empty_trace())
+    trace <- failure$error$trace %||% empty_trace()
+    if (inherits(failure$error, "cucumber_hook_error")) {
+      # An error that doesn't end the test, as testthat shows an error in a test
+      testthat::expectation("error", paste0("Error: ", conditionMessage(failure$error)), srcref = location(failure), trace = trace)
+    } else {
+      testthat::fail(conditionMessage(failure$error), srcref = location(failure), trace = trace)
+    }
   }
   if (!is.null(failed_step)) {
     error <- failed_step$error
