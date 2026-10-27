@@ -632,6 +632,33 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    Scenario Outline: The snapshot of a removed scenario is deleted, with <runner>
+      Given the steps that take snapshots
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the snapshot of "1 apple" matches
+
+          Scenario: Showing an empty basket
+            Then the snapshot of "nothing" matches
+        """
+      And I run the feature files with "<runner>"
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the snapshot of "1 apple" matches
+        """
+      When I run the feature files with "<runner>"
+      Then the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+      And the snapshot file "_snaps/basket.feature.md" has no snapshot for "Showing an empty basket"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
   Rule: Snapshots are kept however the scenarios run
 
     Scenario Outline: A scenario's snapshot doesn't depend on which scenarios run, with <runner>

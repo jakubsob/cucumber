@@ -269,6 +269,67 @@ Feature: Scenarios as documentation
       """
     And the help page "remove" doesn't include "Scenario: Add an item"
 
+  Scenario: Scenarios of the feature files whose name matches a filter
+    Given a file named "tests/acceptance/checkout.feature" with
+      """
+      Feature: Checkout
+        @rd
+        Scenario: Pay for the basket
+          When I pay
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(filter = "^basket$")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes "Scenario: Add an item"
+    And the help page "add" doesn't include "Scenario: Pay for the basket"
+
+  Scenario: Only the selected Examples of a Scenario Outline are shown, without their tags
+    Given a file named "tests/acceptance/checkout.feature" with
+      """
+      Feature: Checkout
+        Scenario Outline: Pay with <card>
+          When I pay with <card>
+
+          @rd
+          Examples: Cards
+            | card |
+            | Visa |
+
+          Examples: Vouchers
+            | card    |
+            | voucher |
+      """
+    And a file named "R/pay.R" with
+      """
+      #' Pay for a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature")
+      #' @export
+      pay <- function(basket) basket
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "pay" includes
+      """
+      Scenario Outline: Pay with <card>
+        When I pay with <card>
+
+        Examples: Cards
+          | card |
+          | Visa |
+      """
+    And the help page "pay" doesn't include "Vouchers"
+    And the help page "pay" doesn't include "@rd"
+
   Scenario: Another tag marks the scenarios for documentation
     Given a file named "R/remove.R" with
       """

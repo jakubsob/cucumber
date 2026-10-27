@@ -181,6 +181,40 @@ Elsewhere, like in CI, it's printed once the feature finishes.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that didn't pass is printed before its feature's line, and again in the summary
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    Scenario: Remove an item</span>
+<span class="st">    x When I remove 1 item</span>
+<span class="st">    x |  1     1      1 | Basket</span>
+<span class="st">    Failures</span>
+<span class="st">    Scenario: Remove an item</span>
+<span class="st">    x When I remove 1 item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the output includes <span class="st">"x When I remove 1 item"</span> 2 times</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A scenario that didn't pass is printed before its feature's line, and again in the summary
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the output includes these lines in order:
+    """
+    Scenario: Remove an item
+    x When I remove 1 item
+    x |  1     1      1 | Basket
+    Failures
+    Scenario: Remove an item
+    x When I remove 1 item
+    """
+  And the output includes "x When I remove 1 item" 2 times
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A warning is printed as it's raised
   <span class="fu">Given</span> a file named <span class="st">"features/setup-hooks.R"</span> with
 <span class="st">    """</span>

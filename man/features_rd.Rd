@@ -616,6 +616,132 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of the feature files whose name matches a filter
+  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/checkout.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Checkout</span>
+<span class="st">      @rd</span>
+<span class="st">      Scenario: Pay for the basket</span>
+<span class="st">        When I pay</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"R/add.R"</span> with
+<span class="st">    """</span>
+<span class="st">    #' Add items to a basket</span>
+<span class="st">    #' @eval cucumber::features_rd(filter = "^basket$")</span>
+<span class="st">    #' @export</span>
+<span class="st">    add &lt;- function(basket, n) basket + n</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    roxygen2::roxygenise()</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes <span class="st">"Scenario: Add an item"</span>
+  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"Scenario: Pay for the basket"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Scenarios of the feature files whose name matches a filter
+  Given a file named "tests/acceptance/checkout.feature" with
+    """
+    Feature: Checkout
+      @rd
+      Scenario: Pay for the basket
+        When I pay
+    """
+  And a file named "R/add.R" with
+    """
+    #' Add items to a basket
+    #' @eval cucumber::features_rd(filter = "^basket$")
+    #' @export
+    add <- function(basket, n) basket + n
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "add" includes "Scenario: Add an item"
+  And the help page "add" doesn't include "Scenario: Pay for the basket"
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Only the selected Examples of a Scenario Outline are shown, without their tags
+  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/checkout.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Checkout</span>
+<span class="st">      Scenario Outline: Pay with &lt;card&gt;</span>
+<span class="st">        When I pay with &lt;card&gt;</span>
+<span class="st"></span>
+<span class="st">        @rd</span>
+<span class="st">        Examples: Cards</span>
+<span class="st">          | card |</span>
+<span class="st">          | Visa |</span>
+<span class="st"></span>
+<span class="st">        Examples: Vouchers</span>
+<span class="st">          | card    |</span>
+<span class="st">          | voucher |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"R/pay.R"</span> with
+<span class="st">    """</span>
+<span class="st">    #' Pay for a basket</span>
+<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature")</span>
+<span class="st">    #' @export</span>
+<span class="st">    pay &lt;- function(basket) basket</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    roxygen2::roxygenise()</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the help page <span class="st">"pay"</span> includes
+<span class="st">    """</span>
+<span class="st">    Scenario Outline: Pay with &lt;card&gt;</span>
+<span class="st">      When I pay with &lt;card&gt;</span>
+<span class="st"></span>
+<span class="st">      Examples: Cards</span>
+<span class="st">        | card |</span>
+<span class="st">        | Visa |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> the help page <span class="st">"pay"</span> doesn't include <span class="st">"Vouchers"</span>
+  <span class="fu">And</span> the help page <span class="st">"pay"</span> doesn't include <span class="st">"@rd"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Only the selected Examples of a Scenario Outline are shown, without their tags
+  Given a file named "tests/acceptance/checkout.feature" with
+    """
+    Feature: Checkout
+      Scenario Outline: Pay with <card>
+        When I pay with <card>
+
+        @rd
+        Examples: Cards
+          | card |
+          | Visa |
+
+        Examples: Vouchers
+          | card    |
+          | voucher |
+    """
+  And a file named "R/pay.R" with
+    """
+    #' Pay for a basket
+    #' @eval cucumber::features_rd(features = "checkout.feature")
+    #' @export
+    pay <- function(basket) basket
+    """
+  When I run
+    """
+    roxygen2::roxygenise()
+    """
+  Then the help page "pay" includes
+    """
+    Scenario Outline: Pay with <card>
+      When I pay with <card>
+
+      Examples: Cards
+        | card |
+        | Visa |
+    """
+  And the help page "pay" doesn't include "Vouchers"
+  And the help page "pay" doesn't include "@rd"
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> Another tag marks the scenarios for documentation
   <span class="fu">Given</span> a file named <span class="st">"R/remove.R"</span> with
 <span class="st">    """</span>

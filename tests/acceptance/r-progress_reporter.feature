@@ -79,6 +79,22 @@ Feature: Progress reporter
       4 scenarios (1 failed, 1 undefined, 2 passed)
       """
 
+  Scenario: A scenario that didn't pass is printed before its feature's line, and again in the summary
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      Scenario: Remove an item
+      x When I remove 1 item
+      x |  1     1      1 | Basket
+      Failures
+      Scenario: Remove an item
+      x When I remove 1 item
+      """
+    And the output includes "x When I remove 1 item" 2 times
+
   Scenario: A warning is printed as it's raised
     Given a file named "features/setup-hooks.R" with
       """

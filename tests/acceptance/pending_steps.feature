@@ -132,3 +132,21 @@ Feature: Pending steps
       | before_step | step     | FALSE  | skipped | Reason: Hook `before_step()` is pending: the API client isn't written yet | pending | skipped |
       | after_step  | step     | FALSE  | skipped | Reason: Hook `after_step()` is pending: the API client isn't written yet  | pending | skipped |
       | after       | scenario | FALSE  | skipped | Reason: Hook `after()` is pending: the API client isn't written yet       | passed  | passed  |
+
+  Scenario: A pending named hook's message names the hook
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) pending("the API client isn't written yet"), name = "Connect to the API")
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the scenario "Sync the basket" is failed with "Hook \"Connect to the API\" is pending: the API client isn't written yet"

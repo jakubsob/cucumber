@@ -152,6 +152,31 @@ Feature: Skipped steps
     Then the scenario "Add an item" is skipped with "Reason: too late"
     And the output includes "this hook still runs"
 
+  Scenario: skip_scenario() in a before all hook skips every scenario
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_all(function() skip_scenario("the API is down"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario        | status  |
+      | Sync the basket | skipped |
+      | Add an item     | skipped |
+    And the results are skipped with "the API is down"
+
   Rule: testthat::skip() also skips the scenario
 
     Scenario: testthat::skip() in a step skips the scenario
