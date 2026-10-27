@@ -41,7 +41,8 @@ Suggests:
     quarto,
     pkgdown,
     muttest,
-    xml2
+    xml2,
+    yaml
 Config/testthat/edition: 3
 RoxygenNote: 7.3.3
 VignetteBuilder:

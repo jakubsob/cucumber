@@ -1,0 +1,409 @@
+{
+  "allows-escaped-optional-parameter-types": {
+    "expression": "\\({int})",
+    "text": "(3)",
+    "expected_args": [
+      3
+    ]
+  },
+  "allows-parameter-type-in-alternation-1": {
+    "expression": "a/i{int}n/y",
+    "text": "i18n",
+    "expected_args": [
+      18
+    ]
+  },
+  "allows-parameter-type-in-alternation-2": {
+    "expression": "a/i{int}n/y",
+    "text": "a11y",
+    "expected_args": [
+      11
+    ]
+  },
+  "does-allow-parameter-adjacent-to-alternation": {
+    "expression": "{int}st/nd/rd/th",
+    "text": "3rd",
+    "expected_args": [
+      3
+    ]
+  },
+  "does-not-allow-alternation-in-optional": {
+    "expression": "three( brown/black) mice",
+    "text": "three brown/black mice",
+    "exception": "This Cucumber Expression has a problem at column 13:\n\nthree( brown/black) mice\n            ^\nAn alternation can not be used inside an optional.\nIf you did not mean to use an alternation you can use '\\/' to escape the '/'. Otherwise rephrase your expression or consider using a regular expression instead."
+  },
+  "does-not-allow-alternation-with-empty-alternative-by-adjacent-left-parameter": {
+    "expression": "{int}/x",
+    "text": "3",
+    "exception": "This Cucumber Expression has a problem at column 6:\n\n{int}/x\n     ^\nAlternative may not be empty.\nIf you did not mean to use an alternative you can use '\\/' to escape the '/'"
+  },
+  "does-not-allow-alternation-with-empty-alternative-by-adjacent-optional": {
+    "expression": "three (brown)/black mice",
+    "text": "three brown mice",
+    "exception": "This Cucumber Expression has a problem at column 7:\n\nthree (brown)/black mice\n      ^-----^\nAn alternative may not exclusively contain optionals.\nIf you did not mean to use an optional you can use '\\(' to escape the '('"
+  },
+  "does-not-allow-alternation-with-empty-alternative-by-adjacent-right-parameter": {
+    "expression": "x/{int}",
+    "text": "3",
+    "exception": "This Cucumber Expression has a problem at column 3:\n\nx/{int}\n  ^\nAlternative may not be empty.\nIf you did not mean to use an alternative you can use '\\/' to escape the '/'"
+  },
+  "does-not-allow-alternation-with-empty-alternative": {
+    "expression": "three brown//black mice",
+    "text": "three brown mice",
+    "exception": "This Cucumber Expression has a problem at column 13:\n\nthree brown//black mice\n            ^\nAlternative may not be empty.\nIf you did not mean to use an alternative you can use '\\/' to escape the '/'"
+  },
+  "does-not-allow-empty-optional": {
+    "expression": "three () mice",
+    "text": "three brown mice",
+    "exception": "This Cucumber Expression has a problem at column 7:\n\nthree () mice\n      ^^\nAn optional must contain some text.\nIf you did not mean to use an optional you can use '\\(' to escape the '('"
+  },
+  "does-not-allow-nested-optional": {
+    "expression": "(a(b))",
+    "exception": "This Cucumber Expression has a problem at column 3:\n\n(a(b))\n  ^-^\nAn optional may not contain an other optional.\nIf you did not mean to use an optional type you can use '\\(' to escape the '('. For more complicated expressions consider using a regular expression instead."
+  },
+  "does-not-allow-optional-parameter-types": {
+    "expression": "({int})",
+    "text": "3",
+    "exception": "This Cucumber Expression has a problem at column 2:\n\n({int})\n ^---^\nAn optional may not contain a parameter type.\nIf you did not mean to use an parameter type you can use '\\{' to escape the '{'"
+  },
+  "does-not-allow-parameter-name-with-reserved-characters": {
+    "expression": "{(string)}",
+    "text": "something",
+    "exception": "This Cucumber Expression has a problem at column 2:\n\n{(string)}\n ^\nParameter names may not contain '{', '}', '(', ')', '\\' or '/'.\nDid you mean to use a regular expression?"
+  },
+  "does-not-allow-unfinished-parenthesis-1": {
+    "expression": "three (exceptionally\\) {string\\} mice",
+    "exception": "This Cucumber Expression has a problem at column 24:\n\nthree (exceptionally\\) {string\\} mice\n                       ^\nThe '{' does not have a matching '}'.\nIf you did not intend to use a parameter you can use '\\{' to escape the a parameter"
+  },
+  "does-not-allow-unfinished-parenthesis-2": {
+    "expression": "three (exceptionally\\) {string} mice",
+    "exception": "This Cucumber Expression has a problem at column 7:\n\nthree (exceptionally\\) {string} mice\n      ^\nThe '(' does not have a matching ')'.\nIf you did not intend to use optional text you can use '\\(' to escape the optional text"
+  },
+  "does-not-allow-unfinished-parenthesis-3": {
+    "expression": "three ((exceptionally\\) strong) mice",
+    "exception": "This Cucumber Expression has a problem at column 7:\n\nthree ((exceptionally\\) strong) mice\n      ^\nThe '(' does not have a matching ')'.\nIf you did not intend to use optional text you can use '\\(' to escape the optional text"
+  },
+  "does-not-match-misquoted-string": {
+    "expression": "three {string} mice",
+    "text": "three \"blind' mice",
+    "expected_args": null
+  },
+  "does-not-match-single-minus-as-double": {
+    "expression": "{double}",
+    "text": "-",
+    "expected_args": null
+  },
+  "does-not-match-single-minus-as-int": {
+    "expression": "{int}",
+    "text": "-",
+    "expected_args": null
+  },
+  "doesnt-match-float-as-int": {
+    "expression": "{int}",
+    "text": "1.22",
+    "expected_args": null
+  },
+  "matches-alternation": {
+    "expression": "mice/rats and rats\\/mice",
+    "text": "rats and rats/mice",
+    "expected_args": []
+  },
+  "matches-anonymous-parameter-type": {
+    "expression": "{}",
+    "text": "0.22",
+    "expected_args": [
+      "0.22"
+    ]
+  },
+  "matches-bigdecimal": {
+    "expression": "{bigdecimal}",
+    "text": "3.1415926535897932384626433832795028841971693993751",
+    "expected_args": [
+      "3.1415926535897932384626433832795028841971693993751"
+    ]
+  },
+  "matches-biginteger": {
+    "expression": "{biginteger}",
+    "text": "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679",
+    "expected_args": [
+      "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679"
+    ]
+  },
+  "matches-byte": {
+    "expression": "{byte}",
+    "text": "127",
+    "expected_args": [
+      127
+    ]
+  },
+  "matches-double-quoted-empty-string-as-empty-string-along-with-other-strings": {
+    "expression": "three {string} and {string} mice",
+    "text": "three \"\" and \"handsome\" mice",
+    "expected_args": [
+      "",
+      "handsome"
+    ]
+  },
+  "matches-double-quoted-empty-string-as-empty-string": {
+    "expression": "three {string} mice",
+    "text": "three \"\" mice",
+    "expected_args": [
+      ""
+    ]
+  },
+  "matches-double-quoted-string-with-escaped-double-quote": {
+    "expression": "three {string} mice",
+    "text": "three \"bl\\\"nd\" mice",
+    "expected_args": [
+      "bl\"nd"
+    ]
+  },
+  "matches-double-quoted-string-with-single-quotes": {
+    "expression": "three {string} mice",
+    "text": "three \"'blind'\" mice",
+    "expected_args": [
+      "'blind'"
+    ]
+  },
+  "matches-double-quoted-string": {
+    "expression": "three {string} mice",
+    "text": "three \"blind\" mice",
+    "expected_args": [
+      "blind"
+    ]
+  },
+  "matches-double": {
+    "expression": "{double}",
+    "text": "3.141592653589793",
+    "expected_args": [
+      3.14159265358979
+    ]
+  },
+  "matches-doubly-escaped-parenthesis": {
+    "expression": "three \\\\(exceptionally) \\\\{string} mice",
+    "text": "three \\exceptionally \\\"blind\" mice",
+    "expected_args": [
+      "blind"
+    ]
+  },
+  "matches-doubly-escaped-slash-1": {
+    "expression": "12\\\\/2020",
+    "text": "12\\",
+    "expected_args": []
+  },
+  "matches-doubly-escaped-slash-2": {
+    "expression": "12\\\\/2020",
+    "text": "2020",
+    "expected_args": []
+  },
+  "matches-escaped-parenthesis-1": {
+    "expression": "three \\(exceptionally) \\{string} mice",
+    "text": "three (exceptionally) {string} mice",
+    "expected_args": []
+  },
+  "matches-escaped-parenthesis-2": {
+    "expression": "three \\((exceptionally)) \\{{string}} mice",
+    "text": "three (exceptionally) {\"blind\"} mice",
+    "expected_args": [
+      "blind"
+    ]
+  },
+  "matches-escaped-parenthesis-3": {
+    "expression": "three \\((exceptionally)) \\{{string}} mice",
+    "text": "three (exceptionally) {\"blind\"} mice",
+    "expected_args": [
+      "blind"
+    ]
+  },
+  "matches-escaped-slash": {
+    "expression": "12\\/2020",
+    "text": "12/2020",
+    "expected_args": []
+  },
+  "matches-float-leading-plus-scientific-notation": {
+    "expression": "{float}",
+    "text": "+1.5E+3",
+    "expected_args": [
+      1500
+    ]
+  },
+  "matches-float-leading-plus": {
+    "expression": "{float}",
+    "text": "+3.141593",
+    "expected_args": [
+      3.141593
+    ]
+  },
+  "matches-float-negative": {
+    "expression": "{float}",
+    "text": "-3.141593",
+    "expected_args": [
+      -3.141593
+    ]
+  },
+  "matches-float-scientific-notation": {
+    "expression": "{float}",
+    "text": "1.5E+3",
+    "expected_args": [
+      1500
+    ]
+  },
+  "matches-float-with-integer-part": {
+    "expression": "{float}",
+    "text": "0.22",
+    "expected_args": [
+      0.22
+    ]
+  },
+  "matches-float-without-integer-part": {
+    "expression": "{float}",
+    "text": ".22",
+    "expected_args": [
+      0.22
+    ]
+  },
+  "matches-float": {
+    "expression": "{float}",
+    "text": "3.141593",
+    "expected_args": [
+      3.141593
+    ]
+  },
+  "matches-int-negative": {
+    "expression": "{int}",
+    "text": "-2147483647",
+    "expected_args": [
+      -2147483647
+    ]
+  },
+  "matches-int": {
+    "expression": "{int}",
+    "text": "2147483647",
+    "expected_args": [
+      2147483647
+    ]
+  },
+  "matches-long": {
+    "expression": "{long}",
+    "text": "9223372036854775807",
+    "expected_args": [
+      9.22337203685478e+18
+    ]
+  },
+  "matches-multiple-double-quoted-strings": {
+    "expression": "three {string} and {string} mice",
+    "text": "three \"blind\" and \"crippled\" mice",
+    "expected_args": [
+      "blind",
+      "crippled"
+    ]
+  },
+  "matches-multiple-single-quoted-strings": {
+    "expression": "three {string} and {string} mice",
+    "text": "three 'blind' and 'crippled' mice",
+    "expected_args": [
+      "blind",
+      "crippled"
+    ]
+  },
+  "matches-optional-before-alternation-1": {
+    "expression": "three (brown )mice/rats",
+    "text": "three brown mice",
+    "expected_args": []
+  },
+  "matches-optional-before-alternation-2": {
+    "expression": "three (brown )mice/rats",
+    "text": "three rats",
+    "expected_args": []
+  },
+  "matches-optional-before-alternation-with-regex-characters-1": {
+    "expression": "I wait {int} second(s)./second(s)?",
+    "text": "I wait 2 seconds?",
+    "expected_args": [
+      2
+    ]
+  },
+  "matches-optional-before-alternation-with-regex-characters-2": {
+    "expression": "I wait {int} second(s)./second(s)?",
+    "text": "I wait 1 second.",
+    "expected_args": [
+      1
+    ]
+  },
+  "matches-optional-in-alternation-1": {
+    "expression": "{int} rat(s)/mouse/mice",
+    "text": "3 rats",
+    "expected_args": [
+      3
+    ]
+  },
+  "matches-optional-in-alternation-2": {
+    "expression": "{int} rat(s)/mouse/mice",
+    "text": "2 mice",
+    "expected_args": [
+      2
+    ]
+  },
+  "matches-optional-in-alternation-3": {
+    "expression": "{int} rat(s)/mouse/mice",
+    "text": "1 mouse",
+    "expected_args": [
+      1
+    ]
+  },
+  "matches-short": {
+    "expression": "{short}",
+    "text": "32767",
+    "expected_args": [
+      32767
+    ]
+  },
+  "matches-single-quoted-empty-string-as-empty-string-along-with-other-strings": {
+    "expression": "three {string} and {string} mice",
+    "text": "three '' and 'handsome' mice",
+    "expected_args": [
+      "",
+      "handsome"
+    ]
+  },
+  "matches-single-quoted-empty-string-as-empty-string": {
+    "expression": "three {string} mice",
+    "text": "three '' mice",
+    "expected_args": [
+      ""
+    ]
+  },
+  "matches-single-quoted-string-with-double-quotes": {
+    "expression": "three {string} mice",
+    "text": "three '\"blind\"' mice",
+    "expected_args": [
+      "\"blind\""
+    ]
+  },
+  "matches-single-quoted-string-with-escaped-single-quote": {
+    "expression": "three {string} mice",
+    "text": "three 'bl\\'nd' mice",
+    "expected_args": [
+      "bl'nd"
+    ]
+  },
+  "matches-single-quoted-string": {
+    "expression": "three {string} mice",
+    "text": "three 'blind' mice",
+    "expected_args": [
+      "blind"
+    ]
+  },
+  "matches-word": {
+    "expression": "three {word} mice",
+    "text": "three blind mice",
+    "expected_args": [
+      "blind"
+    ]
+  },
+  "throws-unknown-parameter-type": {
+    "expression": "{unknown}",
+    "text": "something",
+    "exception": "This Cucumber Expression has a problem at column 1:\n\n{unknown}\n^-------^\nUndefined parameter type 'unknown'.\nPlease register a ParameterType for 'unknown'"
+  }
+}

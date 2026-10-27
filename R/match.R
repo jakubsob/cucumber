@@ -74,7 +74,7 @@ unmatched_step <- function(step, status, message, body) {
 #' @keywords internal
 #' @noRd
 #' @importFrom purrr map map_chr map_lgl
-#' @importFrom stringr str_detect str_match
+#' @importFrom stringr str_detect
 #' @importFrom rlang exec
 #' @importFrom glue glue
 match_single_step <- function(
@@ -134,10 +134,6 @@ match_single_step <- function(
   matched_step <- steps[step_mask][[1]]
   pattern <- patterns[step_mask][[1]]
 
-  # Each top-level capture group is an argument. A parameter type's regexp
-  # with capture groups of its own passes their text to its transformer.
-  values <- unname(str_match(description, pattern)[1, -1])
-  groups <- attr(pattern, "groups")
   impl_formals <- formals(matched_step)
 
   # Transformed when the step runs, so a failing transformer fails the step
@@ -147,15 +143,7 @@ match_single_step <- function(
       map_chr(attr(pattern, "parameters"), "name"),
       unname(STEP_ARGUMENT_NAMES[step$argument_order])
     )
-    # Map, as purrr would wrap a transformer's error
-    params <- Map(
-      \(group, parameter) {
-        children <- which(groups == group)
-        transform_parameter(parameter, values[group], values[if (length(children)) children else group])
-      },
-      which(groups == 0),
-      attr(pattern, "parameters")
-    )
+    params <- pattern_arguments(description, pattern)
 
     # Add the data table and the docstring, in the order they are written
     step_arguments <- unclass(step)[step$argument_order]

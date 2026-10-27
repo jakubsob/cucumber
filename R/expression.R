@@ -31,6 +31,27 @@ expression_to_pattern <- function(x, parameters = get_parameters()) {
   structure(c(pattern), parameters = types, groups = groups$parent)
 }
 
+#' The arguments of a text that a pattern of `expression_to_pattern()`
+#' matches: each top-level capture group, transformed by its parameter type. A
+#' parameter type's regexp with capture groups of its own passes their text to
+#' its transformer.
+#' @keywords internal
+#' @noRd
+#' @importFrom stringr str_match
+pattern_arguments <- function(text, pattern) {
+  values <- unname(str_match(text, pattern)[1, -1])
+  groups <- attr(pattern, "groups")
+  # Map, as purrr would wrap a transformer's error
+  Map(
+    \(group, parameter) {
+      children <- which(groups == group)
+      transform_parameter(parameter, values[group], values[if (length(children)) children else group])
+    },
+    which(groups == 0),
+    attr(pattern, "parameters")
+  )
+}
+
 is_regular_expression <- function(x) {
   startsWith(x, "^") || endsWith(x, "$") || grepl("^/.*/$", x)
 }
