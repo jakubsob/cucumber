@@ -201,6 +201,16 @@ CucumberMultiReporter <- R6::R6Class(
   )
 )
 
+#' The absolute path of a report's file, with its directory created, like
+#' Cucumber creates the directories of a formatter's file
+#' @keywords internal
+#' @noRd
+report_path <- function(file) {
+  file <- as.character(fs::path_abs(file))
+  fs::dir_create(fs::path_dir(file))
+  file
+}
+
 #' Cucumber Messages Reporter
 #'
 #' @description
@@ -238,10 +248,11 @@ CucumberMessagesReporter <- R6::R6Class(
     #' Create a messages reporter
     #' @param file Path of the file to write, replaced by each run, or a
     #'   connection, like `stdout()`. A relative path is relative to the
-    #'   working directory when the reporter is created.
+    #'   working directory when the reporter is created. Its
+    #'   directory is created when the reporter is, if it doesn't exist.
     initialize = function(file = "cucumber.ndjson") {
       rlang::check_installed("jsonlite", "to write Cucumber Messages.")
-      self$file <- if (is.character(file)) as.character(fs::path_abs(file)) else file
+      self$file <- if (is.character(file)) report_path(file) else file
     },
 
     #' @description

@@ -339,7 +339,8 @@ Create a JUnit reporter
 \describe{
 \item{\code{file}}{Path of the XML file to write, replaced by each run. A
 relative path is relative to the working directory when the reporter
-is created.}
+is created. Its directory is created when the reporter is, if it
+doesn't exist.}
 }
 \if{html}{\out{</div>}}
 }

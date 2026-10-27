@@ -38,9 +38,10 @@ CucumberJunitReporter <- R6::R6Class(
     #' Create a JUnit reporter
     #' @param file Path of the XML file to write, replaced by each run. A
     #'   relative path is relative to the working directory when the reporter
-    #'   is created.
+    #'   is created. Its directory is created when the reporter is, if it
+    #'   doesn't exist.
     initialize = function(file = "cucumber-junit.xml") {
-      self$file <- as.character(fs::path_abs(file))
+      self$file <- report_path(file)
     },
 
     #' @description

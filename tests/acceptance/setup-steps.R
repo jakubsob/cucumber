@@ -457,6 +457,10 @@ then("the HTML report {string} shows these attachments:", function(file, expecte
   expect_equal(as.data.frame(shown[names(expected)]), as.data.frame(expected))
 })
 
+then("there is a file {string}", function(file, context) {
+  expect_true(fs::file_exists(fs::path(context$tempdir, file)))
+})
+
 then("there is no file {string}", function(file, context) {
   expect_false(fs::file_exists(fs::path(context$tempdir, file)))
 })

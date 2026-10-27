@@ -38,10 +38,11 @@ CucumberHtmlReporter <- R6::R6Class(
     #' Create an HTML reporter
     #' @param file Path of the HTML file to write, replaced by each run. A
     #'   relative path is relative to the working directory when the reporter
-    #'   is created.
+    #'   is created. Its directory is created when the reporter is, if it
+    #'   doesn't exist.
     initialize = function(file = "cucumber-report.html") {
       rlang::check_installed("jsonlite", "to write Cucumber Messages.")
-      self$file <- as.character(fs::path_abs(file))
+      self$file <- report_path(file)
     },
 
     #' @description

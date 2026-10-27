@@ -75,6 +75,20 @@ Feature: Reporters
       """
     Then the output includes "1 failed"
 
+  Scenario Outline: A report is written into directories that don't exist yet
+    When I run
+      """
+      test("features", reporter = <reporter>$new("test-results/<file>"), stop_on_failure = FALSE)
+      """
+    Then there is a file "test-results/<file>"
+
+    Examples:
+      | reporter                 | file            |
+      | CucumberMessagesReporter | cucumber.ndjson |
+      | CucumberHtmlReporter     | report.html     |
+      | CucumberJunitReporter    | junit.xml       |
+      | CucumberRerunReporter    | rerun.txt       |
+
   Scenario: A report that can't be written fails the run
     The scenarios run, and the error names the reporter that failed when the run ended.
 
@@ -82,7 +96,7 @@ Feature: Reporters
       """
       test("features", reporter = CucumberMultiReporter$new(list(
         CucumberProgressReporter$new(),
-        CucumberHtmlReporter$new("missing/report.html")
+        CucumberHtmlReporter$new("features")
       )), stop_on_failure = FALSE)
       """
     Then it fails with

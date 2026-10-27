@@ -396,7 +396,8 @@ Create a rerun reporter
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{file}}{Path of the file to write, replaced by each run. A relative
-path is relative to the working directory when the reporter is created.}
+path is relative to the working directory when the reporter is created. Its
+directory is created when the reporter is, if it doesn't exist.}
 }
 \if{html}{\out{</div>}}
 }

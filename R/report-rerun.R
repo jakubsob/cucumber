@@ -32,9 +32,10 @@ CucumberRerunReporter <- R6::R6Class(
     #' @description
     #' Create a rerun reporter
     #' @param file Path of the file to write, replaced by each run. A relative
-    #'   path is relative to the working directory when the reporter is created.
+    #'   path is relative to the working directory when the reporter is created. Its
+    #'   directory is created when the reporter is, if it doesn't exist.
     initialize = function(file = "rerun.txt") {
-      self$file <- as.character(fs::path_abs(file))
+      self$file <- report_path(file)
     },
 
     #' @description

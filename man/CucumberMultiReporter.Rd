@@ -165,6 +165,36 @@ several reporters, to show the progress of a run and write its reports at once.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A report is written into directories that don't exist yet
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = &lt;reporter&gt;$new("test-results/&lt;file&gt;"), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> there is a file <span class="st">"test-results/<span class="va">&lt;file&gt;</span>"</span>
+<span></span>
+  <span class="kw">Examples:</span>
+    <span class="op">|</span> reporter                 <span class="op">|</span> file            <span class="op">|</span>
+    <span class="op">|</span> CucumberMessagesReporter <span class="op">|</span> cucumber.ndjson <span class="op">|</span>
+    <span class="op">|</span> CucumberHtmlReporter     <span class="op">|</span> report.html     <span class="op">|</span>
+    <span class="op">|</span> CucumberJunitReporter    <span class="op">|</span> junit.xml       <span class="op">|</span>
+    <span class="op">|</span> CucumberRerunReporter    <span class="op">|</span> rerun.txt       <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario Outline: A report is written into directories that don't exist yet
+  When I run
+    """
+    test("features", reporter = <reporter>$new("test-results/<file>"), stop_on_failure = FALSE)
+    """
+  Then there is a file "test-results/<file>"
+
+  Examples:
+    | reporter                 | file            |
+    | CucumberMessagesReporter | cucumber.ndjson |
+    | CucumberHtmlReporter     | report.html     |
+    | CucumberJunitReporter    | junit.xml       |
+    | CucumberRerunReporter    | rerun.txt       |
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A report that can't be written fails the run
   The scenarios run, and the error names the reporter that failed when the run ended.
 <span></span>
@@ -172,7 +202,7 @@ several reporters, to show the progress of a run and write its reports at once.
 <span class="st">    """</span>
 <span class="st">    test("features", reporter = CucumberMultiReporter$new(list(</span>
 <span class="st">      CucumberProgressReporter$new(),</span>
-<span class="st">      CucumberHtmlReporter$new("missing/report.html")</span>
+<span class="st">      CucumberHtmlReporter$new("features")</span>
 <span class="st">    )), stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> it fails with
@@ -190,7 +220,7 @@ several reporters, to show the progress of a run and write its reports at once.
     """
     test("features", reporter = CucumberMultiReporter$new(list(
       CucumberProgressReporter$new(),
-      CucumberHtmlReporter$new("missing/report.html")
+      CucumberHtmlReporter$new("features")
     )), stop_on_failure = FALSE)
     """
   Then it fails with
