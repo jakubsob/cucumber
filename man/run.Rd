@@ -82,7 +82,8 @@ testthat runs the \verb{setup-*.R} files before \code{run()}, so for them to def
 Skip scenarios in a \code{\link[=before_all]{before_all()}} or \code{\link[=before]{before()}} hook, not with \code{skip()} before \code{run()} in its
 test file: testthat deletes the snapshot files of feature files that a run of every test file
 didn't run.
-To get result and a report, use \code{cucumber::test()}, or inspect the result of \code{testthat} function call.
+
+To get the results of a run, use \code{\link[=test]{test()}}, which returns them like \code{\link[testthat:test_dir]{testthat::test_dir()}}.
 }
 \section{Specification}{
 

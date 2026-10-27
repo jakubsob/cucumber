@@ -39,7 +39,8 @@
 #' Skip scenarios in a [before_all()] or [before()] hook, not with `skip()` before `run()` in its
 #' test file: testthat deletes the snapshot files of feature files that a run of every test file
 #' didn't run.
-#'   To get result and a report, use `cucumber::test()`, or inspect the result of `testthat` function call.
+#'
+#' To get the results of a run, use [test()], which returns them like [testthat::test_dir()].
 #'
 #' @eval features_rd(features = "r-running_alongside_testthat.feature")
 #'
