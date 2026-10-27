@@ -79,6 +79,7 @@ withr::with_dir(pass_dir, {
     Summary
       3 scenarios (3 passed)
       6 steps (6 passed)
+      0m00.042s (executing steps: 0m00.013s)
     --------------------------------------------------------------------------------
 
 When a step fails, the reporter shows which step broke and why as soon
@@ -96,54 +97,65 @@ withr::with_dir(fail_dir, {
       Scenario: Adding integer and float
         v When I add 1 and 1.1
         x Then the result is 5
+        Error: 
+          Step "the result is 5" failed
+          i Feature: addition.feature
+          i Scenario: Adding integer and float
+          i Step defined at: setup-steps-addition.R:5
           Expected `context$result` to equal `expected`.
           Differences:
             `actual`: 2.1
           `expected`: 5.0
-          
-          Step at: setup-steps-addition.R:5
 
     Feature: Addition
       Scenario: Adding float and float
         v When I add 1.1 and 1.1
         x Then the result is 5
+        Error: 
+          Step "the result is 5" failed
+          i Feature: addition.feature
+          i Scenario: Adding float and float
+          i Step defined at: setup-steps-addition.R:5
           Expected `context$result` to equal `expected`.
           Differences:
             `actual`: 2.2
           `expected`: 5.0
-          
-          Step at: setup-steps-addition.R:5
     x |  2            1 | Addition
+
+    Failures:
+
+    1) Scenario: Adding integer and float # addition.feature:5
+        v When I add 1 and 1.1
+        x Then the result is 5
+        Error: 
+          Step "the result is 5" failed
+          i Feature: addition.feature
+          i Scenario: Adding integer and float
+          i Step defined at: setup-steps-addition.R:5
+          Expected `context$result` to equal `expected`.
+          Differences:
+            `actual`: 2.1
+          `expected`: 5.0
+
+    2) Scenario: Adding float and float # addition.feature:8
+        v When I add 1.1 and 1.1
+        x Then the result is 5
+        Error: 
+          Step "the result is 5" failed
+          i Feature: addition.feature
+          i Scenario: Adding float and float
+          i Step defined at: setup-steps-addition.R:5
+          Expected `context$result` to equal `expected`.
+          Differences:
+            `actual`: 2.2
+          `expected`: 5.0
 
     --------------------------------------------------------------------------------
     Summary
       3 scenarios (2 failed, 1 passed)
       6 steps (2 failed, 4 passed)
+      0m00.139s (executing steps: 0m00.114s)
     --------------------------------------------------------------------------------
-
-    Failures
-
-    Feature: Addition
-      Scenario: Adding integer and float
-        v When I add 1 and 1.1
-        x Then the result is 5
-          Expected `context$result` to equal `expected`.
-          Differences:
-            `actual`: 2.1
-          `expected`: 5.0
-          
-          Step at: setup-steps-addition.R:5
-
-    Feature: Addition
-      Scenario: Adding float and float
-        v When I add 1.1 and 1.1
-        x Then the result is 5
-          Expected `context$result` to equal `expected`.
-          Differences:
-            `actual`: 2.2
-          `expected`: 5.0
-          
-          Step at: setup-steps-addition.R:5
 
     Error:
     ! Test failures.
@@ -175,6 +187,7 @@ withr::with_dir(pass_dir, {
     Summary
       3 scenarios (3 passed)
       6 steps (6 passed)
+      0m00.033s (executing steps: 0m00.004s)
     --------------------------------------------------------------------------------
 
 Put your acceptance tests in a directory separate to your unit tests:

@@ -363,9 +363,13 @@ then("the output includes {string} once", function(text, context) {
   expect_equal(lengths(regmatches(output, gregexpr(text, output, fixed = TRUE))), 1, info = output)
 })
 
-then("the output includes {string} {int} times", function(text, n, context) {
+then("the output includes {string} {int} time(s)", function(text, n, context) {
   output <- paste(context$output, collapse = "\n")
   expect_equal(lengths(regmatches(output, gregexpr(text, output, fixed = TRUE))), n, info = output)
+})
+
+then("the output is empty", function(context) {
+  expect_equal(trimws(paste(context$output, collapse = "\n")), "")
 })
 
 then("the output doesn't include {string}", function(text, context) {
