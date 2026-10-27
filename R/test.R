@@ -271,10 +271,15 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
 #' @keywords internal
 #' @noRd
 resolve_order <- function(order) {
-  if (!rlang::is_string(order) || !grepl("^(defined|reverse|random(:[0-9]+)?)$", order)) {
+  valid <- rlang::is_string(order) && grepl("^(defined|reverse|random(:[0-9]+)?)$", order) && {
+    # A seed of set.seed(), an integer
+    seed <- regmatches(order, regexec("^random:([0-9]+)$", order))[[1]][2]
+    is.na(seed) || as.numeric(seed) <= .Machine$integer.max
+  }
+  if (!valid) {
     abort(
       paste0("Unknown order ", deparse1(order), "."),
-      body = c(i = "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\"."),
+      body = c(i = "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\", with a seed of up to 2147483647."),
       call = NULL,
       trace = empty_trace()
     )

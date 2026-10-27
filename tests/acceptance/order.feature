@@ -86,14 +86,19 @@ Feature: Order
       """
     Then the output includes "Running scenarios in random order. Use `order = \"random:"
 
-  Scenario: An unknown order is an error
+  Scenario Outline: An unknown order is an error
     When I run it and it fails
       """
-      test("features", order = "shuffled")
+      test("features", order = "<order>")
       """
     Then it fails with
       """
       Error:
-      ! Unknown order "shuffled".
-      i Use "defined", "reverse", "random" or "random:<seed>", like "random:1234".
+      ! Unknown order "<order>".
+      i Use "defined", "reverse", "random" or "random:<seed>", like "random:1234", with a seed of up to 2147483647.
       """
+
+    Examples:
+      | order             |
+      | shuffled          |
+      | random:2147483648 |
