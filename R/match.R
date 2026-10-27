@@ -39,7 +39,19 @@ match_steps <- function(
 #' @noRd
 #' @importFrom purrr map
 compile_steps <- function(steps, parameters) {
-  map(steps, \(step) expression_to_pattern(attr(step, "description"), parameters))
+  map(steps, \(step) {
+    expression <- attr(step, "description")
+    rlang::try_fetch(
+      expression_to_pattern(expression, parameters),
+      # Which step definition has the invalid expression, and where it's defined
+      cucumber_expression_error = \(e) {
+        info <- glue("Step definition \"{expression}\" is invalid")
+        location <- srcref_location(attr(step, "srcref"))
+        if (!is.null(location)) info <- c(info, i = glue("Step defined at: {location}"))
+        abort(info, class = "cucumber_expression_error", parent = e, call = NULL, trace = empty_trace())
+      }
+    )
+  })
 }
 
 #' Mark a step that can't be run, keeping the reason as its error

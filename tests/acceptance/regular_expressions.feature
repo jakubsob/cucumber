@@ -96,7 +96,10 @@ Feature: Regular expressions
     Then the errors are
       """
       [error]
-      Error: This Regular Expression has a problem:
+      Error: Step definition "I pay {int}$" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Regular Expression has a problem:
 
       I pay {int}$
 

@@ -160,7 +160,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 9:
+      Error: Step definition "I visit /about" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 9:
 
       I visit /about
               ^
@@ -188,7 +191,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 8:
+      Error: Step definition "I have ()" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 8:
 
       I have ()
              ^^
@@ -216,7 +222,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 9:
+      Error: Step definition "I have ({int})" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 9:
 
       I have ({int})
               ^---^
@@ -244,7 +253,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 9:
+      Error: Step definition "I have ((very) big)" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 9:
 
       I have ((very) big)
               ^----^
@@ -272,7 +284,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 8:
+      Error: Step definition "I have (big)/(small)" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 8:
 
       I have (big)/(small)
              ^---^
@@ -300,7 +315,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 12:
+      Error: Step definition "I have (big/small)" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 12:
 
       I have (big/small)
                  ^
@@ -328,7 +346,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 8:
+      Error: Step definition "I have (big" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 8:
 
       I have (big
              ^
@@ -356,7 +377,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 8:
+      Error: Step definition "I have {int" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 8:
 
       I have {int
              ^
@@ -384,7 +408,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 10:
+      Error: Step definition "I have {i(n)t}" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 10:
 
       I have {i(n)t}
                ^
@@ -411,7 +438,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 9:
+      Error: Step definition "I have \a" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 9:
 
       I have \a
               ^
@@ -439,7 +469,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 3:
+      Error: Step definition "a//b" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 3:
 
       a//b
         ^
@@ -467,7 +500,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 6:
+      Error: Step definition "{int}/{int}" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 6:
 
       {int}/{int}
            ^
@@ -495,7 +531,10 @@ Feature: Cucumber Expressions
     Then the errors are
       """
       [error]
-      Error: This Cucumber Expression has a problem at column 8:
+      Error: Step definition "I have \" is invalid
+      i Step defined at: setup-steps.R:1
+      Caused by error:
+      ! This Cucumber Expression has a problem at column 8:
 
       I have \
              ^
