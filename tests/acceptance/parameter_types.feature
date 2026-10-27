@@ -164,6 +164,27 @@ Feature: Parameter types
         | String parameter double quotes | passed |
         | String parameter single quotes | passed |
 
+    Scenario: {string} captures an empty string
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Empty name
+            Given the name is ""
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the name is {string}", function(name, context) {
+          expect_identical(name, "")
+        })
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then the steps have these results:
+        | step                 | status |
+        | Given the name is "" | passed |
+
     Scenario: {string} unescapes escaped quotes
       Given a file named "features/params.feature" with
         """
@@ -323,6 +344,37 @@ Feature: Parameter types
         test("features")
         """
       Then it passes
+
+    Scenario: A parameter type can be defined in a file loaded after the steps that use it
+      Setup files are loaded in alphabetical order, so `setup-steps.R` is loaded before `setup-types.R`.
+
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Custom parameter
+            Given the direction is north
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the direction is {direction}", function(dir, context) {
+          expect_equal(dir, "NORTH")
+        })
+        """
+      And a file named "features/setup-types.R" with
+        """
+        define_parameter_type(
+          name = "direction",
+          regexp = "north|south|east|west",
+          transformer = toupper
+        )
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then the steps have these results:
+        | step                         | status |
+        | Given the direction is north | passed |
 
     @rd
     Scenario: A custom parameter type's regexp is a plain regular expression

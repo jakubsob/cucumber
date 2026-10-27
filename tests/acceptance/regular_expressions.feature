@@ -32,6 +32,28 @@ Feature: Regular expressions
       """
     Then it passes
 
+  Scenario: A regular expression without ^ and $ matches a part of the step's text
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Cucumbers
+          Given I have 5 cucumbers in my basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("/I have (\\d+) cucumbers/", function(n, context) {
+        expect_identical(n, 5L)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the steps have these results:
+      | step                                  | status |
+      | Given I have 5 cucumbers in my basket | passed |
+
   Scenario: A group with the regexp of a negative {int} is converted to an integer
     Given a package
     And a file named "features/basket.feature" with

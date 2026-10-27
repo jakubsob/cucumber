@@ -393,6 +393,39 @@ Feature: Hooks
       | before_step | step     | failed  | error | Error: Hook `before_step()` failed |
       | after_step  | step     | failed  | error | Error: Hook `after_step()` failed  |
 
+  Scenario Outline: A named <hook>() hook's error starts with its name
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      <hook>(function(context, <argument>) stop("the hook failed"), name = "Check the basket")
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error] Scenario: Add an item
+      Error: Hook "Check the basket" failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! the hook failed
+      """
+
+    Examples:
+      | hook        | argument |
+      | after       | scenario |
+      | before_step | step     |
+      | after_step  | step     |
+
   Scenario Outline: <hook>() with the wrong number of arguments is an error
     Given a file named "features/basket.feature" with
       """

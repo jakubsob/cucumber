@@ -1382,6 +1382,8 @@ Undefined and ambiguous steps are reported, but they don't fail a dry run: a sce
 <span class="st">    before_all(function() stop("hooks must not run"))</span>
 <span class="st">    before(function(context, scenario) stop("hooks must not run"))</span>
 <span class="st">    before_step(function(context, step) stop("hooks must not run"))</span>
+<span class="st">    after_step(function(context, step) stop("hooks must not run"))</span>
+<span class="st">    after(function(context, scenario) stop("hooks must not run"))</span>
 <span class="st">    after_all(function() stop("hooks must not run"))</span>
 <span class="st">    given("an empty basket", function(context) \{</span>
 <span class="st">      stop("steps must not run")</span>
@@ -1412,6 +1414,8 @@ Undefined and ambiguous steps are reported, but they don't fail a dry run: a sce
     before_all(function() stop("hooks must not run"))
     before(function(context, scenario) stop("hooks must not run"))
     before_step(function(context, step) stop("hooks must not run"))
+    after_step(function(context, step) stop("hooks must not run"))
+    after(function(context, scenario) stop("hooks must not run"))
     after_all(function() stop("hooks must not run"))
     given("an empty basket", function(context) \{
       stop("steps must not run")

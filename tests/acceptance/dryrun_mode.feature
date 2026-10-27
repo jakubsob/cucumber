@@ -18,6 +18,8 @@ Feature: Dry run
       before_all(function() stop("hooks must not run"))
       before(function(context, scenario) stop("hooks must not run"))
       before_step(function(context, step) stop("hooks must not run"))
+      after_step(function(context, step) stop("hooks must not run"))
+      after(function(context, scenario) stop("hooks must not run"))
       after_all(function() stop("hooks must not run"))
       given("an empty basket", function(context) {
         stop("steps must not run")

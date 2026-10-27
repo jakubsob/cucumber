@@ -7,6 +7,59 @@ Feature: Pretty reporter
   Background:
     Given a package
 
+  Scenario: Each step is printed with the keyword it's written with, under its scenario and Rule
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Example: Add items
+          Given an empty basket
+          When I add 1 item
+          And I add 1 item
+          But I don't pay
+          Then the basket has 2 items
+          * the basket is full
+
+        Rule: Removing items
+          Scenario Outline: Remove items
+            Given a basket with <n> items
+            When I remove <n> items
+            Then the basket has 0 items
+
+            Examples:
+              | n |
+              | 1 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$n <- 0)
+      given("a basket with {int} item(s)", function(n, context) context$n <- n)
+      when("I add {int} item(s)", function(n, context) context$n <- context$n + n)
+      when("I remove {int} item(s)", function(n, context) context$n <- context$n - n)
+      when("I don't pay", function(context) {})
+      then("the basket has {int} item(s)", function(n, context) expect_equal(context$n, n))
+      then("the basket is full", function(context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      Feature: Basket
+      Example: Add items
+      v Given an empty basket
+      v When I add 1 item
+      v And I add 1 item
+      v But I don't pay
+      v Then the basket has 2 items
+      v * the basket is full
+      Rule: Removing items
+      Scenario Outline: Remove items
+      v Given a basket with 1 items
+      v When I remove 1 items
+      v Then the basket has 0 items
+      """
+
   Scenario: A step's warnings are printed under it
     Given a file named "features/basket.feature" with
       """

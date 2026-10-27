@@ -85,6 +85,33 @@ Feature: Step hooks
       note: A gift
       """
 
+  Scenario: An after step hook gets the error of a failed step
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after_step(function(context, step) {
+        if (is.null(step$error)) cat("no error:", step$text, "\n") else cat("error:", conditionMessage(step$error), "\n")
+      })
+      given("an empty basket", function(context) {})
+      when("I add an item", function(context) stop("basket is full"))
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      no error: an empty basket
+      error: Step "I add an item" failed
+      ! basket is full
+      """
+
   Scenario: A failing step hook fails the step
     Given a file named "features/basket.feature" with
       """

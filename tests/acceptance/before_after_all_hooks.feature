@@ -72,6 +72,28 @@ Feature: Before all and after all hooks
       after all 1
       """
 
+  Scenario: The context of a before all hook isn't the context of the scenarios
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_all(function(context) context$server <- "started")
+      given("an empty basket", function(context) {
+        expect_null(context$server)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the steps have these results:
+      | step                  | status |
+      | Given an empty basket | passed |
+
   Rule: A failing before all or after all hook fails the run
 
     Background:
@@ -167,10 +189,10 @@ Feature: Before all and after all hooks
         | Remove an item | failed |
       And the output includes "stop the server" once
 
-    Scenario: A named before all hook's error starts with its name
+    Scenario Outline: A named <hook>() hook's error starts with its name
       Given a file named "features/setup-steps.R" with
         """
-        before_all(function() stop("connection refused"), name = "Start the server")
+        <hook>(function() stop("connection refused"), name = "<name>")
         given("an empty basket", function(context) {})
         """
       When I run
@@ -180,11 +202,16 @@ Feature: Before all and after all hooks
       Then the errors are
         """
         [error]
-        Error: Hook "Start the server" failed
+        Error: Hook "<name>" failed
         i Hook defined at: setup-steps.R:1
         Caused by error:
         ! connection refused
         """
+
+      Examples:
+        | hook       | name             |
+        | before_all | Start the server |
+        | after_all  | Stop the server  |
 
     Scenario: A pending before all hook's error names the hook
       Given a file named "features/setup-steps.R" with

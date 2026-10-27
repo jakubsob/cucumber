@@ -97,6 +97,31 @@ Feature: Fail fast
       """
     Then the output includes "3 scenarios (1 undefined, 2 skipped)"
 
+  Scenario: A pending step doesn't fail fast with strict = FALSE
+    Given a file named "features/a.feature" with
+      """
+      Feature: A
+        Scenario: Pending
+          Given a pending step
+
+        Scenario: After the pending step
+          Given I have 3
+          Then I get 3
+      """
+    And a file named "features/setup-pending.R" with
+      """
+      given("a pending step", function(context) pending())
+      """
+    When I run
+      """
+      test("features", fail_fast = TRUE, strict = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario                 | status  |
+      | Pending                  | pending |
+      | After the pending step   | passed  |
+      | In the next feature file | passed  |
+
   Scenario: A scenario that passes when it's retried doesn't stop the run
     Given a file named "features/a.feature" with
       """

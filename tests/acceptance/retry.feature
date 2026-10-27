@@ -88,8 +88,13 @@ Feature: Retry
       | scenario               | status | attempts |
       | Passes the second time | failed | 1        |
 
-  Scenario: Pending and undefined scenarios aren't retried
-    Given a file named "features/unfinished.feature" with
+  Scenario: Pending, undefined and ambiguous scenarios aren't retried
+    Given a file named "features/setup-ambiguous.R" with
+      """
+      given("a step that matches twice", function(context) {})
+      given("a step that matches {word}", function(word, context) {})
+      """
+    And a file named "features/unfinished.feature" with
       """
       Feature: Unfinished
         Scenario: Pending
@@ -97,6 +102,9 @@ Feature: Retry
 
         Scenario: Undefined
           Given a step that doesn't exist
+
+        Scenario: Ambiguous
+          Given a step that matches twice
       """
     When I run
       """
@@ -106,6 +114,7 @@ Feature: Retry
       | scenario  | status    | attempts |
       | Pending   | pending   | 1        |
       | Undefined | undefined | 1        |
+      | Ambiguous | ambiguous | 1        |
 
   Scenario: testthat gets the expectations and warnings of only the last attempt
     Given a file named "features/setup-warnings.R" with
@@ -134,6 +143,48 @@ Feature: Retry
     And the scenarios have these warnings:
       | scenario               | warning   |
       | Passes the second time | Attempt 2 |
+
+  Scenario: Each attempt gets a new context
+    Given a file named "features/setup-context.R" with
+      """
+      given("a step that sees what the attempt before left", function(context) {
+        expect_null(context$left)
+        context$left <- "something"
+      })
+      """
+    And a file named "features/flaky.feature" with
+      """
+      Feature: Flaky
+        Scenario: Passes the second time
+          Given a step that sees what the attempt before left
+          And a step that passes the second time
+      """
+    When I run
+      """
+      test("features", retry = 1)
+      """
+    Then the scenarios have these results:
+      | scenario               | status | attempts |
+      | Passes the second time | passed | 2        |
+
+  Scenario: Each attempt is printed with its number
+    Given a file named "features/flaky.feature" with
+      """
+      Feature: Flaky
+        Scenario: Passes the second time
+          Given a step that passes the second time
+      """
+    When I run
+      """
+      test("features", retry = 1, reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes these lines in order:
+      """
+      Scenario: Passes the second time
+      x Given a step that passes the second time
+      Scenario: Passes the second time (attempt 2)
+      v Given a step that passes the second time
+      """
 
   @rd
   Scenario: The summary counts only the last attempt of a scenario

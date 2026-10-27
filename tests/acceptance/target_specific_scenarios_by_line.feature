@@ -51,6 +51,13 @@ Feature: Running scenarios by line
       | scenario           |
       | Adding big numbers |
 
+  Scenario: The line of a step runs no scenario
+    When I run
+      """
+      test("features", features = "addition.feature:3")
+      """
+    Then no scenario ran
+
   Scenario: An absolute path can be given
     When I run
       """

@@ -60,6 +60,54 @@ Feature: Rerun reporter
       | Pay with amex  | failed  |
       | Ship           | pending |
 
+  Scenario: A scenario that passed when retried isn't in the file
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given a step that passes the second time
+
+        Scenario: Remove an item
+          Given a step that fails
+      """
+    And a file named "features/setup-flaky.R" with
+      """
+      attempts <- 0
+      given("a step that passes the second time", function(context) {
+        attempts <<- attempts + 1
+        if (attempts < 2) stop("Not yet")
+      })
+      """
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)
+      cat(readLines("rerun.txt"), sep = "\n")
+      """
+    Then the output includes
+      """
+      basket.feature:5
+      checkout.feature:2
+      """
+
+  Scenario: The scenarios that fail_fast skipped are in the file
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)
+      cat(readLines("rerun.txt"), sep = "\n")
+      """
+    Then the scenarios have these results:
+      | scenario       | status  |
+      | Add an item    | passed  |
+      | Remove an item | failed  |
+      | Pay with visa  | skipped |
+      | Pay with amex  | skipped |
+      | Ship           | skipped |
+    And the output includes
+      """
+      basket.feature:5:13:14
+      checkout.feature:2
+      """
+
   Scenario: Empty lines of a rerun file are ignored
     Like a rerun file edited by hand, with an empty line at its end.
 

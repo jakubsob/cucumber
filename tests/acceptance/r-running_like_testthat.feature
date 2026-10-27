@@ -460,6 +460,69 @@ Feature: Running feature files like testthat runs test files
       | scenario        | location         |
       | Adding an apple | basket.feature:2 |
 
+  Scenario: skip_on_cran() and skip_if_not_installed() skip a scenario, with run() in a testthat run on CRAN
+    Given a file named "tests/testthat/shop.feature" with
+      """
+      Feature: Shop
+        Scenario: Paying by card
+          Given a step that needs a package that isn't installed
+
+        @slow
+        Scenario: Restocking
+          Given a step that isn't run on CRAN
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      before(function(context, scenario) skip_on_cran(), tags = "@slow")
+      given("a step that needs a package that isn't installed", function(context) {
+        skip_if_not_installed("aPackageThatIsNotInstalled")
+      })
+      given("a step that isn't run on CRAN", function(context) {})
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      cucumber::run()
+      """
+    When I run
+      """
+      withr::with_envvar(c(NOT_CRAN = "false"), testthat::test_dir("tests/testthat", reporter = "silent", stop_on_failure = FALSE))
+      """
+    Then the scenarios skipped at these locations:
+      | scenario       | location       |
+      | Paying by card | shop.feature:3 |
+      | Restocking     | shop.feature:6 |
+
+  Scenario: skip_on_cran() and skip_if_not_installed() skip a scenario, with test() in R CMD check on CRAN
+    Given a file named "tests/acceptance/shop.feature" with
+      """
+      Feature: Shop
+        Scenario: Paying by card
+          Given a step that needs a package that isn't installed
+
+        @slow
+        Scenario: Restocking
+          Given a step that isn't run on CRAN
+      """
+    And a file named "tests/acceptance/setup-steps.R" with
+      """
+      before(function(context, scenario) skip_on_cran(), tags = "@slow")
+      given("a step that needs a package that isn't installed", function(context) {
+        skip_if_not_installed("aPackageThatIsNotInstalled")
+      })
+      given("a step that isn't run on CRAN", function(context) {})
+      """
+    When I run
+      """
+      withr::with_envvar(
+        c(NOT_CRAN = NA, TESTTHAT = NA, `_R_CHECK_PACKAGE_NAME_` = "example"),
+        test("tests/acceptance")
+      )
+      """
+    Then the scenarios have these results:
+      | scenario       | status  |
+      | Paying by card | skipped |
+      | Restocking     | skipped |
+
   Scenario: skip() in a setup file stops the run, like in testthat
     Given a file named "features/setup-skip.R" with
       """

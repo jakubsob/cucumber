@@ -33,6 +33,31 @@ Feature: Tagged hooks
     And the output doesn't include "connect for Add an item"
     And the output doesn't include "disconnect for Add an item"
 
+  Scenario: A tagged hook runs for every scenario of a feature with the tag
+    Scenarios inherit the tags of their feature, Rule and Examples.
+
+    Given a file named "features/basket.feature" with
+      """
+      @db
+      Feature: Basket
+        Scenario: Save the basket
+          Given an empty basket
+
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) cat("connect for", scenario$name, "\n"), tags = "@db")
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes "connect for Save the basket"
+    And the output includes "connect for Add an item"
+
   Scenario Outline: A tagged <hook>() hook runs only for the steps of scenarios that match the tag expression
     Given a file named "features/basket.feature" with
       """

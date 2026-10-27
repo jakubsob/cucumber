@@ -138,6 +138,106 @@ pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only 
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that passed when retried isn't in the file
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given a step that passes the second time</span>
+<span class="st"></span>
+<span class="st">      Scenario: Remove an item</span>
+<span class="st">        Given a step that fails</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-flaky.R"</span> with
+<span class="st">    """</span>
+<span class="st">    attempts &lt;- 0</span>
+<span class="st">    given("a step that passes the second time", function(context) \{</span>
+<span class="st">      attempts &lt;&lt;- attempts + 1</span>
+<span class="st">      if (attempts &lt; 2) stop("Not yet")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)</span>
+<span class="st">    cat(readLines("rerun.txt"), sep = "\\n")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    basket.feature:5</span>
+<span class="st">    checkout.feature:2</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A scenario that passed when retried isn't in the file
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given a step that passes the second time
+
+      Scenario: Remove an item
+        Given a step that fails
+    """
+  And a file named "features/setup-flaky.R" with
+    """
+    attempts <- 0
+    given("a step that passes the second time", function(context) \{
+      attempts <<- attempts + 1
+      if (attempts < 2) stop("Not yet")
+    \})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)
+    cat(readLines("rerun.txt"), sep = "\\n")
+    """
+  Then the output includes
+    """
+    basket.feature:5
+    checkout.feature:2
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios that fail_fast skipped are in the file
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)</span>
+<span class="st">    cat(readLines("rerun.txt"), sep = "\\n")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the scenarios have these results:
+    <span class="op">|</span> scenario       <span class="op">|</span> status  <span class="op">|</span>
+    <span class="op">|</span> Add an item    <span class="op">|</span> passed  <span class="op">|</span>
+    <span class="op">|</span> Remove an item <span class="op">|</span> failed  <span class="op">|</span>
+    <span class="op">|</span> Pay with visa  <span class="op">|</span> skipped <span class="op">|</span>
+    <span class="op">|</span> Pay with amex  <span class="op">|</span> skipped <span class="op">|</span>
+    <span class="op">|</span> Ship           <span class="op">|</span> skipped <span class="op">|</span>
+  <span class="fu">And</span> the output includes
+<span class="st">    """</span>
+<span class="st">    basket.feature:5:13:14</span>
+<span class="st">    checkout.feature:2</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: The scenarios that fail_fast skipped are in the file
+  When I run
+    """
+    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)
+    cat(readLines("rerun.txt"), sep = "\\n")
+    """
+  Then the scenarios have these results:
+    | scenario       | status  |
+    | Add an item    | passed  |
+    | Remove an item | failed  |
+    | Pay with visa  | skipped |
+    | Pay with amex  | skipped |
+    | Ship           | skipped |
+  And the output includes
+    """
+    basket.feature:5:13:14
+    checkout.feature:2
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> Empty lines of a rerun file are ignored
   Like a rerun file edited by hand, with an empty line at its end.
 <span></span>

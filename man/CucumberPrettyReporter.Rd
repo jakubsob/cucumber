@@ -32,6 +32,114 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step is printed with the keyword it's written with, under its scenario and Rule
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Example: Add items</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">        When I add 1 item</span>
+<span class="st">        And I add 1 item</span>
+<span class="st">        But I don't pay</span>
+<span class="st">        Then the basket has 2 items</span>
+<span class="st">        * the basket is full</span>
+<span class="st"></span>
+<span class="st">      Rule: Removing items</span>
+<span class="st">        Scenario Outline: Remove items</span>
+<span class="st">          Given a basket with &lt;n&gt; items</span>
+<span class="st">          When I remove &lt;n&gt; items</span>
+<span class="st">          Then the basket has 0 items</span>
+<span class="st"></span>
+<span class="st">          Examples:</span>
+<span class="st">            | n |</span>
+<span class="st">            | 1 |</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) context$n &lt;- 0)</span>
+<span class="st">    given("a basket with \{int\} item(s)", function(n, context) context$n &lt;- n)</span>
+<span class="st">    when("I add \{int\} item(s)", function(n, context) context$n &lt;- context$n + n)</span>
+<span class="st">    when("I remove \{int\} item(s)", function(n, context) context$n &lt;- context$n - n)</span>
+<span class="st">    when("I don't pay", function(context) \{\})</span>
+<span class="st">    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$n, n))</span>
+<span class="st">    then("the basket is full", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">    Example: Add items</span>
+<span class="st">    v Given an empty basket</span>
+<span class="st">    v When I add 1 item</span>
+<span class="st">    v And I add 1 item</span>
+<span class="st">    v But I don't pay</span>
+<span class="st">    v Then the basket has 2 items</span>
+<span class="st">    v * the basket is full</span>
+<span class="st">    Rule: Removing items</span>
+<span class="st">    Scenario Outline: Remove items</span>
+<span class="st">    v Given a basket with 1 items</span>
+<span class="st">    v When I remove 1 items</span>
+<span class="st">    v Then the basket has 0 items</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Each step is printed with the keyword it's written with, under its scenario and Rule
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Example: Add items
+        Given an empty basket
+        When I add 1 item
+        And I add 1 item
+        But I don't pay
+        Then the basket has 2 items
+        * the basket is full
+
+      Rule: Removing items
+        Scenario Outline: Remove items
+          Given a basket with <n> items
+          When I remove <n> items
+          Then the basket has 0 items
+
+          Examples:
+            | n |
+            | 1 |
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) context$n <- 0)
+    given("a basket with \{int\} item(s)", function(n, context) context$n <- n)
+    when("I add \{int\} item(s)", function(n, context) context$n <- context$n + n)
+    when("I remove \{int\} item(s)", function(n, context) context$n <- context$n - n)
+    when("I don't pay", function(context) \{\})
+    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$n, n))
+    then("the basket is full", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes
+    """
+    Feature: Basket
+    Example: Add items
+    v Given an empty basket
+    v When I add 1 item
+    v And I add 1 item
+    v But I don't pay
+    v Then the basket has 2 items
+    v * the basket is full
+    Rule: Removing items
+    Scenario Outline: Remove items
+    v Given a basket with 1 items
+    v When I remove 1 items
+    v Then the basket has 0 items
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A step's warnings are printed under it
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>
@@ -368,6 +476,8 @@ cucumber::test(
 \item{\code{step_warnings}}{Warnings of the step currently executing, printed under it}
 
 \item{\code{step_attachments}}{Lines of the attachments of the step currently executing, printed under it}
+
+\item{\code{printed_rule}}{The Rule last printed in the current feature, printed again only for a scenario of another Rule}
 }
 \if{html}{\out{</div>}}
 }

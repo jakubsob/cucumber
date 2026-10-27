@@ -519,6 +519,9 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field current_scenario Name of the scenario currently executing, like `"Scenario: Add an item"`
     current_scenario = NULL,
 
+    #' @field current_rule Name of the Rule of the scenario currently executing, like `"Rule: Removing items"`, or `NULL`
+    current_rule = NULL,
+
     #' @field current_steps Steps executed so far in the current scenario
     current_steps = NULL,
 
@@ -650,6 +653,7 @@ CucumberSummaryReporter <- R6::R6Class(
             self$current_feature <- feature_label(lineage$feature)
             private$on_feature_start()
           }
+          self$current_rule <- if (!is.null(lineage$rule)) paste0(lineage$rule$keyword, ": ", lineage$rule$name)
           self$current_scenario <- paste0(
             lineage$scenario$keyword,
             ": ",
@@ -1190,6 +1194,9 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @field step_attachments Lines of the attachments of the step currently executing, printed under it
     step_attachments = NULL,
 
+    #' @field printed_rule The Rule last printed in the current feature, printed again only for a scenario of another Rule
+    printed_rule = NULL,
+
     #' @description
     #' Initialize the reporter
     #' @param show_praise Whether to show praise (default TRUE)
@@ -1264,6 +1271,7 @@ CucumberPrettyReporter <- R6::R6Class(
         cli.unicode = self$unicode
       )
       cat("\n", bold_label(self$current_feature), "\n", sep = "")
+      self$printed_rule <- NULL
     },
 
     on_feature_end = function() {
@@ -1275,6 +1283,10 @@ CucumberPrettyReporter <- R6::R6Class(
         cli.num_colors = self$num_colors,
         cli.unicode = self$unicode
       )
+      if (!is.null(self$current_rule) && !identical(self$current_rule, self$printed_rule)) {
+        cat("  ", bold_label(self$current_rule), "\n", sep = "")
+        self$printed_rule <- self$current_rule
+      }
       cat("  ", bold_label(self$current_scenario), "\n", sep = "")
     },
 

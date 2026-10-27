@@ -66,6 +66,18 @@ Feature: Order
       | B2       | passed |
       | A2       | passed |
 
+  Scenario: A random order leaves the random numbers of the session as they were
+    When I run
+      """
+      set.seed(42)
+      test("features", order = "random:1")
+      cat("next:", runif(1), "\n")
+      set.seed(42)
+      cat("expected:", runif(1), "\n")
+      """
+    Then the output includes "next: 0.914806"
+    And the output includes "expected: 0.914806"
+
   @rd
   Scenario: A random order without a seed shows the seed to run the same order again
     When I run
