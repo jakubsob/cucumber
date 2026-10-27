@@ -171,3 +171,33 @@ Feature: Fail fast
       | Passes the second time   | passed | 2        |
       | After the retry          | passed | 1        |
       | In the next feature file | passed | 1        |
+
+  Scenario: A scenario that fails every attempt uses its retries, then stops the run
+    When I run
+      """
+      test("features", fail_fast = TRUE, retry = 1, stop_on_failure = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario                 | status  | attempts |
+      | Passing                  | passed  | 1        |
+      | Failing                  | failed  | 2        |
+      | After the failure        | skipped | 1        |
+      | In the next feature file | skipped | 1        |
+
+  Scenario: The after hooks of the skipped scenarios don't run, and after_all() hooks do
+    Given a file named "features/setup-hooks.R" with
+      """
+      after(function(context, scenario) cat("after", scenario$name, "\n"))
+      after_all(function() cat("after all\n"))
+      """
+    When I run
+      """
+      test("features", fail_fast = TRUE, stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      after Failing
+      after all
+      """
+    And the output doesn't include "after After the failure"
+    And the output doesn't include "after In the next feature file"
