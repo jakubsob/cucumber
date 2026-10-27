@@ -46,10 +46,10 @@
       Feature: Step arguments
         Scenario: Steps with a docstring and a table
           v Given a message
-            """
+            ```
             line one
             line two
-            """
+            ```
           v And these people
             | name  | age |
             | Alice | 30  |
@@ -66,9 +66,9 @@
       Feature: Step arguments
         Scenario: Long docstring
           v Given a long message
-            """
+            ```
             line one
             line two
             ... and 2 more line(s)
-            """
+            ```
 

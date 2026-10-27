@@ -202,10 +202,10 @@ Feature: Pretty reporter
     Then the output includes
       """
       v Given a note
-      \"\"\"
+      ```
       line 1
       ... and 2 more line(s)
-      \"\"\"
+      ```
       v And these items
       | item     |
       | cucumber |
@@ -238,3 +238,88 @@ Feature: Pretty reporter
       | a\|b     | x\\y |
       | cucumber | 1\n2 |
       """
+
+  Scenario: A Doc String is printed as it's written, with its delimiter, media type and empty lines
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given a receipt
+            ```json
+            {"items": 2}
+
+            ```
+          And a note
+            \"\"\"
+            Thanks
+            \"\"\"
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a receipt", function(doc_string, context) {})
+      given("a note", function(doc_string, context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given a receipt
+      ```json
+      {"items": 2}
+
+      ```
+      v And a note
+      \"\"\"
+      Thanks
+      \"\"\"
+      """
+
+  Scenario: A Data Table and a Doc String are printed in the order they're written
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given these items and a note
+            | item     |
+            | cucumber |
+            \"\"\"
+            Fresh
+            \"\"\"
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("these items and a note", function(data_table, doc_string, context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given these items and a note
+      | item     |
+      | cucumber |
+      \"\"\"
+      Fresh
+      \"\"\"
+      """
+
+  Scenario: A keyword is printed as it's written, without a space it doesn't have
+    Given a file named "features/basket.feature" with
+      """
+      # language: zh-CN
+      功能: 购物篮
+        场景: 添加商品
+          假如购物篮是空的
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("购物篮是空的", function(context) {})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes "v 假如购物篮是空的"

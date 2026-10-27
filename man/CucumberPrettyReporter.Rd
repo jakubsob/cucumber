@@ -397,10 +397,10 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
   <span class="fu">Then</span> the output includes
 <span class="st">    """</span>
 <span class="st">    v Given a note</span>
-<span class="st">    \\"\\"\\"</span>
+<span class="st">    ```</span>
 <span class="st">    line 1</span>
 <span class="st">    ... and 2 more line(s)</span>
-<span class="st">    \\"\\"\\"</span>
+<span class="st">    ```</span>
 <span class="st">    v And these items</span>
 <span class="st">    | item     |</span>
 <span class="st">    | cucumber |</span>
@@ -442,10 +442,10 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
   Then the output includes
     """
     v Given a note
-    \\"\\"\\"
+    ```
     line 1
     ... and 2 more line(s)
-    \\"\\"\\"
+    ```
     v And these items
     | item     |
     | cucumber |
@@ -508,6 +508,182 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     """
 %</pre>
 }}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A Doc String is printed as it's written, with its delimiter, media type and empty lines
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add items</span>
+<span class="st">        Given a receipt</span>
+<span class="st">          ```json</span>
+<span class="st">          \{"items": 2\}</span>
+<span class="st"></span>
+<span class="st">          ```</span>
+<span class="st">        And a note</span>
+<span class="st">          \\"\\"\\"</span>
+<span class="st">          Thanks</span>
+<span class="st">          \\"\\"\\"</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("a receipt", function(doc_string, context) \{\})</span>
+<span class="st">    given("a note", function(doc_string, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    v Given a receipt</span>
+<span class="st">    ```json</span>
+<span class="st">    \{"items": 2\}</span>
+<span class="st"></span>
+<span class="st">    ```</span>
+<span class="st">    v And a note</span>
+<span class="st">    \\"\\"\\"</span>
+<span class="st">    Thanks</span>
+<span class="st">    \\"\\"\\"</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A Doc String is printed as it's written, with its delimiter, media type and empty lines
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        Given a receipt
+          ```json
+          \{"items": 2\}
+
+          ```
+        And a note
+          \\"\\"\\"
+          Thanks
+          \\"\\"\\"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("a receipt", function(doc_string, context) \{\})
+    given("a note", function(doc_string, context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes
+    """
+    v Given a receipt
+    ```json
+    \{"items": 2\}
+
+    ```
+    v And a note
+    \\"\\"\\"
+    Thanks
+    \\"\\"\\"
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A Data Table and a Doc String are printed in the order they're written
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add items</span>
+<span class="st">        Given these items and a note</span>
+<span class="st">          | item     |</span>
+<span class="st">          | cucumber |</span>
+<span class="st">          \\"\\"\\"</span>
+<span class="st">          Fresh</span>
+<span class="st">          \\"\\"\\"</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("these items and a note", function(data_table, doc_string, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    v Given these items and a note</span>
+<span class="st">    | item     |</span>
+<span class="st">    | cucumber |</span>
+<span class="st">    \\"\\"\\"</span>
+<span class="st">    Fresh</span>
+<span class="st">    \\"\\"\\"</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A Data Table and a Doc String are printed in the order they're written
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add items
+        Given these items and a note
+          | item     |
+          | cucumber |
+          \\"\\"\\"
+          Fresh
+          \\"\\"\\"
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("these items and a note", function(data_table, doc_string, context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes
+    """
+    v Given these items and a note
+    | item     |
+    | cucumber |
+    \\"\\"\\"
+    Fresh
+    \\"\\"\\"
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A keyword is printed as it's written, without a space it doesn't have
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    # language: zh-CN</span>
+<span class="st">    功能: 购物篮</span>
+<span class="st">      场景: 添加商品</span>
+<span class="st">        假如购物篮是空的</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("购物篮是空的", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"v 假如购物篮是空的"</span></code></pre >}}                                                                  
+\if{text,latex}{\preformatted{Scenario: A keyword is printed as it's written, without a space it doesn't have
+  Given a file named "features/basket.feature" with
+    """
+    # language: zh-CN
+    功能: 购物篮
+      场景: 添加商品
+        假如购物篮是空的
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("购物篮是空的", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes "v 假如购物篮是空的"
+%</pre>
+}}                                                                  
 
 Source: \code{tests/acceptance/r-pretty_reporter.feature}
 }
@@ -622,8 +798,8 @@ Keep a step's warnings to print them under it, print the others as they're raise
 \if{html}{\out{<a id="method-CucumberPrettyReporter-print_step_args"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberPrettyReporter-print_step_args}{}}}
 \subsection{Method \code{print_step_args()}}{
-Print a step's docstring and/or data table arguments, indented and
-truncated to \code{reporter_max_docstring_lines} / \code{reporter_max_table_lines}
+Print a step's docstring and/or data table arguments as they're written,
+indented and truncated to \code{reporter_max_docstring_lines} / \code{reporter_max_table_lines}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberPrettyReporter$print_step_args(step)}\if{html}{\out{</div>}}
 }
@@ -631,7 +807,7 @@ truncated to \code{reporter_max_docstring_lines} / \code{reporter_max_table_line
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{step}}{The step, with its \code{docstring} lines or \code{data_table} rows}
+\item{\code{step}}{The step, with its \code{docstring} and its \code{data_table} rows}
 }
 \if{html}{\out{</div>}}
 }

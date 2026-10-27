@@ -201,13 +201,13 @@
       Feature: Docstrings
         Scenario: It is possible to pass docstring to a step
           v Given I have a docstring
-            """
+            ```
             My docstring
             
             It has multiple lines
             
             I will remove this one
-            """
+            ```
           v When I remove line that contains 'I will remove this one'
           v And I remove trailing empty lines
           v Then the docstring looks like this

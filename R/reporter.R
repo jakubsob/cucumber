@@ -406,7 +406,6 @@ print_step <- function(step) {
     status_symbol(step$status %||% "passed"),
     " ",
     cli::style_bold(step$keyword),
-    " ",
     step$text,
     "\n",
     sep = ""
@@ -485,19 +484,29 @@ format_attachment <- function(attachment) {
 #' @noRd
 reported_step <- function(q, pickle_step, result) {
   argument <- pickle_step$argument
+  step <- q$step_of(pickle_step)
+  content <- argument$docString$content
   list(
-    keyword = trimws(q$step_of(pickle_step)$keyword),
+    # Its space too, as some keywords have none, like `假如` in Chinese
+    keyword = step$keyword,
     text = pickle_step$text,
     status = tolower(result$status),
     error = result$message,
     docstring = if (!is.null(argument$docString)) {
-      strsplit(argument$docString$content, "\n", fixed = TRUE)[[1]]
+      list(
+        delimiter = step$docString$delimiter %||% '"""',
+        media_type = argument$docString$mediaType,
+        # With its empty lines at the end
+        lines = if (nzchar(content)) stringi::stri_split_fixed(content, "\n")[[1]] else character()
+      )
     },
     data_table = if (!is.null(argument$dataTable)) {
       lapply(argument$dataTable$rows, \(row) {
         vapply(row$cells, \(cell) cell$value, character(1))
       })
-    }
+    },
+    data_table_first = !is.null(step$dataTable) && !is.null(step$docString) &&
+      step$dataTable$location$line < step$docString$location$line
   )
 }
 
@@ -1318,29 +1327,31 @@ CucumberPrettyReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Print a step's docstring and/or data table arguments, indented and
-    #' truncated to `reporter_max_docstring_lines` / `reporter_max_table_lines`
-    #' @param step The step, with its `docstring` lines or `data_table` rows
+    #' Print a step's docstring and/or data table arguments as they're written,
+    #' indented and truncated to `reporter_max_docstring_lines` / `reporter_max_table_lines`
+    #' @param step The step, with its `docstring` and its `data_table` rows
     print_step_args = function(step) {
+      docstring <- NULL
       if (!is.null(step$docstring)) {
-        body <- truncate_lines(
-          step$docstring,
-          self$reporter_max_docstring_lines
+        doc <- step$docstring
+        docstring <- c(
+          paste0(doc$delimiter, doc$media_type %||% ""),
+          truncate_lines(doc$lines, self$reporter_max_docstring_lines),
+          doc$delimiter
         )
-        for (line in c('"""', body, '"""')) {
-          cat("      ", cli::style_dim(line), "\n", sep = "")
-        }
       }
+      table <- NULL
       if (!is.null(step$data_table)) {
         rows <- format_data_table(step$data_table)
         # Keep the header, truncate only the body rows
-        rows <- c(
+        table <- c(
           rows[1],
           truncate_lines(rows[-1], self$reporter_max_table_lines)
         )
-        for (line in rows) {
-          cat("      ", cli::style_dim(line), "\n", sep = "")
-        }
+      }
+      lines <- if (isTRUE(step$data_table_first)) c(table, docstring) else c(docstring, table)
+      for (line in lines) {
+        cat("      ", cli::style_dim(line), "\n", sep = "")
       }
       invisible(self)
     }
