@@ -421,9 +421,19 @@ failed attempts of retried scenarios, in the order they finished}
 \subsection{Method \code{new()}}{
 Initialize the reporter
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberSummaryReporter$new(file = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{Path of a file to print to instead of the console, replaced
+by each run, or \code{NULL}. A relative path is relative to the working
+directory when the reporter is created. Its directory is created when
+the reporter is, if it doesn't exist.}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CucumberSummaryReporter-draw"></a>}}

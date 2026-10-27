@@ -58,6 +58,10 @@
 CucumberReporter <- R6::R6Class(
   "CucumberReporter",
   public = list(
+    #' @field output Path of the file what the reporter prints goes to, replaced
+    #'   by each run, or `NULL` to print to the console
+    output = NULL,
+
     #' @description
     #' Start a run
     start_run = function() {
@@ -93,11 +97,11 @@ CucumberReporter <- R6::R6Class(
     report = function(file) {
       rlang::check_installed("jsonlite", "to read Cucumber Messages.")
       lines <- readLines(file, warn = FALSE, encoding = "UTF-8")
-      self$start_run()
+      reporter_call(self, "start_run")
       for (line in lines[nzchar(lines)]) {
-        self$add_message(jsonlite::fromJSON(line, simplifyVector = FALSE))
+        reporter_call(self, "add_message", jsonlite::fromJSON(line, simplifyVector = FALSE))
       }
-      self$end_run()
+      reporter_call(self, "end_run")
       invisible(self)
     }
   )
@@ -112,7 +116,7 @@ cucumber_event <- function(reporter, method, ...) {
     return(invisible())
   }
   tryCatch(
-    reporter[[method]](...),
+    reporter_call(reporter, method, ...),
     error = function(e) {
       # Of a reporter in a CucumberMultiReporter, already named
       if (!inherits(e, "cucumber_reporter_error")) {
@@ -129,6 +133,17 @@ cucumber_event <- function(reporter, method, ...) {
     }
   )
   invisible()
+}
+
+#' Call an event of a reporter, with what it prints going to its `output`
+#' file, if it has one, which the start of a run replaces
+#' @keywords internal
+#' @noRd
+reporter_call <- function(reporter, method, ...) {
+  if (is.null(reporter$output)) {
+    return(reporter[[method]](...))
+  }
+  withr::with_output_sink(reporter$output, append = method != "start_run", reporter[[method]](...))
 }
 
 #' Check that a reporter is a CucumberReporter, or NULL for no reporter
@@ -599,7 +614,11 @@ CucumberSummaryReporter <- R6::R6Class(
 
     #' @description
     #' Initialize the reporter
-    initialize = function() {
+    #' @param file Path of a file to print to instead of the console, replaced
+    #'   by each run, or `NULL`. A relative path is relative to the working
+    #'   directory when the reporter is created. Its directory is created when
+    #'   the reporter is, if it doesn't exist.
+    initialize = function(file = NULL) {
       self$step_statuses <- character()
       self$scenario_statuses <- character()
       self$current_steps <- list()
@@ -615,6 +634,12 @@ CucumberSummaryReporter <- R6::R6Class(
       self$unicode <- cli::is_utf8_output()
       self$dynamic <- cli::is_dynamic_tty()
       self$width <- cli::console_width()
+      if (!is.null(file)) {
+        self$output <- report_path(file)
+        # A file has no colors and can't redraw a line
+        self$num_colors <- 1L
+        self$dynamic <- FALSE
+      }
       invisible(self)
     },
 
@@ -1048,8 +1073,10 @@ CucumberProgressReporter <- R6::R6Class(
 
     #' @description
     #' Initialize the reporter
-    initialize = function() {
-      super$initialize()
+    #' @param file Path of a file to print to instead of the console, replaced
+    #'   by each run, or `NULL`
+    initialize = function(file = NULL) {
+      super$initialize(file)
       self$frames <- cli::get_spinner()$frames
       invisible(self)
     },
@@ -1296,6 +1323,8 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @param reporter_max_table_lines Max data table rows to print for a step before
     #'   truncating. Defaults to the `cucumber.reporter_max_table_lines` option, or `Inf`
     #'   (print in full) if unset.
+    #' @param file Path of a file to print to instead of the console, replaced
+    #'   by each run, or `NULL`
     initialize = function(
       show_praise = TRUE,
       reporter_max_docstring_lines = getOption(
@@ -1305,9 +1334,10 @@ CucumberPrettyReporter <- R6::R6Class(
       reporter_max_table_lines = getOption(
         "cucumber.reporter_max_table_lines",
         Inf
-      )
+      ),
+      file = NULL
     ) {
-      super$initialize()
+      super$initialize(file)
       self$show_praise <- show_praise
       self$reporter_max_docstring_lines <- reporter_max_docstring_lines
       self$reporter_max_table_lines <- reporter_max_table_lines

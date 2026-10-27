@@ -427,6 +427,14 @@ cucumber::test("tests/acceptance", reporter = StatusReporter$new())
 
 }
 \keyword{internal}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{output}}{Path of the file what the reporter prints goes to, replaced
+by each run, or \code{NULL} to print to the console}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

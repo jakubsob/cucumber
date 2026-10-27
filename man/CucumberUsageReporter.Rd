@@ -335,6 +335,7 @@ cucumber::test(reporter = cucumber::CucumberUsageReporter$new())
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-CucumberUsageReporter-new}{\code{CucumberUsageReporter$new()}}
 \item \href{#method-CucumberUsageReporter-start_run}{\code{CucumberUsageReporter$start_run()}}
 \item \href{#method-CucumberUsageReporter-add_message}{\code{CucumberUsageReporter$add_message()}}
 \item \href{#method-CucumberUsageReporter-end_run}{\code{CucumberUsageReporter$end_run()}}
@@ -349,6 +350,26 @@ cucumber::test(reporter = cucumber::CucumberUsageReporter$new())
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-CucumberUsageReporter-new"></a>}}
+\if{latex}{\out{\hypertarget{method-CucumberUsageReporter-new}{}}}
+\subsection{Method \code{new()}}{
+Create a usage reporter
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{CucumberUsageReporter$new(file = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{Path of a file to print to instead of the console, replaced
+by each run, or \code{NULL}. A relative path is relative to the working
+directory when the reporter is created. Its directory is created when
+the reporter is, if it doesn't exist.}
+}
+\if{html}{\out{</div>}}
+}
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CucumberUsageReporter-start_run"></a>}}
 \if{latex}{\out{\hypertarget{method-CucumberUsageReporter-start_run}{}}}

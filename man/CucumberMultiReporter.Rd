@@ -15,6 +15,8 @@ Every reporter gets the run as Cucumber Messages. \code{CucumberMultiReporter} s
 several reporters, to show the progress of a run and write its reports at once.
 \code{report()} sends a reporter the messages stored in an ndjson file, like the one a
 \code{CucumberMessagesReporter} writes, to report a run after it ran.
+A reporter that prints, like \code{CucumberSummaryReporter}, prints to a \code{file} instead of the console
+when it's given one, replaced by each run.
 
 \if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Background:</span>
@@ -207,6 +209,80 @@ several reporters, to show the progress of a run and write its reports at once.
     | CucumberHtmlReporter     | report.html     |
     | CucumberJunitReporter    | junit.xml       |
     | CucumberRerunReporter    | rerun.txt       |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> <span class="va">&lt;reporter&gt;</span> prints to a file
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = &lt;reporter&gt;$new(file = "test-results/output.txt"), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the file <span class="st">"test-results/output.txt"</span> includes <span class="st">"<span class="va">&lt;text&gt;</span>"</span> 1 time
+  <span class="fu">And</span> the output doesn't include <span class="st">"<span class="va">&lt;text&gt;</span>"</span>
+<span></span>
+  <span class="kw">Examples:</span>
+    <span class="op">|</span> reporter                    <span class="op">|</span> text                             <span class="op">|</span>
+    <span class="op">|</span> CucumberSummaryReporter     <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
+    <span class="op">|</span> CucumberDotsReporter        <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
+    <span class="op">|</span> CucumberProgressReporter    <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
+    <span class="op">|</span> CucumberProgressBarReporter <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
+    <span class="op">|</span> CucumberPrettyReporter      <span class="op">|</span> Scenario: Add an item            <span class="op">|</span>
+    <span class="op">|</span> CucumberUsageReporter       <span class="op">|</span> Step definition / Step           <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario Outline: <reporter> prints to a file
+  When I run
+    """
+    test("features", reporter = <reporter>$new(file = "test-results/output.txt"), stop_on_failure = FALSE)
+    """
+  Then the file "test-results/output.txt" includes "<text>" 1 time
+  And the output doesn't include "<text>"
+
+  Examples:
+    | reporter                    | text                             |
+    | CucumberSummaryReporter     | 2 scenarios (1 failed, 1 passed) |
+    | CucumberDotsReporter        | 2 scenarios (1 failed, 1 passed) |
+    | CucumberProgressReporter    | 2 scenarios (1 failed, 1 passed) |
+    | CucumberProgressBarReporter | 2 scenarios (1 failed, 1 passed) |
+    | CucumberPrettyReporter      | Scenario: Add an item            |
+    | CucumberUsageReporter       | Step definition / Step           |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Each run replaces the file a reporter prints to
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the file <span class="st">"summary.txt"</span> includes <span class="st">"2 scenarios (1 failed, 1 passed)"</span> 1 time</code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Each run replaces the file a reporter prints to
+  When I run
+    """
+    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+    """
+  Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A stored run is printed to a file
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)</span>
+<span class="st">    CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the file <span class="st">"summary.txt"</span> includes <span class="st">"2 scenarios (1 failed, 1 passed)"</span> 1 time
+  <span class="fu">And</span> the output doesn't include <span class="st">"2 scenarios"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A stored run is printed to a file
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+    CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")
+    """
+  Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+  And the output doesn't include "2 scenarios"
 %</pre>
 }}
 

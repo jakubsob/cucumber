@@ -361,9 +361,17 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberProgressReporter
 \subsection{Method \code{new()}}{
 Initialize the reporter
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CucumberProgressReporter$new(file = NULL)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{file}}{Path of a file to print to instead of the console, replaced
+by each run, or \code{NULL}}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-CucumberProgressReporter-feature_statuses"></a>}}

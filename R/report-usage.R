@@ -29,6 +29,16 @@ CucumberUsageReporter <- R6::R6Class(
   inherit = CucumberReporter,
   public = list(
     #' @description
+    #' Create a usage reporter
+    #' @param file Path of a file to print to instead of the console, replaced
+    #'   by each run, or `NULL`. A relative path is relative to the working
+    #'   directory when the reporter is created. Its directory is created when
+    #'   the reporter is, if it doesn't exist.
+    initialize = function(file = NULL) {
+      if (!is.null(file)) self$output <- report_path(file)
+    },
+
+    #' @description
     #' Start following the messages of a run
     start_run = function() {
       private$query <- new_query()

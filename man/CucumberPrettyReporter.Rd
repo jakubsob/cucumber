@@ -757,7 +757,8 @@ Initialize the reporter
 \if{html}{\out{<div class="r">}}\preformatted{CucumberPrettyReporter$new(
   show_praise = TRUE,
   reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines", Inf),
-  reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf)
+  reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
+  file = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -773,6 +774,9 @@ truncating. Defaults to the \code{cucumber.reporter_max_docstring_lines} option,
 \item{\code{reporter_max_table_lines}}{Max data table rows to print for a step before
 truncating. Defaults to the \code{cucumber.reporter_max_table_lines} option, or \code{Inf}
 (print in full) if unset.}
+
+\item{\code{file}}{Path of a file to print to instead of the console, replaced
+by each run, or \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }

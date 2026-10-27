@@ -4,6 +4,8 @@ Feature: Reporters
   several reporters, to show the progress of a run and write its reports at once.
   `report()` sends a reporter the messages stored in an ndjson file, like the one a
   `CucumberMessagesReporter` writes, to report a run after it ran.
+  A reporter that prints, like `CucumberSummaryReporter`, prints to a `file` instead of the console
+  when it's given one, replaced by each run.
 
   Background:
     Given a package
@@ -96,6 +98,40 @@ Feature: Reporters
       | CucumberHtmlReporter     | report.html     |
       | CucumberJunitReporter    | junit.xml       |
       | CucumberRerunReporter    | rerun.txt       |
+
+  Scenario Outline: <reporter> prints to a file
+    When I run
+      """
+      test("features", reporter = <reporter>$new(file = "test-results/output.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "test-results/output.txt" includes "<text>" 1 time
+    And the output doesn't include "<text>"
+
+    Examples:
+      | reporter                    | text                             |
+      | CucumberSummaryReporter     | 2 scenarios (1 failed, 1 passed) |
+      | CucumberDotsReporter        | 2 scenarios (1 failed, 1 passed) |
+      | CucumberProgressReporter    | 2 scenarios (1 failed, 1 passed) |
+      | CucumberProgressBarReporter | 2 scenarios (1 failed, 1 passed) |
+      | CucumberPrettyReporter      | Scenario: Add an item            |
+      | CucumberUsageReporter       | Step definition / Step           |
+
+  Scenario: Each run replaces the file a reporter prints to
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+      test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+
+  Scenario: A stored run is printed to a file
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+      CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")
+      """
+    Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+    And the output doesn't include "2 scenarios"
 
   Scenario: A report that can't be written fails the run
     The scenarios run, and the error names the reporter that failed when the run ended.
