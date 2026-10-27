@@ -26,7 +26,7 @@ evaluate_tag_expression <- function(expression, scenario_tags) {
   if (is.null(expression) || length(expression) == 0) {
     return(TRUE)
   }
-  match_tag_expression(expression, paste0("@", scenario_tags))
+  match_tag_expression(expression, paste0("@", scenario_tags, recycle0 = TRUE))
 }
 
 #' Whether tags, as written, match a tag expression

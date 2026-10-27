@@ -148,6 +148,24 @@ Feature: Hooks
       after: failed Step "I add an item" failed
       """
 
+  Scenario: A scenario without tags has no tags
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) cat("tags:", deparse(scenario$tags), "\n"))
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes "tags: character(0)"
+
   @rd
   Scenario: Hooks get where the scenario is and its id
     The line of an example of a Scenario Outline is the line of its row.

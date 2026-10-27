@@ -99,7 +99,7 @@ execute_single_pickle <- function(
       withCallingHandlers({
         scenario <- list(
           name = pickle$name,
-          tags = paste0("@", pickle$tags),
+          tags = paste0("@", pickle$tags, recycle0 = TRUE),
           uri = pickle$feature_file,
           line = pickle$source_line,
           id = pickle$message$id
