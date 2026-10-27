@@ -533,3 +533,38 @@ Feature: Hooks
       | after_step  | An | 2      | Use `function(context, step)`.           |
       | before_all  | A  | 0 or 1 | Use `function()` or `function(context)`. |
       | after_all   | An | 0 or 1 | Use `function()` or `function(context)`. |
+
+  Scenario: Several tag expressions of a hook are an error
+    Given a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) {}, tags = c("@db", "@slow"))
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then it fails with
+      """
+      Error in `source_dir()`:
+      ! Failed to evaluate './setup-steps.R'.
+      Caused by error in `before()`:
+      ! `tags` must be one tag expression.
+      i Combine tag expressions with `and`, like `"@smoke and not @slow"`.
+      """
+
+  Scenario: A hook's name that isn't a string is an error
+    Given a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) {}, name = 1)
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then it fails with
+      """
+      Error in `source_dir()`:
+      ! Failed to evaluate './setup-steps.R'.
+      Caused by error in `before()`:
+      ! `name` must be a string, or `NULL`.
+      """

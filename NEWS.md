@@ -72,7 +72,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `before_step()` and `after_step()` hooks run around each step. They get the step's `keyword`, `text`, `line`, and its `data_table` and `doc_string` as its step definition gets them, and in `after_step()` its `status` and `error`. A failing step hook fails the step.
 - ✨ `before_all()` and `after_all()` hooks run once before the first and after the last scenario of a run. They get no arguments, or a `context` to attach data to the report.
 - ✨ Hooks get a `tags` argument, a tag expression. The hook runs only for scenarios that match it, e.g. `before(connect_db, tags = "@db")`.
-- ✨ Hooks get a `name` argument. A named hook's errors start with its name, e.g. `Hook "Connect to the database" failed`.
+- ✨ Hooks get a `name` argument. A named hook's errors start with its name, e.g. `Hook "Connect to the database" failed`. Several tag expressions in `tags`, or a `name` that isn't a string, are an error of the hook's definition, like ``` `tags` must be one tag expression. ```
 - ✨ A failing hook's error is like a failing step's: it says which hook failed, like ``Hook `before()` failed``, or its name, the scenario's feature and name, and where the hook is defined, caused by the hook's error. `after()` hooks get it as `scenario$error`, and the hook's own error is its `parent`.
 - ✨ A `before()` hook skips its scenario by calling `skip_scenario()`. The rest of the before hooks and the scenario's steps are skipped, and `after()` hooks get `"skipped"` as the scenario's `status`.
 - ✨ A step can call `skip_scenario()` too. The step and the steps after it are skipped, the scenario is reported as skipped, and `after()` hooks still run.

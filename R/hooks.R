@@ -1,11 +1,13 @@
 #' @importFrom rlang abort
-#' @importFrom checkmate assert_function assert_string
+#' @importFrom checkmate assert_function
 make_hook <- function(kind, arguments) {
   function(hook, tags = NULL, name = NULL) {
     assert_function(hook)
     srcref <- attr(hook, "srcref")
     # before_all and after_all hooks can leave out their context
     optional <- identical(arguments, "context")
+    # The call of before_all() and after_all(), which call this function
+    call <- if (optional) rlang::caller_env() else rlang::current_env()
     if (optional && length(formals(hook)) == 0) {
       fn <- hook
       hook <- function(context) fn()
@@ -23,14 +25,14 @@ make_hook <- function(kind, arguments) {
         } else {
           glue("Use `function({paste(arguments, collapse = ', ')})`.")
         }),
-        # The call of before_all() and after_all(), which call this function
-        call = if (optional) rlang::caller_env() else rlang::current_env()
+        call = call
       )
     }
-    assert_string(tags, null.ok = TRUE)
-    assert_string(name, null.ok = TRUE)
     # Fail at registration on an invalid tag expression
-    evaluate_tag_expression(tags, character())
+    check_tags(tags, call = call)
+    if (!is.null(name) && !rlang::is_string(name)) {
+      abort("`name` must be a string, or `NULL`.", call = call)
+    }
     register_hook(hook, kind, tags, hook_name = name, srcref = srcref)
     invisible(hook)
   }
