@@ -43,6 +43,23 @@ Feature: Summary reporter
     And the output doesn't include "Scenario: Add an item"
     And the output doesn't include "...."
 
+  Scenario: A run without scenarios counts no scenarios and no steps
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new())
+      """
+    Then the output includes
+      """
+      Summary
+      0 scenarios
+      0 steps
+      """
+
   Scenario: A hook's error is printed in the summary where the hook ran
     Given a package
     And a file named "features/basket.feature" with

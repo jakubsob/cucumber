@@ -115,6 +115,42 @@ Feature: Basket
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A run without scenarios counts no scenarios and no steps
+  <span class="fu">Given</span> a package
+  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberSummaryReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Summary</span>
+<span class="st">    0 scenarios</span>
+<span class="st">    0 steps</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A run without scenarios counts no scenarios and no steps
+  Given a package
+  And a file named "features/basket.feature" with
+    """
+    Feature: Basket
+    """
+  When I run
+    """
+    test("features", reporter = CucumberSummaryReporter$new())
+    """
+  Then the output includes
+    """
+    Summary
+    0 scenarios
+    0 steps
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's error is printed in the summary where the hook ran
   <span class="fu">Given</span> a package
   <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with

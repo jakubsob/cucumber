@@ -135,6 +135,40 @@ Feature: Failing steps
       | Add an item          | failed |
       | Look into the basket | passed |
 
+  Scenario: An error is shown with the errors that caused it
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Save the basket
+          When I save the basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      write_basket <- function() stop("the disk is full")
+      when("I save the basket", function(context) {
+        tryCatch(
+          write_basket(),
+          error = function(e) rlang::abort("The basket can't be saved.", parent = e)
+        )
+      })
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error] Scenario: Save the basket
+      Error: Step "I save the basket" failed
+      i Feature: basket.feature
+      i Scenario: Save the basket
+      i Step defined at: setup-steps.R:2
+      Caused by error:
+      ! The basket can't be saved.
+      Caused by error in `write_basket()`:
+      ! the disk is full
+      """
+
   Scenario: An error is shown with the backtrace of the step
     Given a file named "features/basket.feature" with
       """

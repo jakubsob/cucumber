@@ -125,6 +125,58 @@ Feature: Step definition snippets
         })
       """
 
+  Scenario: An undefined step of a Background is reported with a snippet
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Background:
+          Given an empty basket
+
+        Scenario: Start shopping
+          When I start shopping
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I start shopping", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [failure] Scenario: Start shopping
+      No step found for: "an empty basket"
+      i Add a step definition:
+        given("an empty basket", function(context) {
+          pending()
+        })
+      """
+
+  Scenario: A snippet of a step written in another language uses the step's keyword
+    Given a package
+    And a file named "features/panier.feature" with
+      """
+      # language: fr
+      Fonctionnalité: Panier
+        Scénario: Panier vide
+          Alors le panier est vide
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [failure] Scenario: Panier vide
+      No step found for: "le panier est vide"
+      i Add a step definition:
+        then("le panier est vide", function(context) {
+          pending()
+        })
+      """
+
   Scenario: A snippet's parameters are in the order they are written
     Given a package
     And a file named "features/order.feature" with

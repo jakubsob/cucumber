@@ -1747,6 +1747,76 @@ An error is shown with its backtrace, the calls of the step down to where it was
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> An error is shown with the errors that caused it
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Save the basket</span>
+<span class="st">        When I save the basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    write_basket &lt;- function() stop("the disk is full")</span>
+<span class="st">    when("I save the basket", function(context) \{</span>
+<span class="st">      tryCatch(</span>
+<span class="st">        write_basket(),</span>
+<span class="st">        error = function(e) rlang::abort("The basket can't be saved.", parent = e)</span>
+<span class="st">      )</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the errors are
+<span class="st">    """</span>
+<span class="st">    [error] Scenario: Save the basket</span>
+<span class="st">    Error: Step "I save the basket" failed</span>
+<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Scenario: Save the basket</span>
+<span class="st">    i Step defined at: setup-steps.R:2</span>
+<span class="st">    Caused by error:</span>
+<span class="st">    ! The basket can't be saved.</span>
+<span class="st">    Caused by error in `write_basket()`:</span>
+<span class="st">    ! the disk is full</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: An error is shown with the errors that caused it
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Save the basket
+        When I save the basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    write_basket <- function() stop("the disk is full")
+    when("I save the basket", function(context) \{
+      tryCatch(
+        write_basket(),
+        error = function(e) rlang::abort("The basket can't be saved.", parent = e)
+      )
+    \})
+    """
+  When I run
+    """
+    test("features", stop_on_failure = FALSE)
+    """
+  Then the errors are
+    """
+    [error] Scenario: Save the basket
+    Error: Step "I save the basket" failed
+    i Feature: basket.feature
+    i Scenario: Save the basket
+    i Step defined at: setup-steps.R:2
+    Caused by error:
+    ! The basket can't be saved.
+    Caused by error in `write_basket()`:
+    ! the disk is full
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> An error is shown with the backtrace of the step
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>
