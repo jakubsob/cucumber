@@ -1,4 +1,3 @@
-@rd
 Feature: Running scenarios alongside testthat tests
   `run()` in a `tests/testthat/test-*.R` file runs the feature files in `tests/testthat`
   as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.
@@ -31,6 +30,7 @@ Feature: Running scenarios alongside testthat tests
       run()
       """
 
+  @rd
   Scenario: Scenarios run with the package's testthat tests
     Given a file named "tests/testthat/setup-steps.R" with
       """
@@ -101,6 +101,7 @@ Feature: Running scenarios alongside testthat tests
       """
     Then it passes
 
+  @rd
   Scenario Outline: run() chooses what to run like test(), with <argument>
     Given a file named "tests/testthat/other.feature" with
       """
@@ -137,6 +138,7 @@ Feature: Running scenarios alongside testthat tests
       | tags     | not @slow         |
       | name     | Adding one        |
 
+  @rd
   Scenario: Each scenario is a test of the test file that calls run()
     Given a file named "tests/testthat/setup-steps.R" with
       """
@@ -220,6 +222,7 @@ Feature: Running scenarios alongside testthat tests
     Then the output includes 'Step "the result is 2" failed'
     And the output doesn't include "1 scenario"
 
+  @rd
   Scenario: testthat's reporter shows the line of the feature file where the step failed
     Given a file named "tests/testthat/setup-steps.R" with
       """
@@ -321,6 +324,7 @@ Feature: Running scenarios alongside testthat tests
       | scenario   | status    |
       | Adding one | undefined |
 
+  @rd
   Scenario: run() outside of a testthat run runs every scenario, and fails if one failed
     Steps can use testthat's expectations, as `run()` attaches testthat.
 
@@ -358,6 +362,7 @@ Feature: Running scenarios alongside testthat tests
       | Adding two   | failed |
       | Adding three | passed |
 
+  @rd
   Scenario: run() in a parallel testthat run is an error
     When I run
       """
