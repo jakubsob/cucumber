@@ -187,6 +187,17 @@ then("the scenarios have these warnings:", function(expected, context) {
   expect_equal(warnings, as.data.frame(expected))
 })
 
+# How many expectations passed and warnings testthat got for each scenario of the last test() run
+then("testthat counts these results of the scenarios:", function(expected, context) {
+  results <- as.data.frame(context$result)
+  actual <- tibble::tibble(
+    scenario = sub("^Scenario: ", "", results$test),
+    passed = as.character(results$passed),
+    warnings = as.character(results$warning)
+  )
+  expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
+})
+
 # Where testthat's results of the last run say each scenario failed or skipped, as `file:line`
 expect_result_locations <- function(classes, expected, context) {
   results <- lapply(context$result, \(test) {

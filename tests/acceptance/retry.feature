@@ -107,6 +107,34 @@ Feature: Retry
       | Pending   | pending   | 1        |
       | Undefined | undefined | 1        |
 
+  Scenario: testthat gets the expectations and warnings of only the last attempt
+    Given a file named "features/setup-warnings.R" with
+      """
+      tries <- 0
+      given("a step that warns and passes the second time", function(context) {
+        tries <<- tries + 1
+        expect_true(TRUE)
+        warning("Attempt ", tries)
+        if (tries < 2) stop("Not yet")
+      })
+      """
+    And a file named "features/flaky.feature" with
+      """
+      Feature: Flaky
+        Scenario: Passes the second time
+          Given a step that warns and passes the second time
+      """
+    When I run
+      """
+      test("features", retry = 1)
+      """
+    Then testthat counts these results of the scenarios:
+      | scenario               | passed | warnings |
+      | Passes the second time | 1      | 1        |
+    And the scenarios have these warnings:
+      | scenario               | warning   |
+      | Passes the second time | Attempt 2 |
+
   @rd
   Scenario: The summary counts only the last attempt of a scenario
     Given a file named "features/flaky.feature" with
