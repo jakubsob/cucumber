@@ -85,6 +85,30 @@ Feature: Cucumber Expressions
     Then it passes
 
   @rd
+  Scenario: Text is matched literally, not as a regular expression
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Literal text
+        Scenario: A dot
+          Given the version is 1.5
+
+        Scenario: Any character
+          Given the version is 105
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the version is 1.5", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                     | status    |
+      | Given the version is 1.5 | passed    |
+      | Given the version is 105 | undefined |
+
   Scenario: Special characters match literally and can be escaped
     Given a package
     And a file named "features/expressions.feature" with

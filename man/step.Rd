@@ -198,64 +198,52 @@ An invalid expression is an error pointing at the problem.
 }}
 
 \if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Special characters match literally and can be escaped
+<pre class="gherkin"><code><span class="kw">Scenario:</span> Text is matched literally, not as a regular expression
   <span class="fu">Given</span> a package
   <span class="fu">And</span> a file named <span class="st">"features/expressions.feature"</span> with
 <span class="st">    """</span>
 <span class="st">    Feature: Literal text</span>
-<span class="st">      Scenario: Punctuation</span>
-<span class="st">        Given the total is 5.00?</span>
-<span class="st">        When I visit /about</span>
-<span class="st">        Then I see (5) items on a/b</span>
+<span class="st">      Scenario: A dot</span>
+<span class="st">        Given the version is 1.5</span>
+<span class="st"></span>
+<span class="st">      Scenario: Any character</span>
+<span class="st">        Given the version is 105</span>
 <span class="st">    """</span>
   <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
 <span class="st">    """</span>
-<span class="st">    given("the total is \{float\}?", function(total, context) \{</span>
-<span class="st">      context$total &lt;- total</span>
-<span class="st">    \})</span>
-<span class="st">    when("I visit \\\\/about", function(context) \{</span>
-<span class="st">      context$page &lt;- "/about"</span>
-<span class="st">    \})</span>
-<span class="st">    then("I see \\\\(\{int\}) items on a\\\\/b", function(n, context) \{</span>
-<span class="st">      expect_equal(n, 5L)</span>
-<span class="st">      expect_equal(context$total, 5)</span>
-<span class="st">      expect_equal(context$page, "/about")</span>
-<span class="st">    \})</span>
+<span class="st">    given("the version is 1.5", function(context) \{\})</span>
 <span class="st">    """</span>
   <span class="fu">When</span> I run
 <span class="st">    """</span>
-<span class="st">    test("features")</span>
+<span class="st">    test("features", stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Special characters match literally and can be escaped
+  <span class="fu">Then</span> the steps have these results:
+    <span class="op">|</span> step                     <span class="op">|</span> status    <span class="op">|</span>
+    <span class="op">|</span> Given the version is 1.5 <span class="op">|</span> passed    <span class="op">|</span>
+    <span class="op">|</span> Given the version is 105 <span class="op">|</span> undefined <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: Text is matched literally, not as a regular expression
   Given a package
   And a file named "features/expressions.feature" with
     """
     Feature: Literal text
-      Scenario: Punctuation
-        Given the total is 5.00?
-        When I visit /about
-        Then I see (5) items on a/b
+      Scenario: A dot
+        Given the version is 1.5
+
+      Scenario: Any character
+        Given the version is 105
     """
   And a file named "features/setup-steps.R" with
     """
-    given("the total is \{float\}?", function(total, context) \{
-      context$total <- total
-    \})
-    when("I visit \\\\/about", function(context) \{
-      context$page <- "/about"
-    \})
-    then("I see \\\\(\{int\}) items on a\\\\/b", function(n, context) \{
-      expect_equal(n, 5L)
-      expect_equal(context$total, 5)
-      expect_equal(context$page, "/about")
-    \})
+    given("the version is 1.5", function(context) \{\})
     """
   When I run
     """
-    test("features")
+    test("features", stop_on_failure = FALSE)
     """
-  Then it passes
+  Then the steps have these results:
+    | step                     | status    |
+    | Given the version is 1.5 | passed    |
+    | Given the version is 105 | undefined |
 %</pre>
 }}
 
