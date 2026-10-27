@@ -382,7 +382,13 @@ Feature: Hooks
       """
       test("features", strict = <strict>, stop_on_failure = FALSE)
       """
-    Then the output includes "after: <case>"
+    Then the output includes these lines in order:
+      """
+      after: <case>
+      """
+    And the scenarios have these results:
+      | scenario    | status |
+      | Add an item | <case> |
 
     Examples:
       | case      | strict | definitions                                                                                   |
@@ -400,7 +406,10 @@ Feature: Hooks
       """
     And a file named "features/setup-steps.R" with
       """
-      after(function(context, scenario) cat("after:", scenario$status, conditionMessage(scenario$error), "\n"))
+      after(function(context, scenario) {
+        cat("after:", scenario$status, conditionMessage(scenario$error), "\n")
+        cat("parent:", conditionMessage(scenario$error$parent), "\n")
+      })
       after(function(context, scenario) stop("can't close the database"))
       given("an empty basket", function(context) {})
       """
@@ -413,10 +422,11 @@ Feature: Hooks
       after: failed Hook `after()` failed
       i Feature: basket.feature
       i Scenario: Add an item
-      i Hook defined at: setup-steps.R:2
+      i Hook defined at: setup-steps.R:5
       Caused by error:
       ! can't close the database
       """
+    And the output includes "parent: can't close the database"
 
   Scenario Outline: A failing <hook>() hook fails the scenario
     Given a file named "features/basket.feature" with
