@@ -747,6 +747,68 @@ scenario, as its steps already have their results.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> What steps and hooks defer in context runs after the after hooks
+  Like `withr::defer()`, what was deferred last runs first.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        When I add an item</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    before(function(context, scenario) \{</span>
+<span class="st">      withr::defer(cat("deferred by the before hook\\n"), envir = context)</span>
+<span class="st">    \})</span>
+<span class="st">    after(function(context, scenario) cat("after hook\\n"))</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      withr::defer(cat("deferred by the step\\n"), envir = context)</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    after hook</span>
+<span class="st">    deferred by the step</span>
+<span class="st">    deferred by the before hook</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: What steps and hooks defer in context runs after the after hooks
+  Like `withr::defer()`, what was deferred last runs first.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        When I add an item
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    before(function(context, scenario) \{
+      withr::defer(cat("deferred by the before hook\\n"), envir = context)
+    \})
+    after(function(context, scenario) cat("after hook\\n"))
+    when("I add an item", function(context) \{
+      withr::defer(cat("deferred by the step\\n"), envir = context)
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the output includes these lines in order:
+    """
+    after hook
+    deferred by the step
+    deferred by the before hook
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> What a step changes without context is undone when the step ends
   <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
 <span class="st">    """</span>

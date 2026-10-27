@@ -278,6 +278,29 @@ Feature: Hooks
       | Before                | failed  |
       | Given an empty basket | skipped |
 
+  Scenario: After hooks run after a failing before hook
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) stop("no database"))
+      after(function(context, scenario) {})
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps and hooks have these results:
+      | step                  | status  |
+      | Before                | failed  |
+      | Given an empty basket | skipped |
+      | After                 | passed  |
+
   Scenario: A failing after hook fails the scenario
     Given a file named "features/basket.feature" with
       """

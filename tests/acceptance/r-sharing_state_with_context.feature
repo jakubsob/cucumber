@@ -86,6 +86,36 @@ Feature: Sharing state with context
       | Add an item          | passed |
       | Look into the basket | passed |
 
+  Scenario: What steps and hooks defer in context runs after the after hooks
+    Like `withr::defer()`, what was deferred last runs first.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) {
+        withr::defer(cat("deferred by the before hook\n"), envir = context)
+      })
+      after(function(context, scenario) cat("after hook\n"))
+      when("I add an item", function(context) {
+        withr::defer(cat("deferred by the step\n"), envir = context)
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      after hook
+      deferred by the step
+      deferred by the before hook
+      """
+
   Scenario: What a step changes without context is undone when the step ends
     Given a file named "features/setup-steps.R" with
       """
