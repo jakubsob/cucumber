@@ -48,6 +48,40 @@ Feature: Usage reporter
       I remove {int} apples   UNUSED    setup-steps.R:4
       """
 
+  Scenario: A regular expression is shown between slashes
+    Given a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) {})
+      when("^I add (\\d+) apples$", function(n, context) {})
+      when("I wait", function(context) {})
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes
+      """
+      Step definition / Step  Duration  Location
+      an empty basket         -         setup-steps.R:1
+        an empty basket       -         basket.feature:3
+        an empty basket       -         basket.feature:8
+      /^I add (\d+) apples$/  -         setup-steps.R:2
+        I add 2 apples        -         basket.feature:4
+        I add 1 apples        -         basket.feature:5
+      I wait                  -         setup-steps.R:3
+        I wait                -         basket.feature:9
+      """
+
+  Scenario: A run without step definitions has no usage to show
+    Given a file named "features/setup-steps.R" with
+      """
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes "No step definitions"
+
   Scenario: The slowest step definitions come first, and the unused ones last
     When I run
       """

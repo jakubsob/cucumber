@@ -67,3 +67,11 @@ Feature: Custom report
       basket.feature:12 Add items passed
       basket.feature:13 Add items failed
       """
+
+  Scenario: The messages print how many features and scenarios ran, by status
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      print(read_messages("messages.ndjson"))
+      """
+    Then the output includes "<cucumber_messages> 1 feature, 3 scenarios (1 failed, 2 passed)"

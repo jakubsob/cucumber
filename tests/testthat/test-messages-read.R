@@ -83,5 +83,5 @@ test_that("it prints how many features and scenarios ran, by status", {
   output <- capture.output(print(run))
 
   # Assert
-  expect_equal(output, "<cucumber_messages> 1 features, 7 scenarios (2 failed, 5 passed) ")
+  expect_equal(output, "<cucumber_messages> 1 feature, 7 scenarios (2 failed, 5 passed) ")
 })

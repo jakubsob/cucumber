@@ -118,6 +118,78 @@ that no step matched is \code{UNUSED}. It finds slow steps, and step definitions
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A regular expression is shown between slashes
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) \{\})</span>
+<span class="st">    when("^I add (\\\\d+) apples$", function(n, context) \{\})</span>
+<span class="st">    when("I wait", function(context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    Step definition / Step  Duration  Location</span>
+<span class="st">    an empty basket         -         setup-steps.R:1</span>
+<span class="st">      an empty basket       -         basket.feature:3</span>
+<span class="st">      an empty basket       -         basket.feature:8</span>
+<span class="st">    /^I add (\\d+) apples$/  -         setup-steps.R:2</span>
+<span class="st">      I add 2 apples        -         basket.feature:4</span>
+<span class="st">      I add 1 apples        -         basket.feature:5</span>
+<span class="st">    I wait                  -         setup-steps.R:3</span>
+<span class="st">      I wait                -         basket.feature:9</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A regular expression is shown between slashes
+  Given a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{\})
+    when("^I add (\\\\d+) apples$", function(n, context) \{\})
+    when("I wait", function(context) \{\})
+    """
+  When I run
+    """
+    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+    """
+  Then the output includes
+    """
+    Step definition / Step  Duration  Location
+    an empty basket         -         setup-steps.R:1
+      an empty basket       -         basket.feature:3
+      an empty basket       -         basket.feature:8
+    /^I add (\\d+) apples$/  -         setup-steps.R:2
+      I add 2 apples        -         basket.feature:4
+      I add 1 apples        -         basket.feature:5
+    I wait                  -         setup-steps.R:3
+      I wait                -         basket.feature:9
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A run without step definitions has no usage to show
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"No step definitions"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A run without step definitions has no usage to show
+  Given a file named "features/setup-steps.R" with
+    """
+    """
+  When I run
+    """
+    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+    """
+  Then the output includes "No step definitions"
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> The slowest step definitions come first, and the unused ones last
   <span class="fu">When</span> I run
 <span class="st">    """</span>

@@ -90,9 +90,9 @@ Feature: JUnit reporter
       test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
       """
     Then the JUnit report "report.xml" has these test cases:
-      | result  | message                |
-      | failure | The server didn't stop |
-      | passed  |                        |
+      | name            | result  | message                |
+      | setup-steps.R:2 | failure | The server didn't stop |
+      | Add an item     | passed  |                        |
 
   Scenario: A test case's output is its steps and their results
     Given a file named "features/basket.feature" with

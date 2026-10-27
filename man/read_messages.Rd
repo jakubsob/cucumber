@@ -175,6 +175,24 @@ features, scenarios and steps. Write a report of your own from them, like a summ
 %</pre>
 }}
 
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> The messages print how many features and scenarios ran, by status
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
+<span class="st">    print(read_messages("messages.ndjson"))</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes <span class="st">"<span class="va">&lt;cucumber_messages&gt;</span> 1 feature, 3 scenarios (1 failed, 2 passed)"</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: The messages print how many features and scenarios ran, by status
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+    print(read_messages("messages.ndjson"))
+    """
+  Then the output includes "<cucumber_messages> 1 feature, 3 scenarios (1 failed, 2 passed)"
+%</pre>
+}}
+
 Source: \code{tests/acceptance/r-custom_report.feature}
 }
 }

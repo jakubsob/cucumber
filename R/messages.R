@@ -166,7 +166,8 @@ source_reference <- function(srcref) {
   if (length(file) == 0) {
     return(empty_object())
   }
-  list(uri = file, location = list(line = utils::getSrcLocation(srcref, "line")))
+  # Like the uri of a feature file, without the `./` of a file sourced from the run's directory
+  list(uri = as.character(fs::path_norm(file)), location = list(line = utils::getSrcLocation(srcref, "line")))
 }
 
 step_definition_message <- function(id, step) {

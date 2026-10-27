@@ -174,9 +174,9 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
 <span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
 <span class="st">    """</span>
   <span class="fu">Then</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> result  <span class="op">|</span> message                <span class="op">|</span>
-    <span class="op">|</span> failure <span class="op">|</span> The server didn't stop <span class="op">|</span>
-    <span class="op">|</span> passed  <span class="op">|</span>                        <span class="op">|</span></code></pre >}}
+    <span class="op">|</span> name            <span class="op">|</span> result  <span class="op">|</span> message                <span class="op">|</span>
+    <span class="op">|</span> setup-steps.R:2 <span class="op">|</span> failure <span class="op">|</span> The server didn't stop <span class="op">|</span>
+    <span class="op">|</span> Add an item     <span class="op">|</span> passed  <span class="op">|</span>                        <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A failed before_all() or after_all() hook is a failed test case
   Given a file named "features/basket.feature" with
     """
@@ -195,9 +195,9 @@ A \code{before_all()} or \code{after_all()} hook that failed is a failed test ca
     test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
     """
   Then the JUnit report "report.xml" has these test cases:
-    | result  | message                |
-    | failure | The server didn't stop |
-    | passed  |                        |
+    | name            | result  | message                |
+    | setup-steps.R:2 | failure | The server didn't stop |
+    | Add an item     | passed  |                        |
 %</pre>
 }}
 

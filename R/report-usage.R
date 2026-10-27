@@ -50,6 +50,8 @@ CucumberUsageReporter <- R6::R6Class(
       rows <- usage_rows(private$query)
       if (nrow(rows) > 0) {
         cat(format_usage(rows), sep = "\n")
+      } else {
+        cat("No step definitions\n")
       }
       invisible(self)
     }
@@ -90,8 +92,9 @@ usage_rows <- function(q) {
   definitions <- lapply(unname(q$step_definitions), \(definition) {
     steps <- matches[[definition$id]]
     reference <- definition$sourceReference
+    pattern <- definition$pattern
     row <- data.frame(
-      text = definition$pattern$source,
+      text = if (pattern$type == "REGULAR_EXPRESSION") paste0("/", pattern$source, "/") else pattern$source,
       seconds = if (is.null(steps)) NA_real_ else mean(steps$seconds, na.rm = TRUE),
       location = if (!is.null(reference$uri)) paste0(fs::path_rel(reference$uri), ":", reference$location$line) else ""
     )
@@ -123,7 +126,11 @@ usage_rows <- function(q) {
 #' @keywords internal
 #' @noRd
 format_usage <- function(rows) {
-  column <- \(header, values) formatC(c(header, values), width = -max(nchar(c(header, values))))
+  # Not formatC(), which counts a backslash as two characters
+  column <- \(header, values) {
+    x <- c(header, values)
+    paste0(x, strrep(" ", max(nchar(x)) - nchar(x)))
+  }
   lines <- paste(
     column("Step definition / Step", rows$text),
     column("Duration", rows$duration),

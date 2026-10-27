@@ -180,11 +180,11 @@ dedent <- function(text) {
 scenario_summary <- function(scenarios) {
   counts <- table(factor(scenarios$status, STEP_STATUSES))
   counts <- counts[counts > 0]
-  paste0(nrow(scenarios), " scenarios", if (length(counts)) paste0(" (", paste(counts, names(counts), collapse = ", "), ")"))
+  paste0(nrow(scenarios), " scenario", if (nrow(scenarios) != 1) "s", if (length(counts)) paste0(" (", paste(counts, names(counts), collapse = ", "), ")"))
 }
 
 #' @export
 print.cucumber_messages <- function(x, ...) {
-  cat("<cucumber_messages>", paste0(nrow(x$features), " features, ", scenario_summary(x$scenarios)), "\n")
+  cat("<cucumber_messages>", paste0(nrow(x$features), " feature", if (nrow(x$features) != 1) "s", ", ", scenario_summary(x$scenarios)), "\n")
   invisible(x)
 }
