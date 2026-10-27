@@ -227,6 +227,48 @@ like the HTML, JUnit and JSON formatters.
 %</pre>
 }}
 
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A failed step's error has the backtrace of the step as its stack trace
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    open_basket &lt;- function() find_basket()</span>
+<span class="st">    find_basket &lt;- function() stop("basket is missing")</span>
+<span class="st">    given("an empty basket", function(context) open_basket())</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
+<span class="st">    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)</span>
+<span class="st">    finished &lt;- Filter(\\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)</span>
+<span class="st">    cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes lines matching these patterns in order:
+<span class="st">    """</span>
+<span class="st">    open_basket\\(\\)</span>
+<span class="st">    find_basket\\(\\)</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A failed step's error has the backtrace of the step as its stack trace
+  Given a file named "features/setup-steps.R" with
+    """
+    open_basket <- function() find_basket()
+    find_basket <- function() stop("basket is missing")
+    given("an empty basket", function(context) open_basket())
+    """
+  When I run
+    """
+    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+    messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+    finished <- Filter(\\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)
+    cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)
+    """
+  Then the output includes lines matching these patterns in order:
+    """
+    open_basket\\(\\)
+    find_basket\\(\\)
+    """
+%</pre>
+}}
+
 Source: \code{tests/acceptance/r-messages_reporter.feature}
 }
 }

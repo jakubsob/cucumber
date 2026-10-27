@@ -101,3 +101,23 @@ Feature: Messages reporter
       v Then the basket has 2 items
       """
     And the output includes "1 scenario written"
+
+  Scenario: A failed step's error has the backtrace of the step as its stack trace
+    Given a file named "features/setup-steps.R" with
+      """
+      open_basket <- function() find_basket()
+      find_basket <- function() stop("basket is missing")
+      given("an empty basket", function(context) open_basket())
+      """
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+      finished <- Filter(\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)
+      cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      open_basket\(\)
+      find_basket\(\)
+      """
