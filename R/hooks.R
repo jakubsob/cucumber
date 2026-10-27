@@ -214,7 +214,7 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref
       cucumber_pending = function(cnd) {
         error_cnd(
           class = "cucumber_pending",
-          message = glue("Hook is pending: {cnd$reason}"),
+          message = glue("{hook_label(hook)} is pending: {cnd$reason}"),
           trace = empty_trace()
         )
       },
@@ -225,7 +225,11 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref
           return(cnd)
         }
         fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
-        error_cnd(message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step."))
+        hook_error(
+          hook,
+          error_cnd(message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step.")),
+          pickle
+        )
       },
       error = \(e) {
         # A failed expectation is reported as it is, like in a step

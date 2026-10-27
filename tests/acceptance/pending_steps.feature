@@ -91,9 +91,9 @@ Feature: Pending steps
       | After                 | passed  |
 
     Examples:
-      | strict | outcome | message                                                   |
-      | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
-      | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |
+      | strict | outcome | message                                                              |
+      | TRUE   | failed  | Hook `before()` is pending: the API client isn't written yet         |
+      | FALSE  | skipped | Reason: Hook `before()` is pending: the API client isn't written yet |
 
   Scenario Outline: pending() in <hook>() makes the scenario pending, strict = <strict>
     A pending step hook makes its step pending. A pending after hook makes the scenario pending.
@@ -120,15 +120,15 @@ Feature: Pending steps
       | scenario        | status  |
       | Sync the basket | pending |
     And the steps have these results:
-      | step                      | status   |
-      | Given an empty basket     | <given>  |
-      | Then the basket is synced | <then>   |
+      | step                      | status  |
+      | Given an empty basket     | <given> |
+      | Then the basket is synced | <then>  |
 
     Examples:
-      | hook        | argument | strict | outcome | message                                                   | given   | then    |
-      | before_step | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | pending | skipped |
-      | after_step  | step     | TRUE   | failed  | Hook is pending: the API client isn't written yet         | pending | skipped |
-      | after       | scenario | TRUE   | failed  | Hook is pending: the API client isn't written yet         | passed  | passed  |
-      | before_step | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | pending | skipped |
-      | after_step  | step     | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | pending | skipped |
-      | after       | scenario | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet | passed  | passed  |
+      | hook        | argument | strict | outcome | message                                                                   | given   | then    |
+      | before_step | step     | TRUE   | failed  | Hook `before_step()` is pending: the API client isn't written yet         | pending | skipped |
+      | after_step  | step     | TRUE   | failed  | Hook `after_step()` is pending: the API client isn't written yet          | pending | skipped |
+      | after       | scenario | TRUE   | failed  | Hook `after()` is pending: the API client isn't written yet               | passed  | passed  |
+      | before_step | step     | FALSE  | skipped | Reason: Hook `before_step()` is pending: the API client isn't written yet | pending | skipped |
+      | after_step  | step     | FALSE  | skipped | Reason: Hook `after_step()` is pending: the API client isn't written yet  | pending | skipped |
+      | after       | scenario | FALSE  | skipped | Reason: Hook `after()` is pending: the API client isn't written yet       | passed  | passed  |

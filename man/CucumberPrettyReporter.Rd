@@ -78,6 +78,62 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A step's error is printed under it, after its warnings
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Add an item</span>
+<span class="st">        Given an empty basket</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    given("an empty basket", function(context) \{</span>
+<span class="st">      warning("the basket is dusty")</span>
+<span class="st">      stop("the basket is broken")</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run it and it fails
+<span class="st">    """</span>
+<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes
+<span class="st">    """</span>
+<span class="st">    x Given an empty basket</span>
+<span class="st">    Warning:</span>
+<span class="st">    the basket is dusty</span>
+<span class="st">    Error:</span>
+<span class="st">    Step "an empty basket" failed</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A step's error is printed under it, after its warnings
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Add an item
+        Given an empty basket
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    given("an empty basket", function(context) \{
+      warning("the basket is dusty")
+      stop("the basket is broken")
+    \})
+    """
+  When I run it and it fails
+    """
+    test("features", reporter = CucumberPrettyReporter$new())
+    """
+  Then the output includes
+    """
+    x Given an empty basket
+    Warning:
+    the basket is dusty
+    Error:
+    Step "an empty basket" failed
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's error is printed where the hook runs
   <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
 <span class="st">    """</span>

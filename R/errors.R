@@ -28,7 +28,7 @@ srcref_location <- function(src) {
 #' @keywords internal
 #' @noRd
 hook_error <- function(hook, error, pickle = NULL) {
-  info <- if (is.null(hook$hook_name)) glue("Hook `{hook$name}()` failed") else glue("Hook \"{hook$hook_name}\" failed")
+  info <- glue("{hook_label(hook)} failed")
   if (!is.null(pickle$feature_file))
     info <- c(info, i = glue("Feature: {feature_path(pickle$feature_file)}"))
   if (!is.null(pickle$name))
@@ -42,6 +42,13 @@ hook_error <- function(hook, error, pickle = NULL) {
     parent = error,
     trace = empty_trace()
   )
+}
+
+#' A hook as its errors name it: by its name, or by its kind
+#' @keywords internal
+#' @noRd
+hook_label <- function(hook) {
+  if (is.null(hook$hook_name)) glue("Hook `{hook$name}()`") else glue("Hook \"{hook$hook_name}\"")
 }
 
 #' Where a feature file is, relative to the working directory of the run, like

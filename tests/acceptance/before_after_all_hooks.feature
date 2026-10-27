@@ -185,3 +185,39 @@ Feature: Before all and after all hooks
         Caused by error:
         ! connection refused
         """
+
+    Scenario: A pending before all hook's error names the hook
+      Given a file named "features/setup-steps.R" with
+        """
+        before_all(function() pending("the server isn't set up yet"))
+        given("an empty basket", function(context) {})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the errors are
+        """
+        [error]
+        Error: Hook `before_all()` is pending: the server isn't set up yet
+        """
+      And no scenario ran
+
+    Scenario: Skipping in an after all hook is an error of the hook
+      Given a file named "features/setup-steps.R" with
+        """
+        after_all(function() testthat::skip("the server is gone"))
+        given("an empty basket", function(context) {})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the errors are
+        """
+        [error]
+        Error: Hook `after_all()` failed
+        i Hook defined at: setup-steps.R:1
+        Caused by error:
+        ! `testthat::skip()` can only be called in a `before_all()`, `before()` or `after()` hook or a step.
+        """

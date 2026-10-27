@@ -168,9 +168,9 @@ Hooks can call \code{pending()} too.
     <span class="op">|</span> After                 <span class="op">|</span> passed  <span class="op">|</span>
 <span></span>
   <span class="kw">Examples:</span>
-    <span class="op">|</span> strict <span class="op">|</span> outcome <span class="op">|</span> message                                                   <span class="op">|</span>
-    <span class="op">|</span> TRUE   <span class="op">|</span> failed  <span class="op">|</span> Hook is pending: the API client isn't written yet         <span class="op">|</span>
-    <span class="op">|</span> FALSE  <span class="op">|</span> skipped <span class="op">|</span> Reason: Hook is pending: the API client isn't written yet <span class="op">|</span></code></pre >}}
+    <span class="op">|</span> strict <span class="op">|</span> outcome <span class="op">|</span> message                                                              <span class="op">|</span>
+    <span class="op">|</span> TRUE   <span class="op">|</span> failed  <span class="op">|</span> Hook `before()` is pending: the API client isn't written yet         <span class="op">|</span>
+    <span class="op">|</span> FALSE  <span class="op">|</span> skipped <span class="op">|</span> Reason: Hook `before()` is pending: the API client isn't written yet <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: A before hook makes the scenario pending with pending(), strict = <strict>
   A pending scenario fails the run only in strict mode, like a pending step.
 
@@ -199,9 +199,9 @@ Hooks can call \code{pending()} too.
     | After                 | passed  |
 
   Examples:
-    | strict | outcome | message                                                   |
-    | TRUE   | failed  | Hook is pending: the API client isn't written yet         |
-    | FALSE  | skipped | Reason: Hook is pending: the API client isn't written yet |
+    | strict | outcome | message                                                              |
+    | TRUE   | failed  | Hook `before()` is pending: the API client isn't written yet         |
+    | FALSE  | skipped | Reason: Hook `before()` is pending: the API client isn't written yet |
 %</pre>
 }}
 

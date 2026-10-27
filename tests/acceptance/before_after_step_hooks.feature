@@ -140,7 +140,12 @@ Feature: Step hooks
     And the errors are
       """
       [error] Scenario: Add an item
-      Error: `skip_scenario()` can only be called in a `before_all()`, `before()` or `after()` hook or a step.
+      Error: Hook `before_step()` failed
+      i Feature: basket.feature
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! `skip_scenario()` can only be called in a `before_all()`, `before()` or `after()` hook or a step.
       """
 
   Scenario: A failing after step hook fails a pending step
