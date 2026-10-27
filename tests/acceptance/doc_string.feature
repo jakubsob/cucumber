@@ -25,7 +25,7 @@ Feature: Doc Strings
           context$message <- message
         })
         then("the message is {string}", function(expected, context) {
-          expect_equal(context$message[[1]], expected)
+          expect_identical(context$message, expected)
         })
         """
       When I run
@@ -51,7 +51,7 @@ Feature: Doc Strings
           context$message <- message
         })
         then("the message is {string}", function(expected, context) {
-          expect_equal(context$message[[1]], expected)
+          expect_identical(context$message, expected)
         })
         """
       When I run
@@ -101,10 +101,10 @@ Feature: Doc Strings
       And a file named "features/setup-steps.R" with
         """
         given("file {string} contains", function(filename, content, context) {
-          context$files <- c(context$files, setNames(list(content[[1]]), filename))
+          context$files <- c(context$files, setNames(list(content), filename))
         })
         then("file {string} has content {string}", function(filename, expected, context) {
-          expect_equal(context$files[[filename]], expected)
+          expect_identical(context$files[[filename]], expected)
         })
         """
       When I run

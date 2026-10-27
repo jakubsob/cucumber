@@ -72,7 +72,7 @@ Feature: Background
       | Increment once  | passed |
       | Increment twice | passed |
 
-  Scenario: A failing background step marks the scenario as failed
+  Scenario: A failing background step fails the scenario and skips its steps
     Given a package
     And a file named "features/background.feature" with
       """
@@ -96,6 +96,7 @@ Feature: Background
       """
       test("features", stop_on_failure = FALSE)
       """
-    Then the scenarios have these results:
-      | scenario    | status |
-      | Should fail | failed |
+    Then the steps have these results:
+      | scenario    | step                           | status  |
+      | Should fail | Given a step that always fails | failed  |
+      | Should fail | Then I get 1                   | skipped |

@@ -38,6 +38,9 @@ Feature: Strict mode
       | scenario            | status  |
       | Implemented         | passed  |
       | Not yet implemented | pending |
+    And the scenarios skipped at these locations:
+      | scenario            | location        |
+      | Not yet implemented | mixed.feature:7 |
 
   Scenario: An undefined step skips the scenario when not strict
     Given a file named "features/basket.feature" with
@@ -57,6 +60,9 @@ Feature: Strict mode
     Then the scenarios have these results:
       | scenario    | status    |
       | Add an item | undefined |
+    And the scenarios skipped at these locations:
+      | scenario    | location         |
+      | Add an item | basket.feature:3 |
 
   Scenario: An ambiguous step fails the scenario even when not strict
     Given a file named "features/basket.feature" with

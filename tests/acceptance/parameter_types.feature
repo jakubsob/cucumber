@@ -22,9 +22,8 @@ Feature: Parameter types
         given("the count is {int}", function(n, context) {
           context$value <- n
         })
-        then("I verify the count is {int}", function(n, context) {
-          expect_equal(context$value, n)
-          expect_true(is.integer(context$value))
+        then("I verify the count is 42", function(context) {
+          expect_identical(context$value, 42L)
         })
         """
       When I run
@@ -72,9 +71,8 @@ Feature: Parameter types
         given("the price is {float}", function(price, context) {
           context$price <- price
         })
-        then("I verify the price is {float}", function(price, context) {
-          expect_equal(context$price, price)
-          expect_true(is.double(context$price))
+        then("I verify the price is 3.99", function(context) {
+          expect_identical(context$price, 3.99)
         })
         """
       When I run
@@ -222,8 +220,8 @@ Feature: Parameter types
         given("the colour is {word}", function(colour, context) {
           context$colour <- colour
         })
-        then("I verify the colour is {word}", function(colour, context) {
-          expect_equal(context$colour, colour)
+        then("I verify the colour is red", function(context) {
+          expect_identical(context$colour, "red")
         })
         """
       When I run
