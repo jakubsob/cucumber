@@ -69,7 +69,8 @@ Each \code{run()} is a run of its own: its \code{\link[=before_all]{before_all()
 once for each \code{run()}, so twice if two test files call \code{run()}. Step definitions,
 hooks and parameter types are kept until testthat's run ends, as testthat runs the
 \verb{setup-*.R} files that define them once for all test files. Outside of a testthat run,
-like when \code{run()} is called in the console, they're kept until \code{run()} returns.
+like when \code{run()} is called in the console, they're kept until \code{run()} returns, and code
+deferred to \code{testthat::teardown_env()} runs when it returns.
 \code{run()} then attaches testthat for the steps' expectations, runs every scenario, reports
 them with \link{CucumberProgressReporter} and fails with "Test failures." if one of them failed.
 

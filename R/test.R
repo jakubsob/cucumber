@@ -26,7 +26,8 @@
 #' once for each `run()`, so twice if two test files call `run()`. Step definitions,
 #' hooks and parameter types are kept until testthat's run ends, as testthat runs the
 #' `setup-*.R` files that define them once for all test files. Outside of a testthat run,
-#' like when `run()` is called in the console, they're kept until `run()` returns.
+#' like when `run()` is called in the console, they're kept until `run()` returns, and code
+#' deferred to `testthat::teardown_env()` runs when it returns.
 #' `run()` then attaches testthat for the steps' expectations, runs every scenario, reports
 #' them with [CucumberProgressReporter] and fails with "Test failures." if one of them failed.
 #'
@@ -91,6 +92,8 @@ run <- function(
   # would stop at its failure, so the scenarios run with a reporter of their own,
   # like in test(), and testthat is attached for the steps' expectations
   if (!"package:testthat" %in% search()) attachNamespace("testthat")
+  # Code deferred to testthat::teardown_env() runs when run() returns, like in test()
+  rlang::local_bindings(teardown_env = cleanup_env, .env = utils::getFromNamespace("the", "testthat"))
   lister <- testthat::ListReporter$new()
   lister$start_file("cucumber")
   testthat::with_reporter(

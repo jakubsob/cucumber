@@ -362,6 +362,35 @@ Feature: Running scenarios alongside testthat tests
       | Adding two   | failed |
       | Adding three | passed |
 
+  Scenario: Code deferred to testthat's teardown environment runs when run() outside of a testthat run returns
+    Given a file named "features/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one
+          Then one plus 1 is 2
+      """
+    And a file named "features/steps.R" with
+      """
+      then("one plus {int} is {int}", function(n, sum, context) {
+        withr::defer(cat("torn down\n"), testthat::teardown_env())
+        expect_equal(1 + n, sum)
+      })
+      """
+    When I run outside of a testthat run
+      """
+      source("features/steps.R")
+      run("features", reporter = NULL)
+      cat("after run()\n")
+      """
+    Then the scenarios have these results:
+      | scenario   | status |
+      | Adding one | passed |
+    And the output includes these lines in order:
+      """
+      torn down
+      after run()
+      """
+
   Rule: Outside of a testthat run, run() reports the run with CucumberProgressReporter
 
     As there is no testthat reporter to show it. Pass `reporter = NULL` to report nothing.
