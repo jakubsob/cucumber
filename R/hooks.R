@@ -168,7 +168,7 @@ after_all <- function(hook, name = NULL) {
 #' @importFrom rlang `:=` list2
 register_hook <- function(hook, name, tags = NULL, hook_name = NULL, srcref = NULL) {
   # A hook defined again where it's written replaces itself
-  hooks <- Filter(\(other) !(other$name == name && same_place(other$srcref, srcref)), get_hooks())
+  hooks <- Filter(\(other) !(other$name == name && defined_again(other$srcref, srcref)), get_hooks())
   hook <- list(
     name = name,
     fn = hook,

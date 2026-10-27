@@ -102,12 +102,15 @@ definition_place <- function(srcref) {
   paste(fs::path_abs(srcfile$filename, srcfile$wd %||% "."), srcref[[1]], srcref[[5]])
 }
 
-#' Whether two definitions are written in the same place
+#' Whether a definition is one of an earlier load of its file: written in the
+#' same place, but parsed again. The definitions of one load, like by a function
+#' or a loop, share their srcfile, so they are different definitions.
 #' @keywords internal
 #' @noRd
-same_place <- function(srcref, other) {
+defined_again <- function(srcref, other) {
   place <- definition_place(srcref)
-  !is.null(place) && identical(place, definition_place(other))
+  !is.null(place) && identical(place, definition_place(other)) &&
+    !identical(attr(srcref, "srcfile"), attr(other, "srcfile"))
 }
 
 #' @importFrom rlang `:=`
@@ -115,7 +118,7 @@ register_step <- function(step) {
   assert_step(step)
   steps <- getOption(getOption(".cucumber_steps_option"), default = .steps())
   # A step definition defined again where it's written replaces itself
-  again <- vapply(steps, \(other) identical(attr(other, "description"), attr(step, "description")) && same_place(attr(other, "srcref"), attr(step, "srcref")), logical(1))
+  again <- vapply(steps, \(other) identical(attr(other, "description"), attr(step, "description")) && defined_again(attr(other, "srcref"), attr(step, "srcref")), logical(1))
   steps <- .steps(!!!steps[!again], !!attr(step, "description") := step)
   options(list2(!!getOption(".cucumber_steps_option") := steps))
   invisible(step)

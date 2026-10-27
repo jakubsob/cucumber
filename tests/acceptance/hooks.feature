@@ -81,6 +81,39 @@ Feature: Hooks
       after helper-z
       """
 
+  Scenario: Hooks defined by a function or a loop all run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        @db @api
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      connect <- function(service) {
+        before(function(context, scenario) cat("connect", service, "\n"), tags = paste0("@", service))
+      }
+      connect("db")
+      connect("api")
+      for (service in c("db", "api")) local({
+        name <- service
+        after(function(context, scenario) cat("disconnect", name, "\n"))
+      })
+      given("an empty basket", function(context) {})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      connect db
+      connect api
+      disconnect api
+      disconnect db
+      """
+
   @rd
   Scenario: Hooks get the scenario, and after hooks get its result
     Given a file named "features/basket.feature" with
