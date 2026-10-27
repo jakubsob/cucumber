@@ -724,8 +724,11 @@ test <- function(
   }
   testthat::local_test_directory(path)
   # Like testthat::test_local(), testthat::testing_package() is the package of
-  # `path`, the default package of testthat::local_mocked_bindings()
-  package <- tryCatch(pkgload::pkg_name("."), error = \(e) NULL)
+  # `path`, the default package of testthat::local_mocked_bindings(). R CMD check
+  # runs the tests from a copy of `tests` with no DESCRIPTION above it, so there
+  # it's the package being checked.
+  package <- tryCatch(pkgload::pkg_name("."), error = \(e) NULL) %||%
+    (if (!identical(Sys.getenv("_R_CHECK_PACKAGE_NAME_"), "")) Sys.getenv("_R_CHECK_PACKAGE_NAME_"))
   if (!is.null(package)) withr::local_envvar(TESTTHAT_PKG = package)
   # Like testthat::test_dir(package = ), steps see the internal functions of the
   # package: of the loaded one, or in R CMD check of the installed one. Another

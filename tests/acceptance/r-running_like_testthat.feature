@@ -814,7 +814,8 @@ Feature: Running feature files like testthat runs test files
     And it ran "Scenario: Adding an apple in R CMD check"
 
   Scenario: Steps use the internal functions of the installed package, with test() in R CMD check
-    R CMD check runs the scripts in `tests`, like one that calls `test("acceptance")`, with the installed package.
+    R CMD check runs the scripts in a copy of `tests`, like one that calls `test("acceptance")`, with the installed package.
+    The copy is in `<package>.Rcheck`, with no DESCRIPTION above it.
 
     Given a file named "NAMESPACE" with
       """
@@ -835,6 +836,7 @@ Feature: Running feature files like testthat runs test files
     And a file named "tests/acceptance/setup-steps.R" with
       """
       given("an empty basket", function(context) {
+        expect_equal(testthat::testing_package(), "example")
         context$items <- 0
       })
       when("I add an apple", function(context) {
@@ -851,7 +853,9 @@ Feature: Running feature files like testthat runs test files
       withr::local_libpaths(lib, action = "prefix")
       withr::local_envvar(NOT_CRAN = NA, `_R_CHECK_PACKAGE_NAME_` = "example")
       withr::defer(unloadNamespace("example"))
-      withr::with_dir("tests", test("acceptance", reporter = NULL, stop_on_failure = FALSE))
+      check_dir <- withr::local_tempdir()
+      fs::dir_copy("tests", fs::path(check_dir, "tests"))
+      withr::with_dir(fs::path(check_dir, "tests"), test("acceptance", reporter = NULL, stop_on_failure = FALSE))
       """
     Then the scenarios have these results:
       | scenario                       | status |
