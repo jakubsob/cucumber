@@ -67,6 +67,57 @@ Feature: Sharing state with context
     And the output includes "Add an item ends with 1 items"
     And the output includes "Look into the basket ends with 0 items"
 
+  Scenario: A printed context shows what steps and hooks put in it, and its methods
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) {
+        context$items <- c("apple", "pear")
+        context$total <- 2
+        print(context)
+      })
+      then("the basket has {int} item(s)", function(n, context) {})
+      """
+    When I run
+      """
+      test("features", filter = "basket", name = "Add an item")
+      """
+    Then the output includes these lines in order:
+      """
+      <context>
+      items: chr [1:2] "apple" "pear"
+      total: num 2
+      Methods:
+      attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
+      log(text): attach text to the report
+      link(...): attach links to the report
+      """
+
+  Scenario: A printed context shows its first 10 items and how many more there are
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) {
+        for (i in 1:12) assign(sprintf("item_%02d", i), i, envir = context)
+        print(context)
+        print(context, n = 12)
+      })
+      then("the basket has {int} item(s)", function(n, context) {})
+      """
+    When I run
+      """
+      test("features", filter = "basket", name = "Add an item")
+      """
+    Then the output includes these lines in order:
+      """
+      <context>
+      item_10: int 10
+      # i 2 more items
+      # i Use `print(n = ...)` to see more items
+      Methods:
+      <context>
+      item_12: int 12
+      Methods:
+      """
+
   Scenario: What a step defers in context runs when the scenario ends
     Given a file named "features/setup-steps.R" with
       """

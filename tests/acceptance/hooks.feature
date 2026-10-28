@@ -148,6 +148,30 @@ Feature: Hooks
       after: failed Step "I add an item" failed
       """
 
+  Scenario: A printed scenario shows where it is, and in after hooks its status and error
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) print(scenario))
+      after(function(context, scenario) print(scenario))
+      when("I add an item", function(context) stop("basket is full"))
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      <scenario> "Add an item" (basket.feature:2)
+      <scenario> "Add an item" (basket.feature:2) failed
+      Step "I add an item" failed
+      """
+
   Scenario: A scenario without tags has no tags
     Given a file named "features/basket.feature" with
       """

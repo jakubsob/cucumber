@@ -104,13 +104,13 @@ run_scenario <- function(state, pickle, hooks, config, skip_steps, snapshots) {
     # Errors of the scenario's steps and hooks are caught where they run. An
     # error that gets here is of cucumber itself, and stops the run.
     withCallingHandlers({
-      scenario <- list(
+      scenario <- new_scenario(list(
         name = pickle$name,
         tags = paste0("@", pickle$tags, recycle0 = TRUE),
         uri = pickle$feature_file,
         line = pickle$source_line,
         id = pickle$message$id
-      )
+      ))
       # Each attempt is a test case started of its own, with a new context
       for (attempt in 0:config$retry) {
         if (attempt > 0 && !is.null(snapshots)) retry_snapshot_scenario(snapshots)
@@ -234,11 +234,27 @@ run_test_steps <- function(state, test_case_started_id, pickle, hooks, config, s
 
     for (test_step in pickle$test_case$after) {
       run_hook(
-        test_step, skip_steps, .context, c(scenario, worst_result(state$results)),
+        test_step, skip_steps, .context, new_scenario(c(scenario, worst_result(state$results))),
         can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle
       )
     }
   })
+}
+
+#' The scenario that before and after hooks get, see `before()`
+#' @param fields Its fields, in after hooks with its `status` and `error`
+#' @keywords internal
+#' @noRd
+new_scenario <- function(fields) {
+  structure(unclass(fields), class = "cucumber_scenario")
+}
+
+#' @export
+print.cucumber_scenario <- function(x, ...) {
+  status <- if (!is.null(x$status)) paste0(" ", x$status)
+  cat("<scenario> \"", x$name, "\" (", x$uri, ":", x$line, ")", status, "\n", sep = "")
+  if (!is.null(x$error)) cat(conditionMessage(x$error), "\n", sep = "")
+  invisible(x)
 }
 
 #' Report a scenario's last attempt to testthat: its warnings and passed

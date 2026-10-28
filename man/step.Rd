@@ -707,6 +707,112 @@ scenario, as its steps already have their results.
 }}
 
 \if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A printed context shows what steps and hooks put in it, and its methods
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      context$items &lt;- c("apple", "pear")</span>
+<span class="st">      context$total &lt;- 2</span>
+<span class="st">      print(context)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", filter = "basket", name = "Add an item")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    &lt;context&gt;</span>
+<span class="st">    items: chr [1:2] "apple" "pear"</span>
+<span class="st">    total: num 2</span>
+<span class="st">    Methods:</span>
+<span class="st">    attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report</span>
+<span class="st">    log(text): attach text to the report</span>
+<span class="st">    link(...): attach links to the report</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A printed context shows what steps and hooks put in it, and its methods
+  Given a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) \{
+      context$items <- c("apple", "pear")
+      context$total <- 2
+      print(context)
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", filter = "basket", name = "Add an item")
+    """
+  Then the output includes these lines in order:
+    """
+    <context>
+    items: chr [1:2] "apple" "pear"
+    total: num 2
+    Methods:
+    attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
+    log(text): attach text to the report
+    link(...): attach links to the report
+    """
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A printed context shows its first 10 items and how many more there are
+  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I add an item", function(context) \{</span>
+<span class="st">      for (i in 1:12) assign(sprintf("item_\%02d", i), i, envir = context)</span>
+<span class="st">      print(context)</span>
+<span class="st">      print(context, n = 12)</span>
+<span class="st">    \})</span>
+<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{\})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features", filter = "basket", name = "Add an item")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the output includes these lines in order:
+<span class="st">    """</span>
+<span class="st">    &lt;context&gt;</span>
+<span class="st">    item_10: int 10</span>
+<span class="st">    # i 2 more items</span>
+<span class="st">    # i Use `print(n = ...)` to see more items</span>
+<span class="st">    Methods:</span>
+<span class="st">    &lt;context&gt;</span>
+<span class="st">    item_12: int 12</span>
+<span class="st">    Methods:</span>
+<span class="st">    """</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A printed context shows its first 10 items and how many more there are
+  Given a file named "features/setup-steps.R" with
+    """
+    when("I add an item", function(context) \{
+      for (i in 1:12) assign(sprintf("item_\%02d", i), i, envir = context)
+      print(context)
+      print(context, n = 12)
+    \})
+    then("the basket has \{int\} item(s)", function(n, context) \{\})
+    """
+  When I run
+    """
+    test("features", filter = "basket", name = "Add an item")
+    """
+  Then the output includes these lines in order:
+    """
+    <context>
+    item_10: int 10
+    # i 2 more items
+    # i Use `print(n = ...)` to see more items
+    Methods:
+    <context>
+    item_12: int 12
+    Methods:
+    """
+%</pre>
+}}
+
+\if{html}{\out{
 <pre class="gherkin"><code><span class="kw">Scenario:</span> What a step defers in context runs when the scenario ends
   <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
 <span class="st">    """</span>
@@ -2001,6 +2107,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
 <span class="st">      given("an empty basket", function(context) \{</span>
 <span class="st">        pending()</span>
 <span class="st">      \})</span>
+<span class="st">    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: An undefined step is reported with a snippet
   Given a package
@@ -2025,6 +2132,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
       given("an empty basket", function(context) \{
         pending()
       \})
+    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
     """
 %</pre>
 }}
@@ -2054,6 +2162,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
 <span class="st">      # given("I have \{float\} cucumbers in my basket", function(float, context) \{</span>
 <span class="st">        pending()</span>
 <span class="st">      \})</span>
+<span class="st">    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: Alternative step definitions are listed when more than one parameter type matches
   Given a package
@@ -2079,6 +2188,7 @@ Keep only one of them, as a step that matches several step definitions is ambigu
       # given("I have \{float\} cucumbers in my basket", function(float, context) \{
         pending()
       \})
+    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
     """
 %</pre>
 }}
