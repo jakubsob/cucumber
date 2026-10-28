@@ -572,21 +572,6 @@ filter_features <- function(features, filter = NULL, ...) {
   features[grepl(filter, context_name(features), ...)]
 }
 
-cleanup <- function() {
-  clear_steps()
-  clear_hooks()
-  set_default_parameters()
-}
-
-#' Restore the step definitions, hooks and parameter types when `frame` ends
-#' @keywords internal
-#' @noRd
-local_registry <- function(frame = parent.frame()) {
-  names <- c(getOption(".cucumber_steps_option"), getOption(".cucumber_hooks_option"), getOption(".cucumber_parameters_option"))
-  registry <- lapply(rlang::set_names(names), getOption)
-  withr::defer(options(registry), frame)
-}
-
 #' Run Cucumber tests
 #'
 #' @description

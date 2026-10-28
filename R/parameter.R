@@ -165,18 +165,6 @@ check_parameter_type <- function(parameter, parameters) {
   }
 }
 
-get_parameters <- function() {
-  getOption(
-    getOption(".cucumber_parameters_option"),
-    default = .parameters()
-  )
-}
-
-#' @importFrom rlang list2 `:=`
-set_parameters <- function(parameters) {
-  options(list2(!!getOption(".cucumber_parameters_option") := parameters))
-}
-
 #' Transform the text a parameter matched with its parameter type's transformer.
 #' Its error says which parameter type failed, with the backtrace of the
 #' transformer, like the error of a step, see `call_step()`.

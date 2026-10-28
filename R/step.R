@@ -116,20 +116,12 @@ defined_again <- function(srcref, other) {
 #' @importFrom rlang `:=`
 register_step <- function(step) {
   assert_step(step)
-  steps <- getOption(getOption(".cucumber_steps_option"), default = .steps())
+  steps <- get_steps()
   # A step definition defined again where it's written replaces itself
   again <- vapply(steps, \(other) identical(attr(other, "description"), attr(step, "description")) && defined_again(attr(other, "srcref"), attr(step, "srcref")), logical(1))
   steps <- .steps(!!!steps[!again], !!attr(step, "description") := step)
-  options(list2(!!getOption(".cucumber_steps_option") := steps))
+  set_steps(steps)
   invisible(step)
-}
-
-clear_steps <- function() {
-  options(list2(!!getOption(".cucumber_steps_option") := .steps()))
-}
-
-get_steps <- function() {
-  getOption(getOption(".cucumber_steps_option"), default = .steps())
 }
 
 #' @importFrom checkmate assert_function assert_class assert_string

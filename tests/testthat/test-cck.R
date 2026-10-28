@@ -24,15 +24,7 @@ run_sample <- function(sample) {
   dir <- withr::local_tempdir()
   fs::dir_copy(sample, dir, overwrite = TRUE)
   output <- file.path(dir, "messages.ndjson")
-  id <- as.character(runif(1))
-  options <- paste0(c(".cucumber_steps_", ".cucumber_hooks_", ".cucumber_parameters_"), id)
-  withr::local_options(list(
-    .cucumber_steps_option = options[[1]],
-    .cucumber_hooks_option = options[[2]],
-    .cucumber_parameters_option = options[[3]]
-  ))
-  withr::defer(options(rlang::set_names(vector("list", 3), options)))
-  set_default_parameters()
+  local_registry(new_registry())
   # Like the CCK, a run that fails is what some samples are about
   arguments <- sample_arguments(sample)
   try(rlang::exec(test, dir, reporter = CucumberMessagesReporter$new(output), stop_on_failure = FALSE, !!!arguments), silent = TRUE)

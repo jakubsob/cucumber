@@ -40,43 +40,27 @@ run_code <- function(code, context, catch_error = FALSE) {
   }
   test <- function(..., reporter = CucumberProgressReporter$new()) record(cucumber::test)(..., reporter = reporter)
   run <- function(..., reporter = eval(formals(cucumber::run)$reporter, asNamespace("cucumber"))) record(cucumber::run)(..., reporter = reporter)
-  x <- as.character(runif(1))
-  .cucumber_hooks_option <- paste0(".cucumber_hooks_", x)
-  .cucumber_steps_option <- paste0(".cucumber_steps_", x)
-  .cucumber_parameters_option <- paste0(".cucumber_parameters_", x)
-  withr::with_options(
-    list(
-      .cucumber_steps_option = .cucumber_steps_option,
-      .cucumber_hooks_option = .cucumber_hooks_option,
-      .cucumber_parameters_option = .cucumber_parameters_option
-    ),
-    {
-      cucumber:::set_default_parameters()
-      withr::with_dir(context$tempdir, {
-        # Messages are output too, printed where they're signalled
-        output <- utils::capture.output(withCallingHandlers({
-          if (catch_error) {
-            context$error <- tryCatch(
-              {
-                eval(parse(text = code))
-                NULL
-              },
-              error = identity
-            )
-          } else {
-            context$result <- eval(parse(text = code))
-          }
-        }, message = function(m) {
-          cat(conditionMessage(m))
-          invokeRestart("muffleMessage")
-        }))
-        context$output <- cli::ansi_strip(output)
-      })
-    }
-  )
-  options(rlang::list2(!!.cucumber_hooks_option := NULL))
-  options(rlang::list2(!!.cucumber_steps_option := NULL))
-  options(rlang::list2(!!.cucumber_parameters_option := NULL))
+  cucumber:::local_registry(cucumber:::new_registry())
+  withr::with_dir(context$tempdir, {
+    # Messages are output too, printed where they're signalled
+    output <- utils::capture.output(withCallingHandlers({
+      if (catch_error) {
+        context$error <- tryCatch(
+          {
+            eval(parse(text = code))
+            NULL
+          },
+          error = identity
+        )
+      } else {
+        context$result <- eval(parse(text = code))
+      }
+    }, message = function(m) {
+      cat(conditionMessage(m))
+      invokeRestart("muffleMessage")
+    }))
+    context$output <- cli::ansi_strip(output)
+  })
 }
 
 when("I run", function(code, context) run_code(code, context))

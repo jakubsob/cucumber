@@ -180,7 +180,7 @@ register_hook <- function(hook, name, tags = NULL, hook_name = NULL, srcref = NU
     order = next_registration()
   )
   hooks <- structure(c(hooks, list(hook)), class = "hooks")
-  options(list2(!!getOption(".cucumber_hooks_option") := hooks))
+  set_hooks(hooks)
   invisible(hooks)
 }
 
@@ -249,13 +249,4 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref
     if (!is.null(error) && stop_on_error) break
   }
   first_error
-}
-
-#' @importFrom rlang list2
-clear_hooks <- function() {
-  options(list2(!!getOption(".cucumber_hooks_option") := .hooks()))
-}
-
-get_hooks <- function() {
-  getOption(getOption(".cucumber_hooks_option"), default = .hooks())
 }
