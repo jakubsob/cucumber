@@ -41,7 +41,7 @@ Feature: Snapshots
         """
         [error] Scenario: Showing the basket
         Error: Step "the snapshot of "1 apple" matches" failed
-        i Feature: basket.feature
+        i Feature: basket.feature:3
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:9
         Caused by error in `edition_require()`:
@@ -64,7 +64,7 @@ Feature: Snapshots
         """
         [failure] Scenario: Showing the basket
         Step "the snapshot of "2 apples" matches" failed
-        i Feature: <feature>
+        i Feature: <feature>:3
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:9
         Snapshot of code has changed:
@@ -110,7 +110,7 @@ Feature: Snapshots
         """
         [failure] Scenario: Showing the basket
         Step "the snapshot of "2 apples" for "linux" matches" failed
-        i Feature: <feature>
+        i Feature: <feature>:3
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:10
         Snapshot of code has changed (variant 'linux'):
@@ -190,7 +190,7 @@ Feature: Snapshots
         """
         [failure] Scenario: Showing the basket
         Step "the file snapshot "basket.txt" of "2 apples" matches" failed
-        i Feature: <feature>
+        i Feature: <feature>:3
         i Scenario: Showing the basket
         i Step defined at: setup-snapshot-steps.R:17
         Snapshot of `file` has changed.

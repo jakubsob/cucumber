@@ -293,7 +293,7 @@ Feature: Parameter types
         """
         [error] Scenario: Big number
         Error: Step "the count is 3000000000" failed
-        i Feature: params.feature
+        i Feature: params.feature:3
         i Scenario: Big number
         i Step defined at: setup-steps.R:1
         Caused by error:
@@ -506,7 +506,7 @@ Feature: Parameter types
         """
         [error] Scenario: Colour
         Error: Step "the colour is blue" failed
-        i Feature: params.feature
+        i Feature: params.feature:3
         i Scenario: Colour
         i Step defined at: setup-steps.R:3
         Caused by error:

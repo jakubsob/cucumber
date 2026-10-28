@@ -55,18 +55,23 @@ feature_path <- function(file) {
   as.character(fs::path_rel(file, "."))
 }
 
-#' The feature and scenario an error of a step or a hook happened in
+#' The feature and scenario an error of a step or a hook happened in, with the
+#' feature at `line`, like `basket.feature:3`: the step's, or the scenario's
 #' @keywords internal
 #' @noRd
-scenario_bullets <- function(pickle) {
+scenario_bullets <- function(pickle, line = pickle$source_line) {
   c(
-    if (!is.null(pickle$feature_file)) c(i = glue("Feature: {feature_path(pickle$feature_file)}")),
+    if (!is.null(pickle$feature_file)) {
+      path <- feature_path(pickle$feature_file)
+      if (length(line) == 1 && !is.na(line)) path <- glue("{path}:{line}")
+      c(i = glue("Feature: {path}"))
+    },
     if (!is.null(pickle$name)) c(i = glue("Scenario: {pickle$name}"))
   )
 }
 
 step_error_bullets <- function(step, pickle) {
-  info <- c(glue("Step \"{step$text}\" failed"), scenario_bullets(pickle))
+  info <- c(glue("Step \"{step$text}\" failed"), scenario_bullets(pickle, step$line))
   location <- step_location(step)
   if (!is.null(location))
     info <- c(info, i = glue("Step defined at: {location}"))

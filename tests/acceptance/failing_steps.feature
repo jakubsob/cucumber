@@ -3,6 +3,7 @@ Feature: Failing steps
   A step fails when its step definition throws an error or a failed expectation.
   The steps after it are skipped, and the other scenarios still run.
   A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
+  An error names the feature file and the line of the step that failed, like `basket.feature:3`.
   An error is shown with its backtrace, the calls of the step down to where it was thrown, like in a testthat test.
 
   Background:
@@ -90,7 +91,7 @@ Feature: Failing steps
       """
       [failure] Scenario: Add an item
       Step "the basket has an apple" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Add an item
       i Step defined at: setup-steps.R:1
       Expected the number of items to equal 1.
@@ -124,7 +125,7 @@ Feature: Failing steps
       """
       [error] Scenario: Add an item
       Error: Step "I add an item" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Add an item
       i Step defined at: setup-steps.R:2
       Caused by error:
@@ -160,7 +161,7 @@ Feature: Failing steps
       """
       [error] Scenario: Save the basket
       Error: Step "I save the basket" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Save the basket
       i Step defined at: setup-steps.R:2
       Caused by error:

@@ -65,7 +65,7 @@
           x When I add them
           Error: 
             Step "I add them" failed
-            i Feature: addition.feature
+            i Feature: addition.feature:4
             i Scenario: Adding two numbers
             i Step defined at: setup-steps.R:6
             Caused by error:
@@ -80,7 +80,7 @@
           x When I add them
           Error: 
             Step "I add them" failed
-            i Feature: addition.feature
+            i Feature: addition.feature:4
             i Scenario: Adding two numbers
             i Step defined at: setup-steps.R:6
             Caused by error:
@@ -108,7 +108,7 @@
           x When I start the scenario with error
           Error: 
             Step "I start the scenario with error" failed
-            i Feature: hooks.feature
+            i Feature: hooks.feature:3
             i Scenario: After hook is executed even when a step throws an error
             i Step defined at: setup-steps.R:9
             Caused by error:
@@ -123,7 +123,7 @@
           x When I start the scenario with error
           Error: 
             Step "I start the scenario with error" failed
-            i Feature: hooks.feature
+            i Feature: hooks.feature:3
             i Scenario: After hook is executed even when a step throws an error
             i Step defined at: setup-steps.R:9
             Caused by error:
@@ -152,7 +152,7 @@
           x Then the result is 5
           Error: 
             Step "the result is 5" failed
-            i Feature: addition.feature
+            i Feature: addition.feature:7
             i Scenario: Adding integer and float
             i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
@@ -164,7 +164,7 @@
           x Then the result is 5
           Error: 
             Step "the result is 5" failed
-            i Feature: addition.feature
+            i Feature: addition.feature:10
             i Scenario: Adding float and float
             i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
@@ -183,7 +183,7 @@
           x Then the Breaker must guess a word with 6 characters
           Error: 
             Step "the Breaker must guess a word with 6 characters" failed
-            i Feature: guess_the_word.feature
+            i Feature: guess_the_word.feature:8
             i Scenario: Breaker joins a game
             i Step defined at: setup-steps-guess_the_word.R:17
             Expected `nchar(context$word)` to equal `n`.
@@ -199,7 +199,7 @@
           x Then the result is 5
           Error: 
             Step "the result is 5" failed
-            i Feature: addition.feature
+            i Feature: addition.feature:7
             i Scenario: Adding integer and float
             i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
@@ -212,7 +212,7 @@
           x Then the result is 5
           Error: 
             Step "the result is 5" failed
-            i Feature: addition.feature
+            i Feature: addition.feature:10
             i Scenario: Adding float and float
             i Step defined at: setup-steps-addition.R:5
             Expected `context$result` to equal `expected`.
@@ -226,7 +226,7 @@
           x Then the Breaker must guess a word with 6 characters
           Error: 
             Step "the Breaker must guess a word with 6 characters" failed
-            i Feature: guess_the_word.feature
+            i Feature: guess_the_word.feature:8
             i Scenario: Breaker joins a game
             i Step defined at: setup-steps-guess_the_word.R:17
             Expected `nchar(context$word)` to equal `n`.

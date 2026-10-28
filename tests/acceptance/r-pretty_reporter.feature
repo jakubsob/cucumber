@@ -135,7 +135,7 @@ Feature: Pretty reporter
       Scenario: Add an item
       Error:
       Hook `before()` failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
       Caused by error:

@@ -256,7 +256,7 @@ Feature: Hooks
       """
       [error] Scenario: Save the basket
       Error: Hook "Connect to the database" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Save the basket
       i Hook defined at: setup-steps.R:1
       Caused by error:
@@ -288,7 +288,7 @@ Feature: Hooks
       """
       [error] Scenario: Add an item
       Error: Hook `before()` failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
       Caused by error:
@@ -351,7 +351,7 @@ Feature: Hooks
       """
       [error] Scenario: Add an item
       Error: Hook `after()` failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
       Caused by error:
@@ -383,7 +383,7 @@ Feature: Hooks
       ! basket is broken
       Error:
       Hook `after()` failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
       Caused by error:
@@ -444,7 +444,7 @@ Feature: Hooks
     Then the output includes
       """
       after: failed Hook `after()` failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:5
       Caused by error:
@@ -472,7 +472,7 @@ Feature: Hooks
       """
       [error] Scenario: Add an item
       <headline>
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
       Caused by error:
@@ -511,7 +511,7 @@ Feature: Hooks
       """
       [error] Scenario: Add an item
       Error: Hook "Check the basket" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:2
       i Scenario: Add an item
       i Hook defined at: setup-steps.R:1
       Caused by error:

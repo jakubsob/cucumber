@@ -174,7 +174,7 @@ Feature: Attachments
       """
       [error] Scenario: Add an item
       Error: Step "I add an item" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Add an item
       i Step defined at: setup-steps.R:1
       Caused by error:
@@ -200,7 +200,7 @@ Feature: Attachments
       """
       [error] Scenario: Add an item
       Error: Step "I add an item" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Add an item
       i Step defined at: setup-steps.R:1
       Caused by error:
@@ -234,7 +234,7 @@ Feature: Attachments
       """
       [error] Scenario: Add an item
       Error: Step "I add an item" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Add an item
       i Step defined at: setup-steps.R:1
       Caused by error:

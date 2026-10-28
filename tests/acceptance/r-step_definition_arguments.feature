@@ -28,7 +28,7 @@ Feature: Step definition arguments
       """
       [error] Scenario: Add items
       Error: Step "I add 3 items" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:3
       i Scenario: Add items
       i Step defined at: setup-steps.R:1
       Caused by error:

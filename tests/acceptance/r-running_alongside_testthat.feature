@@ -257,7 +257,7 @@ Feature: Running scenarios alongside testthat tests
       """
       [error] Scenario: Adding one
       Error: Step "I calculate" failed
-      i Feature: calculate.feature
+      i Feature: calculate.feature:3
       i Scenario: Adding one
       i Step defined at: setup-steps.R:1
       Caused by error:

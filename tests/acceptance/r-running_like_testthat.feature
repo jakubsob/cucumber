@@ -209,7 +209,7 @@ Feature: Running feature files like testthat runs test files
       """
       [failure] Scenario: Adding an apple
       Step "the basket has 2 items" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:5
       i Scenario: Adding an apple
       i Step defined at: setup-steps.R:7
       Expected `context$items` to equal `n`.
@@ -292,7 +292,7 @@ Feature: Running feature files like testthat runs test files
 
       [failure] Scenario: Checking the basket with a test
       Step "the basket is checked by a test" failed
-      i Feature: basket.feature
+      i Feature: basket.feature:5
       i Scenario: Checking the basket with a test
       i Step defined at: setup-test.R:1
       The test "the basket is empty" in the step failed.
