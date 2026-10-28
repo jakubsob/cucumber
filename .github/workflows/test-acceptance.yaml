@@ -10,7 +10,7 @@ name: test-acceptance.yaml
 permissions: read-all
 
 jobs:
-  test-coverage:
+  test-acceptance:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

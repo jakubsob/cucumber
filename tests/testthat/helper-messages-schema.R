@@ -12,11 +12,11 @@ messages_schema <- local({
 
 # Expect each message, a line of NDJSON, to follow the schema of Cucumber Messages
 expect_valid_messages <- function(lines) {
-  skip_if_not_installed("jsonvalidate")
+  testthat::skip_if_not_installed("jsonvalidate")
   for (line in lines) {
     valid <- messages_schema()$validate(line, verbose = TRUE)
     errors <- attr(valid, "errors")
-    expect(
+    testthat::expect(
       valid,
       paste0(
         "Message doesn't follow the schema:\n", line, "\n",
