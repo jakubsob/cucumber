@@ -5,7 +5,8 @@ on:
       - dev
 
 name: test-mutation.yml
-permissions: write-all
+permissions:
+  contents: write
 
 jobs:
   generate-badge:
@@ -14,7 +15,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
