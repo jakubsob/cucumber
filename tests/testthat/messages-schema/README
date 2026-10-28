@@ -1,0 +1,2 @@
+The JSON schema of Cucumber Messages (https://github.com/cucumber/messages),
+commit e5769e8 (v34.2.1), copied by update_messages_schema() in R/tools-update_messages_schema.R.

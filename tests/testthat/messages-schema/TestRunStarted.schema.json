@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "required": [
+    "timestamp"
+  ],
+  "properties": {
+    "timestamp": {
+      "$ref": "Timestamp.schema.json"
+    },
+    "id": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

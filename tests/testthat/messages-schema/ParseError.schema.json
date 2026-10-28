@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "required": [
+    "source",
+    "message"
+  ],
+  "properties": {
+    "source": {
+      "$ref": "SourceReference.schema.json"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

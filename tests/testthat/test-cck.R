@@ -1,11 +1,12 @@
 # The samples of the Cucumber Compatibility Kit in tests/testthat/cck, see
 # R/tools-update_cck.R. Each sample runs with CucumberMessagesReporter, and its
-# messages must be the ones the CCK expects.
+# messages must be the ones the CCK expects and follow the schema of Cucumber
+# Messages.
 skip_if_not_installed("jsonlite")
 
-read_ndjson <- function(path) {
-  lapply(readLines(path, warn = FALSE, encoding = "UTF-8"), jsonlite::fromJSON, simplifyVector = FALSE)
-}
+read_lines <- function(path) readLines(path, warn = FALSE, encoding = "UTF-8")
+
+parse_ndjson <- function(lines) lapply(lines, jsonlite::fromJSON, simplifyVector = FALSE)
 
 #' The arguments a sample runs with, from its `.arguments.txt`, like
 #' `--retry 2`, as arguments of test(): `list(retry = 2)`
@@ -19,7 +20,8 @@ sample_arguments <- function(sample) {
   rlang::set_names(values, sub("^--", "", words[c(TRUE, FALSE)]))
 }
 
-#' Run a sample in a copy of its directory, with registries of its own
+#' Run a sample in a copy of its directory, with registries of its own, and
+#' give the lines of NDJSON it writes
 run_sample <- function(sample) {
   dir <- withr::local_tempdir()
   fs::dir_copy(sample, dir, overwrite = TRUE)
@@ -31,7 +33,7 @@ run_sample <- function(sample) {
     rlang::exec(test, dir, reporter = CucumberMessagesReporter$new(output), stop_on_failure = FALSE, !!!arguments),
     silent = TRUE
   )
-  read_ndjson(output)
+  read_lines(output)
 }
 
 # Fields that change between runs and implementations: where files are,
@@ -90,7 +92,7 @@ describe("Cucumber Messages", {
     local_ids()
     ids$next_id <- 100L
 
-    messages <- run_sample(test_path("cck", "minimal"))
+    messages <- parse_ndjson(run_sample(test_path("cck", "minimal")))
 
     expect_equal(ids$next_id, 100L)
     expect_equal(messages[[4]]$pickle$id, "3")
@@ -100,10 +102,13 @@ describe("Cucumber Messages", {
 describe("the Cucumber Compatibility Kit", {
   for (sample in fs::dir_ls(test_path("cck"), type = "directory")) {
     it(paste("gives the messages of", fs::path_file(sample)), {
-      expected <- read_ndjson(fs::dir_ls(sample, glob = "*.ndjson"))
+      expected <- parse_ndjson(read_lines(fs::dir_ls(sample, glob = "*.ndjson")))
       returned <- fs::path_file(sample) %in% RETURNED_STATUSES
 
-      expect_equal(normalize_messages(run_sample(sample), returned), normalize_messages(expected, returned))
+      lines <- run_sample(sample)
+
+      expect_valid_messages(lines)
+      expect_equal(normalize_messages(parse_ndjson(lines), returned), normalize_messages(expected, returned))
     })
   }
 })

@@ -1,6 +1,7 @@
 # The good and bad files of the official Gherkin test data
 # (https://github.com/cucumber/gherkin/tree/main/testdata), with the source,
-# document, pickles and errors the official parser gives.
+# document, pickles and errors the official parser gives. The messages must
+# also follow the schema of Cucumber Messages.
 skip_if_not_installed("jsonlite")
 
 read_ndjson <- function(path) {
@@ -19,8 +20,15 @@ normalize <- function(x) {
   lapply(x, normalize)
 }
 
-as_read <- function(message) {
-  normalize(jsonlite::fromJSON(envelope_json(message), simplifyVector = FALSE))
+# The official Markdown parser makes the first line a Feature even without a
+# "# Feature:" header, and gives it no keyword, which the schema requires
+# (GherkinInMarkdownTokenMatcher.match_FeatureLine). Ours does the same.
+INVALID_DOCUMENTS <- "misc.feature.md"
+
+as_read <- function(message, valid = TRUE) {
+  json <- envelope_json(message)
+  if (valid) expect_valid_messages(json)
+  normalize(jsonlite::fromJSON(json, simplifyVector = FALSE))
 }
 
 describe("parse_gherkin", {
@@ -36,7 +44,8 @@ describe("parse_gherkin", {
       document <- parse_gherkin(read_feature(path), uri = path)
       pickles <- create_pickles(document)
 
-      expect_equal(as_read(list(gherkinDocument = document)), expected("ast")[[1]])
+      valid <- !fs::path_file(path) %in% INVALID_DOCUMENTS
+      expect_equal(as_read(list(gherkinDocument = document), valid), expected("ast")[[1]])
       expect_equal(lapply(pickles, \(pickle) as_read(list(pickle = pickle$message))), expected("pickles"))
     })
   }
