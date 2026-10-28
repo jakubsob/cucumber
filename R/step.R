@@ -7,9 +7,14 @@ define_step <- function(description, implementation) {
   args <- names(formals(implementation))
   if (!identical(args[length(args)], "context")) {
     suggested <- paste(c(setdiff(args, "context"), "context"), collapse = ", ")
+    hint <- glue("Use `function({suggested})`")
+    # A last argument other than `context` may be the context under another name.
+    if (length(args) > 0 && !any(c("context", "...") %in% args)) {
+      hint <- glue("{hint}, or rename `{args[length(args)]}` to `context`")
+    }
     abort(
       message = "A step definition must have `context` as its last argument.",
-      body = c(i = glue("Use `function({suggested})`."))
+      body = c(i = glue("{hint}."))
     )
   }
   step <- structure(

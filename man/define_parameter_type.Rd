@@ -339,7 +339,7 @@ Register your own with \code{define_parameter_type()}.
 <span class="st">    """</span>
 <span class="st">    [error] Scenario: Big number</span>
 <span class="st">    Error: Step "the count is 3000000000" failed</span>
-<span class="st">    i Feature: params.feature</span>
+<span class="st">    i Feature: params.feature:3</span>
 <span class="st">    i Scenario: Big number</span>
 <span class="st">    i Step defined at: setup-steps.R:1</span>
 <span class="st">    Caused by error:</span>
@@ -369,7 +369,7 @@ Register your own with \code{define_parameter_type()}.
     """
     [error] Scenario: Big number
     Error: Step "the count is 3000000000" failed
-    i Feature: params.feature
+    i Feature: params.feature:3
     i Scenario: Big number
     i Step defined at: setup-steps.R:1
     Caused by error:
@@ -655,7 +655,7 @@ Register your own with \code{define_parameter_type()}.
 <span class="st">    """</span>
 <span class="st">    [error] Scenario: Colour</span>
 <span class="st">    Error: Step "the colour is blue" failed</span>
-<span class="st">    i Feature: params.feature</span>
+<span class="st">    i Feature: params.feature:3</span>
 <span class="st">    i Scenario: Colour</span>
 <span class="st">    i Step defined at: setup-steps.R:3</span>
 <span class="st">    Caused by error:</span>
@@ -696,7 +696,7 @@ Register your own with \code{define_parameter_type()}.
     """
     [error] Scenario: Colour
     Error: Step "the colour is blue" failed
-    i Feature: params.feature
+    i Feature: params.feature:3
     i Scenario: Colour
     i Step defined at: setup-steps.R:3
     Caused by error:

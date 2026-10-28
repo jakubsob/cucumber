@@ -452,13 +452,14 @@ then \code{context}, in this order.
 <span class="st">    ! Failed to evaluate './setup-steps.R'.</span>
 <span class="st">    Caused by error in `when()`:</span>
 <span class="st">    ! A step definition must have `context` as its last argument.</span>
-<span class="st">    i Use `function(n, context)`.</span>
+<span class="st">    i &lt;hint&gt;</span>
 <span class="st">    """</span>
 <span></span>
   <span class="kw">Examples:</span>
-    <span class="op">|</span> case             <span class="op">|</span> definition              <span class="op">|</span>
-    <span class="op">|</span> missing context  <span class="op">|</span> function(n) \{\}          <span class="op">|</span>
-    <span class="op">|</span> context not last <span class="op">|</span> function(context, n) \{\} <span class="op">|</span></code></pre >}}
+    <span class="op">|</span> case             <span class="op">|</span> definition              <span class="op">|</span> hint                                                           <span class="op">|</span>
+    <span class="op">|</span> missing context  <span class="op">|</span> function(n) \{\}          <span class="op">|</span> Use `function(n, context)`, or rename `n` to `context`.        <span class="op">|</span>
+    <span class="op">|</span> misnamed context <span class="op">|</span> function(n, ctx) \{\}     <span class="op">|</span> Use `function(n, ctx, context)`, or rename `ctx` to `context`. <span class="op">|</span>
+    <span class="op">|</span> context not last <span class="op">|</span> function(context, n) \{\} <span class="op">|</span> Use `function(n, context)`.                                    <span class="op">|</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario Outline: A step definition without `context` as its last argument is an error, <case>
   Given a file named "features/basket.feature" with
     """
@@ -480,13 +481,14 @@ then \code{context}, in this order.
     ! Failed to evaluate './setup-steps.R'.
     Caused by error in `when()`:
     ! A step definition must have `context` as its last argument.
-    i Use `function(n, context)`.
+    i <hint>
     """
 
   Examples:
-    | case             | definition              |
-    | missing context  | function(n) \{\}          |
-    | context not last | function(context, n) \{\} |
+    | case             | definition              | hint                                                           |
+    | missing context  | function(n) \{\}          | Use `function(n, context)`, or rename `n` to `context`.        |
+    | misnamed context | function(n, ctx) \{\}     | Use `function(n, ctx, context)`, or rename `ctx` to `context`. |
+    | context not last | function(context, n) \{\} | Use `function(n, context)`.                                    |
 %</pre>
 }}
 
@@ -1580,6 +1582,7 @@ Source: \code{tests/acceptance/passing_steps.feature}
 A step fails when its step definition throws an error or a failed expectation.
 The steps after it are skipped, and the other scenarios still run.
 A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
+An error names the feature file and the line of the step that failed, like \code{basket.feature:3}.
 An error is shown with its backtrace, the calls of the step down to where it was thrown, like in a testthat test.
 
 \if{html}{\out{
@@ -1733,7 +1736,7 @@ An error is shown with its backtrace, the calls of the step down to where it was
 <span class="st">    """</span>
 <span class="st">    [failure] Scenario: Add an item</span>
 <span class="st">    Step "the basket has an apple" failed</span>
-<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Feature: basket.feature:3</span>
 <span class="st">    i Scenario: Add an item</span>
 <span class="st">    i Step defined at: setup-steps.R:1</span>
 <span class="st">    Expected the number of items to equal 1.</span>
@@ -1767,7 +1770,7 @@ An error is shown with its backtrace, the calls of the step down to where it was
     """
     [failure] Scenario: Add an item
     Step "the basket has an apple" failed
-    i Feature: basket.feature
+    i Feature: basket.feature:3
     i Scenario: Add an item
     i Step defined at: setup-steps.R:1
     Expected the number of items to equal 1.
@@ -1804,7 +1807,7 @@ An error is shown with its backtrace, the calls of the step down to where it was
 <span class="st">    """</span>
 <span class="st">    [error] Scenario: Add an item</span>
 <span class="st">    Error: Step "I add an item" failed</span>
-<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Feature: basket.feature:3</span>
 <span class="st">    i Scenario: Add an item</span>
 <span class="st">    i Step defined at: setup-steps.R:2</span>
 <span class="st">    Caused by error:</span>
@@ -1839,7 +1842,7 @@ An error is shown with its backtrace, the calls of the step down to where it was
     """
     [error] Scenario: Add an item
     Error: Step "I add an item" failed
-    i Feature: basket.feature
+    i Feature: basket.feature:3
     i Scenario: Add an item
     i Step defined at: setup-steps.R:2
     Caused by error:
@@ -1878,7 +1881,7 @@ An error is shown with its backtrace, the calls of the step down to where it was
 <span class="st">    """</span>
 <span class="st">    [error] Scenario: Save the basket</span>
 <span class="st">    Error: Step "I save the basket" failed</span>
-<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Feature: basket.feature:3</span>
 <span class="st">    i Scenario: Save the basket</span>
 <span class="st">    i Step defined at: setup-steps.R:2</span>
 <span class="st">    Caused by error:</span>
@@ -1911,7 +1914,7 @@ An error is shown with its backtrace, the calls of the step down to where it was
     """
     [error] Scenario: Save the basket
     Error: Step "I save the basket" failed
-    i Feature: basket.feature
+    i Feature: basket.feature:3
     i Scenario: Save the basket
     i Step defined at: setup-steps.R:2
     Caused by error:

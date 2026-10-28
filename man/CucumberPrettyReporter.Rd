@@ -273,7 +273,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 <span class="st">    Scenario: Add an item</span>
 <span class="st">    Error:</span>
 <span class="st">    Hook `before()` failed</span>
-<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Feature: basket.feature:2</span>
 <span class="st">    i Scenario: Add an item</span>
 <span class="st">    i Hook defined at: setup-steps.R:1</span>
 <span class="st">    Caused by error:</span>
@@ -301,7 +301,7 @@ with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
     Scenario: Add an item
     Error:
     Hook `before()` failed
-    i Feature: basket.feature
+    i Feature: basket.feature:2
     i Scenario: Add an item
     i Hook defined at: setup-steps.R:1
     Caused by error:

@@ -64,13 +64,14 @@ Feature: Step definition arguments
       ! Failed to evaluate './setup-steps.R'.
       Caused by error in `when()`:
       ! A step definition must have `context` as its last argument.
-      i Use `function(n, context)`.
+      i <hint>
       """
 
     Examples:
-      | case             | definition              |
-      | missing context  | function(n) {}          |
-      | context not last | function(context, n) {} |
+      | case             | definition              | hint                                                           |
+      | missing context  | function(n) {}          | Use `function(n, context)`, or rename `n` to `context`.        |
+      | misnamed context | function(n, ctx) {}     | Use `function(n, ctx, context)`, or rename `ctx` to `context`. |
+      | context not last | function(context, n) {} | Use `function(n, context)`.                                    |
 
   @rd
   Scenario: A step definition with `...` gets any number of arguments

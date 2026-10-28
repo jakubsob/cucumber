@@ -306,7 +306,7 @@ use a Background instead, and keep before hooks for low-level work like starting
 <span class="st">    """</span>
 <span class="st">    [error] Scenario: Save the basket</span>
 <span class="st">    Error: Hook "Connect to the database" failed</span>
-<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Feature: basket.feature:2</span>
 <span class="st">    i Scenario: Save the basket</span>
 <span class="st">    i Hook defined at: setup-steps.R:1</span>
 <span class="st">    Caused by error:</span>
@@ -336,7 +336,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     [error] Scenario: Save the basket
     Error: Hook "Connect to the database" failed
-    i Feature: basket.feature
+    i Feature: basket.feature:2
     i Scenario: Save the basket
     i Hook defined at: setup-steps.R:1
     Caused by error:
@@ -370,7 +370,7 @@ use a Background instead, and keep before hooks for low-level work like starting
 <span class="st">    """</span>
 <span class="st">    [error] Scenario: Add an item</span>
 <span class="st">    Error: Hook `before()` failed</span>
-<span class="st">    i Feature: basket.feature</span>
+<span class="st">    i Feature: basket.feature:2</span>
 <span class="st">    i Scenario: Add an item</span>
 <span class="st">    i Hook defined at: setup-steps.R:1</span>
 <span class="st">    Caused by error:</span>
@@ -407,7 +407,7 @@ use a Background instead, and keep before hooks for low-level work like starting
     """
     [error] Scenario: Add an item
     Error: Hook `before()` failed
-    i Feature: basket.feature
+    i Feature: basket.feature:2
     i Scenario: Add an item
     i Hook defined at: setup-steps.R:1
     Caused by error:
