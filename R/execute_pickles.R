@@ -136,7 +136,7 @@ execute_single_pickle <- function(
           }
           run_hook <- function(test_step, skip, ...) {
             run_test_step(test_step$id, \() {
-              if (skip) list(status = "skipped", duration = 0, hook = TRUE) else run_hook_step(test_step$hook, ...)
+              if (skip) new_hook_result("skipped") else run_hook_step(test_step$hook, ...)
             })
           }
 
@@ -247,7 +247,7 @@ with_scenario_context <- function(send, run) {
 run_hook_step <- function(hook, ...) {
   start <- Sys.time()
   error <- run_hooks(list(hook), ...)
-  result <- if (is.null(error)) list(status = "passed", hook = TRUE) else hook_result(error)
+  result <- if (is.null(error)) new_hook_result("passed") else hook_result(error)
   result$duration <- seconds_since(start)
   result
 }
@@ -300,7 +300,14 @@ hook_result <- function(error) {
     "failed"
   }
   if (inherits(error, "expectation_failure")) error <- variant_snapshot_hint(error)
-  list(status = status, error = error, hook = TRUE)
+  new_hook_result(status, error)
+}
+
+#' A hook's result, with a status of `STEP_STATUSES`
+#' @keywords internal
+#' @noRd
+new_hook_result <- function(status, error = NULL, duration = 0) {
+  list(status = rlang::arg_match0(status, STEP_STATUSES), error = error, duration = duration, hook = TRUE)
 }
 
 #' Run a step between its before_step and after_step hooks. A failing step hook
@@ -429,8 +436,11 @@ skip_at <- function(skip, srcref) {
   stop(skip)
 }
 
+#' A step's result, with a status of `STEP_STATUSES`
+#' @keywords internal
+#' @noRd
 new_step_result <- function(step, status, error = NULL, duration = 0) {
-  step$status <- status
+  step$status <- rlang::arg_match0(status, STEP_STATUSES)
   step$error <- error
   step$duration <- duration
   step

@@ -60,13 +60,11 @@ compile_steps <- function(steps, parameters) {
 #' @noRd
 #' @importFrom rlang error_cnd format_error_bullets
 unmatched_step <- function(step, status, message, body) {
-  step$status <- status
-  step$error <- error_cnd(
+  new_step_result(step, status, error_cnd(
     class = paste0("cucumber_", status),
     message = paste(c(message, format_error_bullets(body)), collapse = "\n"),
     trace = empty_trace()
-  )
-  step
+  ))
 }
 
 #' Match a single step to its definition
