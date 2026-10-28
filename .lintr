@@ -10,6 +10,7 @@ exclusions: list(
     "tests/acceptance/setup-steps.R" = list(object_usage_linter = Inf),
     "tests/testthat/test-cucumber_expressions.R" = list(object_usage_linter = Inf),
     "tests/testthat/test-gherkin.R" = list(object_usage_linter = Inf),
+    "tests/testthat/test-reporter.R" = list(object_usage_linter = Inf),
     "tests/testthat/test-messages-read.R" = list(object_usage_linter = Inf),
     "inst/examples/custom_loading/tests/acceptance/support/expect.R" = list(object_usage_linter = Inf)
   )

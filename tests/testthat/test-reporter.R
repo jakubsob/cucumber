@@ -1,3 +1,14 @@
+# Run the scenario under its own testthat reporter, so the snapshot is
+# recorded under this test and not under the scenario's nested test, and a
+# scenario that fails on purpose stays out of this test's results
+expect_report_snapshot <- function(feature, reporter = CucumberPrettyReporter$new(show_praise = FALSE)) {
+  .expect_snapshot({
+    testthat::with_reporter(testthat::SilentReporter$new(), {
+      cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
+    })
+  })
+}
+
 describe("CucumberPrettyReporter", {
   it("prints step-by-step progress", {
     local_steps()
@@ -23,15 +34,7 @@ describe("CucumberPrettyReporter", {
       expect_equal(context$result, n)
     })
 
-    reporter <- CucumberPrettyReporter$new(show_praise = FALSE)
-
-    # Run the scenario under its own testthat reporter, so the snapshot is
-    # recorded under this test and not under the scenario's nested test
-    .expect_snapshot({
-      testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
-      })
-    })
+    expect_report_snapshot(feature)
   })
 
   it("shows errors for failing steps", {
@@ -56,14 +59,7 @@ describe("CucumberPrettyReporter", {
       expect_equal(context$value, 5)
     })
 
-    reporter <- CucumberPrettyReporter$new(show_praise = FALSE)
-
-    # The scenario fails on purpose, keep its failure out of this test's results
-    .expect_snapshot({
-      testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
-      })
-    })
+    expect_report_snapshot(feature)
   })
 
   it("prints docstring and data table step arguments", {
@@ -85,15 +81,7 @@ describe("CucumberPrettyReporter", {
     given("a message", function(message, context) {})
     given("these people", function(people, context) {})
 
-    reporter <- CucumberPrettyReporter$new(show_praise = FALSE)
-
-    # Run the scenario under its own testthat reporter, so the snapshot is
-    # recorded under this test and not under the scenario's nested test
-    .expect_snapshot({
-      testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
-      })
-    })
+    expect_report_snapshot(feature)
   })
 
   it("truncates long step arguments to max_lines", {
@@ -117,13 +105,7 @@ describe("CucumberPrettyReporter", {
       reporter_max_docstring_lines = 2
     )
 
-    # Run the scenario under its own testthat reporter, so the snapshot is
-    # recorded under this test and not under the scenario's nested test
-    .expect_snapshot({
-      testthat::with_reporter(testthat::SilentReporter$new(), {
-        cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
-      })
-    })
+    expect_report_snapshot(feature, reporter)
   })
 })
 

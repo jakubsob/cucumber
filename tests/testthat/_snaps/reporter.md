@@ -29,7 +29,7 @@
           Error: 
             Step "it should fail" failed
             i Scenario: This will fail
-            i Step defined at: test-reporter.R:55
+            i Step defined at: test-reporter.R:58
             Expected `context$value` to equal 5.
             Differences:
               `actual`: 10.0
