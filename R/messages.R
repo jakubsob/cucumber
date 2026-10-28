@@ -18,8 +18,14 @@ new_id <- function() {
   as.character(id)
 }
 
-reset_ids <- function() {
+#' Number ids from 0 until `frame` ends. A run nested in another one, like in a
+#' step that tests cucumber, has ids of its own, and the outer run's ids
+#' continue after it.
+#' @noRd
+local_ids <- function(frame = parent.frame()) {
+  outer <- ids$next_id
   ids$next_id <- 0L
+  withr::defer(ids$next_id <- outer, frame)
 }
 
 #' Step definitions, hooks and parameter types are reported in the order they

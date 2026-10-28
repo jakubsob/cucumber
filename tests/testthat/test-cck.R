@@ -82,8 +82,8 @@ normalize_messages <- function(messages, returned_statuses = FALSE) {
 
 describe("Cucumber Messages", {
   it("gives a run nested in another run ids of its own, and the outer run's ids continue after it", {
+    local_ids()
     ids$next_id <- 100L
-    withr::defer(reset_ids())
 
     messages <- run_sample(test_path("cck", "minimal"))
 

@@ -202,11 +202,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
   lines <- feature_lines(features, path)
   features <- select_features(path, filter, lines, ...)
 
-  # A run nested in another one, like in a step that tests cucumber, has ids of
-  # its own, and the outer run's ids continue after it
-  outer_id <- ids$next_id
-  reset_ids()
-  on.exit(ids$next_id <- outer_id, add = TRUE)
+  local_ids()
   emit(reporter, "meta", meta_message())
   sources <- parse_features(features, reporter)
   glue <- emit_glue(reporter, get_steps(), get_hooks(), get_parameters())

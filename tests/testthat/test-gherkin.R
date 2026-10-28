@@ -32,7 +32,7 @@ describe("parse_gherkin", {
     })
 
     it(paste("gives the official document and pickles for", fs::path_file(path)), {
-      reset_ids()
+      local_ids()
       document <- parse_gherkin(read_feature(path), uri = path)
       pickles <- create_pickles(document)
 
