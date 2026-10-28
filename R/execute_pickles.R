@@ -6,11 +6,7 @@
 #'
 #' @param pickles List of pickle objects (must have matched steps)
 #' @param hooks List of before/after hooks
-#' @param reporter A CucumberReporter, or NULL
-#' @param strict Whether pending and undefined steps fail the scenario
-#' @param dry_run Whether to skip hooks and step bodies
-#' @param fail_fast Whether to skip the scenarios after a failed scenario
-#' @param retry How many times to retry a failed scenario
+#' @param config The settings of the run, from `run_config()`
 #' @param failed Whether a scenario of an earlier feature failed
 #' @param skip The skip of a before all hook, that skips every scenario, or NULL
 #' @param snapshots The snapshots of the feature, from `run_snapshots()`, or NULL
@@ -23,12 +19,8 @@
 #' @importFrom glue glue
 execute_pickles <- function(
   pickles,
-  hooks = get_hooks(),
-  reporter = NULL,
-  strict = TRUE,
-  dry_run = FALSE,
-  fail_fast = FALSE,
-  retry = 0L,
+  hooks,
+  config,
   failed = FALSE,
   skip = NULL,
   snapshots = NULL
@@ -40,13 +32,10 @@ execute_pickles <- function(
     pickle_failed <- execute_single_pickle(
       pickles[[i]],
       hooks,
-      reporter,
+      config,
       test_names[[i]],
-      strict = strict,
-      skip_steps = dry_run || (fail_fast && failed) || !is.null(skip),
+      skip_steps = config$dry_run || (config$fail_fast && failed) || !is.null(skip),
       skip_reason = if (!is.null(skip)) conditionMessage(skip) else "A previous scenario failed and `fail_fast = TRUE`.",
-      dry_run = dry_run,
-      retry = retry,
       snapshots = snapshots
     )
     failed <- failed || pickle_failed
@@ -78,15 +67,13 @@ execute_pickles <- function(
 execute_single_pickle <- function(
   pickle,
   hooks,
-  reporter = NULL,
+  config,
   test_name = pickle$name,
-  strict = TRUE,
   skip_steps = FALSE,
   skip_reason = NULL,
-  dry_run = FALSE,
-  retry = 0L,
   snapshots = NULL
 ) {
+  reporter <- config$reporter
   failed <- FALSE
   # Whether a snapshot wasn't checked, as on CRAN
   snapshot_on_cran <- FALSE
@@ -105,7 +92,7 @@ execute_single_pickle <- function(
           id = pickle$message$id
         )
         # Each attempt is a test case started of its own, with a new context
-        for (attempt in 0:retry) {
+        for (attempt in 0:config$retry) {
           if (attempt > 0 && !is.null(snapshots)) retry_snapshot_scenario(snapshots)
           # testthat gets the warnings and passed expectations of the last attempt only
           held <- list()
@@ -183,7 +170,7 @@ execute_single_pickle <- function(
           result <- worst_result(results)
           # Only a failed scenario is retried: pending, undefined or ambiguous
           # steps wouldn't pass on another attempt
-          retried <- result$status == "failed" && attempt < retry
+          retried <- result$status == "failed" && attempt < config$retry
           emit(reporter, "testCaseFinished", list(
             testCaseStartedId = test_case_started$id,
             timestamp = timestamp(),
@@ -192,7 +179,7 @@ execute_single_pickle <- function(
           if (!retried) break
         }
       }, error = \(e) if (has_restart("cucumber_abort_run")) invokeRestart("cucumber_abort_run", e))
-      failing <- failing_statuses(strict, dry_run)
+      failing <- failing_statuses(config$strict, config$dry_run)
       failed <<- result$status %in% failing
       if (!is.null(snapshots)) end_snapshot_scenario(snapshots, result$status, snapshot_on_cran)
     },
@@ -222,7 +209,7 @@ execute_single_pickle <- function(
     if (!skip_steps && result$status == "passed" && expectations == 0) {
       testthat::succeed()
     }
-    if (skip_steps && !dry_run && result$status == "skipped") {
+    if (skip_steps && !config$dry_run && result$status == "skipped") {
       skip_at(skip_reason, feature_srcref(pickle))
     }
   })

@@ -29,17 +29,8 @@ execute <- function(
   emit(reporter, "gherkinDocument", document)
   walk(pickles, \(pickle) emit(reporter, "pickle", pickle$message))
   pickles <- prepare_pickles(pickles, steps, parameters, hooks, tags, name, lines, reporter)
-  execute_feature(
-    document,
-    pickles,
-    hooks,
-    reporter = reporter,
-    strict = strict,
-    dry_run = dry_run,
-    fail_fast = fail_fast,
-    retry = retry,
-    failed = failed
-  )
+  config <- run_config(".", NULL, tags, reporter, strict, dry_run, name, NULL, fail_fast, retry, "defined")
+  execute_feature(document, pickles, hooks, config, failed = failed)
 }
 
 #' Choose the pickles to run, match their steps and plan their test cases
@@ -71,6 +62,7 @@ prepare_pickles <- function(
 
 #' Run the prepared pickles of a feature
 #'
+#' @param config The settings of the run, from `run_config()`
 #' @param skip The skip of a before all hook, that skips every scenario, or `NULL`
 #' @param snapshots The snapshots of the feature, from `run_snapshots()`, or
 #'   `NULL` to leave snapshots to testthat
@@ -81,12 +73,8 @@ prepare_pickles <- function(
 execute_feature <- function(
   document,
   pickles,
-  hooks = get_hooks(),
-  reporter = NULL,
-  strict = TRUE,
-  dry_run = FALSE,
-  fail_fast = FALSE,
-  retry = 0L,
+  hooks,
+  config,
   failed = FALSE,
   skip = NULL,
   snapshots = NULL
@@ -104,11 +92,7 @@ execute_feature <- function(
   execute_pickles(
     pickles,
     hooks,
-    reporter = reporter,
-    strict = strict,
-    dry_run = dry_run,
-    fail_fast = fail_fast,
-    retry = retry,
+    config,
     failed = failed,
     skip = skip,
     snapshots = snapshots

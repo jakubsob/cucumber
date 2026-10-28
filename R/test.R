@@ -74,6 +74,7 @@ run <- function(
       trace = empty_trace()
     )
   }
+  config <- run_config(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
   # Step definitions and hooks are cleared at the end of testthat's run, as the
   # setup files that registered them run once for all test files
   cleanup_env <- tryCatch(testthat::teardown_env(), error = \(e) NULL) %||% environment()
@@ -86,7 +87,7 @@ run <- function(
       tests_reporter$end_context_if_started()
       if (!is.null(test_file_context)) tests_reporter$.start_context(test_file_context)
     })
-    return(run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env))
+    return(run_cucumber(config, cleanup_env = cleanup_env))
   }
   # Outside of a testthat run, like in the console, each scenario's test_that()
   # would stop at its failure, so the scenarios run with a reporter of their own,
@@ -98,7 +99,7 @@ run <- function(
   lister$start_file("cucumber")
   testthat::with_reporter(
     lister,
-    run_cucumber(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env)
+    run_cucumber(config, cleanup_env = cleanup_env)
   )
   results <- as.data.frame(lister$get_results())
   if (sum(results$failed) > 0 || any(results$error)) {
@@ -108,16 +109,15 @@ run <- function(
 }
 
 #' Run the feature files and report the run, see `run()`
+#' @param config The settings of the run, from `run_config()`
 #' @param cleanup_env The environment whose end clears step definitions, hooks
 #'   and parameter types
 #' @param start_file A function called with each feature file before its
 #'   scenarios run, or `NULL`
 #' @keywords internal
 #' @noRd
-run_cucumber <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env, start_file = NULL) {
-  check_run_args(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...)
-  retry <- as.integer(retry)
-  order <- resolve_order(order)
+run_cucumber <- function(config, cleanup_env, start_file = NULL) {
+  reporter <- config$reporter
   error <- NULL
   # An error of a reporter or of cucumber itself stops the run, see abort_run()
   broken <- FALSE
@@ -126,7 +126,7 @@ run_cucumber <- function(path, filter, tags, reporter, strict, dry_run, name, fe
       withCallingHandlers(
         {
           cucumber_event(reporter, "start_run")
-          run_features(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env = cleanup_env, start_file = start_file)
+          run_features(config, cleanup_env = cleanup_env, start_file = start_file)
         },
         # Warnings outside scenarios, like in a before all hook. testthat keeps a
         # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
@@ -192,22 +192,24 @@ fail_test <- function(error) {
 #' Run the feature files, see `run()`
 #' @keywords internal
 #' @noRd
-run_features <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ..., cleanup_env, start_file = NULL) {
+run_features <- function(config, cleanup_env, start_file = NULL) {
   withr::defer(cleanup(), cleanup_env)
+  path <- config$path
+  reporter <- config$reporter
   # Before anything can stop the run, or testthat would delete the snapshot
   # files of the features as unused
-  complete <- complete_run(filter, tags, name, features, dry_run)
+  complete <- complete_run(config$filter, config$tags, config$name, config$features, config$dry_run)
   snapshots <- run_snapshots(path, find_features(path), complete)
 
-  lines <- feature_lines(features, path)
-  features <- select_features(path, filter, lines, ...)
+  lines <- feature_lines(config$features, path)
+  features <- exec(select_features, path, config$filter, lines, !!!config$grepl_args)
 
   local_ids()
   emit(reporter, "meta", meta_message())
   sources <- parse_features(features, reporter)
   glue <- emit_glue(reporter, get_steps(), get_hooks(), get_parameters())
   # A dry run runs no hooks
-  hooks <- if (dry_run) .hooks() else glue$hooks
+  hooks <- if (config$dry_run) .hooks() else glue$hooks
 
   test_run_started <- list(id = new_id(), timestamp = timestamp())
   emit(reporter, "testRunStarted", test_run_started)
@@ -233,11 +235,11 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
 
   # The scenarios of all features are put in order together
   pickles <- unlist(
-    map(unname(features), \(path) filter_pickles(sources[[path]]$pickles, tags, name, lines[[path]])),
+    map(unname(features), \(path) filter_pickles(sources[[path]]$pickles, config$tags, config$name, lines[[path]])),
     recursive = FALSE
   )
   pickles <- prepare_pickles(
-    order_pickles(pickles, order),
+    order_pickles(pickles, config$order),
     glue$steps,
     get_parameters(),
     hooks,
@@ -252,11 +254,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
       sources[[run[[1]]$feature_file]]$document,
       run,
       hooks,
-      reporter = reporter,
-      strict = strict,
-      dry_run = dry_run,
-      fail_fast = fail_fast,
-      retry = retry,
+      config,
       failed = failed,
       skip = skip,
       snapshots = snapshots$feature(run[[1]]$feature_file, map_chr(sources[[run[[1]]$feature_file]]$pickles, "test_name"))
@@ -264,7 +262,7 @@ run_features <- function(path, filter, tags, reporter, strict, dry_run, name, fe
   }
   # A run that skipped scenarios after a failed one, or all of them in a before
   # all hook, didn't run every scenario
-  if (!(fail_fast && failed) && is.null(skip)) snapshots$finish()
+  if (!(config$fail_fast && failed) && is.null(skip)) snapshots$finish()
 
   invisible(NULL)
 }
@@ -484,11 +482,13 @@ check_grepl_args <- function(...) {
   }
 }
 
-#' Check the arguments of `run()` and `test()` before anything runs, so a
-#' mistake is an error that names the argument
+#' The settings of a run, from the arguments of `run()` and `test()`, checked
+#' before anything runs, so a mistake is an error that names the argument
+#' @return A list of the arguments, with `retry` an integer, `order` from
+#'   `resolve_order()` and the arguments of `grepl()` in `grepl_args`
 #' @keywords internal
 #' @noRd
-check_run_args <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...) {
+run_config <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...) {
   check_reporter(reporter, call = NULL)
   check_selection(path, filter, tags, name, features, ...)
   check_flag(strict)
@@ -497,6 +497,20 @@ check_run_args <- function(path, filter, tags, reporter, strict, dry_run, name, 
   if (!rlang::is_scalar_integerish(retry) || is.na(retry) || retry < 0) {
     abort("`retry` must be a whole number of 0 or more, like `retry = 2`.", call = NULL, trace = empty_trace())
   }
+  list(
+    path = path,
+    filter = filter,
+    tags = tags,
+    reporter = reporter,
+    strict = strict,
+    dry_run = dry_run,
+    name = name,
+    features = features,
+    fail_fast = fail_fast,
+    retry = as.integer(retry),
+    order = resolve_order(order),
+    grepl_args = list(...)
+  )
 }
 
 #' Check the arguments that select the scenarios, see `test()`
@@ -687,14 +701,13 @@ test <- function(
 ) {
   # Before the working directory is `path`, so the arguments are evaluated
   # where test() is called, like `features = readLines("rerun.txt")`
-  check_run_args(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, ...)
+  config <- run_config(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
   check_flag(load_helpers)
   check_flag(stop_on_failure)
   check_flag(stop_on_warning)
   if (!is.null(env) && !is.environment(env)) {
     abort("`env` must be an environment, or `NULL`.", call = NULL, trace = empty_trace())
   }
-  order <- resolve_order(order)
 
   # What testthat::test_dir() does before it runs test files. It attaches
   # testthat, so steps can use its expectations without `testthat::`.
@@ -723,6 +736,7 @@ test <- function(
     )
   }
   testthat::local_test_directory(path)
+  config$path <- "."
   # Like testthat::test_local(), testthat::testing_package() is the package of
   # `path`, the default package of testthat::local_mocked_bindings(). R CMD check
   # runs the tests from a copy of `tests` with no DESCRIPTION above it, so there
@@ -759,7 +773,7 @@ test <- function(
     testthat::with_reporter(lister, {
       tryCatch(
         run_cucumber(
-          ".", filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...,
+          config,
           cleanup_env = environment(),
           # Like a test file, each feature file is the file of its results
           start_file = \(feature) lister$start_file(as.character(fs::path_rel(feature, ".")))
