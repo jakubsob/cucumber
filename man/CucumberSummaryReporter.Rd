@@ -364,7 +364,8 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 
 \item{\code{current_scenario}}{Name of the scenario currently executing, like \code{"Scenario: Add an item"}}
 
-\item{\code{current_rule}}{Name of the Rule of the scenario currently executing, like \code{"Rule: Removing items"}, or \code{NULL}}
+\item{\code{current_rule}}{Name of the Rule of the scenario currently executing, like
+\code{"Rule: Removing items"}, or \code{NULL}}
 
 \item{\code{current_steps}}{Steps executed so far in the current scenario}
 

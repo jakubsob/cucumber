@@ -159,7 +159,8 @@ run_snapshots <- function(path, features, complete, frame = parent.frame()) {
   started <- list()
   list(
     feature = function(feature, test_names) {
-      started[[feature]] <<- started[[feature]] %||% local_feature_snapshots(dir, snapshot_file(feature, path), outer %||% seen, frame, test_names)
+      started[[feature]] <<- started[[feature]] %||%
+        local_feature_snapshots(dir, snapshot_file(feature, path), outer %||% seen, frame, test_names)
       started[[feature]]
     },
     finish = function() finished <<- TRUE
@@ -316,7 +317,9 @@ local_feature_snapshots <- function(dir, file, outer, frame, test_names) {
 variant_snapshot_hint <- function(failure) {
   variant <- regmatches(failure$message, regexec("has changed \\(variant '([^']+)'\\)", failure$message))[[1]][2]
   if (!is.na(variant)) {
-    failure$message <- gsub("(snapshot_(accept|review)\\(\")([^\"/]+\")", paste0("\\1", variant, "/\\3"), failure$message)
+    failure$message <- gsub(
+      "(snapshot_(accept|review)\\(\")([^\"/]+\")", paste0("\\1", variant, "/\\3"), failure$message
+    )
   }
   failure
 }

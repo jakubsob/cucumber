@@ -35,7 +35,8 @@
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
 #'   are documented.
 #' @param features If not NULL, only these feature files are documented. Relative paths are
-#'   relative to `path`. A directory selects the feature files in it and its subdirectories. Add `:line` to select only the scenario at that line, e.g.
+#'   relative to `path`. A directory selects the feature files in it and its subdirectories.
+#'   Add `:line` to select only the scenario at that line, e.g.
 #'   `"addition.feature:12"`. The line of an example row selects only that example.
 #' @param section Name of the section. Defaults to the `cucumber.rd_section` option, or
 #'   `"Specification"` if it's not set.
@@ -97,7 +98,8 @@ feature_rd <- function(document, pickles, source, file) {
   selected <- unlist(map(pickles, \(pickle) pickle$message$astNodeIds))
   tokens <- gherkin_tokens(document, source)
   # A child of the feature or of a rule ends before the first line of the next one
-  starts <- c(unlist(map(c(feature$children, unlist(map(feature$children, \(child) child$rule$children), recursive = FALSE)), \(child) {
+  children <- c(feature$children, unlist(map(feature$children, \(child) child$rule$children), recursive = FALSE))
+  starts <- c(unlist(map(children, \(child) {
     node <- child$background %||% child$scenario %||% child$rule
     first_line(node)
   })), length(source) + 1)

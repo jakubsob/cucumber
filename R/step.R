@@ -118,7 +118,10 @@ register_step <- function(step) {
   assert_step(step)
   steps <- get_steps()
   # A step definition defined again where it's written replaces itself
-  again <- vapply(steps, \(other) identical(attr(other, "description"), attr(step, "description")) && defined_again(attr(other, "srcref"), attr(step, "srcref")), logical(1))
+  again <- vapply(steps, \(other) {
+    identical(attr(other, "description"), attr(step, "description")) &&
+      defined_again(attr(other, "srcref"), attr(step, "srcref"))
+  }, logical(1))
   steps <- .steps(!!!steps[!again], !!attr(step, "description") := step)
   set_steps(steps)
   invisible(step)

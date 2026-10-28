@@ -69,7 +69,9 @@ run <- function(
   if (identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {
     abort(
       "`run()` isn't supported in a parallel testthat run.",
-      body = c(i = "Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`."),
+      body = c(
+        i = "Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`."
+      ),
       call = NULL,
       trace = empty_trace()
     )
@@ -226,7 +228,10 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
   }, add = TRUE, after = FALSE)
   # Every before all hook runs, but no scenario runs if one failed. One that
   # skipped skips every scenario, like skip() at the top of a test file.
-  before_error <- run_test_run_hooks(get_hooks_to_run(hooks, "before_all"), reporter, test_run_started$id, can_skip = TRUE)
+  before_error <- run_test_run_hooks(
+    get_hooks_to_run(hooks, "before_all"), reporter, test_run_started$id,
+    can_skip = TRUE
+  )
   skip <- if (inherits(before_error, "skip")) before_error
   if (!is.null(skip)) before_error <- NULL
   if (!is.null(before_error)) {
@@ -249,15 +254,16 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
   # Consecutive scenarios of a feature run in its testthat context
   files <- rle(map_chr(pickles, "feature_file"))
   for (run in split(pickles, rep(seq_along(files$lengths), files$lengths))) {
-    if (!is.null(start_file)) start_file(run[[1]]$feature_file)
+    feature_file <- run[[1]]$feature_file
+    if (!is.null(start_file)) start_file(feature_file)
     failed <- execute_feature(
-      sources[[run[[1]]$feature_file]]$document,
+      sources[[feature_file]]$document,
       run,
       hooks,
       config,
       failed = failed,
       skip = skip,
-      snapshots = snapshots$feature(run[[1]]$feature_file, map_chr(sources[[run[[1]]$feature_file]]$pickles, "test_name"))
+      snapshots = snapshots$feature(feature_file, map_chr(sources[[feature_file]]$pickles, "test_name"))
     )
   }
   # A run that skipped scenarios after a failed one, or all of them in a before
@@ -281,7 +287,10 @@ resolve_order <- function(order) {
   if (!valid) {
     abort(
       paste0("Unknown order ", deparse1(order), "."),
-      body = c(i = "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\", with a seed of up to 2147483647."),
+      body = c(i = paste(
+        "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\",",
+        "with a seed of up to 2147483647."
+      )),
       call = NULL,
       trace = empty_trace()
     )
@@ -289,7 +298,9 @@ resolve_order <- function(order) {
   if (order == "random") {
     # Without changing the session's random numbers
     order <- paste0("random:", withr::with_preserve_seed(sample.int(99999L, 1L)))
-    rlang::inform(paste0("Running scenarios in random order. Use `order = \"", order, "\"` to run them in this order again."))
+    rlang::inform(paste0(
+      "Running scenarios in random order. Use `order = \"", order, "\"` to run them in this order again."
+    ))
   }
   order
 }
@@ -317,14 +328,23 @@ run_test_run_hooks <- function(hooks, reporter, test_run_started_id, can_skip = 
   for (hook in hooks) {
     started <- list(id = new_id(), testRunStartedId = test_run_started_id, hookId = hook$id, timestamp = timestamp())
     emit(reporter, "testRunHookStarted", started)
-    context <- new_context(\(attachment) emit(reporter, "attachment", c(list(testRunHookStartedId = started$id), attachment)))
-    result <- withr::with_options(list(testthat.snapshotter = test_run_hook_snapshotter()), run_hook_step(hook, context, can_skip = can_skip))
+    context <- new_context(\(attachment) {
+      emit(reporter, "attachment", c(list(testRunHookStartedId = started$id), attachment))
+    })
+    result <- withr::with_options(
+      list(testthat.snapshotter = test_run_hook_snapshotter()),
+      run_hook_step(hook, context, can_skip = can_skip)
+    )
     emit(reporter, "testRunHookFinished", list(
       testRunHookStartedId = started$id,
       result = test_step_result(result),
       timestamp = timestamp()
     ))
-    if (inherits(result$error, "skip")) first_skip <- first_skip %||% result$error else first_error <- first_error %||% result$error
+    if (inherits(result$error, "skip")) {
+      first_skip <- first_skip %||% result$error
+    } else {
+      first_error <- first_error %||% result$error
+    }
   }
   first_error %||% first_skip
 }
@@ -334,7 +354,13 @@ run_test_run_hooks <- function(hooks, reporter, test_run_started_id, can_skip = 
 #' @keywords internal
 #' @noRd
 test_run_hook_snapshotter <- function() {
-  error <- \(fn) \(...) abort(paste0("`", fn, "` can only be called in a step, or in a `before()`, `after()`, `before_step()` or `after_step()` hook."), call = NULL)
+  error <- \(fn) {
+    message <- paste0(
+      "`", fn, "` can only be called in a step, ",
+      "or in a `before()`, `after()`, `before_step()` or `after_step()` hook."
+    )
+    \(...) abort(message, call = NULL)
+  }
   list(
     is_active = \() TRUE,
     take_snapshot = error("testthat::expect_snapshot()"),
@@ -475,7 +501,10 @@ check_grepl_args <- function(...) {
   if (length(unknown) > 0) {
     abort(
       paste0("Unknown argument", if (length(unknown) > 1) "s", ": ", paste0("`", unknown, "`", collapse = ", "), "."),
-      body = c(i = paste0("Arguments of `grepl()` for `filter` can be passed in `...`: ", paste0("`", allowed, "`", collapse = ", "), ".")),
+      body = c(i = paste0(
+        "Arguments of `grepl()` for `filter` can be passed in `...`: ",
+        paste0("`", allowed, "`", collapse = ", "), "."
+      )),
       call = NULL,
       trace = empty_trace()
     )
@@ -609,7 +638,8 @@ filter_features <- function(features, filter = NULL, ...) {
 #'   serve a different purpose and are better run separately, especially if acceptance tests take
 #'   longer to run than unit tests.
 #'
-#'   If you want to run Cucumber tests alongside `testthat` tests, you can use `cucumber::run()` in one of the `test-*.R` files in your `tests/testthat` directory.
+#'   If you want to run Cucumber tests alongside `testthat` tests, you can use `cucumber::run()`
+#'   in one of the `test-*.R` files in your `tests/testthat` directory.
 #'
 #' - Use `test-*.R` files to test the support code you might have implemented that is used to run Cucumber tests.
 #'
@@ -725,12 +755,17 @@ test <- function(
   # of the snapshot files of the features, or it deletes them at the end of its run.
   # Its directory is relative, so it's compared before the working directory changes.
   snapshotter <- getOption("testthat.snapshotter")
-  if (!is.null(snapshotter) && fs::path_abs(snapshotter$snap_dir) != fs::path_abs(fs::path(path, "_snaps"))) snapshotter <- NULL
+  if (!is.null(snapshotter) && fs::path_abs(snapshotter$snap_dir) != fs::path_abs(fs::path(path, "_snaps"))) {
+    snapshotter <- NULL
+  }
   # In a parallel run, the process that deletes the unused snapshot files can't be told
   if (!is.null(snapshotter) && identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {
     abort(
       "`test()` of the directory of a parallel testthat run isn't supported.",
-      body = c(i = "Set `Config/testthat/parallel: false` in DESCRIPTION, or keep the feature files in another directory, like `test(\"../acceptance\")`."),
+      body = c(i = paste(
+        "Set `Config/testthat/parallel: false` in DESCRIPTION,",
+        "or keep the feature files in another directory, like `test(\"../acceptance\")`."
+      )),
       call = NULL,
       trace = empty_trace()
     )
@@ -757,7 +792,10 @@ test <- function(
   # Like testthat::test_dir(), what helper and setup files and steps defer to
   # testthat::teardown_env() runs when test() ends, and testthat::local_mocked_bindings()
   # mocks in `env` too, a copy of the package's namespace
-  rlang::local_bindings(teardown_env = environment(), testing_env = env, .env = utils::getFromNamespace("the", "testthat"))
+  rlang::local_bindings(
+    teardown_env = environment(), testing_env = env,
+    .env = utils::getFromNamespace("the", "testthat")
+  )
   # Before the setup files, so what they defined is cleared even if one fails,
   # and what was defined before, like by the setup files of a testthat run that
   # calls test(), is restored
@@ -782,8 +820,10 @@ test <- function(
         error = function(e) {
           run_error <<- e
           # Shown like testthat shows the error of a test file, as `run()` shows it
-          header <- if (is.null(conditionCall(e))) "Error: " else paste0("Error in `", deparse1(conditionCall(e)), "`: ")
-          lister$add_result(context = NULL, test = NULL, result = testthat::new_expectation("error", paste0(header, conditionMessage(e))))
+          call <- conditionCall(e)
+          header <- if (is.null(call)) "Error: " else paste0("Error in `", deparse1(call), "`: ")
+          result <- testthat::new_expectation("error", paste0(header, conditionMessage(e)))
+          lister$add_result(context = NULL, test = NULL, result = result)
           lister$end_context(NULL)
         }
       )

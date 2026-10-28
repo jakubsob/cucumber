@@ -35,7 +35,11 @@ execute_pickles <- function(
       config,
       test_names[[i]],
       skip_steps = config$dry_run || (config$fail_fast && failed) || !is.null(skip),
-      skip_reason = if (!is.null(skip)) conditionMessage(skip) else "A previous scenario failed and `fail_fast = TRUE`.",
+      skip_reason = if (!is.null(skip)) {
+        conditionMessage(skip)
+      } else {
+        "A previous scenario failed and `fail_fast = TRUE`."
+      },
       snapshots = snapshots
     )
     failed <- failed || pickle_failed
@@ -52,7 +56,8 @@ execute_pickles <- function(
 #'
 #' Hooks and steps are the scenario's test steps: the scenario gets the worst
 #' of their results, and each after hook gets the worst result so far. Each
-#' test step is reported as a message when it starts and when it finishes. Before hooks after one that didn't pass are skipped.
+#' test step is reported as a message when it starts and when it finishes.
+#' Before hooks after one that didn't pass are skipped.
 #'
 #' With `skip_steps`, neither hooks nor step bodies run, and testthat skips the
 #' scenario with `skip_reason`. In a dry run, undefined and ambiguous steps
@@ -135,23 +140,23 @@ run_scenario <- function(state, pickle, hooks, config, skip_steps, snapshots) {
     state$failed <- state$result$status %in% failing_statuses(config$strict, config$dry_run)
     if (!is.null(snapshots)) end_snapshot_scenario(snapshots, state$result$status, state$snapshot_on_cran)
   },
-    # The reporter gets a warning as it's raised. A warning of a hook, or of
-    # what a step or a hook deferred, is at the scenario's line.
-    warning = \(w) {
-      cucumber_event(reporter, "add_warning", w)
-      if (is.null(w$srcref)) {
-        w <- rlang::cnd_entrace(w)
-        w$srcref <- feature_srcref(pickle)
-      }
-      state$held <- c(state$held, list(w))
-      tryInvokeRestart("muffleWarning")
-    },
-    expectation_success = \(e) {
-      state$held <- c(state$held, list(e))
-      tryInvokeRestart("muffle_expectation")
-    },
-    # Not muffled, so testthat skips the test, as it does on CRAN
-    snapshot_on_cran = \(cnd) state$snapshot_on_cran <- TRUE
+  # The reporter gets a warning as it's raised. A warning of a hook, or of
+  # what a step or a hook deferred, is at the scenario's line.
+  warning = \(w) {
+    cucumber_event(reporter, "add_warning", w)
+    if (is.null(w$srcref)) {
+      w <- rlang::cnd_entrace(w)
+      w$srcref <- feature_srcref(pickle)
+    }
+    state$held <- c(state$held, list(w))
+    tryInvokeRestart("muffleWarning")
+  },
+  expectation_success = \(e) {
+    state$held <- c(state$held, list(e))
+    tryInvokeRestart("muffle_expectation")
+  },
+  # Not muffled, so testthat skips the test, as it does on CRAN
+  snapshot_on_cran = \(cnd) state$snapshot_on_cran <- TRUE
   )
 }
 
@@ -169,7 +174,10 @@ run_test_steps <- function(state, test_case_started_id, pickle, hooks, config, s
   # Attachments are of the test step that runs
   state$test_step_id <- NULL
   send <- \(attachment) {
-    emit(reporter, "attachment", c(list(testCaseStartedId = test_case_started_id, testStepId = state$test_step_id), attachment))
+    emit(reporter, "attachment", c(
+      list(testCaseStartedId = test_case_started_id, testStepId = state$test_step_id),
+      attachment
+    ))
   }
   # A test step that didn't pass skips the steps after it. A hook or a step
   # that skipped the scenario also skips undefined and ambiguous steps.
@@ -202,7 +210,10 @@ run_test_steps <- function(state, test_case_started_id, pickle, hooks, config, s
   with_scenario_context(send, \(.context) {
     # A dry run matches the steps, but runs neither hooks nor step bodies
     for (test_step in pickle$test_case$before) {
-      run_hook(test_step, skipping(), .context, scenario, can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle)
+      run_hook(
+        test_step, skipping(), .context, scenario,
+        can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle
+      )
     }
 
     withCallingHandlers(for (step in pickle$steps) {
@@ -222,7 +233,10 @@ run_test_steps <- function(state, test_case_started_id, pickle, hooks, config, s
     }, expectation = \(e) state$expectations <- state$expectations + 1)
 
     for (test_step in pickle$test_case$after) {
-      run_hook(test_step, skip_steps, .context, c(scenario, worst_result(state$results)), can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle)
+      run_hook(
+        test_step, skip_steps, .context, c(scenario, worst_result(state$results)),
+        can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle
+      )
     }
   })
 }
@@ -264,7 +278,10 @@ with_scenario_context <- function(send, run) {
       ran <<- TRUE
     })(),
     # An error of a test step is the scenario's
-    error = \(e) if (ran) warning(paste("Cleanup of the scenario failed:", conditionMessage(e)), call. = FALSE) else rlang::zap()
+    error = \(e) {
+      if (!ran) return(rlang::zap())
+      warning(paste("Cleanup of the scenario failed:", conditionMessage(e)), call. = FALSE)
+    }
   )
   invisible()
 }
@@ -356,7 +373,10 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
   ))
   # The tests in step hooks are at the step's line
   srcref <- feature_srcref(pickle, step$line)
-  before_error <- run_hooks(get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step, srcref = srcref, pickle = pickle)
+  before_error <- run_hooks(
+    get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step,
+    srcref = srcref, pickle = pickle
+  )
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)
   } else {
@@ -402,7 +422,10 @@ signal_scenario_result <- function(results, result, failing, pickle) {
     trace <- failure$error$trace %||% empty_trace()
     if (inherits(failure$error, "cucumber_hook_error")) {
       # An error that doesn't end the test, as testthat shows an error in a test
-      testthat::expectation("error", paste0("Error: ", conditionMessage(failure$error)), srcref = location(failure), trace = trace)
+      testthat::expectation(
+        "error", paste0("Error: ", conditionMessage(failure$error)),
+        srcref = location(failure), trace = trace
+      )
     } else {
       testthat::fail(conditionMessage(failure$error), srcref = location(failure), trace = trace)
     }

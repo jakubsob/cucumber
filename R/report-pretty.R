@@ -45,7 +45,8 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @field step_attachments Lines of the attachments of the step currently executing, printed under it
     step_attachments = NULL,
 
-    #' @field printed_rule The Rule last printed in the current feature, printed again only for a scenario of another Rule
+    #' @field printed_rule The Rule last printed in the current feature, printed again only
+    #'   for a scenario of another Rule
     printed_rule = NULL,
 
     #' @description

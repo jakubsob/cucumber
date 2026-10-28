@@ -97,7 +97,8 @@ It's not prohibited to use \code{tests/testthat} directory, but it's not recomme
 serve a different purpose and are better run separately, especially if acceptance tests take
 longer to run than unit tests.
 
-If you want to run Cucumber tests alongside \code{testthat} tests, you can use \code{cucumber::run()} in one of the \verb{test-*.R} files in your \code{tests/testthat} directory.
+If you want to run Cucumber tests alongside \code{testthat} tests, you can use \code{cucumber::run()}
+in one of the \verb{test-*.R} files in your \code{tests/testthat} directory.
 \item Use \verb{test-*.R} files to test the support code you might have implemented that is used to run Cucumber tests.
 
 Those tests won't be run when calling \code{\link[=test]{test()}}. To run those tests use

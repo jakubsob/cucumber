@@ -89,7 +89,8 @@ parse_tag_expression <- function(expression) {
     } else if (token %in% c("and", "or")) {
       expect(expected, "operator")
       # Both are left associative
-      while (length(operators) > 0 && peek() %in% TAG_OPERATORS && TAG_PRECEDENCE[[token]] <= TAG_PRECEDENCE[[peek()]]) {
+      while (length(operators) > 0 && peek() %in% TAG_OPERATORS &&
+               TAG_PRECEDENCE[[token]] <= TAG_PRECEDENCE[[peek()]]) {
         push_expression(pop_operator())
       }
       operators <- c(operators, token)

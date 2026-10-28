@@ -85,7 +85,8 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field current_scenario Name of the scenario currently executing, like `"Scenario: Add an item"`
     current_scenario = NULL,
 
-    #' @field current_rule Name of the Rule of the scenario currently executing, like `"Rule: Removing items"`, or `NULL`
+    #' @field current_rule Name of the Rule of the scenario currently executing, like
+    #'   `"Rule: Removing items"`, or `NULL`
     current_rule = NULL,
 
     #' @field current_steps Steps executed so far in the current scenario

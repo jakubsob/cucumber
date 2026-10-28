@@ -28,18 +28,22 @@ given("a package", function(context) {
 run_code <- function(code, context, catch_error = FALSE) {
   # Each test() and run() of the code also writes its run as Cucumber Messages, read into
   # `context$run`, so the results of the run are checked whatever the reporter prints
-  record <- function(runner) function(..., reporter) {
-    # A reporter that isn't cucumber's gets the error of test() or run(), not of the recorder's CucumberMultiReporter
-    if (!is.null(reporter) && !inherits(reporter, "CucumberReporter")) return(runner(..., reporter = reporter))
-    messages <- tempfile(fileext = ".ndjson")
-    # A run stopped before it started writes no messages, and has no results
-    context$run <- NULL
-    on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
-    recorder <- CucumberMessagesReporter$new(messages)
-    runner(..., reporter = CucumberMultiReporter$new(purrr::compact(list(reporter, recorder))))
+  record <- function(runner) {
+    function(..., reporter) {
+      # A reporter that isn't cucumber's gets the error of test() or run(), not of the recorder's CucumberMultiReporter
+      if (!is.null(reporter) && !inherits(reporter, "CucumberReporter")) return(runner(..., reporter = reporter))
+      messages <- tempfile(fileext = ".ndjson")
+      # A run stopped before it started writes no messages, and has no results
+      context$run <- NULL
+      on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
+      recorder <- CucumberMessagesReporter$new(messages)
+      runner(..., reporter = CucumberMultiReporter$new(purrr::compact(list(reporter, recorder))))
+    }
   }
   test <- function(..., reporter = CucumberProgressReporter$new()) record(cucumber::test)(..., reporter = reporter)
-  run <- function(..., reporter = eval(formals(cucumber::run)$reporter, asNamespace("cucumber"))) record(cucumber::run)(..., reporter = reporter)
+  run <- function(..., reporter = eval(formals(cucumber::run)$reporter, asNamespace("cucumber"))) {
+    record(cucumber::run)(..., reporter = reporter)
+  }
   cucumber:::local_registry(cucumber:::new_registry())
   withr::with_dir(context$tempdir, {
     # Messages are output too, printed where they're signalled
@@ -111,7 +115,11 @@ then("the steps and hooks have these results:", function(expected, context) {
 
 then("the scenarios have these results:", function(expected, context) {
   scenarios <- context$run$scenarios
-  actual <- tibble::tibble(scenario = scenarios$name, status = scenarios$status, attempts = as.character(scenarios$attempts))
+  actual <- tibble::tibble(
+    scenario = scenarios$name,
+    status = scenarios$status,
+    attempts = as.character(scenarios$attempts)
+  )
   expect_equal(as.data.frame(actual[names(expected)]), as.data.frame(expected))
 })
 
@@ -207,7 +215,11 @@ expect_result_locations <- function(classes, expected, context) {
     result <- Find(\(result) inherits(result, classes), test$results)
     if (is.null(result)) return(NULL)
     srcref <- result$srcref
-    location <- if (inherits(srcref, "srcref")) paste0(attr(srcref, "srcfile")$filename, ":", srcref[[1]]) else NA_character_
+    location <- if (inherits(srcref, "srcref")) {
+      paste0(attr(srcref, "srcfile")$filename, ":", srcref[[1]])
+    } else {
+      NA_character_
+    }
     data.frame(scenario = sub("^Scenario: ", "", test$test), location = location)
   })
   expect_equal(do.call(rbind, results), as.data.frame(expected))
@@ -288,14 +300,16 @@ then("it fails with", function(message, context) {
 # like the error of a feature file that can't be parsed
 shown_results <- function(result) {
   kinds <- c(expectation_failure = "failure", expectation_error = "error", expectation_warning = "warning")
-  shown <- unlist(lapply(result, \(test) lapply(test$results, \(expectation) {
-    kind <- kinds[intersect(class(expectation), names(kinds))[1]]
-    if (is.na(kind)) return(NULL)
-    header <- paste0("[", kind, "]", if (!is.na(test$test)) paste0(" ", test$test))
-    # Without spaces at the ends of lines, which editors remove from feature files
-    lines <- strsplit(cli::ansi_strip(conditionMessage(expectation)), "\n")[[1]]
-    paste(c(header, trimws(lines, which = "right")), collapse = "\n")
-  })))
+  shown <- unlist(lapply(result, \(test) {
+    lapply(test$results, \(expectation) {
+      kind <- kinds[intersect(class(expectation), names(kinds))[1]]
+      if (is.na(kind)) return(NULL)
+      header <- paste0("[", kind, "]", if (!is.na(test$test)) paste0(" ", test$test))
+      # Without spaces at the ends of lines, which editors remove from feature files
+      lines <- strsplit(cli::ansi_strip(conditionMessage(expectation)), "\n")[[1]]
+      paste(c(header, trimws(lines, which = "right")), collapse = "\n")
+    })
+  }))
   paste(shown, collapse = "\n\n")
 }
 
@@ -320,7 +334,10 @@ then("the output includes these lines in order:", function(text, context) {
   at <- 0
   for (line in lines) {
     found <- which(output == line & seq_along(output) > at)
-    expect_true(length(found) > 0, info = paste0("Missing in order: ", line, "\n\nIn output:\n", paste(output, collapse = "\n")))
+    expect_true(
+      length(found) > 0,
+      info = paste0("Missing in order: ", line, "\n\nIn output:\n", paste(output, collapse = "\n"))
+    )
     at <- found[1]
   }
 })
@@ -332,7 +349,10 @@ then("the output includes lines matching these patterns in order:", function(tex
   at <- 0
   for (pattern in patterns) {
     found <- which(grepl(pattern, output) & seq_along(output) > at)
-    expect_true(length(found) > 0, info = paste0("Missing in order: ", pattern, "\n\nIn output:\n", paste(output, collapse = "\n")))
+    expect_true(
+      length(found) > 0,
+      info = paste0("Missing in order: ", pattern, "\n\nIn output:\n", paste(output, collapse = "\n"))
+    )
     at <- found[1]
   }
 })
@@ -370,7 +390,9 @@ junit_test_cases <- function(file, context) {
   tibble::tibble(
     classname = xml2::xml_attr(cases, "classname"),
     name = xml2::xml_attr(cases, "name"),
-    result = vapply(outcome, \(node) if (inherits(node, "xml_missing")) "passed" else xml2::xml_name(node), character(1)),
+    result = vapply(
+      outcome, \(node) if (inherits(node, "xml_missing")) "passed" else xml2::xml_name(node), character(1)
+    ),
     message = vapply(outcome, \(node) rlang::`%|%`(xml2::xml_attr(node, "message"), ""), character(1)),
     output = xml2::xml_text(xml2::xml_find_first(cases, "system-out"))
   )
@@ -486,7 +508,10 @@ after(function(context, scenario) {
 # The help page of a topic of the package, as text, like `?topic` shows it
 help_page <- function(topic, context) {
   rd <- fs::path(context$tempdir, "man", paste0(topic, ".Rd"))
-  text <- withr::with_options(list(useFancyQuotes = FALSE), utils::capture.output(tools::Rd2txt(rd, options = list(underline_titles = FALSE))))
+  text <- withr::with_options(
+    list(useFancyQuotes = FALSE),
+    utils::capture.output(tools::Rd2txt(rd, options = list(underline_titles = FALSE)))
+  )
   paste(text, collapse = "\n")
 }
 
@@ -511,7 +536,10 @@ then("the help page {string} doesn't include {string}", function(topic, text, co
 then("the reference page {string} has the Gherkin block", function(topic, text, context) {
   html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
   blocks <- trimws(xml2::xml_text(xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code")))
-  expect_true(text %in% blocks, info = paste0("Expected:\n", text, "\n\nGherkin blocks:\n", paste(blocks, collapse = "\n\n")))
+  expect_true(
+    text %in% blocks,
+    info = paste0("Expected:\n", text, "\n\nGherkin blocks:\n", paste(blocks, collapse = "\n\n"))
+  )
 })
 
 # The tokens of the Gherkin blocks of a pkgdown reference page, with their classes
@@ -520,7 +548,10 @@ then("the reference page {string} highlights the Gherkin", function(topic, table
   spans <- xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code//span[@class]")
   tokens <- paste(trimws(xml2::xml_text(spans)), "-", xml2::xml_attr(spans, "class"))
   expected <- paste(table$token, "-", table$class)
-  expect_true(all(expected %in% tokens), info = paste0("Missing:\n", paste(setdiff(expected, tokens), collapse = "\n"), "\n\nTokens:\n", paste(tokens, collapse = "\n")))
+  expect_true(all(expected %in% tokens), info = paste0(
+    "Missing:\n", paste(setdiff(expected, tokens), collapse = "\n"),
+    "\n\nTokens:\n", paste(tokens, collapse = "\n")
+  ))
 })
 
 then("the file {string} has these lines:", function(file, lines, context) {
@@ -550,7 +581,10 @@ snapshots_dir <- "tests/testthat"
 
 write_snapshot_feature <- function(file, context) {
   feature <- context$snapshot_features[[file]]
-  steps <- c(if (!is.null(feature$before)) paste("Given", feature$before), sprintf('Then the snapshot of "%s" matches', feature$value))
+  steps <- c(
+    if (!is.null(feature$before)) paste("Given", feature$before),
+    sprintf('Then the snapshot of "%s" matches', feature$value)
+  )
   lines <- if (grepl("[.]md$", file)) {
     c(paste("# Feature:", file), "", paste("## Scenario:", feature$scenario), "", paste("*", steps))
   } else {
@@ -563,6 +597,8 @@ write_snapshot_feature <- function(file, context) {
 
 write_snapshot_steps <- function(context) {
   fs::dir_create(fs::path(context$tempdir, snapshots_dir))
+  # The features show the lines of these steps, so each step keeps its line
+  # nolint start: line_length_linter.
   writeLines(
     c(
       'given("it fails", function(context) stop("Failed on purpose"))',
@@ -571,33 +607,37 @@ write_snapshot_steps <- function(context) {
       '  if (!file.exists("failed-once")) {',
       '    file.create("failed-once")',
       '    stop("Failed the first time")',
-      '  }',
-      '})',
+      "  }",
+      "})",
       'then("the snapshot of {string} matches", function(value, context) expect_snapshot(value))',
       'then("the snapshot of {string} for {string} matches", function(value, variant, context) expect_snapshot(value, variant = variant))',
       'then("the snapshot of the error {string} matches", function(message, context) expect_snapshot(stop(message), error = TRUE))',
       'then("the snapshot of the temporary directory matches", function(context) {',
       '  expect_snapshot(cat(tempdir()), transform = function(lines) sub(tempdir(), "<tempdir>", lines, fixed = TRUE))',
-      '})',
+      "})",
       'then("the snapshot of the value {string} matches", function(value, context) expect_snapshot_value(value, style = "deparse"))',
       'given("the file snapshot {string} is announced", function(name, context) announce_snapshot_file(name = name))',
       'then("the file snapshot {string} of {string} matches", function(name, value, context) {',
       '  file <- tempfile(fileext = ".txt")',
-      '  writeLines(value, file)',
-      '  expect_snapshot_file(file, name)',
-      '})'
+      "  writeLines(value, file)",
+      "  expect_snapshot_file(file, name)",
+      "})"
     ),
     fs::path(context$tempdir, snapshots_dir, "setup-snapshot-steps.R")
   )
+  # nolint end
 }
 
 given("the steps that take snapshots", function(context) write_snapshot_steps(context))
 
-given("a feature file {string} with a scenario {string} that snapshots {string}", function(file, scenario, value, context) {
-  context$snapshot_features[[file]] <- list(scenario = scenario, value = value)
-  write_snapshot_steps(context)
-  write_snapshot_feature(file, context)
-})
+given(
+  "a feature file {string} with a scenario {string} that snapshots {string}",
+  function(file, scenario, value, context) {
+    context$snapshot_features[[file]] <- list(scenario = scenario, value = value)
+    write_snapshot_steps(context)
+    write_snapshot_feature(file, context)
+  }
+)
 
 given("the scenario {string} of {string} snapshots {string}", function(scenario, file, value, context) {
   context$snapshot_features[[file]]$value <- value
@@ -631,7 +671,10 @@ run_feature_files <- function(runner, args, context, ci = FALSE, cran = FALSE) {
     on.exit(if (fs::file_exists(messages)) context$run <- read_messages(messages))
     'testthat::test_local(reporter = "silent", stop_on_failure = FALSE)'
   }
-  run_code(sprintf("withr::with_envvar(c(NOT_CRAN = %s, CI = %s, TESTTHAT = NA, `_R_CHECK_PACKAGE_NAME_` = NA), %s)", if (cran) '"false"' else "NA", if (ci) '"true"' else "NA", code), context)
+  run_code(sprintf(
+    "withr::with_envvar(c(NOT_CRAN = %s, CI = %s, TESTTHAT = NA, `_R_CHECK_PACKAGE_NAME_` = NA), %s)",
+    if (cran) '"false"' else "NA", if (ci) '"true"' else "NA", code
+  ), context)
 }
 
 when("I run the feature files with {string}", function(runner, context) {
@@ -666,7 +709,8 @@ when("I run the feature files with {string} and {word} = {int}", function(runner
 then("the snapshot file {string} has {string} for {string}", function(file, value, scenario, context) {
   dir <- fs::path(context$tempdir, snapshots_dir)
   path <- fs::path(dir, file)
-  expect_true(fs::file_exists(path), info = paste("Snapshot files:", paste(fs::dir_ls(dir, recurse = TRUE, glob = "*.md"), collapse = ", ")))
+  snapshot_files <- fs::dir_ls(dir, recurse = TRUE, glob = "*.md")
+  expect_true(fs::file_exists(path), info = paste("Snapshot files:", paste(snapshot_files, collapse = ", ")))
   lines <- readLines(path)
   start <- match(paste("# Scenario:", scenario), lines)
   expect_false(is.na(start), info = paste(lines, collapse = "\n"))

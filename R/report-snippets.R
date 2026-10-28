@@ -48,7 +48,9 @@ CucumberSnippetsReporter <- R6::R6Class(
       suggestion <- envelope$suggestion
       if (!is.null(suggestion)) {
         # The first line of each step definition, the others commented out
-        definitions <- vapply(suggestion$snippets, \(snippet) strsplit(snippet$code, "\n", fixed = TRUE)[[1]][[1]], character(1))
+        definitions <- vapply(
+          suggestion$snippets, \(snippet) strsplit(snippet$code, "\n", fixed = TRUE)[[1]][[1]], character(1)
+        )
         private$snippets <- c(private$snippets, format_step_snippet(definitions))
       }
       invisible(self)

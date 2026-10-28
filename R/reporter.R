@@ -7,10 +7,12 @@
 #' @section Methods:
 #' \describe{
 #'   \item{`start_run()`}{Called when a run starts}
-#'   \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a failing `before_all()` hook, or `NULL`}
+#'   \item{`end_run(error)`}{Called when a run ends, with the error that stopped it, like a
+#'     failing `before_all()` hook, or `NULL`}
 #'   \item{`add_message(envelope)`}{Called with each Cucumber Message of the run, see [CucumberMessagesReporter]}
 #'   \item{`add_warning(warning)`}{Called with each warning raised in a step, a hook or elsewhere in the run}
-#'   \item{`report(file)`}{Reports a run after it ran, from the Cucumber Messages [CucumberMessagesReporter] stored in `file`}
+#'   \item{`report(file)`}{Reports a run after it ran, from the Cucumber Messages
+#'     [CucumberMessagesReporter] stored in `file`}
 #' }
 #'
 #' An envelope is a list with one element, named by the message's type. The
@@ -154,7 +156,10 @@ check_reporter <- function(reporter, call = rlang::caller_env(), arg = "reporter
     rlang::abort(
       c(
         paste0("`", arg, "` must be a `CucumberReporter`, or `NULL` to report nothing."),
-        i = "testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`."
+        i = paste(
+          "testthat reporters can't report a cucumber run,",
+          "use one of cucumber's, like `CucumberProgressReporter$new()`."
+        )
       ),
       call = call
     )
@@ -342,7 +347,8 @@ print_failure <- function(failure, number = NULL) {
     cat("\n", bold_label(failure$feature %||% ""), "\n", sep = "")
     cat("  ", bold_label(failure$scenario %||% ""), "\n", sep = "")
   } else {
-    cat("\n", number, ") ", bold_label(failure$scenario), cli::col_grey(paste0(" # ", failure$location)), "\n", sep = "")
+    location <- cli::col_grey(paste0(" # ", failure$location))
+    cat("\n", number, ") ", bold_label(failure$scenario), location, "\n", sep = "")
   }
   # Each hook is printed where it ran, after the steps before it
   print_hooks <- function(steps) {

@@ -79,7 +79,8 @@ CucumberHtmlReporter <- R6::R6Class(
 #' @noRd
 html_report <- function(lines) {
   formatter <- \(file) {
-    paste(readLines(system.file("html-formatter", file, package = "cucumber"), encoding = "UTF-8", warn = FALSE), collapse = "\n")
+    path <- system.file("html-formatter", file, package = "cucumber")
+    paste(readLines(path, encoding = "UTF-8", warn = FALSE), collapse = "\n")
   }
   values <- list(
     title = "Cucumber",

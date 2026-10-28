@@ -108,8 +108,9 @@ define_parameter_type <- function(
 #' @keywords internal
 #' @noRd
 same_parameter_type <- function(parameter, other) {
+  fields <- c("name", "regexp", "use_for_snippets", "prefer_for_regexp_match")
   !is.null(parameter) &&
-    identical(parameter[c("name", "regexp", "use_for_snippets", "prefer_for_regexp_match")], other[c("name", "regexp", "use_for_snippets", "prefer_for_regexp_match")]) &&
+    identical(parameter[fields], other[fields]) &&
     identical(parameter$transformer, other$transformer, ignore.environment = TRUE)
 }
 

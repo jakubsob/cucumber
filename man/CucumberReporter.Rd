@@ -11,10 +11,12 @@ overriding the methods you need. Each does nothing by default.
 
 \describe{
 \item{\code{start_run()}}{Called when a run starts}
-\item{\code{end_run(error)}}{Called when a run ends, with the error that stopped it, like a failing \code{before_all()} hook, or \code{NULL}}
+\item{\code{end_run(error)}}{Called when a run ends, with the error that stopped it, like a
+failing \code{before_all()} hook, or \code{NULL}}
 \item{\code{add_message(envelope)}}{Called with each Cucumber Message of the run, see \link{CucumberMessagesReporter}}
 \item{\code{add_warning(warning)}}{Called with each warning raised in a step, a hook or elsewhere in the run}
-\item{\code{report(file)}}{Reports a run after it ran, from the Cucumber Messages \link{CucumberMessagesReporter} stored in \code{file}}
+\item{\code{report(file)}}{Reports a run after it ran, from the Cucumber Messages
+\link{CucumberMessagesReporter} stored in \code{file}}
 }
 
 An envelope is a list with one element, named by the message's type. The

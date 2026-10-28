@@ -8,7 +8,10 @@ when("the string {string} is logged", function(text, context) {
 
 when("text with ANSI escapes is logged", function(context) {
   context$log(
-    "This displays a \033[31mr\033[0m\033[91ma\033[0m\033[33mi\033[0m\033[32mn\033[0m\033[34mb\033[0m\033[95mo\033[0m\033[35mw\033[0m"
+    paste0(
+      "This displays a \033[31mr\033[0m\033[91ma\033[0m\033[33mi\033[0m\033[32mn\033[0m",
+      "\033[34mb\033[0m\033[95mo\033[0m\033[35mw\033[0m"
+    )
   )
 })
 
@@ -21,7 +24,8 @@ when("an array with {int} bytes is attached as {string}", function(size, media_t
 })
 
 when("a PDF document is attached and renamed", function(context) {
-  context$attach(readBin("document.pdf", "raw", file.size("document.pdf")), "application/pdf", file_name = "renamed.pdf")
+  pdf <- readBin("document.pdf", "raw", file.size("document.pdf"))
+  context$attach(pdf, "application/pdf", file_name = "renamed.pdf")
 })
 
 when("a link to {string} is attached", function(uri, context) {

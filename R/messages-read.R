@@ -47,7 +47,8 @@ read_messages <- function(x) {
   test_cases <- by_id(of("testCase"))
   started <- by_id(of("testCaseStarted"))
   # Only the last attempt of a retried scenario
-  retried <- vapply(Filter(\(finished) isTRUE(finished$willBeRetried), of("testCaseFinished")), \(finished) finished$testCaseStartedId, character(1))
+  retried <- Filter(\(finished) isTRUE(finished$willBeRetried), of("testCaseFinished"))
+  retried <- vapply(retried, \(finished) finished$testCaseStartedId, character(1))
   started <- started[setdiff(names(started), retried)]
   hooks <- by_id(of("hook"))
 
@@ -118,7 +119,13 @@ read_messages <- function(x) {
       tibble::tibble(
         scenario_id = id,
         scenario = pickles[[test_cases[[started[[id]]$testCaseId]]$pickleId]]$name,
-        keyword = if (hook) (if (startsWith(entry$hook$type %||% "", "AFTER")) "After" else "Before") else keywords[[entry$step$astNodeIds[[1]]]],
+        keyword = if (!hook) {
+          keywords[[entry$step$astNodeIds[[1]]]]
+        } else if (startsWith(entry$hook$type %||% "", "AFTER")) {
+          "After"
+        } else {
+          "Before"
+        },
         text = if (hook) entry$hook$name %||% "" else entry$step$text,
         status = entry$status,
         duration = entry$duration,
@@ -138,7 +145,10 @@ read_messages <- function(x) {
 
   structure(
     list(
-      features = rows(features, tibble::tibble(uri = character(), name = character(), description = character(), tags = list())),
+      features = rows(
+        features,
+        tibble::tibble(uri = character(), name = character(), description = character(), tags = list())
+      ),
       scenarios = rows(scenarios, tibble::tibble(
         id = character(), uri = character(), feature = character(), rule = character(), name = character(),
         line = integer(), tags = list(), status = character(), duration = numeric(), attempts = integer()
@@ -180,11 +190,15 @@ dedent <- function(text) {
 scenario_summary <- function(scenarios) {
   counts <- table(factor(scenarios$status, STEP_STATUSES))
   counts <- counts[counts > 0]
-  paste0(nrow(scenarios), " scenario", if (nrow(scenarios) != 1) "s", if (length(counts)) paste0(" (", paste(counts, names(counts), collapse = ", "), ")"))
+  paste0(
+    nrow(scenarios), " scenario", if (nrow(scenarios) != 1) "s",
+    if (length(counts)) paste0(" (", paste(counts, names(counts), collapse = ", "), ")")
+  )
 }
 
 #' @export
 print.cucumber_messages <- function(x, ...) {
-  cat("<cucumber_messages>", paste0(nrow(x$features), " feature", if (nrow(x$features) != 1) "s", ", ", scenario_summary(x$scenarios)), "\n")
+  features <- paste0(nrow(x$features), " feature", if (nrow(x$features) != 1) "s")
+  cat("<cucumber_messages>", paste0(features, ", ", scenario_summary(x$scenarios)), "\n")
   invisible(x)
 }

@@ -11,8 +11,9 @@
 # them must give, as NDJSON, and the files its steps attach. The CCK writes its step definitions in
 # TypeScript (devkit/samples/<sample>/<sample>.ts); the R ones are ported by
 # hand into tests/testthat/cck/<sample>/setup-steps.R, which this script
-# keeps, like the sample's junit.xml, copied by update_junit_xml(). test-cck.R runs each sample with CucumberMessagesReporter and compares the
-# messages with the CCK's.
+# keeps, like the sample's junit.xml, copied by update_junit_xml(). test-cck.R
+# runs each sample with CucumberMessagesReporter and compares the messages with
+# the CCK's.
 #
 # A new sample is copied only once it's added to CCK_SAMPLES, with its R
 # step definitions.

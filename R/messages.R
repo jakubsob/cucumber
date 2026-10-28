@@ -303,13 +303,16 @@ test_step_result <- function(result) {
   drop_null(list(
     status = toupper(result$status),
     duration = duration(result$duration),
-    message = if (!is.null(error)) paste(c(conditionMessage(error), if (!is.null(backtrace(error))) "Backtrace:", backtrace(error)), collapse = "\n"),
+    message = if (!is.null(error)) {
+      paste(c(conditionMessage(error), if (!is.null(backtrace(error))) "Backtrace:", backtrace(error)), collapse = "\n")
+    },
     exception = if (raised) exception_message(error)
   ))
 }
 
 exception_message <- function(error) {
-  cause <- if (inherits(error, c("cucumber_step_error", "cucumber_step_failure", "cucumber_hook_error"))) error$parent else error
+  wrapped <- inherits(error, c("cucumber_step_error", "cucumber_step_failure", "cucumber_hook_error"))
+  cause <- if (wrapped) error$parent else error
   drop_null(list(type = class(cause)[[1]], message = conditionMessage(cause), stackTrace = backtrace(error)))
 }
 

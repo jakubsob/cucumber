@@ -229,7 +229,9 @@ run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref
         fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
         hook_error(
           hook,
-          error_cnd(message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step.")),
+          error_cnd(
+            message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step.")
+          ),
           pickle
         )
       },

@@ -118,7 +118,10 @@ usage_rows <- function(q) {
     rows <- rbind(row, steps)
     rows$duration <- ifelse(is.na(rows$seconds), "-", sprintf("%.2fms", rows$seconds * 1000))
     if (more > 0) {
-      rows <- rbind(rows, data.frame(text = paste0("  ... ", more, " more"), seconds = NA_real_, location = "", duration = ""))
+      rows <- rbind(
+        rows,
+        data.frame(text = paste0("  ... ", more, " more"), seconds = NA_real_, location = "", duration = "")
+      )
     }
     rows
   })

@@ -53,7 +53,10 @@ describe("parse_gherkin", {
   }
 
   it("reports every error with the file path", {
-    lines <- c("Feature: Broken", "  Scenario: Junk", "    Given a step", "    not a step", "    Given a step", "    also not a step")
+    lines <- c(
+      "Feature: Broken", "  Scenario: Junk",
+      "    Given a step", "    not a step", "    Given a step", "    also not a step"
+    )
 
     expect_snapshot(parse_gherkin(lines, uri = "features/broken.feature"), error = TRUE)
   })

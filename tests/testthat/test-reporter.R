@@ -131,7 +131,10 @@ describe("run", {
   it("stops with an error of cucumber itself in a scenario, instead of failing the scenario", {
     local_mocked_bindings(test_step_result = function(result) stop("a bug in cucumber"))
     dir <- withr::local_tempdir()
-    writeLines(c("Feature: Basket", "  Scenario: Add an item", "    Given an empty basket"), fs::path(dir, "basket.feature"))
+    writeLines(
+      c("Feature: Basket", "  Scenario: Add an item", "    Given an empty basket"),
+      fs::path(dir, "basket.feature")
+    )
     writeLines('given("an empty basket", function(context) {})', fs::path(dir, "setup-steps.R"))
 
     expect_error(

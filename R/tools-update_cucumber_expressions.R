@@ -36,7 +36,10 @@ update_cucumber_expressions <- function(ref = "main", pkg = ".") {
   to <- file.path(pkg, "tests", "testthat", "cucumber-expressions")
   dir.create(to, recursive = TRUE, showWarnings = FALSE)
   for (kind in c("matching", "tokenizer", "parser")) {
-    files <- list.files(file.path(repo, "testdata", "cucumber-expression", kind), pattern = "\\.yaml$", full.names = TRUE)
+    files <- list.files(
+      file.path(repo, "testdata", "cucumber-expression", kind),
+      pattern = "\\.yaml$", full.names = TRUE
+    )
     # Numbers are doubles, as an integer like 9223372036854775807 is out of R's range
     cases <- lapply(files, yaml::read_yaml, handlers = list(int = as.numeric))
     names(cases) <- sub("\\.yaml$", "", basename(files))
@@ -47,7 +50,10 @@ update_cucumber_expressions <- function(ref = "main", pkg = ".") {
       if (!is.null(case$expected_args)) case$expected_args <- I(as.list(case$expected_args))
       case
     })
-    jsonlite::write_json(cases, file.path(to, paste0(kind, ".json")), auto_unbox = TRUE, digits = NA, null = "null", pretty = TRUE)
+    jsonlite::write_json(
+      cases, file.path(to, paste0(kind, ".json")),
+      auto_unbox = TRUE, digits = NA, null = "null", pretty = TRUE
+    )
   }
   file.copy(file.path(repo, "LICENSE"), file.path(to, "LICENSE"), overwrite = TRUE)
   writeLines(

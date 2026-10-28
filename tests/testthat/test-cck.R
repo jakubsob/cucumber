@@ -27,7 +27,10 @@ run_sample <- function(sample) {
   local_registry(new_registry())
   # Like the CCK, a run that fails is what some samples are about
   arguments <- sample_arguments(sample)
-  try(rlang::exec(test, dir, reporter = CucumberMessagesReporter$new(output), stop_on_failure = FALSE, !!!arguments), silent = TRUE)
+  try(
+    rlang::exec(test, dir, reporter = CucumberMessagesReporter$new(output), stop_on_failure = FALSE, !!!arguments),
+    silent = TRUE
+  )
   read_ndjson(output)
 }
 
@@ -43,7 +46,9 @@ ID_FIELDS <- c(
 # Samples whose step definitions return "pending" or "skipped". R signals
 # pending() and skip_scenario() as conditions, like the pending-exception and
 # skipped-exception samples, so their results have an exception too.
-RETURNED_STATUSES <- c("failedish-combinations", "hooks-skipped", "pending", "retry-pending", "skipped", "skipped-failing-hook")
+RETURNED_STATUSES <- c(
+  "failedish-combinations", "hooks-skipped", "pending", "retry-pending", "skipped", "skipped-failing-hook"
+)
 
 #' Messages without the fields that change, with their fields in alphabetical
 #' order. Ids are numbered in the order they first appear, so they still have

@@ -23,7 +23,7 @@
 test_example <- function(path, tests_path = "tests/acceptance", ...) {
   # Clear any steps registered by previous tests
   cucumber:::clear_steps()
-  
+
   .with_example_dir(path, {
     .expect_snapshot(
       test(

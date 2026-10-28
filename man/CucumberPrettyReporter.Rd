@@ -717,7 +717,8 @@ cucumber::test(
 
 \item{\code{step_attachments}}{Lines of the attachments of the step currently executing, printed under it}
 
-\item{\code{printed_rule}}{The Rule last printed in the current feature, printed again only for a scenario of another Rule}
+\item{\code{printed_rule}}{The Rule last printed in the current feature, printed again only
+for a scenario of another Rule}
 }
 \if{html}{\out{</div>}}
 }

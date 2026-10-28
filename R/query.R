@@ -112,7 +112,10 @@ index_document <- function(q, document) {
           examples <- node$examples[[i]]
           for (j in seq_along(examples$tableBody)) {
             row <- examples$tableBody[[j]]
-            q$lineages[[row$id]] <- c(lineage, list(examples = examples, examples_index = i, example = row, example_index = j))
+            q$lineages[[row$id]] <- c(
+              lineage,
+              list(examples = examples, examples_index = i, example = row, example_index = j)
+            )
           }
         }
       }

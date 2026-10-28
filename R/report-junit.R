@@ -108,10 +108,17 @@ junit_xml <- function(q) {
 junit_test_run_hook <- function(q, finished) {
   hook <- q$hooks[[q$test_run_hooks_started[[finished$testRunHookStartedId]]$hookId]]
   reference <- hook$sourceReference
-  name <- if (!is.null(reference$uri)) paste0(reference$uri, if (!is.null(reference$location)) paste0(":", reference$location$line)) else "Unknown"
+  name <- if (!is.null(reference$uri)) {
+    paste0(reference$uri, if (!is.null(reference$location)) paste0(":", reference$location$line))
+  } else {
+    "Unknown"
+  }
   started <- q$test_run_hooks_started[[finished$testRunHookStartedId]]
   c(
-    xml_start("testcase", c(name = name, time = java_seconds(millis_between(started$timestamp, finished$timestamp)))), "\n",
+    xml_start(
+      "testcase",
+      c(name = name, time = java_seconds(millis_between(started$timestamp, finished$timestamp)))
+    ), "\n",
     junit_non_passed(finished$result),
     "</testcase>\n"
   )
