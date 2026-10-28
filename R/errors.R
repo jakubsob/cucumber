@@ -28,11 +28,7 @@ srcref_location <- function(src) {
 #' @keywords internal
 #' @noRd
 hook_error <- function(hook, error, pickle = NULL) {
-  info <- glue("{hook_label(hook)} failed")
-  if (!is.null(pickle$feature_file))
-    info <- c(info, i = glue("Feature: {feature_path(pickle$feature_file)}"))
-  if (!is.null(pickle$name))
-    info <- c(info, i = glue("Scenario: {pickle$name}"))
+  info <- c(glue("{hook_label(hook)} failed"), scenario_bullets(pickle))
   location <- srcref_location(hook$srcref)
   if (!is.null(location))
     info <- c(info, i = glue("Hook defined at: {location}"))
@@ -59,12 +55,18 @@ feature_path <- function(file) {
   as.character(fs::path_rel(file, "."))
 }
 
+#' The feature and scenario an error of a step or a hook happened in
+#' @keywords internal
+#' @noRd
+scenario_bullets <- function(pickle) {
+  c(
+    if (!is.null(pickle$feature_file)) c(i = glue("Feature: {feature_path(pickle$feature_file)}")),
+    if (!is.null(pickle$name)) c(i = glue("Scenario: {pickle$name}"))
+  )
+}
+
 step_error_bullets <- function(step, pickle) {
-  info <- c(glue("Step \"{step$text}\" failed"))
-  if (!is.null(pickle$feature_file))
-    info <- c(info, i = glue("Feature: {feature_path(pickle$feature_file)}"))
-  if (!is.null(pickle$name))
-    info <- c(info, i = glue("Scenario: {pickle$name}"))
+  info <- c(glue("Step \"{step$text}\" failed"), scenario_bullets(pickle))
   location <- step_location(step)
   if (!is.null(location))
     info <- c(info, i = glue("Step defined at: {location}"))
