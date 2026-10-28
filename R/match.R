@@ -48,7 +48,7 @@ compile_steps <- function(steps, parameters) {
         info <- glue("Step definition \"{expression}\" is invalid")
         location <- srcref_location(attr(step, "srcref"))
         if (!is.null(location)) info <- c(info, i = glue("Step defined at: {location}"))
-        abort(info, class = "cucumber_expression_error", parent = e, call = NULL, trace = empty_trace())
+        abort_user(info, class = "cucumber_expression_error", parent = e)
       }
     )
   })
@@ -189,14 +189,12 @@ check_arity <- function(formals, types, argument_names) {
     return(invisible())
   }
   args <- paste(c(snippet_argument_names(types), argument_names, "context"), collapse = ", ")
-  abort(
+  abort_user(
     glue(
       "The step definition has {length(formals)} argument{if (length(formals) == 1) '' else 's'}, ",
       "but the step passes {expected}."
     ),
-    body = c(i = glue("Use `function({args})`.")),
-    call = NULL,
-    trace = empty_trace()
+    body = c(i = glue("Use `function({args})`."))
   )
 }
 
@@ -226,7 +224,7 @@ STEP_ARGUMENT_NAMES <- c(data_table = "data_table", docstring = "doc_string")
 snippet_argument_names <- function(types) {
   types[types %in% c("", "context", STEP_ARGUMENT_NAMES)] <- "arg"
   types <- make.names(gsub("[^[:alnum:]_.]", "_", types))
-  uses <- vapply(seq_along(types), \(i) sum(types[seq_len(i)] == types[[i]]), integer(1))
+  uses <- stats::ave(seq_along(types), types, FUN = seq_along)
   ifelse(uses == 1, types, paste0(types, uses))
 }
 

@@ -50,10 +50,6 @@ set_hooks <- function(hooks) {
   the$registry$hooks <- hooks
 }
 
-clear_hooks <- function() {
-  set_hooks(.hooks())
-}
-
 get_parameters <- function() {
   the$registry$parameters
 }
@@ -64,6 +60,6 @@ set_parameters <- function(parameters) {
 
 cleanup <- function() {
   clear_steps()
-  clear_hooks()
+  set_hooks(.hooks())
   set_default_parameters()
 }

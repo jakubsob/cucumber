@@ -101,14 +101,14 @@ print.cucumber_context <- function(x, n = 10, ...) {
 #' @noRd
 attachment_message <- function(data, media_type = NULL, file_name = NULL) {
   if (!is.null(media_type) && !rlang::is_string(media_type)) {
-    abort("An attachment's `media_type` must be a string, like \"image/png\".", call = NULL, trace = empty_trace())
+    abort_user("An attachment's `media_type` must be a string, like \"image/png\".")
   }
   if (!is.null(file_name) && !rlang::is_string(file_name)) {
-    abort("An attachment's `file_name` must be a string, like \"screenshot.png\".", call = NULL, trace = empty_trace())
+    abort_user("An attachment's `file_name` must be a string, like \"screenshot.png\".")
   }
   if (is.raw(data)) {
     if (is.null(media_type)) {
-      abort("A raw vector attachment must have a `media_type`.", call = NULL, trace = empty_trace())
+      abort_user("A raw vector attachment must have a `media_type`.")
     }
     rlang::check_installed("jsonlite", "to attach a raw vector.")
     body <- gsub("\n", "", jsonlite::base64_enc(data), fixed = TRUE)
@@ -117,7 +117,7 @@ attachment_message <- function(data, media_type = NULL, file_name = NULL) {
     body <- as.character(data)
     encoding <- "IDENTITY"
   } else {
-    abort("An attachment must be a string or a raw vector.", call = NULL, trace = empty_trace())
+    abort_user("An attachment must be a string or a raw vector.")
   }
   drop_null(list(
     body = body,

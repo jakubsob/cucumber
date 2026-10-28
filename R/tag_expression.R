@@ -45,10 +45,8 @@ TAG_PRECEDENCE <- c("(" = -2, ")" = -1, or = 0, and = 1, not = 2)
 #' @noRd
 parse_tag_expression <- function(expression) {
   syntax_error <- function(message) {
-    abort(
-      sprintf('Tag expression "%s" could not be parsed because of syntax error: %s', expression, message),
-      call = NULL,
-      trace = empty_trace()
+    abort_user(
+      sprintf('Tag expression "%s" could not be parsed because of syntax error: %s', expression, message)
     )
   }
   expect <- function(expected, actual) {
@@ -82,7 +80,7 @@ parse_tag_expression <- function(expression) {
 
   expected <- "operand"
   for (token in tokens) {
-    if (token == "not") {
+    if (token %in% c("not", "(")) {
       expect(expected, "operand")
       operators <- c(operators, token)
       expected <- "operand"
@@ -93,10 +91,6 @@ parse_tag_expression <- function(expression) {
                TAG_PRECEDENCE[[token]] <= TAG_PRECEDENCE[[peek()]]) {
         push_expression(pop_operator())
       }
-      operators <- c(operators, token)
-      expected <- "operand"
-    } else if (token == "(") {
-      expect(expected, "operand")
       operators <- c(operators, token)
       expected <- "operand"
     } else if (token == ")") {

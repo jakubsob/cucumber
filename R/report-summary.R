@@ -158,10 +158,7 @@ CucumberSummaryReporter <- R6::R6Class(
     draw = function(text) {
       self$live <- text
       if (self$dynamic) {
-        withr::local_options(
-          cli.num_colors = self$num_colors,
-          cli.unicode = self$unicode
-        )
+        private$local_cli()
         text <- cli::ansi_strtrim(text, self$width - 1L)
         cat(
           "\r",
@@ -186,10 +183,7 @@ CucumberSummaryReporter <- R6::R6Class(
     #' Print above the line drawn by `draw()`, then draw it again
     #' @param code Code that prints
     print_above = function(code) {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       self$clear()
       force(code)
       if (!is.null(self$live)) {
@@ -331,10 +325,7 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @description
     #' Print the scenarios and steps counted by status
     print_counts = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       cat("\n")
       cat(cli::rule(), "\n", sep = "")
       cat(cli::style_bold("Summary"), "\n", sep = "")
@@ -371,10 +362,7 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @description
     #' Print each undefined parameter type, with the last step definition that used it
     print_undefined_parameter_types = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       types <- self$undefined_parameter_types
       if (length(types) > 0) {
         cat("\n", cli::col_yellow("Undefined parameter types:"), "\n", sep = "")
@@ -388,10 +376,7 @@ CucumberSummaryReporter <- R6::R6Class(
     #' under Failures those that failed, are ambiguous or undefined, under
     #' Warnings those that are pending and the failed attempts that were retried
     print_failures = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       warning <- vapply(self$issues, \(issue) isTRUE(issue$retried) || issue$status == "pending", logical(1))
       for (title in c("Failures", "Warnings")) {
         issues <- self$issues[if (title == "Failures") !warning else warning]
@@ -433,6 +418,11 @@ CucumberSummaryReporter <- R6::R6Class(
         private$feature_uri <- NULL
         self$current_feature <- NULL
       }
+    },
+
+    # cli's colors and unicode as captured when the reporter was made, until the caller returns
+    local_cli = function(frame = parent.frame()) {
+      withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode, .local_envir = frame)
     },
 
     # What the reporters print as the run goes: each does nothing here

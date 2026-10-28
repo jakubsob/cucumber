@@ -40,96 +40,48 @@ read_messages <- function(x) {
   lines <- if (length(x) == 1 && !startsWith(trimws(x), "{")) readLines(x, warn = FALSE, encoding = "UTF-8") else x
   lines <- lines[nzchar(lines)]
   envelopes <- lapply(lines, jsonlite::fromJSON, simplifyVector = FALSE)
-  of <- \(type) Filter(Negate(is.null), lapply(envelopes, `[[`, type))
-  by_id <- \(messages) set_names(messages, vapply(messages, \(message) message$id, character(1)))
-  documents <- of("gherkinDocument")
-  pickles <- by_id(of("pickle"))
-  test_cases <- by_id(of("testCase"))
-  started <- by_id(of("testCaseStarted"))
+  q <- new_query()
+  for (envelope in envelopes) q$update(envelope)
+  documents <- Filter(Negate(is.null), lapply(envelopes, `[[`, "gherkinDocument"))
+  seconds <- \(duration) duration$seconds + duration$nanos / 1e9
   # Only the last attempt of a retried scenario
-  retried <- Filter(\(finished) isTRUE(finished$willBeRetried), of("testCaseFinished"))
-  retried <- vapply(retried, \(finished) finished$testCaseStartedId, character(1))
-  started <- started[setdiff(names(started), retried)]
-  hooks <- by_id(of("hook"))
+  started <- q$test_cases_started_final()
 
-  # From the documents: the keyword of each step, the line of each scenario
-  # and example row, and the rule of each scenario
-  keywords <- list()
-  locations <- list()
-  rules <- list()
-  walk <- function(children, rule) {
-    for (child in children) {
-      node <- child$background %||% child$scenario
-      for (step in node$steps) keywords[[step$id]] <<- trimws(step$keyword)
-      if (!is.null(child$scenario)) {
-        locations[[node$id]] <<- node$location$line
-        rules[[node$id]] <<- rule
-        for (examples in node$examples) {
-          for (row in examples$tableBody) locations[[row$id]] <<- row$location$line
-        }
-      }
-      if (!is.null(child$rule)) walk(child$rule$children, child$rule$name)
-    }
-  }
-  for (document in documents) walk(document$feature$children, NA_character_)
-
-  # The results of each test case, in the order its steps and hooks ran
-  results <- lapply(started, \(case) list())
-  for (finished in Filter(\(finished) !finished$testCaseStartedId %in% retried, of("testStepFinished"))) {
-    test_case <- test_cases[[started[[finished$testCaseStartedId]]$testCaseId]]
-    test_step <- Find(\(step) step$id == finished$testStepId, test_case$testSteps)
-    result <- finished$testStepResult
-    entry <- list(
-      status = tolower(result$status),
-      duration = result$duration$seconds + result$duration$nanos / 1e9,
-      message = if (!is.null(result$message)) cli::ansi_strip(result$message)
-    )
-    if (is.null(test_step$pickleStepId)) {
-      entry$hook <- hooks[[test_step$hookId]]
-    } else {
-      entry$step <- Find(\(step) step$id == test_step$pickleStepId, pickles[[test_case$pickleId]]$steps)
-    }
-    results[[finished$testCaseStartedId]] <- c(results[[finished$testCaseStartedId]], list(entry))
-  }
-  worst <- \(statuses) if (length(statuses)) STEP_STATUSES[STEP_STATUSES %in% statuses][[1]] else "passed"
-
-  scenarios <- lapply(names(started), \(id) {
-    pickle <- pickles[[test_cases[[started[[id]]$testCaseId]]$pickleId]]
-    ast_ids <- unlist(pickle$astNodeIds)
-    key <- ast_ids[[length(ast_ids)]]
-    case <- results[[id]]
-    case_status <- worst(vapply(case, \(entry) entry$status, character(1)))
-    document <- Find(\(document) document$uri == pickle$uri, documents)
+  scenarios <- lapply(started, \(case) {
+    pickle <- q$pickle_of(case)
+    lineage <- q$lineage_of(pickle)
+    results <- lapply(q$test_steps_of(case), \(step) step$finished$testStepResult)
     tibble::tibble(
-      id = id,
+      id = case$id,
       uri = pickle$uri,
-      feature = document$feature$name,
-      rule = rules[[ast_ids[[1]]]],
+      feature = lineage$feature$name,
+      rule = lineage$rule$name %||% NA_character_,
       name = pickle$name,
-      line = locations[[key]],
+      line = (lineage$example %||% lineage$scenario)$location$line,
       tags = list(vapply(pickle$tags, \(tag) tag$name, character(1))),
-      status = case_status,
-      duration = sum(vapply(case, \(entry) entry$duration, numeric(1))),
-      attempts = (started[[id]]$attempt %||% 0L) + 1L
+      status = tolower(q$most_severe_result_of(case)$status %||% "PASSED"),
+      duration = sum(vapply(results, \(result) seconds(result$duration), numeric(1))),
+      attempts = (case$attempt %||% 0L) + 1L
     )
   })
-  steps <- lapply(names(started), \(id) {
-    lapply(results[[id]], \(entry) {
-      hook <- !is.null(entry$hook)
+  steps <- lapply(started, \(case) {
+    lapply(q$test_steps_of(case), \(step) {
+      result <- step$finished$testStepResult
+      status <- tolower(result$status)
+      hook <- q$hooks[[step$test_step$hookId %||% ""]]
+      pickle_step <- q$pickle_steps[[step$test_step$pickleStepId %||% ""]]
       tibble::tibble(
-        scenario_id = id,
-        scenario = pickles[[test_cases[[started[[id]]$testCaseId]]$pickleId]]$name,
-        keyword = if (!hook) {
-          keywords[[entry$step$astNodeIds[[1]]]]
-        } else if (startsWith(entry$hook$type %||% "", "AFTER")) {
-          "After"
+        scenario_id = case$id,
+        scenario = q$pickle_of(case)$name,
+        keyword = if (is.null(pickle_step)) {
+          if (startsWith(hook$type %||% "", "AFTER")) "After" else "Before"
         } else {
-          "Before"
+          trimws(q$step_of(pickle_step)$keyword)
         },
-        text = if (hook) entry$hook$name %||% "" else entry$step$text,
-        status = entry$status,
-        duration = entry$duration,
-        error = if (entry$status != "passed") entry$message %||% NA_character_ else NA_character_
+        text = if (is.null(pickle_step)) hook$name %||% "" else pickle_step$text,
+        status = status,
+        duration = seconds(result$duration),
+        error = if (status != "passed" && !is.null(result$message)) cli::ansi_strip(result$message) else NA_character_
       )
     })
   })
@@ -183,22 +135,10 @@ dedent <- function(text) {
   paste(substring(lines, min(indents) + 1), collapse = "\n")
 }
 
-#' Count of scenarios by status, like the summary of a run:
-#' "3 scenarios (1 failed, 2 passed)"
-#' @keywords internal
-#' @noRd
-scenario_summary <- function(scenarios) {
-  counts <- table(factor(scenarios$status, STEP_STATUSES))
-  counts <- counts[counts > 0]
-  paste0(
-    nrow(scenarios), " scenario", if (nrow(scenarios) != 1) "s",
-    if (length(counts)) paste0(" (", paste(counts, names(counts), collapse = ", "), ")")
-  )
-}
-
 #' @export
 print.cucumber_messages <- function(x, ...) {
   features <- paste0(nrow(x$features), " feature", if (nrow(x$features) != 1) "s")
-  cat("<cucumber_messages>", paste0(features, ", ", scenario_summary(x$scenarios)), "\n")
+  scenarios <- cli::ansi_strip(format_status_counts(x$scenarios$status, "scenario"))
+  cat("<cucumber_messages>", paste0(features, ", ", scenarios), "\n")
   invisible(x)
 }

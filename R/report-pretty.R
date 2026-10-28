@@ -30,9 +30,6 @@ CucumberPrettyReporter <- R6::R6Class(
   "CucumberPrettyReporter",
   inherit = CucumberSummaryReporter,
   public = list(
-    #' @field show_praise Whether to show praise messages
-    show_praise = TRUE,
-
     #' @field reporter_max_docstring_lines Max docstring lines to print per step
     reporter_max_docstring_lines = Inf,
 
@@ -51,7 +48,7 @@ CucumberPrettyReporter <- R6::R6Class(
 
     #' @description
     #' Initialize the reporter
-    #' @param show_praise Whether to show praise (default TRUE)
+    #' @param show_praise Deprecated, has no effect: the reporter shows no praise.
     #' @param reporter_max_docstring_lines Max docstring lines to print for a step before
     #'   truncating. Defaults to the `cucumber.reporter_max_docstring_lines` option, or
     #'   `Inf` (print in full) if unset.
@@ -61,7 +58,7 @@ CucumberPrettyReporter <- R6::R6Class(
     #' @param file Path of a file to print to instead of the console, replaced
     #'   by each run, or `NULL`
     initialize = function(
-      show_praise = TRUE,
+      show_praise = NULL,
       reporter_max_docstring_lines = getOption(
         "cucumber.reporter_max_docstring_lines",
         Inf
@@ -72,8 +69,8 @@ CucumberPrettyReporter <- R6::R6Class(
       ),
       file = NULL
     ) {
+      if (!is.null(show_praise)) rlang::warn("`show_praise` is deprecated and has no effect.")
       super$initialize(file)
-      self$show_praise <- show_praise
       self$reporter_max_docstring_lines <- reporter_max_docstring_lines
       self$reporter_max_table_lines <- reporter_max_table_lines
       invisible(self)
@@ -123,10 +120,7 @@ CucumberPrettyReporter <- R6::R6Class(
   ),
   private = list(
     on_feature_start = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       cat("\n", bold_label(self$current_feature), "\n", sep = "")
       self$printed_rule <- NULL
     },
@@ -136,10 +130,7 @@ CucumberPrettyReporter <- R6::R6Class(
     },
 
     on_scenario_start = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       if (!is.null(self$current_rule) && !identical(self$current_rule, self$printed_rule)) {
         cat("  ", bold_label(self$current_rule), "\n", sep = "")
         self$printed_rule <- self$current_rule
@@ -157,10 +148,7 @@ CucumberPrettyReporter <- R6::R6Class(
     on_attachment = function(attachment) {
       lines <- format_attachment(attachment)
       if (is.null(self$step_attachments)) {
-        withr::local_options(
-          cli.num_colors = self$num_colors,
-          cli.unicode = self$unicode
-        )
+        private$local_cli()
         for (line in lines) {
           cat("    ", cli::style_dim(line), "\n", sep = "")
         }
@@ -171,10 +159,7 @@ CucumberPrettyReporter <- R6::R6Class(
 
     # Print the step, its arguments, warnings and error
     on_step_end = function(step) {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       # ponytail: cat to stdout so expect_snapshot can capture step output; color
       # is re-enabled via the num_colors option forced above.
       print_step(step)
@@ -193,10 +178,7 @@ CucumberPrettyReporter <- R6::R6Class(
     # Print the error of a hook that failed or is pending, or the reason of
     # one that skipped the scenario
     on_hook_end = function(hook) {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       print_error(hook$error, hook$status)
     }
   )

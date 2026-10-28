@@ -60,14 +60,12 @@ parse_gherkin <- function(lines, uri = NULL, flavour = gherkin_flavour(uri)) {
 default_language <- function() {
   language <- getOption("cucumber.language", "en")
   if (!rlang::is_string(language)) {
-    abort("The `cucumber.language` option must be a language code, like \"fr\".", call = NULL, trace = empty_trace())
+    abort_user("The `cucumber.language` option must be a language code, like \"fr\".")
   }
   if (is.null(GHERKIN_DIALECTS[[language]])) {
-    abort(
+    abort_user(
       paste0("Language not supported: ", language),
-      body = c(i = "The `cucumber.language` option must be a language of Gherkin, like \"fr\"."),
-      call = NULL,
-      trace = empty_trace()
+      body = c(i = "The `cucumber.language` option must be a language of Gherkin, like \"fr\".")
     )
   }
   language
@@ -599,13 +597,11 @@ add_error <- function(p, message) {
 #' @importFrom rlang abort
 #' @importFrom purrr set_names
 abort_gherkin <- function(p) {
-  abort(
+  abort_user(
     paste("Can't parse", p$uri %||% "feature"),
     body = set_names(p$errors, rep("x", length(p$errors))),
     class = "cucumber_parse_error",
     uri = p$uri,
-    errors = p$errors,
-    trace = empty_trace(),
-    call = NULL
+    errors = p$errors
   )
 }

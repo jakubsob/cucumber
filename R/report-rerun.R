@@ -24,7 +24,7 @@
 #' @export
 CucumberRerunReporter <- R6::R6Class(
   "CucumberRerunReporter",
-  inherit = CucumberReporter,
+  inherit = CucumberQueryReporter,
   public = list(
     #' @field file Path of the file the scenarios are written to
     file = NULL,
@@ -39,30 +39,12 @@ CucumberRerunReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Start following the messages of a run
-    start_run = function() {
-      private$query <- new_query()
-      invisible(self)
-    },
-
-    #' @description
-    #' Follow a message of the run
-    #' @param envelope A list with one element, named by the message's type
-    add_message = function(envelope) {
-      private$query$update(envelope)
-      invisible(self)
-    },
-
-    #' @description
     #' Write the scenarios that didn't pass
     #' @param error The error that stopped the run, or `NULL`
     end_run = function(error = NULL) {
       writeLines(enc2utf8(rerun_lines(private$query)), self$file, useBytes = TRUE)
       invisible(self)
     }
-  ),
-  private = list(
-    query = NULL
   )
 )
 

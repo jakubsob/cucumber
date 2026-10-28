@@ -363,8 +363,8 @@ cucumber::CucumberJunitReporter$new("cucumber-junit.xml")$report("cucumber.ndjso
 }
 
 }
-\section{Super class}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberJunitReporter}
+\section{Super classes}{
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{cucumber::CucumberQueryReporter} -> \code{CucumberJunitReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -377,8 +377,6 @@ cucumber::CucumberJunitReporter$new("cucumber-junit.xml")$report("cucumber.ndjso
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-CucumberJunitReporter-new}{\code{CucumberJunitReporter$new()}}
-\item \href{#method-CucumberJunitReporter-start_run}{\code{CucumberJunitReporter$start_run()}}
-\item \href{#method-CucumberJunitReporter-add_message}{\code{CucumberJunitReporter$add_message()}}
 \item \href{#method-CucumberJunitReporter-end_run}{\code{CucumberJunitReporter$end_run()}}
 \item \href{#method-CucumberJunitReporter-clone}{\code{CucumberJunitReporter$clone()}}
 }
@@ -388,6 +386,8 @@ cucumber::CucumberJunitReporter$new("cucumber-junit.xml")$report("cucumber.ndjso
 <ul>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_warning'><code>cucumber::CucumberReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberQueryReporter" data-id="add_message"><a href='../../cucumber/html/CucumberQueryReporter.html#method-CucumberQueryReporter-add_message'><code>cucumber::CucumberQueryReporter$add_message()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberQueryReporter" data-id="start_run"><a href='../../cucumber/html/CucumberQueryReporter.html#method-CucumberQueryReporter-start_run'><code>cucumber::CucumberQueryReporter$start_run()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -407,33 +407,6 @@ Create a JUnit reporter
 relative path is relative to the working directory when the reporter
 is created. Its directory is created when the reporter is, if it
 doesn't exist.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberJunitReporter-start_run"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberJunitReporter-start_run}{}}}
-\subsection{Method \code{start_run()}}{
-Start following the messages of a run
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberJunitReporter$start_run()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberJunitReporter-add_message"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberJunitReporter-add_message}{}}}
-\subsection{Method \code{add_message()}}{
-Follow a message of the run
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberJunitReporter$add_message(envelope)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{envelope}}{A list with one element, named by the message's type}
 }
 \if{html}{\out{</div>}}
 }

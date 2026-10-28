@@ -2,6 +2,10 @@
 #' @importFrom glue glue
 
 empty_trace <- function() rlang::trace_back()[integer(0), ]
+
+# An error of how cucumber is used, shown without the call or backtrace of cucumber code
+abort_user <- function(...) abort(..., call = NULL, trace = empty_trace())
+
 unwrap_purrr_error <- function(err) {
   parent <- err$parent
   if (inherits(parent, "purrr_error_indexed")) {
@@ -9,10 +13,6 @@ unwrap_purrr_error <- function(err) {
   } else {
     cnd_signal(parent)
   }
-}
-
-step_location <- function(step) {
-  srcref_location(step$definition_location)
 }
 
 srcref_location <- function(src) {
@@ -47,14 +47,6 @@ hook_label <- function(hook) {
   if (is.null(hook$hook_name)) glue("Hook `{hook$name}()`") else glue("Hook \"{hook$hook_name}\"")
 }
 
-#' Where a feature file is, relative to the working directory of the run, like
-#' `checkout/basket.feature`, so feature files of the same name are told apart
-#' @keywords internal
-#' @noRd
-feature_path <- function(file) {
-  as.character(fs::path_rel(file, "."))
-}
-
 #' The feature and scenario an error of a step or a hook happened in, with the
 #' feature at `line`, like `basket.feature:3`: the step's, or the scenario's
 #' @keywords internal
@@ -62,7 +54,8 @@ feature_path <- function(file) {
 scenario_bullets <- function(pickle, line = pickle$source_line) {
   c(
     if (!is.null(pickle$feature_file)) {
-      path <- feature_path(pickle$feature_file)
+      # Relative to the run's working directory, so feature files of the same name are told apart
+      path <- as.character(fs::path_rel(pickle$feature_file, "."))
       if (length(line) == 1 && !is.na(line)) path <- glue("{path}:{line}")
       c(i = glue("Feature: {path}"))
     },
@@ -72,7 +65,7 @@ scenario_bullets <- function(pickle, line = pickle$source_line) {
 
 step_error_bullets <- function(step, pickle) {
   info <- c(glue("Step \"{step$text}\" failed"), scenario_bullets(pickle, step$line))
-  location <- step_location(step)
+  location <- srcref_location(step$definition_location)
   if (!is.null(location))
     info <- c(info, i = glue("Step defined at: {location}"))
   info

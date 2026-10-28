@@ -26,7 +26,7 @@
 #' @export
 CucumberUsageReporter <- R6::R6Class(
   "CucumberUsageReporter",
-  inherit = CucumberReporter,
+  inherit = CucumberQueryReporter,
   public = list(
     #' @description
     #' Create a usage reporter
@@ -36,21 +36,6 @@ CucumberUsageReporter <- R6::R6Class(
     #'   the reporter is, if it doesn't exist.
     initialize = function(file = NULL) {
       if (!is.null(file)) self$output <- report_path(file)
-    },
-
-    #' @description
-    #' Start following the messages of a run
-    start_run = function() {
-      private$query <- new_query()
-      invisible(self)
-    },
-
-    #' @description
-    #' Follow a message of the run
-    #' @param envelope A list with one element, named by the message's type
-    add_message = function(envelope) {
-      private$query$update(envelope)
-      invisible(self)
     },
 
     #' @description
@@ -65,9 +50,6 @@ CucumberUsageReporter <- R6::R6Class(
       }
       invisible(self)
     }
-  ),
-  private = list(
-    query = NULL
   )
 )
 

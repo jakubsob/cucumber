@@ -67,13 +67,11 @@ run <- function(
   # Each process of a parallel run would save the snapshots of the feature files
   # in its own snapshotter, and the main process would delete them as unused
   if (identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {
-    abort(
+    abort_user(
       "`run()` isn't supported in a parallel testthat run.",
       body = c(
         i = "Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`."
-      ),
-      call = NULL,
-      trace = empty_trace()
+      )
     )
   }
   config <- run_config(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
@@ -105,7 +103,7 @@ run <- function(
   )
   results <- as.data.frame(lister$get_results())
   if (sum(results$failed) > 0 || any(results$error)) {
-    abort("Test failures.", call = NULL, trace = empty_trace())
+    abort_user("Test failures.")
   }
   invisible(NULL)
 }
@@ -121,7 +119,7 @@ run <- function(
 run_cucumber <- function(config, cleanup_env, start_file = NULL) {
   reporter <- config$reporter
   error <- NULL
-  # An error of a reporter or of cucumber itself stops the run, see abort_run()
+  # An error of a reporter or of cucumber itself stops the run, see stop_with_restart()
   broken <- FALSE
   withRestarts(
     tryCatch(
@@ -154,7 +152,7 @@ run_cucumber <- function(config, cleanup_env, start_file = NULL) {
       broken <- TRUE
     }
   }
-  if (broken) fail_test(error)
+  if (broken) stop_with_restart("cucumber_fail_test", error)
   if (!is.null(error)) {
     # testthat shows the class of an error of its own class, like of a failing before all hook
     class(error) <- setdiff(class(error), "cucumber_hook_error")
@@ -163,31 +161,15 @@ run_cucumber <- function(config, cleanup_env, start_file = NULL) {
   invisible(NULL)
 }
 
-#' Stop the run with an error of a reporter or of cucumber itself, from wherever
-#' it's raised: testthat would report it as the failure of a scenario and run
-#' the next one.
+#' Stop with an error of a reporter or of cucumber itself, from wherever it's
+#' raised, by invoking `restart`: testthat would report it as the failure of a
+#' scenario, or of the test file. `cucumber_abort_run` stops the run,
+#' `cucumber_fail_test` stops `test()`. Without the restart, like with `run()`
+#' in a testthat file, it's an error.
 #' @keywords internal
 #' @noRd
-abort_run <- function(error) {
-  if (has_restart("cucumber_abort_run")) {
-    invokeRestart("cucumber_abort_run", error)
-  }
-  stop(error)
-}
-
-has_restart <- function(name) {
-  !is.null(findRestart(name))
-}
-
-#' Stop `test()` with an error of a reporter or of cucumber itself: testthat
-#' would report it as the failure of the test file. Outside of `test()`, like
-#' with `run()` in a testthat file, it's an error of the test file.
-#' @keywords internal
-#' @noRd
-fail_test <- function(error) {
-  if (has_restart("cucumber_fail_test")) {
-    invokeRestart("cucumber_fail_test", error)
-  }
+stop_with_restart <- function(restart, error) {
+  if (!is.null(findRestart(restart))) invokeRestart(restart, error)
   stop(error)
 }
 
@@ -200,7 +182,9 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
   reporter <- config$reporter
   # Before anything can stop the run, or testthat would delete the snapshot
   # files of the features as unused
-  complete <- complete_run(config$filter, config$tags, config$name, config$features, config$dry_run)
+  # Every scenario runs: no selection, and not a dry run
+  complete <- is.null(config$filter) && is.null(config$tags) && is.null(config$name) &&
+    is.null(config$features) && !config$dry_run
   snapshots <- run_snapshots(path, find_features(path), complete)
 
   lines <- feature_lines(config$features, path)
@@ -285,14 +269,12 @@ resolve_order <- function(order) {
     is.na(seed) || as.numeric(seed) <= .Machine$integer.max
   }
   if (!valid) {
-    abort(
+    abort_user(
       paste0("Unknown order ", deparse1(order), "."),
       body = c(i = paste(
         "Use \"defined\", \"reverse\", \"random\" or \"random:<seed>\", like \"random:1234\",",
         "with a seed of up to 2147483647."
-      )),
-      call = NULL,
-      trace = empty_trace()
+      ))
     )
   }
   if (order == "random") {
@@ -382,13 +364,11 @@ select_features <- function(path, filter, lines, ...) {
     filter_features(filter, ...)
 
   if (length(features) == 0) {
-    abort(
+    abort_user(
       "No feature files found.",
       body = c(
         i = "Add `.feature` files describing your scenarios."
-      ),
-      call = NULL,
-      trace = empty_trace()
+      )
     )
   }
   features
@@ -422,11 +402,9 @@ feature_lines <- function(features, path) {
   files <- ifelse(fs::is_absolute_path(files), files, fs::path_norm(fs::path(path, files)))
   missing <- unique(files[!file_exists(files)])
   if (length(missing) > 0) {
-    abort(
+    abort_user(
       "Feature files not found.",
-      body = c(rlang::set_names(fs::path_norm(missing), "x"), i = "The paths in `features` are relative to `path`."),
-      call = NULL,
-      trace = empty_trace()
+      body = c(rlang::set_names(fs::path_norm(missing), "x"), i = "The paths in `features` are relative to `path`.")
     )
   }
   lines <- regmatches(features, regexpr("(:[0-9]+)*$", features)) |>
@@ -475,20 +453,13 @@ parse_features <- function(paths, reporter = NULL) {
   errors <- Filter(\(document) inherits(document, "cucumber_parse_error"), documents)
   if (length(errors) > 0) {
     messages <- unlist(map(errors, \(error) sprintf('Parse error in "%s" %s', error$uri, error$errors)))
-    abort(
+    abort_user(
       "Can't parse feature files",
       body = set_names(messages, rep("x", length(messages))),
-      class = "cucumber_parse_error",
-      trace = empty_trace(),
-      call = NULL
+      class = "cucumber_parse_error"
     )
   }
   set_names(documents, paths)
-}
-
-#' @importFrom fs path_file
-context_name <- function(feature) {
-  sub(feature_file_pattern(), "", path_file(feature))
 }
 
 #' `...` of test() and run() is passed to grepl(), so a misspelled argument
@@ -499,14 +470,12 @@ check_grepl_args <- function(...) {
   allowed <- setdiff(names(formals(grepl)), c("pattern", "x"))
   unknown <- setdiff(names(list(...)), c(allowed, ""))
   if (length(unknown) > 0) {
-    abort(
+    abort_user(
       paste0("Unknown argument", if (length(unknown) > 1) "s", ": ", paste0("`", unknown, "`", collapse = ", "), "."),
       body = c(i = paste0(
         "Arguments of `grepl()` for `filter` can be passed in `...`: ",
         paste0("`", allowed, "`", collapse = ", "), "."
-      )),
-      call = NULL,
-      trace = empty_trace()
+      ))
     )
   }
 }
@@ -524,7 +493,7 @@ run_config <- function(path, filter, tags, reporter, strict, dry_run, name, feat
   check_flag(dry_run)
   check_flag(fail_fast)
   if (!rlang::is_scalar_integerish(retry) || is.na(retry) || retry < 0) {
-    abort("`retry` must be a whole number of 0 or more, like `retry = 2`.", call = NULL, trace = empty_trace())
+    abort_user("`retry` must be a whole number of 0 or more, like `retry = 2`.")
   }
   list(
     path = path,
@@ -547,29 +516,25 @@ run_config <- function(path, filter, tags, reporter, strict, dry_run, name, feat
 #' @noRd
 check_selection <- function(path, filter, tags, name, features, ...) {
   if (!rlang::is_string(path) || !dir.exists(path)) {
-    abort(
+    abort_user(
       "`path` must be a directory.",
-      body = if (rlang::is_string(path)) c(x = paste0("\"", path, "\" doesn't exist.")),
-      call = NULL,
-      trace = empty_trace()
+      body = if (rlang::is_string(path)) c(x = paste0("\"", path, "\" doesn't exist."))
     )
   }
   check_tags(tags)
   check_grepl_args(...)
   if (!is.null(filter) && !rlang::is_string(filter)) {
-    abort("`filter` must be one regular expression.", call = NULL, trace = empty_trace())
+    abort_user("`filter` must be one regular expression.")
   }
   check_regexps(filter, "`filter` must be a valid regular expression.", ...)
   if (!is.null(name) && !is.character(name)) {
-    abort("`name` must be regular expressions.", call = NULL, trace = empty_trace())
+    abort_user("`name` must be regular expressions.")
   }
   check_regexps(name, "`name` must be valid regular expressions.")
   if (!is.null(features) && !is.character(features)) {
-    abort(
+    abort_user(
       "`features` must be paths of feature files.",
-      body = c(i = "Give a path with the lines of its scenarios to run only them, like `\"basket.feature:12\"`."),
-      call = NULL,
-      trace = empty_trace()
+      body = c(i = "Give a path with the lines of its scenarios to run only them, like `\"basket.feature:12\"`.")
     )
   }
 }
@@ -589,18 +554,16 @@ check_regexps <- function(patterns, message, ...) {
     )
   }))
   if (length(problems) > 0) {
-    abort(
+    abort_user(
       message,
-      body = rlang::set_names(problems, "x"),
-      call = NULL,
-      trace = empty_trace()
+      body = rlang::set_names(problems, "x")
     )
   }
 }
 
 check_flag <- function(x, arg = rlang::caller_arg(x)) {
   if (!rlang::is_bool(x)) {
-    abort(paste0("`", arg, "` must be `TRUE` or `FALSE`."), call = NULL, trace = empty_trace())
+    abort_user(paste0("`", arg, "` must be `TRUE` or `FALSE`."))
   }
 }
 
@@ -608,7 +571,7 @@ filter_features <- function(features, filter = NULL, ...) {
   if (is.null(filter)) {
     return(features)
   }
-  features[grepl(filter, context_name(features), ...)]
+  features[grepl(filter, sub(feature_file_pattern(), "", fs::path_file(features)), ...)]
 }
 
 #' Run Cucumber tests
@@ -736,7 +699,7 @@ test <- function(
   check_flag(stop_on_failure)
   check_flag(stop_on_warning)
   if (!is.null(env) && !is.environment(env)) {
-    abort("`env` must be an environment, or `NULL`.", call = NULL, trace = empty_trace())
+    abort_user("`env` must be an environment, or `NULL`.")
   }
 
   # What testthat::test_dir() does before it runs test files. It attaches
@@ -760,14 +723,12 @@ test <- function(
   }
   # In a parallel run, the process that deletes the unused snapshot files can't be told
   if (!is.null(snapshotter) && identical(Sys.getenv("TESTTHAT_IS_PARALLEL"), "true")) {
-    abort(
+    abort_user(
       "`test()` of the directory of a parallel testthat run isn't supported.",
       body = c(i = paste(
         "Set `Config/testthat/parallel: false` in DESCRIPTION,",
         "or keep the feature files in another directory, like `test(\"../acceptance\")`."
-      )),
-      call = NULL,
-      trace = empty_trace()
+      ))
     )
   }
   testthat::local_test_directory(path)
@@ -834,10 +795,10 @@ test <- function(
   results <- as.data.frame(result)
   if (stop_on_failure && (sum(results$failed) > 0 || any(results$error))) {
     # With the error that stopped the run, like a feature file that can't be parsed
-    abort("Test failures.", parent = run_error, call = NULL, trace = empty_trace())
+    abort_user("Test failures.", parent = run_error)
   }
   if (stop_on_warning && any(results$warning > 0)) {
-    abort("Tests generated warnings.", call = NULL, trace = empty_trace())
+    abort_user("Tests generated warnings.")
   }
   invisible(result)
 }

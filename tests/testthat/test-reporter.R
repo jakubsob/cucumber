@@ -1,12 +1,24 @@
 # Run the scenario under its own testthat reporter, so the snapshot is
 # recorded under this test and not under the scenario's nested test, and a
 # scenario that fails on purpose stays out of this test's results
-expect_report_snapshot <- function(feature, reporter = CucumberPrettyReporter$new(show_praise = FALSE)) {
+expect_report_snapshot <- function(feature, reporter = CucumberPrettyReporter$new()) {
   .expect_snapshot({
     testthat::with_reporter(testthat::SilentReporter$new(), {
-      cucumber:::execute(cucumber:::parse_gherkin(feature), reporter = reporter)
+      report_feature(feature, reporter)
     })
   })
+}
+
+# Run the scenarios of a feature's text, reporting its document and pickles,
+# but not the start and end of a run, whose summary has durations
+report_feature <- function(feature, reporter) {
+  document <- cucumber:::parse_gherkin(feature)
+  pickles <- cucumber:::create_pickles(document)
+  cucumber:::emit(reporter, "gherkinDocument", document)
+  for (pickle in pickles) cucumber:::emit(reporter, "pickle", pickle$message)
+  config <- cucumber:::run_config(".", NULL, NULL, reporter, TRUE, FALSE, NULL, NULL, FALSE, 0, "defined")
+  pickles <- cucumber:::prepare_pickles(pickles, reporter = reporter)
+  cucumber:::execute_feature(document, pickles, cucumber:::get_hooks(), config)
 }
 
 describe("CucumberPrettyReporter", {
@@ -100,10 +112,7 @@ describe("CucumberPrettyReporter", {
 
     given("a long message", function(message, context) {})
 
-    reporter <- CucumberPrettyReporter$new(
-      show_praise = FALSE,
-      reporter_max_docstring_lines = 2
-    )
+    reporter <- CucumberPrettyReporter$new(reporter_max_docstring_lines = 2)
 
     expect_report_snapshot(feature, reporter)
   })
@@ -124,4 +133,8 @@ describe("run", {
       "a bug in cucumber"
     )
   })
+})
+
+test_that("CucumberPrettyReporter warns that show_praise is deprecated", {
+  expect_warning(CucumberPrettyReporter$new(show_praise = FALSE), "`show_praise` is deprecated and has no effect.")
 })

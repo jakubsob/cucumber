@@ -542,7 +542,7 @@ Everything you may need to change when upgrading from 2.2.0, grouped by where th
 
 - Replace testthat reporters passed to `test()` or `run()` with cucumber's, like `CucumberSummaryReporter$new()`, or with `NULL` for no output. See [Reporters](#reporters).
 - Replace `testthat::JunitReporter` with `CucumberJunitReporter`: `test(reporter = CucumberJunitReporter$new("cucumber-junit.xml"))`.
-- Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines`, `reporter_max_table_lines` or `show_praise`. See [Reporters](#reporters).
+- Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines` or `reporter_max_table_lines`. `show_praise` is deprecated, as it never had an effect. See [Reporters](#reporters).
 - Pass `reporter = CucumberProgressReporter$new()` to `run()` to print the run with cucumber's reporter, besides testthat's, as before. See [Reporters](#reporters).
 - Move snapshots from `_snaps/__cucumber__.md`, or from the snapshot file of the testthat file that calls `run()`, to the snapshot file of each feature, like `_snaps/basket.feature.md`. See [Snapshots](#snapshots).
 - Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).

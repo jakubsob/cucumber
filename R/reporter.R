@@ -131,7 +131,7 @@ cucumber_event <- function(reporter, method, ...) {
           trace = empty_trace()
         )
       }
-      abort_run(e)
+      stop_with_restart("cucumber_abort_run", e)
     }
   )
   invisible()
@@ -235,19 +235,22 @@ truncate_lines <- function(lines, max_lines) {
 #' @keywords internal
 #' @noRd
 print_error <- function(message, status = "failed") {
-  color <- status_color(status)
   # A skip's message already starts with "Reason: "
   label <- switch(status, pending = "Pending: ", skipped = NULL, "Error: ")
-  if (!is.null(label)) cat("  ", color(cli::style_bold(label)), "\n", sep = "")
-  for (line in strsplit(message, "\n")[[1]]) {
-    cat("    ", color(line), "\n", sep = "")
-  }
+  print_block(if (!is.null(label)) cli::style_bold(label), message, status_color(status), "  ")
 }
 
 print_warning <- function(message) {
-  cat("    ", cli::col_yellow(cli::style_italic("Warning: ")), "\n", sep = "")
+  print_block(cli::style_italic("Warning: "), message, cli::col_yellow, "    ")
+}
+
+#' Print `label`, if any, at `indent`, then each line of `message` indented under it
+#' @keywords internal
+#' @noRd
+print_block <- function(label, message, color, indent) {
+  if (!is.null(label)) cat(indent, color(label), "\n", sep = "")
   for (line in strsplit(message, "\n")[[1]]) {
-    cat("      ", cli::col_yellow(line), "\n", sep = "")
+    cat(indent, "  ", color(line), "\n", sep = "")
   }
 }
 
@@ -326,14 +329,9 @@ print_step_error <- function(step) {
   if (is.null(step$error)) {
     return(invisible())
   }
-  color <- status_color(step$status %||% "passed")
   # Messages of pending, undefined and skipped steps say what they are
-  if (step$status %in% c("failed", "ambiguous")) {
-    cat("    ", color(cli::style_bold("Error: ")), "\n", sep = "")
-  }
-  for (line in strsplit(step$error, "\n")[[1]]) {
-    cat("      ", color(line), "\n", sep = "")
-  }
+  label <- if (step$status %in% c("failed", "ambiguous")) cli::style_bold("Error: ")
+  print_block(label, step$error, status_color(step$status %||% "passed"), "    ")
 }
 
 #' Print a scenario that didn't pass, with its steps and the hooks that didn't pass

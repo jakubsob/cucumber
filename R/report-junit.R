@@ -29,7 +29,7 @@
 #' @export
 CucumberJunitReporter <- R6::R6Class(
   "CucumberJunitReporter",
-  inherit = CucumberReporter,
+  inherit = CucumberQueryReporter,
   public = list(
     #' @field file Path of the XML file the report is written to
     file = NULL,
@@ -45,30 +45,12 @@ CucumberJunitReporter <- R6::R6Class(
     },
 
     #' @description
-    #' Start following the messages of a run
-    start_run = function() {
-      private$query <- new_query()
-      invisible(self)
-    },
-
-    #' @description
-    #' Follow a message of the run
-    #' @param envelope A list with one element, named by the message's type
-    add_message = function(envelope) {
-      private$query$update(envelope)
-      invisible(self)
-    },
-
-    #' @description
     #' Write the report
     #' @param error The error that stopped the run, or `NULL`
     end_run = function(error = NULL) {
       writeLines(enc2utf8(junit_xml(private$query)), self$file, sep = "", useBytes = TRUE)
       invisible(self)
     }
-  ),
-  private = list(
-    query = NULL
   )
 )
 
@@ -106,14 +88,14 @@ junit_xml <- function(q) {
 }
 
 junit_test_run_hook <- function(q, finished) {
-  hook <- q$hooks[[q$test_run_hooks_started[[finished$testRunHookStartedId]]$hookId]]
+  started <- q$test_run_hooks_started[[finished$testRunHookStartedId]]
+  hook <- q$hooks[[started$hookId]]
   reference <- hook$sourceReference
   name <- if (!is.null(reference$uri)) {
     paste0(reference$uri, if (!is.null(reference$location)) paste0(":", reference$location$line))
   } else {
     "Unknown"
   }
-  started <- q$test_run_hooks_started[[finished$testRunHookStartedId]]
   c(
     xml_start(
       "testcase",

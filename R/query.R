@@ -141,3 +141,34 @@ millis_between <- function(start, end) {
   }
   floor(((end$seconds - start$seconds) * 1e9 + (end$nanos - start$nanos)) / 1e6)
 }
+
+#' Cucumber Query Reporter
+#'
+#' @description
+#' The parent of the reporters that report a run when it ends, from what
+#' `new_query()` indexed of its messages, in `private$query`.
+#'
+#' @keywords internal
+CucumberQueryReporter <- R6::R6Class(
+  "CucumberQueryReporter",
+  inherit = CucumberReporter,
+  public = list(
+    #' @description
+    #' Start following the messages of a run
+    start_run = function() {
+      private$query <- new_query()
+      invisible(self)
+    },
+
+    #' @description
+    #' Follow a message of the run
+    #' @param envelope A list with one element, named by the message's type
+    add_message = function(envelope) {
+      private$query$update(envelope)
+      invisible(self)
+    }
+  ),
+  private = list(
+    query = NULL
+  )
+)

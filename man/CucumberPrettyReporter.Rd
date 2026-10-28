@@ -707,8 +707,6 @@ cucumber::test(
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{show_praise}}{Whether to show praise messages}
-
 \item{\code{reporter_max_docstring_lines}}{Max docstring lines to print per step}
 
 \item{\code{reporter_max_table_lines}}{Max data table rows to print per step}
@@ -756,7 +754,7 @@ for a scenario of another Rule}
 Initialize the reporter
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberPrettyReporter$new(
-  show_praise = TRUE,
+  show_praise = NULL,
   reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines", Inf),
   reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
   file = NULL
@@ -766,7 +764,7 @@ Initialize the reporter
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{show_praise}}{Whether to show praise (default TRUE)}
+\item{\code{show_praise}}{Deprecated, has no effect: the reporter shows no praise.}
 
 \item{\code{reporter_max_docstring_lines}}{Max docstring lines to print for a step before
 truncating. Defaults to the \code{cucumber.reporter_max_docstring_lines} option, or

@@ -182,7 +182,7 @@ step_definition_message <- function(id, step) {
   list(
     id = id,
     pattern = list(
-      source = if (grepl("^/.*/$", expression)) substr(expression, 2, nchar(expression) - 1) else expression,
+      source = sub("^/(.*)/$", "\\1", expression),
       type = if (regex) "REGULAR_EXPRESSION" else "CUCUMBER_EXPRESSION"
     ),
     sourceReference = source_reference(attr(step, "srcref"))

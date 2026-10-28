@@ -120,7 +120,6 @@ defined_again <- function(srcref, other) {
 
 #' @importFrom rlang `:=`
 register_step <- function(step) {
-  assert_step(step)
   steps <- get_steps()
   # A step definition defined again where it's written replaces itself
   again <- vapply(steps, \(other) {
@@ -130,11 +129,4 @@ register_step <- function(step) {
   steps <- .steps(!!!steps[!again], !!attr(step, "description") := step)
   set_steps(steps)
   invisible(step)
-}
-
-#' @importFrom checkmate assert_function assert_class assert_string
-assert_step <- function(x) {
-  assert_function(x)
-  assert_class(x, "step")
-  assert_string(attr(x, "description"))
 }

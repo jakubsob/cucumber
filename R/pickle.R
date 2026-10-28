@@ -10,13 +10,8 @@
 #'   the `media_type` attribute
 #' @param argument_order Names of the step arguments ("docstring",
 #'   "data_table") in the order they are written
-#' @param status Execution status (NULL, "passed", "failed", "skipped", "pending")
-#' @param error Error object if failed
-#' @param duration Execution time in seconds
-#' @param matched_fn Matched step function (added in matching phase)
-#' @param arguments Function returning the named list of arguments (added in
-#'   matching phase)
-#' @param definition_location Source reference for error reporting
+#' Matching and running the step add its status, error, duration, matched
+#' function, arguments and definition location.
 #' @param id Id of the step's PickleStep message
 #' @param message The PickleStep message
 #' @return A pickle_step object
@@ -32,12 +27,6 @@ new_pickle_step <- function(
   data_table = NULL,
   docstring = NULL,
   argument_order = character(),
-  status = NULL,
-  error = NULL,
-  duration = NULL,
-  matched_fn = NULL,
-  arguments = NULL,
-  definition_location = NULL,
   id = NULL,
   message = NULL
 ) {
@@ -50,12 +39,6 @@ new_pickle_step <- function(
       data_table = data_table,
       docstring = docstring,
       argument_order = argument_order,
-      status = status,
-      error = error,
-      duration = duration,
-      matched_fn = matched_fn,
-      arguments = arguments,
-      definition_location = definition_location,
       id = id,
       message = message
     ),
@@ -171,7 +154,7 @@ create_pickles <- function(document, feature_file = NULL) {
 #' @noRd
 unique_test_names <- function(names) {
   repeated <- names %in% names[duplicated(names)]
-  occurrence <- vapply(seq_along(names), \(i) sum(names[seq_len(i)] == names[[i]]), integer(1))
+  occurrence <- stats::ave(seq_along(names), names, FUN = seq_along)
   names[repeated] <- paste0(names[repeated], " (", occurrence[repeated], ")")
   names
 }
@@ -307,50 +290,14 @@ interpolate <- function(x, header, values) {
   x
 }
 
-#' Keep the pickles selected by `tags`, `name` and `lines`, see `test()`
+#' Keep the pickles selected by `tags`, any of the regular expressions in `name`,
+#' and any of the `lines` of their feature file, see `test()`
 #' @keywords internal
 #' @noRd
 filter_pickles <- function(pickles, tags = NULL, name = NULL, lines = integer()) {
-  pickles |>
-    filter_pickles_by_tags(tags) |>
-    filter_pickles_by_name(name) |>
-    filter_pickles_by_lines(lines)
-}
-
-#' Filter pickles by tag expression
-#'
-#' @param pickles List of pickle objects
-#' @param tags Tag expression string (e.g., "@smoke and not @slow")
-#' @return Filtered list of pickle objects
-#' @keywords internal
-#' @noRd
-filter_pickles_by_tags <- function(pickles, tags) {
-  if (is.null(tags)) {
-    return(pickles)
-  }
-
-  pickles |>
-    keep(\(pickle) {
-      evaluate_tag_expression(tags, pickle$tags)
-    })
-}
-
-#' Keep pickles whose name matches any of the regular expressions in `name`
-#' @keywords internal
-#' @noRd
-filter_pickles_by_name <- function(pickles, name) {
-  if (is.null(name)) {
-    return(pickles)
-  }
-  keep(pickles, \(pickle) any(vapply(name, grepl, logical(1), x = pickle$name)))
-}
-
-#' Keep pickles selected by any of the `lines` of their feature file
-#' @keywords internal
-#' @noRd
-filter_pickles_by_lines <- function(pickles, lines) {
-  if (length(lines) == 0) {
-    return(pickles)
-  }
-  keep(pickles, \(pickle) any(pickle$lines %in% lines))
+  keep(pickles, \(pickle) {
+    evaluate_tag_expression(tags, pickle$tags) &&
+      (is.null(name) || any(vapply(name, grepl, logical(1), x = pickle$name))) &&
+      (length(lines) == 0 || any(pickle$lines %in% lines))
+  })
 }

@@ -100,10 +100,7 @@ CucumberProgressReporter <- R6::R6Class(
     #' @description
     #' Draw the current feature's line with the spinner
     draw_feature = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       self$draw(self$feature_line(self$frames[[
         self$frame %% length(self$frames) + 1L
       ]]))
@@ -112,10 +109,7 @@ CucumberProgressReporter <- R6::R6Class(
   private = list(
     # Print the header once, and start the feature's line
     on_feature_start = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       if (!self$header_printed) {
         cat(
           format_progress_line(
@@ -152,21 +146,14 @@ CucumberProgressReporter <- R6::R6Class(
 
     # Print the feature's final line, with its status and how long it took
     on_feature_end = function() {
-      withr::local_options(
-        cli.num_colors = self$num_colors,
-        cli.unicode = self$unicode
-      )
+      private$local_cli()
       statuses <- self$feature_statuses()
       self$clear()
       self$live <- NULL
       if (length(statuses) > 0) {
         worst <- STEP_STATUSES[min(match(statuses, STEP_STATUSES))]
         line <- self$feature_line(status_symbol(worst))
-        time <- as.numeric(difftime(
-          Sys.time(),
-          self$feature_start,
-          units = "secs"
-        ))
+        time <- seconds_since(self$feature_start)
         if (time >= 1) {
           line <- paste0(line, cli::col_grey(sprintf(" [%.1fs]", time)))
         }

@@ -43,7 +43,7 @@ CucumberDotsReporter <- R6::R6Class(
       super$add_message(envelope)
       finished <- envelope$testStepFinished
       if (!is.null(finished)) {
-        withr::local_options(cli.num_colors = self$num_colors, cli.unicode = self$unicode)
+        private$local_cli()
         status <- tolower(finished$testStepResult$status)
         cat(status_color(status)(DOTS_CHARACTERS[[status]]))
       }

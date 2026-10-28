@@ -119,7 +119,7 @@ same_parameter_type <- function(parameter, other) {
 #' @keywords internal
 #' @noRd
 check_parameter_type <- function(parameter, parameters) {
-  fail <- function(message) abort(message, class = "cucumber_expression_error", call = NULL, trace = empty_trace())
+  fail <- function(message) abort_user(message, class = "cucumber_expression_error")
   if (grepl("[{}()\\\\/]", parameter$name)) {
     fail(paste0(
       "Illegal character in parameter name {", parameter$name, "}. ",
@@ -135,20 +135,12 @@ check_parameter_type <- function(parameter, parameters) {
     fail(paste0("There is already a parameter type with name ", parameter$name))
   }
   for (regexp in parameter$regexp) {
-    problem <- tryCatch(
-      {
-        stringi::stri_detect_regex("", regexp)
-        NULL
-      },
-      error = conditionMessage
-    )
+    problem <- regex_problem(regexp)
     if (!is.null(problem)) {
-      abort(
+      abort_user(
         paste0("The regexp /", regexp, "/ of parameter type {", parameter$name, "} is invalid."),
         body = c(x = problem),
-        class = "cucumber_expression_error",
-        call = NULL,
-        trace = empty_trace()
+        class = "cucumber_expression_error"
       )
     }
   }
@@ -174,16 +166,8 @@ check_parameter_type <- function(parameter, parameters) {
 #' @keywords internal
 #' @noRd
 transform_parameter <- function(parameter, text, values) {
-  withr::local_options(rlang_trace_top_env = NULL)
-  run <- rlang::new_function(
-    rlang::pairlist2(... = ),
-    bquote({
-      options(rlang_trace_top_env = environment())
-      .(parameter$transformer)(...)
-    })
-  )
   withCallingHandlers(
-    exec(run, !!!as.list(values)),
+    call_step(parameter$transformer, as.list(values)),
     error = function(e) {
       abort(
         glue("Parameter type {{{parameter$name}}} failed to transform {encodeString(text, quote = '\"')}."),
@@ -200,7 +184,7 @@ transform_parameter <- function(parameter, text, values) {
 as_integer <- function(x) {
   value <- suppressWarnings(as.integer(x))
   if (is.na(value) && !is.na(x)) {
-    abort("It's out of the range of an R integer.", call = NULL, trace = empty_trace())
+    abort_user("It's out of the range of an R integer.")
   }
   value
 }

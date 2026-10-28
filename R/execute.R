@@ -1,38 +1,3 @@
-#' Run a feature's scenarios, reporting its document and pickles
-#'
-#' @param pickles The document's pickles
-#' @importFrom purrr walk
-#' @return Whether a scenario failed, invisibly
-#' @keywords internal
-#' @noRd
-execute <- function(
-  document,
-  steps = get_steps(),
-  parameters = get_parameters(),
-  hooks = get_hooks(),
-  tags = NULL,
-  name = NULL,
-  lines = integer(),
-  feature_file = NULL,
-  reporter = NULL,
-  strict = TRUE,
-  dry_run = FALSE,
-  fail_fast = FALSE,
-  retry = 0L,
-  failed = FALSE,
-  pickles = create_pickles(document, feature_file = feature_file)
-) {
-  checkmate::assert_list(steps)
-  checkmate::assert_list(parameters, min.len = 1)
-  checkmate::assert_list(hooks)
-
-  emit(reporter, "gherkinDocument", document)
-  walk(pickles, \(pickle) emit(reporter, "pickle", pickle$message))
-  pickles <- prepare_pickles(pickles, steps, parameters, hooks, tags, name, lines, reporter)
-  config <- run_config(".", NULL, tags, reporter, strict, dry_run, name, NULL, fail_fast, retry, "defined")
-  execute_feature(document, pickles, hooks, config, failed = failed)
-}
-
 #' Choose the pickles to run, match their steps and plan their test cases
 #'
 #' Each pickle that runs gets a test case, reported before any scenario runs.
@@ -127,7 +92,7 @@ snapshot_file <- function(feature, path) {
 #' snapshot of the features, as testthat keeps those of the test files it
 #' didn't run.
 #' @param features The feature files in `path`
-#' @param complete Whether every scenario runs, see `complete_run()`
+#' @param complete Whether every scenario runs, see `run_features()`
 #' @return A list with `feature()`, that gets the snapshots of a feature file
 #'   from its file and the test names of all its scenarios, and `finish()`,
 #'   called when every scenario ran
@@ -151,7 +116,7 @@ run_snapshots <- function(path, features, complete, frame = parent.frame()) {
       if (!complete || !finished) {
         walk(files, \(file) keep_snapshot_files(outer %||% seen, file, existing_snapshot_files(dir, file)))
       }
-      if (!is.null(seen) && !env_var_is_true("CI")) delete_unused_snapshots(dir, seen)
+      if (!is.null(seen) && !isTRUE(as.logical(Sys.getenv("CI", "false")))) delete_unused_snapshots(dir, seen)
     },
     envir = frame,
     priority = "last"
@@ -165,14 +130,6 @@ run_snapshots <- function(path, features, complete, frame = parent.frame()) {
     },
     finish = function() finished <<- TRUE
   )
-}
-
-#' Whether a run runs every scenario: not with `filter`, `tags`, `name` or
-#' `features`, and not in a dry run
-#' @keywords internal
-#' @noRd
-complete_run <- function(filter, tags, name, features, dry_run) {
-  is.null(filter) && is.null(tags) && is.null(name) && is.null(features) && !dry_run
 }
 
 #' Two feature files can't save their snapshots in the same file, like
@@ -192,11 +149,9 @@ check_snapshot_files <- function(features, files) {
       " save their snapshots in `_snaps/", file, ".md`."
     )
   }, character(1))
-  abort(
+  abort_user(
     "Feature files share a snapshot file.",
-    body = c(rlang::set_names(body, "x"), i = "Rename one of them."),
-    call = NULL,
-    trace = empty_trace()
+    body = c(rlang::set_names(body, "x"), i = "Rename one of them.")
   )
 }
 
@@ -249,10 +204,6 @@ delete_unused_snapshots <- function(dir, seen) {
     if (length(fs::dir_ls(d, all = TRUE)) == 0) fs::dir_delete(d)
   }
   invisible()
-}
-
-env_var_is_true <- function(name) {
-  isTRUE(as.logical(Sys.getenv(name, "false")))
 }
 
 #' Snapshots of a feature go to its own snapshot file, whether it runs in a

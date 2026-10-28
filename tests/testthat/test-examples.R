@@ -119,7 +119,7 @@ describe("test", {
         source("tests/acceptance/support/expect.R", local = env)
         cucumber::test(
           path = "tests/acceptance",
-          reporter = CucumberPrettyReporter$new(show_praise = FALSE),
+          reporter = CucumberPrettyReporter$new(),
           stop_on_failure = FALSE,
           env = env
         )

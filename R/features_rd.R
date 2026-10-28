@@ -66,15 +66,13 @@ features_rd <- function(
     feature_rd(sources[[file]]$document, pickles, read_feature(file), file)
   }))
   if (length(rd) == 0) {
-    abort(
+    abort_user(
       "No scenarios to document.",
       body = c(i = if (is.null(tags)) {
         "Select scenarios with `features`, `filter` or `name`."
       } else {
         paste0("Tag the scenarios with `", tags, "`, or select them whatever their tags with `tags = NULL`.")
-      }),
-      call = NULL,
-      trace = empty_trace()
+      })
     )
   }
   c("@md", paste0("@section ", section, ":"), rd)

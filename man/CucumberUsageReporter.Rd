@@ -329,15 +329,13 @@ cucumber::test(reporter = cucumber::CucumberUsageReporter$new())
 }
 
 }
-\section{Super class}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberUsageReporter}
+\section{Super classes}{
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{cucumber::CucumberQueryReporter} -> \code{CucumberUsageReporter}
 }
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-CucumberUsageReporter-new}{\code{CucumberUsageReporter$new()}}
-\item \href{#method-CucumberUsageReporter-start_run}{\code{CucumberUsageReporter$start_run()}}
-\item \href{#method-CucumberUsageReporter-add_message}{\code{CucumberUsageReporter$add_message()}}
 \item \href{#method-CucumberUsageReporter-end_run}{\code{CucumberUsageReporter$end_run()}}
 \item \href{#method-CucumberUsageReporter-clone}{\code{CucumberUsageReporter$clone()}}
 }
@@ -347,6 +345,8 @@ cucumber::test(reporter = cucumber::CucumberUsageReporter$new())
 <ul>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="add_warning"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-add_warning'><code>cucumber::CucumberReporter$add_warning()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberQueryReporter" data-id="add_message"><a href='../../cucumber/html/CucumberQueryReporter.html#method-CucumberQueryReporter-add_message'><code>cucumber::CucumberQueryReporter$add_message()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberQueryReporter" data-id="start_run"><a href='../../cucumber/html/CucumberQueryReporter.html#method-CucumberQueryReporter-start_run'><code>cucumber::CucumberQueryReporter$start_run()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -366,33 +366,6 @@ Create a usage reporter
 by each run, or \code{NULL}. A relative path is relative to the working
 directory when the reporter is created. Its directory is created when
 the reporter is, if it doesn't exist.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberUsageReporter-start_run"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberUsageReporter-start_run}{}}}
-\subsection{Method \code{start_run()}}{
-Start following the messages of a run
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberUsageReporter$start_run()}\if{html}{\out{</div>}}
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-CucumberUsageReporter-add_message"></a>}}
-\if{latex}{\out{\hypertarget{method-CucumberUsageReporter-add_message}{}}}
-\subsection{Method \code{add_message()}}{
-Follow a message of the run
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CucumberUsageReporter$add_message(envelope)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{envelope}}{A list with one element, named by the message's type}
 }
 \if{html}{\out{</div>}}
 }

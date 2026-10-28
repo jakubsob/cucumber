@@ -16,7 +16,7 @@
 #' @noRd
 expression_to_pattern <- function(x, parameters = get_parameters()) {
   if (is_regular_expression(x)) {
-    pattern <- if (grepl("^/.*/$", x)) substr(x, 2, nchar(x) - 1) else x
+    pattern <- sub("^/(.*)/$", "\\1", x)
     check_regex(pattern)
     groups <- regex_groups(pattern)
     types <- lapply(
@@ -59,20 +59,28 @@ is_regular_expression <- function(x) {
 #' Fail on an invalid regular expression before any step is matched with it
 #' @keywords internal
 #' @noRd
-#' @importFrom stringr str_detect
 check_regex <- function(pattern) {
-  tryCatch(
-    str_detect("", pattern),
-    error = function(e) {
-      abort(
-        paste0("This Regular Expression has a problem:\n\n", pattern, "\n\n", conditionMessage(e)),
-        class = "cucumber_expression_error",
-        call = NULL,
-        trace = empty_trace()
-      )
-    }
-  )
+  problem <- regex_problem(pattern)
+  if (!is.null(problem)) {
+    abort_user(
+      paste0("This Regular Expression has a problem:\n\n", pattern, "\n\n", problem),
+      class = "cucumber_expression_error"
+    )
+  }
   invisible(pattern)
+}
+
+#' Why ICU, the regular expressions of stringi, can't compile `pattern`, or `NULL`
+#' @keywords internal
+#' @noRd
+regex_problem <- function(pattern) {
+  tryCatch(
+    {
+      stringi::stri_detect_regex("", pattern)
+      NULL
+    },
+    error = conditionMessage
+  )
 }
 
 #' The capture groups of a regular expression, in order
@@ -135,7 +143,7 @@ parameter_for_regexp <- function(source, pattern, parameters) {
   preferred <- Filter(\(p) p$prefer_for_regexp_match, candidates)
   if (length(candidates) > 1 && length(preferred) == 0) {
     names <- vapply(candidates, \(p) paste0("{", p$name, "}"), character(1))
-    abort(
+    abort_user(
       paste0(
         "Your Regular Expression ", pattern, "\n",
         "matches multiple parameter types with regexp ", source, ":\n",
@@ -144,9 +152,7 @@ parameter_for_regexp <- function(source, pattern, parameters) {
         "Use a Cucumber Expression instead of a Regular Expression, ",
         "or make one of the parameter types preferential ",
         "with `prefer_for_regexp_match = TRUE`."
-      ),
-      call = NULL,
-      trace = empty_trace()
+      )
     )
   }
   if (length(preferred)) return(preferred[[1]])
@@ -176,7 +182,7 @@ expression_error <- function(expression, start, end, problem, solution, class = 
       "In an R string, double each backslash: \"", gsub("\\", "\\\\", escape, fixed = TRUE), "\"."
     )
   }
-  abort(
+  abort_user(
     paste0(
       "This Cucumber Expression has a problem at column ", start + 1, ":\n\n",
       expression, "\n",
@@ -185,9 +191,7 @@ expression_error <- function(expression, start, end, problem, solution, class = 
       solution
     ),
     class = c(class, "cucumber_expression_error"),
-    ...,
-    call = NULL,
-    trace = empty_trace()
+    ...
   )
 }
 
@@ -365,13 +369,15 @@ parse_expression <- function(expression) {
     }
   }
 
+  # One token, as a text node
+  parse_text_token <- function(token) {
+    list(consumed = 1, ast = list(node("text", text = token$text, start = token$start, end = token$end)))
+  }
+
   parse_text <- function(current) {
     token <- tokens[[current]]
     if (token$type %in% c("white_space", "text", "end_parameter", "end_optional")) {
-      return(list(
-        consumed = 1,
-        ast = list(node("text", text = token$text, start = token$start, end = token$end))
-      ))
+      return(parse_text_token(token))
     }
     if (token$type == "alternation") {
       expression_error(
@@ -389,10 +395,7 @@ parse_expression <- function(expression) {
   parse_name <- function(current) {
     token <- tokens[[current]]
     if (token$type %in% c("white_space", "text")) {
-      return(list(
-        consumed = 1,
-        ast = list(node("text", text = token$text, start = token$start, end = token$end))
-      ))
+      return(parse_text_token(token))
     }
     if (token$type %in% c("begin_parameter", "end_parameter", "begin_optional", "end_optional", "alternation")) {
       expression_error(

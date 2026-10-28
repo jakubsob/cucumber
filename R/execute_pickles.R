@@ -136,7 +136,7 @@ run_scenario <- function(state, pickle, hooks, config, skip_steps, snapshots) {
         ))
         if (!retried) break
       }
-    }, error = \(e) if (has_restart("cucumber_abort_run")) invokeRestart("cucumber_abort_run", e))
+    }, error = \(e) if (!is.null(findRestart("cucumber_abort_run"))) invokeRestart("cucumber_abort_run", e))
     state$failed <- state$result$status %in% failing_statuses(config$strict, config$dry_run)
     if (!is.null(snapshots)) end_snapshot_scenario(snapshots, state$result$status, state$snapshot_on_cran)
   },
@@ -514,11 +514,12 @@ new_step_result <- function(step, status, error = NULL, duration = 0) {
   step
 }
 
-#' Call a step definition with its arguments, so that rlang captures the
-#' backtrace of an error in it from the step down, see `step_trace()`
+#' Call a step definition or a parameter type's transformer with its arguments,
+#' so that rlang captures the backtrace of an error in it from it down, see
+#' `step_trace()`
 #' @keywords internal
 #' @noRd
-call_step <- function(fn, args, context) {
+call_step <- function(fn, args) {
   withr::local_options(rlang_trace_top_env = NULL)
   run <- rlang::new_function(
     rlang::pairlist2(... = ),
@@ -527,7 +528,7 @@ call_step <- function(fn, args, context) {
       .(fn)(...)
     })
   )
-  exec(run, !!!args, context = context)
+  exec(run, !!!args)
 }
 
 #' The backtrace of an error in a step: the calls of the step down to the
@@ -553,13 +554,12 @@ execute_single_step <- function(step, context, pickle = NULL) {
   status <- "passed"
   step_error <- NULL
 
-  # Capture timing
-  start_time <- Sys.time()
+  start <- Sys.time()
 
   tryCatch(
     withCallingHandlers(
       with_nested_tests(
-        call_step(step$matched_fn, step$arguments(), context),
+        call_step(step$matched_fn, c(step$arguments(), list(context = context))),
         "step",
         feature_srcref(pickle, step$line)
       ),
@@ -616,8 +616,7 @@ execute_single_step <- function(step, context, pickle = NULL) {
     }
   )
 
-  duration <- as.numeric(difftime(Sys.time(), start_time, units = "secs"))
-  new_step_result(step, status, step_error, duration)
+  new_step_result(step, status, step_error, seconds_since(start))
 }
 
 #' testthat's reporter of the tests in a step, like `test_that()` in a step
