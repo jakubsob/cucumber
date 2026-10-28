@@ -89,7 +89,7 @@ Feature: Sharing state with context
       Methods:
       attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
       log(text): attach text to the report
-      link(...): attach links to the report
+      link(...): attach one or more URLs to the report
       """
 
   Scenario: A printed context shows its first 10 items and how many more there are

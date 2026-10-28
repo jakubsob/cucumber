@@ -729,7 +729,7 @@ scenario, as its steps already have their results.
 <span class="st">    Methods:</span>
 <span class="st">    attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report</span>
 <span class="st">    log(text): attach text to the report</span>
-<span class="st">    link(...): attach links to the report</span>
+<span class="st">    link(...): attach one or more URLs to the report</span>
 <span class="st">    """</span></code></pre >}}
 \if{text,latex}{\preformatted{Scenario: A printed context shows what steps and hooks put in it, and its methods
   Given a file named "features/setup-steps.R" with
@@ -753,7 +753,7 @@ scenario, as its steps already have their results.
     Methods:
     attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
     log(text): attach text to the report
-    link(...): attach links to the report
+    link(...): attach one or more URLs to the report
     """
 %</pre>
 }}

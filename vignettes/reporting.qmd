@@ -47,7 +47,7 @@ A step or a hook attaches data to the report with its `context`:
 
 - `context$attach(data, media_type, file_name)` attaches a string or a raw vector, like an image read with `readBin()`.
 - `context$log(text)` attaches text to read.
-- `context$link(url)` attaches a link.
+- `context$link(...)` attaches links: each argument is a URL or a character vector of URLs, like `context$link("https://example.com/basket", "https://example.com/checkout")`.
 
 The report shows each attachment under the step it's attached to. See `?attachments`.
 

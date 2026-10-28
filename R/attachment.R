@@ -11,7 +11,10 @@
 #'   for a string, and is required for a raw vector. `file_name` is the name
 #'   of the file the reports offer to download it as.
 #' - `context$log(text)` attaches text to read, like a log line.
-#' - `context$link(...)` attaches links, each one a URL.
+#' - `context$link(...)` attaches one or more links. Each argument is a URL, or a
+#'   character vector of URLs, and they're attached together as one attachment,
+#'   like `context$link("https://example.com/basket", "https://example.com/checkout")`
+#'   or `context$link(urls)`.
 #'
 #' @seealso The [Reports article](https://jakubsob.github.io/cucumber/articles/reporting.html),
 #'   `vignette("reporting", package = "cucumber")`, attaches screenshots and logs of a
@@ -23,6 +26,10 @@
 #'   context$session$go_to("/basket")
 #'   context$log("Opened /basket")
 #'   context$link("https://example.com/basket")
+#' })
+#'
+#' when("I check out", function(context) {
+#'   context$link("https://example.com/basket", "https://example.com/checkout")
 #' })
 #'
 #' after(function(context, scenario) {
@@ -64,7 +71,7 @@ new_context <- function(send, context = new.env()) {
 CONTEXT_METHODS <- c(
   attach = "attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report",
   log = "log(text): attach text to the report",
-  link = "link(...): attach links to the report"
+  link = "link(...): attach one or more URLs to the report"
 )
 
 #' @param n How many of its bindings to show

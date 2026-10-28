@@ -14,7 +14,10 @@ like \code{"image/png"} or \code{"application/json"}. It defaults to \code{"text
 for a string, and is required for a raw vector. \code{file_name} is the name
 of the file the reports offer to download it as.
 \item \code{context$log(text)} attaches text to read, like a log line.
-\item \code{context$link(...)} attaches links, each one a URL.
+\item \code{context$link(...)} attaches one or more links. Each argument is a URL, or a
+character vector of URLs, and they're attached together as one attachment,
+like \code{context$link("https://example.com/basket", "https://example.com/checkout")}
+or \code{context$link(urls)}.
 }
 }
 \section{Specification}{
@@ -87,6 +90,60 @@ show them, like the HTML report. The pretty reporter prints them under their ste
     | When I add an item | application/octet-stream  | AQID                       | BASE64   | basket.bin |
     | When I add an item | text/x.cucumber.log+plain | Added an item              | IDENTITY |            |
     | When I add an item | text/uri-list             | https://example.com/basket | IDENTITY |            |
+%</pre>
+}}
+
+\if{html}{\out{
+<pre class="gherkin"><code><span class="kw">Scenario:</span> A step attaches several links at once
+  Each argument of `context$link()` is a URL or a character vector of URLs.
+  They're attached together, one URL per line.
+<span></span>
+  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
+<span class="st">    """</span>
+<span class="st">    Feature: Basket</span>
+<span class="st">      Scenario: Check out</span>
+<span class="st">        When I check out</span>
+<span class="st">    """</span>
+  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
+<span class="st">    """</span>
+<span class="st">    when("I check out", function(context) \{</span>
+<span class="st">      context$link("https://example.com/basket", "https://example.com/checkout")</span>
+<span class="st">      context$link(c("https://example.com/help", "https://example.com/terms"))</span>
+<span class="st">    \})</span>
+<span class="st">    """</span>
+  <span class="fu">When</span> I run
+<span class="st">    """</span>
+<span class="st">    test("features")</span>
+<span class="st">    """</span>
+  <span class="fu">Then</span> the attachments are:
+    <span class="op">|</span> step             <span class="op">|</span> media_type    <span class="op">|</span> body                                                     <span class="op">|</span> encoding <span class="op">|</span> file_name <span class="op">|</span>
+    <span class="op">|</span> When I check out <span class="op">|</span> text/uri-list <span class="op">|</span> https://example.com/basket\\nhttps://example.com/checkout <span class="op">|</span> IDENTITY <span class="op">|</span>           <span class="op">|</span>
+    <span class="op">|</span> When I check out <span class="op">|</span> text/uri-list <span class="op">|</span> https://example.com/help\\nhttps://example.com/terms      <span class="op">|</span> IDENTITY <span class="op">|</span>           <span class="op">|</span></code></pre >}}
+\if{text,latex}{\preformatted{Scenario: A step attaches several links at once
+  Each argument of `context$link()` is a URL or a character vector of URLs.
+  They're attached together, one URL per line.
+
+  Given a file named "features/basket.feature" with
+    """
+    Feature: Basket
+      Scenario: Check out
+        When I check out
+    """
+  And a file named "features/setup-steps.R" with
+    """
+    when("I check out", function(context) \{
+      context$link("https://example.com/basket", "https://example.com/checkout")
+      context$link(c("https://example.com/help", "https://example.com/terms"))
+    \})
+    """
+  When I run
+    """
+    test("features")
+    """
+  Then the attachments are:
+    | step             | media_type    | body                                                     | encoding | file_name |
+    | When I check out | text/uri-list | https://example.com/basket\\nhttps://example.com/checkout | IDENTITY |           |
+    | When I check out | text/uri-list | https://example.com/help\\nhttps://example.com/terms      | IDENTITY |           |
 %</pre>
 }}
 
@@ -226,6 +283,10 @@ when("I open the basket", function(context) {
   context$session$go_to("/basket")
   context$log("Opened /basket")
   context$link("https://example.com/basket")
+})
+
+when("I check out", function(context) {
+  context$link("https://example.com/basket", "https://example.com/checkout")
 })
 
 after(function(context, scenario) {

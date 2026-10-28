@@ -36,6 +36,33 @@ Feature: Attachments
       | When I add an item | text/uri-list             | https://example.com/basket | IDENTITY |            |
 
   @rd
+  Scenario: A step attaches several links at once
+    Each argument of `context$link()` is a URL or a character vector of URLs.
+    They're attached together, one URL per line.
+
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Check out
+          When I check out
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I check out", function(context) {
+        context$link("https://example.com/basket", "https://example.com/checkout")
+        context$link(c("https://example.com/help", "https://example.com/terms"))
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the attachments are:
+      | step             | media_type    | body                                                     | encoding | file_name |
+      | When I check out | text/uri-list | https://example.com/basket\nhttps://example.com/checkout | IDENTITY |           |
+      | When I check out | text/uri-list | https://example.com/help\nhttps://example.com/terms      | IDENTITY |           |
+
+  @rd
   Scenario: A step attaches images
     Read an image, like a screenshot, with `readBin()` and attach it with its media type.
     It's base64 encoded, and the HTML report shows it.
