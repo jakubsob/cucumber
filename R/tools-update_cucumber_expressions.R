@@ -27,10 +27,7 @@ CUCUMBER_EXPRESSIONS_REPO <- "https://github.com/cucumber/cucumber-expressions.g
 #' @noRd
 update_cucumber_expressions <- function(ref = "main", pkg = ".") {
   rlang::check_installed(c("yaml", "jsonlite"), "to update the Cucumber Expressions test data.")
-  repo <- file.path(tempdir(), "cucumber-expressions")
-  unlink(repo, recursive = TRUE)
-  run_git("clone", "--quiet", "--filter=blob:none", CUCUMBER_EXPRESSIONS_REPO, repo)
-  run_git("-C", repo, "checkout", "--quiet", ref)
+  repo <- clone_repo(CUCUMBER_EXPRESSIONS_REPO, ref)
   commit <- run_git("-C", repo, "rev-parse", "--short", "HEAD")
 
   to <- file.path(pkg, "tests", "testthat", "cucumber-expressions")

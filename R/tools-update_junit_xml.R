@@ -23,10 +23,7 @@ JUNIT_XML_REPO <- "https://github.com/cucumber/junit-xml-formatter.git"
 #' @keywords internal
 #' @noRd
 update_junit_xml <- function(ref = "main", pkg = ".") {
-  repo <- file.path(tempdir(), "junit-xml-formatter")
-  unlink(repo, recursive = TRUE)
-  run_git("clone", "--quiet", "--filter=blob:none", JUNIT_XML_REPO, repo)
-  run_git("-C", repo, "checkout", "--quiet", ref)
+  repo <- clone_repo(JUNIT_XML_REPO, ref)
   commit <- run_git("-C", repo, "rev-parse", "--short", "HEAD")
 
   to <- file.path(pkg, "tests", "testthat", "cck")

@@ -23,10 +23,7 @@ MESSAGES_REPO <- "https://github.com/cucumber/messages.git"
 #' @keywords internal
 #' @noRd
 update_messages_schema <- function(ref = paste0("v", PROTOCOL_VERSION), pkg = ".") {
-  repo <- file.path(tempdir(), "messages")
-  unlink(repo, recursive = TRUE)
-  run_git("clone", "--quiet", "--filter=blob:none", MESSAGES_REPO, repo)
-  run_git("-C", repo, "checkout", "--quiet", ref)
+  repo <- clone_repo(MESSAGES_REPO, ref)
   commit <- run_git("-C", repo, "rev-parse", "--short", "HEAD")
 
   to <- file.path(pkg, "tests", "testthat", "messages-schema")

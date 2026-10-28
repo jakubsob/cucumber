@@ -177,10 +177,7 @@ HAND_PORTED <- c(
 #' @keywords internal
 #' @noRd
 update_gherkin <- function(ref = "main", pkg = ".") {
-  repo <- file.path(tempdir(), "gherkin")
-  unlink(repo, recursive = TRUE)
-  run_git("clone", "--quiet", "--filter=blob:none", GHERKIN_REPO, repo)
-  run_git("-C", repo, "checkout", "--quiet", ref)
+  repo <- clone_repo(GHERKIN_REPO, ref)
   commit <- run_git("-C", repo, "rev-parse", "--short", "HEAD")
 
   states <- file.path(pkg, "R", "gherkin_states.R")
@@ -204,6 +201,17 @@ update_gherkin <- function(ref = "main", pkg = ".") {
 
   testthat::test_local(pkg, filter = "gherkin")
   invisible(patch)
+}
+
+#' Clone a repository into the temporary directory, checked out at `ref`
+#' @keywords internal
+#' @noRd
+clone_repo <- function(url, ref) {
+  repo <- file.path(tempdir(), sub("\\.git$", "", basename(url)))
+  unlink(repo, recursive = TRUE)
+  run_git("clone", "--quiet", "--filter=blob:none", url, repo)
+  run_git("-C", repo, "checkout", "--quiet", ref)
+  repo
 }
 
 run_git <- function(...) {

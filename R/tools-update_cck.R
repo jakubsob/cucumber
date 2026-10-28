@@ -87,10 +87,7 @@ CCK_DIRECTORIES <- c("examples-tables-undefined-multiple" = "examples-undefined-
 #' @keywords internal
 #' @noRd
 update_cck <- function(ref = "main", pkg = ".") {
-  repo <- file.path(tempdir(), "compatibility-kit")
-  unlink(repo, recursive = TRUE)
-  run_git("clone", "--quiet", "--filter=blob:none", CCK_REPO, repo)
-  run_git("-C", repo, "checkout", "--quiet", ref)
+  repo <- clone_repo(CCK_REPO, ref)
   commit <- run_git("-C", repo, "rev-parse", "--short", "HEAD")
 
   to <- file.path(pkg, "tests", "testthat", "cck")
