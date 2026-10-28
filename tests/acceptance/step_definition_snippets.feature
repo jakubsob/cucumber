@@ -27,6 +27,36 @@ Feature: Step definition snippets
         given("an empty basket", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
+      """
+
+  Scenario: An undefined step says where to define steps when none are loaded
+    Only `setup-*.R` and `helper-*.R` files are run before the scenarios, so steps defined in other files stay undefined.
+
+    Given a package
+    And a file named "features/steps.R" with
+      """
+      when("I open the door", function(context) NULL)
+      """
+    And a file named "features/door.feature" with
+      """
+      Feature: Door
+        Scenario: Open
+          When I open the door
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [failure] Scenario: Open
+      No step found for: "I open the door"
+      i Add a step definition:
+        when("I open the door", function(context) {
+          pending()
+        })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   @rd
@@ -54,6 +84,7 @@ Feature: Step definition snippets
         # given("I have {float} cucumbers in my basket", function(float, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: Every combination of matching parameter types is listed, and a repeated type's argument is numbered
@@ -79,6 +110,7 @@ Feature: Step definition snippets
         # given("I have {float} and {float} cucumbers", function(float, float2, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A quoted string becomes a {string} parameter
@@ -101,6 +133,7 @@ Feature: Step definition snippets
         given("I see the message {string}", function(string, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A snippet uses the step's keyword
@@ -123,6 +156,7 @@ Feature: Step definition snippets
         then("the result is shown", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: An undefined step of a Background is reported with a snippet
@@ -175,6 +209,7 @@ Feature: Step definition snippets
         then("le panier est vide", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A snippet's parameters are in the order they are written
@@ -197,6 +232,7 @@ Feature: Step definition snippets
         given("{string} has {float} cucumbers and {string} has none", function(string, float, string2, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A snippet gets an argument for a Data Table or a Doc String
@@ -225,6 +261,7 @@ Feature: Step definition snippets
         given("these people", function(data_table, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
 
       [failure] Scenario: Step arguments
       No step found for: "I send"
@@ -232,6 +269,7 @@ Feature: Step definition snippets
         when("I send", function(doc_string, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario Outline: A snippet for a step written with <keyword> after <previous> uses <function>()
@@ -292,6 +330,7 @@ Feature: Step definition snippets
         then("I start shopping", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
 
       [failure] Scenario: Shopping
       No step found for: "I pick a cucumber"
@@ -299,6 +338,7 @@ Feature: Step definition snippets
         given("I pick a cucumber", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A snippet escapes the characters that Cucumber Expressions give a meaning to
@@ -321,6 +361,7 @@ Feature: Step definition snippets
         given("I visit \\/about \\(beta) \\{draft}", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A snippet's arguments are valid R names, other than those of the step's other arguments
@@ -348,6 +389,7 @@ Feature: Step definition snippets
         given("a meeting on {iso-date} in the {context}", function(iso_date, arg, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: A step that starts with ^ or ends with $ gets a regular expression snippet of its text
@@ -374,6 +416,7 @@ Feature: Step definition snippets
         given("^\\^ is a caret$", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
 
       [failure] Scenario: Price
       No step found for: "I pay 5$"
@@ -381,6 +424,7 @@ Feature: Step definition snippets
         when("^I pay 5\\$$", function(context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """
 
   Scenario: The regular expression snippet matches its step
@@ -436,4 +480,5 @@ Feature: Step definition snippets
         given("a big {colour} ball", function(colour, context) {
           pending()
         })
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       """

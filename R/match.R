@@ -101,7 +101,14 @@ match_single_step <- function(
       glue("No step found for: \"{description}\""),
       c(
         i = "Add a step definition:",
-        set_names(snippet_lines, rep(" ", length(snippet_lines)))
+        set_names(snippet_lines, rep(" ", length(snippet_lines))),
+        # Like testthat, only setup and helper files are run before the tests
+        if (length(steps) == 0) {
+          c(i = paste(
+            "No step definitions are loaded.",
+            "Define them in `setup-*.R` or `helper-*.R` files of the test directory."
+          ))
+        }
       )
     ))
   }

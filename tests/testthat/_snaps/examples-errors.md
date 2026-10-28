@@ -14,6 +14,7 @@
               # given("I have {float}", function(float, context) {
                 pending()
               })
+            i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       
       
       Failures:
@@ -26,6 +27,7 @@
               # given("I have {float}", function(float, context) {
                 pending()
               })
+            i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
       
       --------------------------------------------------------------------------------
       Summary
