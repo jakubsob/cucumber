@@ -623,12 +623,16 @@ NestedTestsReporter <- R6::R6Class(
 #' @keywords internal
 #' @noRd
 local_nested_tests <- function(srcref = NULL, frame = parent.frame()) {
-  the <- utils::getFromNamespace("the", "testthat")
-  if (is.null(the$reporter) || length(the$description) == 0) {
+  testthat_state <- utils::getFromNamespace("the", "testthat")
+  if (is.null(testthat_state$reporter) || length(testthat_state$description) == 0) {
     return(NULL)
   }
-  nested <- NestedTestsReporter$new(the$reporter, paste(the$description, collapse = " / "), srcref)
-  rlang::local_bindings(reporter = nested, .env = the, .frame = frame)
+  nested <- NestedTestsReporter$new(
+    testthat_state$reporter,
+    paste(testthat_state$description, collapse = " / "),
+    srcref
+  )
+  rlang::local_bindings(reporter = nested, .env = testthat_state, .frame = frame)
   nested
 }
 
