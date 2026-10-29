@@ -88,9 +88,11 @@ To get the results of a run, use \code{\link[=test]{test()}}, which returns them
 }
 \section{Specification}{
 
-\subsection{Running scenarios alongside testthat tests}{
-
-\code{run()} in a \verb{tests/testthat/test-*.R} file runs the feature files in \code{tests/testthat}
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Running scenarios alongside testthat tests}{
+\code{run()} in a \code{tests/testthat/test-*.R} file runs the feature files in \code{tests/testthat}
 as part of the package's testthat tests, e.g. with \code{testthat::test_local()} or \code{devtools::test()}.
 It chooses what to run like \code{test()}, with \code{filter}, \code{features}, \code{tags} and \code{name}.
 testthat's reporter reports each scenario as a test of the test file that calls \code{run()}, and a
@@ -102,411 +104,375 @@ Pass a \code{reporter} to \code{run()} to report the run with cucumber's reporte
 \code{run()} can also run feature files outside of a testthat run, like in the console. It then attaches
 testthat for the steps' expectations, runs every scenario and fails if one of them failed.
 Its step definitions and hooks are cleared when it returns.
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"R/calculate.R"</span> with
-<span class="st">    """</span>
-<span class="st">    calculate &lt;- function(x) x + 1</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/calculate.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Calculate</span>
-<span class="st">      Scenario: Adding one</span>
-<span class="st">        Given I calculate</span>
-<span class="st">        Then the result is 2</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
-<span class="st">    """</span>
-<span class="st">    run()</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "R/calculate.R" with
-    """
-    calculate <- function(x) x + 1
-    """
-  And a file named "tests/testthat/calculate.feature" with
-    """
-    Feature: Calculate
-      Scenario: Adding one
-        Given I calculate
-        Then the result is 2
-    """
-  And a file named "tests/testthat/test-acceptance.R" with
-    """
-    run()
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios run with the package's testthat tests
-  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("I calculate", function(context) \{</span>
-<span class="st">      context$result &lt;- calculate(1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
-<span class="st">      expect_equal(context$result, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-calculate.R"</span> with
-<span class="st">    """</span>
-<span class="st">    test_that("calculate adds one", \{</span>
-<span class="st">      expect_equal(calculate(1), 2)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    testthat::test_local()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes
-  <span class="fu">And</span> it ran <span class="st">"Scenario: Adding one"</span>
-  <span class="fu">And</span> it ran <span class="st">"calculate adds one"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios run with the package's testthat tests
-  Given a file named "tests/testthat/setup-steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result <- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, n)
-    \})
-    """
-  And a file named "tests/testthat/test-calculate.R" with
-    """
-    test_that("calculate adds one", \{
-      expect_equal(calculate(1), 2)
-    \})
-    """
-  When I run
-    """
-    testthat::test_local()
-    """
-  Then it passes
-  And it ran "Scenario: Adding one"
-  And it ran "calculate adds one"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> run() chooses what to run like test(), with <span class="va">&lt;argument&gt;</span>
-  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/other.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Other</span>
-<span class="st">      @slow</span>
-<span class="st">      Scenario: Not run</span>
-<span class="st">        Given I calculate</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("I calculate", function(context) \{</span>
-<span class="st">      context$result &lt;- calculate(1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
-<span class="st">      expect_equal(context$result, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
-<span class="st">    """</span>
-<span class="st">    run(&lt;argument&gt; = "&lt;value&gt;")</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    testthat::test_local()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> only these scenarios ran:
-    <span class="op">|</span> scenario   <span class="op">|</span>
-    <span class="op">|</span> Adding one <span class="op">|</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> argument <span class="op">|</span> value             <span class="op">|</span>
-    <span class="op">|</span> filter   <span class="op">|</span> calculate         <span class="op">|</span>
-    <span class="op">|</span> features <span class="op">|</span> calculate.feature <span class="op">|</span>
-    <span class="op">|</span> tags     <span class="op">|</span> not @slow         <span class="op">|</span>
-    <span class="op">|</span> name     <span class="op">|</span> Adding one        <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: run() chooses what to run like test(), with <argument>
-  Given a file named "tests/testthat/other.feature" with
-    """
-    Feature: Other
-      @slow
-      Scenario: Not run
-        Given I calculate
-    """
-  And a file named "tests/testthat/setup-steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result <- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, n)
-    \})
-    """
-  And a file named "tests/testthat/test-acceptance.R" with
-    """
-    run(<argument> = "<value>")
-    """
-  When I run
-    """
-    testthat::test_local()
-    """
-  Then only these scenarios ran:
-    | scenario   |
-    | Adding one |
-
-  Examples:
-    | argument | value             |
-    | filter   | calculate         |
-    | features | calculate.feature |
-    | tags     | not @slow         |
-    | name     | Adding one        |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each scenario is a test of the test file that calls run()
-  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("I calculate", function(context) \{</span>
-<span class="st">      context$result &lt;- calculate(1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
-<span class="st">      expect_equal(context$result, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    testthat::test_local(reporter = "silent")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the results are of these files:
-    <span class="op">|</span> scenario   <span class="op">|</span> file              <span class="op">|</span>
-    <span class="op">|</span> Adding one <span class="op">|</span> test-acceptance.R <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each scenario is a test of the test file that calls run()
-  Given a file named "tests/testthat/setup-steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result <- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, n)
-    \})
-    """
-  When I run
-    """
-    testthat::test_local(reporter = "silent")
-    """
-  Then the results are of these files:
-    | scenario   | file              |
-    | Adding one | test-acceptance.R |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat's reporter shows the line of the feature file where the step failed
-  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("I calculate", function(context) \{</span>
-<span class="st">      context$result &lt;- calculate(1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the result is \{int\}", function(n, context) \{</span>
-<span class="st">      expect_equal(context$result, 3)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    testthat::test_local(reporter = "progress", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios failed at these locations:
-    <span class="op">|</span> scenario   <span class="op">|</span> location            <span class="op">|</span>
-    <span class="op">|</span> Adding one <span class="op">|</span> calculate.feature:4 <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: testthat's reporter shows the line of the feature file where the step failed
-  Given a file named "tests/testthat/setup-steps.R" with
-    """
-    given("I calculate", function(context) \{
-      context$result <- calculate(1)
-    \})
-    then("the result is \{int\}", function(n, context) \{
-      expect_equal(context$result, 3)
-    \})
-    """
-  When I run
-    """
-    testthat::test_local(reporter = "progress", stop_on_failure = FALSE)
-    """
-  Then the scenarios failed at these locations:
-    | scenario   | location            |
-    | Adding one | calculate.feature:4 |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> run() outside of a testthat run runs every scenario, and fails if one failed
-  Steps can use testthat's expectations, as `run()` attaches testthat.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Calculate</span>
-<span class="st">      Scenario: Adding one</span>
-<span class="st">        Then one plus 1 is 2</span>
-<span class="st"></span>
-<span class="st">      Scenario: Adding two</span>
-<span class="st">        Then one plus 2 is 4</span>
-<span class="st"></span>
-<span class="st">      Scenario: Adding three</span>
-<span class="st">        Then one plus 3 is 4</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    then("one plus \{int\} is \{int\}", function(n, sum, context) \{</span>
-<span class="st">      expect_equal(1 + n, sum)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run outside of a testthat run and it fails
-<span class="st">    """</span>
-<span class="st">    source("features/steps.R")</span>
-<span class="st">    run("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! Test failures.</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the scenarios have these results:
-    <span class="op">|</span> scenario     <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Adding one   <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Adding two   <span class="op">|</span> failed <span class="op">|</span>
-    <span class="op">|</span> Adding three <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: run() outside of a testthat run runs every scenario, and fails if one failed
-  Steps can use testthat's expectations, as `run()` attaches testthat.
-
-  Given a file named "features/calculate.feature" with
-    """
-    Feature: Calculate
-      Scenario: Adding one
-        Then one plus 1 is 2
-
-      Scenario: Adding two
-        Then one plus 2 is 4
-
-      Scenario: Adding three
-        Then one plus 3 is 4
-    """
-  And a file named "features/steps.R" with
-    """
-    then("one plus \{int\} is \{int\}", function(n, sum, context) \{
-      expect_equal(1 + n, sum)
-    \})
-    """
-  When I run outside of a testthat run and it fails
-    """
-    source("features/steps.R")
-    run("features")
-    """
-  Then it fails with
-    """
-    Error:
-    ! Test failures.
-    """
-  And the scenarios have these results:
-    | scenario     | status |
-    | Adding one   | passed |
-    | Adding two   | failed |
-    | Adding three | passed |
-%</pre>
-}}
-
-\strong{Rule: Outside of a testthat run, run() reports the run with CucumberProgressReporter}
-
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "R/calculate.R" with
+\preformatted{calculate <- function(x) x + 1}
+\item And a file named "tests/testthat/calculate.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Calculate&#10;  <span class="kw">Scenario:</span> Adding one&#10;    <span class="fu">Given</span> I calculate&#10;    <span class="fu">Then</span> the result is 2</code></pre >}
+\item And a file named "tests/testthat/test-acceptance.R" with
+\preformatted{run()}
+}
+}
+\subsection{Scenario: Scenarios run with the package's testthat tests}{
+\itemize{
+\item Given a file named "tests/testthat/setup-steps.R" with
+\preformatted{given("I calculate", function(context) \{
+  context$result <- calculate(1)
+\})
+then("the result is \{int\}", function(n, context) \{
+  expect_equal(context$result, n)
+\})}
+\item And a file named "tests/testthat/test-calculate.R" with
+\preformatted{test_that("calculate adds one", \{
+  expect_equal(calculate(1), 2)
+\})}
+\item When I run
+\preformatted{testthat::test_local()}
+\item Then it passes
+\item And it ran "Scenario: Adding one"
+\item And it ran "calculate adds one"
+}
+}
+\subsection{Scenario Outline: run() chooses what to run like test(), with <argument>}{
+\itemize{
+\item Given a file named "tests/testthat/other.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Other&#10;  @slow&#10;  <span class="kw">Scenario:</span> Not run&#10;    <span class="fu">Given</span> I calculate</code></pre >}
+\item And a file named "tests/testthat/setup-steps.R" with
+\preformatted{given("I calculate", function(context) \{
+  context$result <- calculate(1)
+\})
+then("the result is \{int\}", function(n, context) \{
+  expect_equal(context$result, n)
+\})}
+\item And a file named "tests/testthat/test-acceptance.R" with
+\preformatted{run(<argument> = "<value>")}
+\item When I run
+\preformatted{testthat::test_local()}
+\item Then only these scenarios ran:
+\tabular{l}{
+scenario \cr
+Adding one
+}
+}
+\subsection{Examples:}{
+\tabular{ll}{
+argument \tab value \cr
+filter \tab calculate \cr
+features \tab calculate.feature \cr
+tags \tab not @slow \cr
+name \tab Adding one
+}
+}
+}
+\subsection{Scenario: Each scenario is a test of the test file that calls run()}{
+\itemize{
+\item Given a file named "tests/testthat/setup-steps.R" with
+\preformatted{given("I calculate", function(context) \{
+  context$result <- calculate(1)
+\})
+then("the result is \{int\}", function(n, context) \{
+  expect_equal(context$result, n)
+\})}
+\item When I run
+\preformatted{testthat::test_local(reporter = "silent")}
+\item Then the results are of these files:
+\tabular{ll}{
+scenario \tab file \cr
+Adding one \tab test-acceptance.R
+}
+}
+}
+\subsection{Scenario: testthat's reporter shows the line of the feature file where the step failed}{
+\itemize{
+\item Given a file named "tests/testthat/setup-steps.R" with
+\preformatted{given("I calculate", function(context) \{
+  context$result <- calculate(1)
+\})
+then("the result is \{int\}", function(n, context) \{
+  expect_equal(context$result, 3)
+\})}
+\item When I run
+\preformatted{testthat::test_local(reporter = "progress", stop_on_failure = FALSE)}
+\item Then the scenarios failed at these locations:
+\tabular{ll}{
+scenario \tab location \cr
+Adding one \tab calculate.feature:4
+}
+}
+}
+\subsection{Scenario: run() outside of a testthat run runs every scenario, and fails if one failed}{
+Steps can use testthat's expectations, as \code{run()} attaches testthat.
+\itemize{
+\item Given a file named "features/calculate.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Calculate&#10;  <span class="kw">Scenario:</span> Adding one&#10;    <span class="fu">Then</span> one plus 1 is 2&#10;&#10;  <span class="kw">Scenario:</span> Adding two&#10;    <span class="fu">Then</span> one plus 2 is 4&#10;&#10;  <span class="kw">Scenario:</span> Adding three&#10;    <span class="fu">Then</span> one plus 3 is 4</code></pre >}
+\item And a file named "features/steps.R" with
+\preformatted{then("one plus \{int\} is \{int\}", function(n, sum, context) \{
+  expect_equal(1 + n, sum)
+\})}
+\item When I run outside of a testthat run and it fails
+\preformatted{source("features/steps.R")
+run("features")}
+\item Then it fails with
+\preformatted{Error:
+! Test failures.}
+\item And the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Adding one \tab passed \cr
+Adding two \tab failed \cr
+Adding three \tab passed
+}
+}
+}
+\subsection{Rule: Outside of a testthat run, run() reports the run with CucumberProgressReporter}{
 As there is no testthat reporter to show it. Pass \code{reporter = NULL} to report nothing.
+\subsection{Scenario: run() outside of a testthat run shows which step failed}{
+\itemize{
+\item Given a file named "features/calculate.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Calculate&#10;  <span class="kw">Scenario:</span> Adding one&#10;    <span class="fu">Then</span> one plus 1 is 3</code></pre >}
+\item And a file named "features/steps.R" with
+\preformatted{then("one plus \{int\} is \{int\}", function(n, sum, context) \{
+  expect_equal(1 + n, sum)
+\})}
+\item When I run outside of a testthat run and it fails
+\preformatted{source("features/steps.R")
+run("features")}
+\item Then the output includes these lines in order:
+\preformatted{Scenario: Adding one
+x Then one plus 1 is 3
+Step "one plus 1 is 3" failed}
+}
+}
+\subsection{Scenario: run() in a parallel testthat run is an error}{
+\itemize{
+\item When I run
+\preformatted{withr::with_envvar(
+  c(TESTTHAT_IS_PARALLEL = "true"),
+  testthat::test_local(reporter = "silent", stop_on_failure = FALSE)
+)}
+\item Then the errors are
+\preformatted{[error]
+Error: `run()` isn't supported in a parallel testthat run.
+i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.}
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Running scenarios alongside testthat tests
+  `run()` in a `tests/testthat/test-*.R` file runs the feature files in `tests/testthat`
+  as part of the package's testthat tests, e.g. with `testthat::test_local()` or `devtools::test()`.
+  It chooses what to run like `test()`, with `filter`, `features`, `tags` and `name`.
+  testthat's reporter reports each scenario as a test of the test file that calls `run()`, and a
+  failed step by its text and a warning, at its line of the feature file.
+  Pass a `reporter` to `run()` to report the run with cucumber's reporter too.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> run() outside of a testthat run shows which step failed
-  <span class="fu">Given</span> a file named <span class="st">"features/calculate.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Calculate</span>
-<span class="st">      Scenario: Adding one</span>
-<span class="st">        Then one plus 1 is 3</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    then("one plus \{int\} is \{int\}", function(n, sum, context) \{</span>
-<span class="st">      expect_equal(1 + n, sum)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run outside of a testthat run and it fails
-<span class="st">    """</span>
-<span class="st">    source("features/steps.R")</span>
-<span class="st">    run("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    Scenario: Adding one</span>
-<span class="st">    x Then one plus 1 is 3</span>
-<span class="st">    Step "one plus 1 is 3" failed</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: run() outside of a testthat run shows which step failed
-  Given a file named "features/calculate.feature" with
-    """
-    Feature: Calculate
-      Scenario: Adding one
-        Then one plus 1 is 3
-    """
-  And a file named "features/steps.R" with
-    """
-    then("one plus \{int\} is \{int\}", function(n, sum, context) \{
-      expect_equal(1 + n, sum)
-    \})
-    """
-  When I run outside of a testthat run and it fails
-    """
-    source("features/steps.R")
-    run("features")
-    """
-  Then the output includes these lines in order:
-    """
-    Scenario: Adding one
-    x Then one plus 1 is 3
-    Step "one plus 1 is 3" failed
-    """
-%</pre>
-}}
+  `run()` isn't supported in a parallel testthat run, with `Config/testthat/parallel: true`: it's an error.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> run() in a parallel testthat run is an error
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    withr::with_envvar(</span>
-<span class="st">      c(TESTTHAT_IS_PARALLEL = "true"),</span>
-<span class="st">      testthat::test_local(reporter = "silent", stop_on_failure = FALSE)</span>
-<span class="st">    )</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [error]</span>
-<span class="st">    Error: `run()` isn't supported in a parallel testthat run.</span>
-<span class="st">    i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: run() in a parallel testthat run is an error
-  When I run
-    """
-    withr::with_envvar(
-      c(TESTTHAT_IS_PARALLEL = "true"),
-      testthat::test_local(reporter = "silent", stop_on_failure = FALSE)
-    )
-    """
-  Then the errors are
-    """
-    [error]
-    Error: `run()` isn't supported in a parallel testthat run.
-    i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.
-    """
+  `run()` can also run feature files outside of a testthat run, like in the console. It then attaches
+  testthat for the steps' expectations, runs every scenario and fails if one of them failed.
+  Its step definitions and hooks are cleared when it returns.
+
+  Background:
+    Given a package
+    And a file named "R/calculate.R" with
+      """
+      calculate <- function(x) x + 1
+      """
+    And a file named "tests/testthat/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one
+          Given I calculate
+          Then the result is 2
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run()
+      """
+
+  Scenario: Scenarios run with the package's testthat tests
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) \{
+        context$result <- calculate(1)
+      \})
+      then("the result is \{int\}", function(n, context) \{
+        expect_equal(context$result, n)
+      \})
+      """
+    And a file named "tests/testthat/test-calculate.R" with
+      """
+      test_that("calculate adds one", \{
+        expect_equal(calculate(1), 2)
+      \})
+      """
+    When I run
+      """
+      testthat::test_local()
+      """
+    Then it passes
+    And it ran "Scenario: Adding one"
+    And it ran "calculate adds one"
+
+  Scenario Outline: run() chooses what to run like test(), with <argument>
+    Given a file named "tests/testthat/other.feature" with
+      """
+      Feature: Other
+        @slow
+        Scenario: Not run
+          Given I calculate
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) \{
+        context$result <- calculate(1)
+      \})
+      then("the result is \{int\}", function(n, context) \{
+        expect_equal(context$result, n)
+      \})
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run(<argument> = "<value>")
+      """
+    When I run
+      """
+      testthat::test_local()
+      """
+    Then only these scenarios ran:
+      | scenario   |
+      | Adding one |
+
+    Examples:
+      | argument | value             |
+      | filter   | calculate         |
+      | features | calculate.feature |
+      | tags     | not @slow         |
+      | name     | Adding one        |
+
+  Scenario: Each scenario is a test of the test file that calls run()
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) \{
+        context$result <- calculate(1)
+      \})
+      then("the result is \{int\}", function(n, context) \{
+        expect_equal(context$result, n)
+      \})
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "silent")
+      """
+    Then the results are of these files:
+      | scenario   | file              |
+      | Adding one | test-acceptance.R |
+
+  Scenario: testthat's reporter shows the line of the feature file where the step failed
+    Given a file named "tests/testthat/setup-steps.R" with
+      """
+      given("I calculate", function(context) \{
+        context$result <- calculate(1)
+      \})
+      then("the result is \{int\}", function(n, context) \{
+        expect_equal(context$result, 3)
+      \})
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "progress", stop_on_failure = FALSE)
+      """
+    Then the scenarios failed at these locations:
+      | scenario   | location            |
+      | Adding one | calculate.feature:4 |
+
+  Scenario: run() outside of a testthat run runs every scenario, and fails if one failed
+    Steps can use testthat's expectations, as `run()` attaches testthat.
+
+    Given a file named "features/calculate.feature" with
+      """
+      Feature: Calculate
+        Scenario: Adding one
+          Then one plus 1 is 2
+
+        Scenario: Adding two
+          Then one plus 2 is 4
+
+        Scenario: Adding three
+          Then one plus 3 is 4
+      """
+    And a file named "features/steps.R" with
+      """
+      then("one plus \{int\} is \{int\}", function(n, sum, context) \{
+        expect_equal(1 + n, sum)
+      \})
+      """
+    When I run outside of a testthat run and it fails
+      """
+      source("features/steps.R")
+      run("features")
+      """
+    Then it fails with
+      """
+      Error:
+      ! Test failures.
+      """
+    And the scenarios have these results:
+      | scenario     | status |
+      | Adding one   | passed |
+      | Adding two   | failed |
+      | Adding three | passed |
+
+  Rule: Outside of a testthat run, run() reports the run with CucumberProgressReporter
+
+    As there is no testthat reporter to show it. Pass `reporter = NULL` to report nothing.
+
+    Scenario: run() outside of a testthat run shows which step failed
+      Given a file named "features/calculate.feature" with
+        """
+        Feature: Calculate
+          Scenario: Adding one
+            Then one plus 1 is 3
+        """
+      And a file named "features/steps.R" with
+        """
+        then("one plus \{int\} is \{int\}", function(n, sum, context) \{
+          expect_equal(1 + n, sum)
+        \})
+        """
+      When I run outside of a testthat run and it fails
+        """
+        source("features/steps.R")
+        run("features")
+        """
+      Then the output includes these lines in order:
+        """
+        Scenario: Adding one
+        x Then one plus 1 is 3
+        Step "one plus 1 is 3" failed
+        """
+
+  Scenario: run() in a parallel testthat run is an error
+    When I run
+      """
+      withr::with_envvar(
+        c(TESTTHAT_IS_PARALLEL = "true"),
+        testthat::test_local(reporter = "silent", stop_on_failure = FALSE)
+      )
+      """
+    Then the errors are
+      """
+      [error]
+      Error: `run()` isn't supported in a parallel testthat run.
+      i Set `Config/testthat/parallel: false` in DESCRIPTION, or run the feature files with `cucumber::test()`.
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-running_alongside_testthat.feature}
-}
 }
 
 \examples{

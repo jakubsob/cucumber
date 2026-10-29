@@ -19,194 +19,164 @@ Summary
 }
 \section{Specification}{
 
-\subsection{Dots reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Dots reporter}{
 \code{CucumberDotsReporter} prints one character for each step and hook as it finishes: \code{.} passed, \code{F} failed, \code{-} skipped, \code{P} pending,
 \code{U} undefined and \code{A} ambiguous. At the end it prints the summary of the run with the
 scenarios that didn't pass.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 1 item&#10;    <span class="fu">Then</span> the basket has 1 item&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I remove 1 item&#10;    <span class="fu">Then</span> the basket has 0 items</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) context$items <- 0)
+when("I add \{int\} item", function(n, context) context$items <- context$items + n)
+when("I remove \{int\} item", function(n, context) \{
+  if (context$items < n) stop("The basket is empty")
+  context$items <- context$items - n
+\})
+then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))}
+}
+}
+\subsection{Scenario: Each step is printed as a character}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{....F-}
+\item And the output includes
+\preformatted{2 scenarios (1 failed, 1 passed)
+6 steps (1 failed, 1 skipped, 4 passed)}
+}
+}
+\subsection{Scenario: The scenarios that didn't pass are printed at the end}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{Failures:
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 1 item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I remove 1 item</span>
-<span class="st">        Then the basket has 0 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) context$items &lt;- 0)</span>
-<span class="st">    when("I add \{int\} item", function(n, context) context$items &lt;- context$items + n)</span>
-<span class="st">    when("I remove \{int\} item", function(n, context) \{</span>
-<span class="st">      if (context$items &lt; n) stop("The basket is empty")</span>
-<span class="st">      context$items &lt;- context$items - n</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add 1 item
-        Then the basket has 1 item
+1) Scenario: Remove an item # basket.feature:7
+v Given an empty basket
+x When I remove 1 item}
+\item And the output includes "The basket is empty"
+\item And the output doesn't include "Scenario: Add an item"
+}
+}
+\subsection{Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Statuses&#10;  <span class="kw">Scenario:</span> Pending&#10;    <span class="fu">Given</span> a pending step&#10;&#10;  <span class="kw">Scenario:</span> Undefined&#10;    <span class="fu">Given</span> an undefined step&#10;&#10;  <span class="kw">Scenario:</span> Ambiguous&#10;    <span class="fu">Given</span> the ambiguous step</code></pre >}
+\item And a file named "features/setup-statuses.R" with
+\preformatted{before(function(context, scenario) \{\})
+given("a pending step", function(context) pending())
+given("the ambiguous step", function(context) \{\})
+given("the \{word\} step", function(word, context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{.P.U.A}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Dots reporter
+  `CucumberDotsReporter` prints one character for each step and hook as it finishes: `.` passed, `F` failed, `-` skipped, `P` pending,
+  `U` undefined and `A` ambiguous. At the end it prints the summary of the run with the
+  scenarios that didn't pass.
 
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove 1 item
-        Then the basket has 0 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$items <- 0)
-    when("I add \{int\} item", function(n, context) context$items <- context$items + n)
-    when("I remove \{int\} item", function(n, context) \{
-      if (context$items < n) stop("The basket is empty")
-      context$items <- context$items - n
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
-    """
-%</pre>
-}}
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add 1 item
+          Then the basket has 1 item
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step is printed as a character
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    ....F-</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    2 scenarios (1 failed, 1 passed)</span>
-<span class="st">    6 steps (1 failed, 1 skipped, 4 passed)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each step is printed as a character
-  When I run
-    """
-    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    ....F-
-    """
-  And the output includes
-    """
-    2 scenarios (1 failed, 1 passed)
-    6 steps (1 failed, 1 skipped, 4 passed)
-    """
-%</pre>
-}}
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove 1 item
+          Then the basket has 0 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$items <- 0)
+      when("I add \{int\} item", function(n, context) context$items <- context$items + n)
+      when("I remove \{int\} item", function(n, context) \{
+        if (context$items < n) stop("The basket is empty")
+        context$items <- context$items - n
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios that didn't pass are printed at the end
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Failures:</span>
-<span class="st"></span>
-<span class="st">    1) Scenario: Remove an item # basket.feature:7</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes <span class="st">"The basket is empty"</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"Scenario: Add an item"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The scenarios that didn't pass are printed at the end
-  When I run
-    """
-    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Failures:
+  Scenario: Each step is printed as a character
+    When I run
+      """
+      test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      ....F-
+      """
+    And the output includes
+      """
+      2 scenarios (1 failed, 1 passed)
+      6 steps (1 failed, 1 skipped, 4 passed)
+      """
 
-    1) Scenario: Remove an item # basket.feature:7
-    v Given an empty basket
-    x When I remove 1 item
-    """
-  And the output includes "The basket is empty"
-  And the output doesn't include "Scenario: Add an item"
-%</pre>
-}}
+  Scenario: The scenarios that didn't pass are printed at the end
+    When I run
+      """
+      test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      Failures:
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Pending, undefined and ambiguous steps and hooks are printed as characters too
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Statuses</span>
-<span class="st">      Scenario: Pending</span>
-<span class="st">        Given a pending step</span>
-<span class="st"></span>
-<span class="st">      Scenario: Undefined</span>
-<span class="st">        Given an undefined step</span>
-<span class="st"></span>
-<span class="st">      Scenario: Ambiguous</span>
-<span class="st">        Given the ambiguous step</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-statuses.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) \{\})</span>
-<span class="st">    given("a pending step", function(context) pending())</span>
-<span class="st">    given("the ambiguous step", function(context) \{\})</span>
-<span class="st">    given("the \{word\} step", function(word, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    .P.U.A</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Statuses
-      Scenario: Pending
-        Given a pending step
+      1) Scenario: Remove an item # basket.feature:7
+      v Given an empty basket
+      x When I remove 1 item
+      """
+    And the output includes "The basket is empty"
+    And the output doesn't include "Scenario: Add an item"
 
-      Scenario: Undefined
-        Given an undefined step
+  Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Statuses
+        Scenario: Pending
+          Given a pending step
 
-      Scenario: Ambiguous
-        Given the ambiguous step
-    """
-  And a file named "features/setup-statuses.R" with
-    """
-    before(function(context, scenario) \{\})
-    given("a pending step", function(context) pending())
-    given("the ambiguous step", function(context) \{\})
-    given("the \{word\} step", function(word, context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    .P.U.A
-    """
+        Scenario: Undefined
+          Given an undefined step
+
+        Scenario: Ambiguous
+          Given the ambiguous step
+      """
+    And a file named "features/setup-statuses.R" with
+      """
+      before(function(context, scenario) \{\})
+      given("a pending step", function(context) pending())
+      given("the ambiguous step", function(context) \{\})
+      given("the \{word\} step", function(word, context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberDotsReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      .P.U.A
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-dots_reporter.feature}
-}
 }
 
 \examples{

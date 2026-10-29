@@ -15,15 +15,17 @@ feature files, like \code{snapshot_accept("checkout-basket.feature", "tests/acce
 }
 \section{Specification}{
 
-\subsection{Snapshots}{
-
-\code{expect_snapshot()} in a step definition saves its snapshot next to the feature files, in \verb{_snaps}.
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Snapshots}{
+\code{expect_snapshot()} in a step definition saves its snapshot next to the feature files, in \code{_snaps}.
 Each feature file has a snapshot file of its own, named after its path with its directories joined by \code{-},
-as testthat's \verb{_snaps} has a file for each test file and a directory for each variant: the snapshots of
-\code{checkout/basket.feature} are in \verb{_snaps/checkout-basket.feature.md}, and the snapshots of \code{basket.feature.md},
-a feature file in Markdown, are in \verb{_snaps/basket.feature.md}.
+as testthat's \code{_snaps} has a file for each test file and a directory for each variant: the snapshots of
+\code{checkout/basket.feature} are in \code{_snaps/checkout-basket.feature.md}, and the snapshots of \code{basket.feature.md},
+a feature file in Markdown, are in \code{_snaps/basket.feature.md}.
 A snapshot is named after its scenario. Scenarios of the same name in a feature file are numbered,
-like the rows of an outline without placeholders in its name: \verb{Showing the basket (1)} and \verb{Showing the basket (2)}.
+like the rows of an outline without placeholders in its name: \code{Showing the basket (1)} and \code{Showing the basket (2)}.
 A scenario of the same name added above them renumbers them, so scenarios that take snapshots need names of their own.
 
 The snapshots are the same whether the feature files are run by \code{test()} or by \code{run()} in a testthat file,
@@ -38,503 +40,544 @@ a \code{/}, like \code{snapshot_accept("checkout-basket.feature/", "tests/accept
 test, with \code{error}, \code{transform} and \code{expect_snapshot_value()}. To skip the scenarios that take snapshots, skip them in a
 \code{before_all()} or \code{before()} hook, not with \code{skip()} before \code{run()} in its test file: testthat deletes the snapshot files of
 feature files that a run of every test file didn't run.
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package that uses the 3rd edition of testthat</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package that uses the 3rd edition of testthat
-%</pre>
-}}
-
-\strong{Rule: A changed snapshot is accepted with testthat}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A changed snapshot of <span class="va">&lt;feature&gt;</span> is accepted with snapshot_accept(<span class="st">"<span class="va">&lt;accepted&gt;</span>"</span>), with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> a feature file <span class="st">"<span class="va">&lt;feature&gt;</span>"</span> with a scenario <span class="st">"Showing the basket"</span> that snapshots <span class="st">"1 apple"</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">And</span> the scenario <span class="st">"Showing the basket"</span> of <span class="st">"<span class="va">&lt;feature&gt;</span>"</span> snapshots <span class="st">"2 apples"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">Then</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [failure] Scenario: Showing the basket</span>
-<span class="st">    Step "the snapshot of "2 apples" matches" failed</span>
-<span class="st">    i Feature: &lt;feature&gt;:3</span>
-<span class="st">    i Scenario: Showing the basket</span>
-<span class="st">    i Step defined at: setup-snapshot-steps.R:9</span>
-<span class="st">    Snapshot of code has changed:</span>
-<span class="st">        old             | new</span>
-<span class="st">    [1] Code            | Code             [1]</span>
-<span class="st">    [2]   value         |   value          [2]</span>
-<span class="st">    [3] Output          | Output           [3]</span>
-<span class="st">    [4]   [1] "1 apple" -   [1] "2 apples" [4]</span>
-<span class="st">    * Run `testthat::snapshot_accept("&lt;accepted&gt;")` to accept the change.</span>
-<span class="st">    * Run `testthat::snapshot_review("&lt;accepted&gt;")` to review the change.</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    testthat::snapshot_accept("&lt;accepted&gt;", "tests/testthat")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the snapshot file <span class="st">"&lt;snapshot file&gt;.md"</span> has <span class="st">"2 apples"</span> for <span class="st">"Showing the basket"</span>
-  <span class="fu">And</span> there is no snapshot file <span class="st">"&lt;snapshot file&gt;.new.md"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> feature                 <span class="op">|</span> accepted                <span class="op">|</span> snapshot file                  <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> basket.feature          <span class="op">|</span> basket.feature          <span class="op">|</span> _snaps/basket.feature          <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> basket.feature          <span class="op">|</span> basket.feature          <span class="op">|</span> _snaps/basket.feature          <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> checkout/basket.feature <span class="op">|</span> checkout-basket.feature <span class="op">|</span> _snaps/checkout-basket.feature <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> checkout/basket.feature <span class="op">|</span> checkout-basket.feature <span class="op">|</span> _snaps/checkout-basket.feature <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A changed snapshot of <feature> is accepted with snapshot_accept("<accepted>"), with <runner>
-  Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
-  And I run the feature files with "<runner>"
-  And the scenario "Showing the basket" of "<feature>" snapshots "2 apples"
-  When I run the feature files with "<runner>"
-  Then the errors are
-    """
-    [failure] Scenario: Showing the basket
-    Step "the snapshot of "2 apples" matches" failed
-    i Feature: <feature>:3
-    i Scenario: Showing the basket
-    i Step defined at: setup-snapshot-steps.R:9
-    Snapshot of code has changed:
-        old             | new
-    [1] Code            | Code             [1]
-    [2]   value         |   value          [2]
-    [3] Output          | Output           [3]
-    [4]   [1] "1 apple" -   [1] "2 apples" [4]
-    * Run `testthat::snapshot_accept("<accepted>")` to accept the change.
-    * Run `testthat::snapshot_review("<accepted>")` to review the change.
-    """
-  When I run
-    """
-    testthat::snapshot_accept("<accepted>", "tests/testthat")
-    """
-  Then the snapshot file "<snapshot file>.md" has "2 apples" for "Showing the basket"
-  And there is no snapshot file "<snapshot file>.new.md"
-
-  Examples:
-    | feature                 | accepted                | snapshot file                  | runner |
-    | basket.feature          | basket.feature          | _snaps/basket.feature          | test() |
-    | basket.feature          | basket.feature          | _snaps/basket.feature          | run()  |
-    | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | test() |
-    | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | run()  |
-%</pre>
-}}
-
-\strong{Rule: Each feature file has a snapshot file of its own}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> The snapshot of <span class="va">&lt;feature&gt;</span> is saved in &lt;snapshot file&gt; by <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> a feature file <span class="st">"<span class="va">&lt;feature&gt;</span>"</span> with a scenario <span class="st">"Showing the basket"</span> that snapshots <span class="st">"1 apple"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">Then</span> the snapshot file <span class="st">"&lt;snapshot file&gt;"</span> has <span class="st">"1 apple"</span> for <span class="st">"Showing the basket"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> feature                    <span class="op">|</span> snapshot file                        <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> basket.feature             <span class="op">|</span> _snaps/basket.feature.md             <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> basket.feature             <span class="op">|</span> _snaps/basket.feature.md             <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> checkout/basket.feature    <span class="op">|</span> _snaps/checkout-basket.feature.md    <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> checkout/basket.feature    <span class="op">|</span> _snaps/checkout-basket.feature.md    <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> shop/checkout/cart.feature <span class="op">|</span> _snaps/shop-checkout-cart.feature.md <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> shop/checkout/cart.feature <span class="op">|</span> _snaps/shop-checkout-cart.feature.md <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> basket.feature.md          <span class="op">|</span> _snaps/basket.feature.md             <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> basket.feature.md          <span class="op">|</span> _snaps/basket.feature.md             <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: The snapshot of <feature> is saved in <snapshot file> by <runner>
-  Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
-  When I run the feature files with "<runner>"
-  Then the snapshot file "<snapshot file>" has "1 apple" for "Showing the basket"
-
-  Examples:
-    | feature                    | snapshot file                        | runner |
-    | basket.feature             | _snaps/basket.feature.md             | test() |
-    | basket.feature             | _snaps/basket.feature.md             | run()  |
-    | checkout/basket.feature    | _snaps/checkout-basket.feature.md    | test() |
-    | checkout/basket.feature    | _snaps/checkout-basket.feature.md    | run()  |
-    | shop/checkout/cart.feature | _snaps/shop-checkout-cart.feature.md | test() |
-    | shop/checkout/cart.feature | _snaps/shop-checkout-cart.feature.md | run()  |
-    | basket.feature.md          | _snaps/basket.feature.md             | test() |
-    | basket.feature.md          | _snaps/basket.feature.md             | run()  |
-%</pre>
-}}
-
-\strong{Rule: A snapshot is of a scenario}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A snapshot in a <span class="va">&lt;hook&gt;</span> hook is of its scenario, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> a feature file <span class="st">"basket.feature"</span> with a scenario <span class="st">"Showing the basket"</span> that snapshots <span class="st">"1 apple"</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/setup-hooks.R"</span> with
-<span class="st">    """</span>
-<span class="st">    &lt;hook&gt;(function(context, scenario) expect_snapshot(cat("&lt;hook&gt; hook of", scenario$name)))</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario           <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Showing the basket <span class="op">|</span> passed <span class="op">|</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> for <span class="st">"Showing the basket"</span> has these lines:
-<span class="st">    """</span>
-<span class="st">    &lt;hook&gt; hook of Showing the basket</span>
-<span class="st">    """</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> hook   <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> before <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> before <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> after  <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> after  <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>
-  Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
-  And a file named "tests/testthat/setup-hooks.R" with
-    """
-    <hook>(function(context, scenario) expect_snapshot(cat("<hook> hook of", scenario$name)))
-    """
-  And I run the feature files with "<runner>"
-  When I run the feature files with "<runner>"
-  Then the scenarios have these results:
-    | scenario           | status |
-    | Showing the basket | passed |
-  And the snapshot file "_snaps/basket.feature.md" for "Showing the basket" has these lines:
-    """
-    <hook> hook of Showing the basket
-    """
-
-  Examples:
-    | hook   | runner |
-    | before | test() |
-    | before | run()  |
-    | after  | test() |
-    | after  | run()  |
-%</pre>
-}}
-
-\strong{Rule: A snapshot is checked by the runs after the one that saved it}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A snapshot saved by <span class="va">&lt;first&gt;</span> is checked by <span class="va">&lt;second&gt;</span>
-  <span class="fu">Given</span> a feature file <span class="st">"basket.feature"</span> with a scenario <span class="st">"Showing the basket"</span> that snapshots <span class="st">"1 apple"</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;first&gt;</span>"</span>
-  <span class="fu">And</span> the scenario <span class="st">"Showing the basket"</span> of <span class="st">"basket.feature"</span> snapshots <span class="st">"2 apples"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;second&gt;</span>"</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario           <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Showing the basket <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> has <span class="st">"1 apple"</span> for <span class="st">"Showing the basket"</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.new.md"</span> has <span class="st">"2 apples"</span> for <span class="st">"Showing the basket"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> first  <span class="op">|</span> second <span class="op">|</span>
-    <span class="op">|</span> test() <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> run()  <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> test() <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> run()  <span class="op">|</span> test() <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A snapshot saved by <first> is checked by <second>
-  Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
-  And I run the feature files with "<first>"
-  And the scenario "Showing the basket" of "basket.feature" snapshots "2 apples"
-  When I run the feature files with "<second>"
-  Then the scenarios have these results:
-    | scenario           | status |
-    | Showing the basket | failed |
-  And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
-  And the snapshot file "_snaps/basket.feature.new.md" has "2 apples" for "Showing the basket"
-
-  Examples:
-    | first  | second |
-    | test() | test() |
-    | run()  | run()  |
-    | test() | run()  |
-    | run()  | test() |
-%</pre>
-}}
-
-\strong{Rule: A snapshot that isn't checked is kept}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A scenario that stops before its snapshot keeps it, when <span class="st">"<span class="va">&lt;step&gt;</span>"</span>, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> a feature file <span class="st">"basket.feature"</span> with a scenario <span class="st">"Showing the basket"</span> that snapshots <span class="st">"1 apple"</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">And</span> the scenario <span class="st">"Showing the basket"</span> of <span class="st">"basket.feature"</span> starts with <span class="st">"<span class="va">&lt;step&gt;</span>"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario           <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Showing the basket <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> has <span class="st">"1 apple"</span> for <span class="st">"Showing the basket"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> step                           <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> it fails                       <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> it fails                       <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> it doesn't meet an expectation <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> it doesn't meet an expectation <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A scenario that stops before its snapshot keeps it, when "<step>", with <runner>
-  Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
-  And I run the feature files with "<runner>"
-  And the scenario "Showing the basket" of "basket.feature" starts with "<step>"
-  When I run the feature files with "<runner>"
-  Then the scenarios have these results:
-    | scenario           | status |
-    | Showing the basket | failed |
-  And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
-
-  Examples:
-    | step                           | runner |
-    | it fails                       | test() |
-    | it fails                       | run()  |
-    | it doesn't meet an expectation | test() |
-    | it doesn't meet an expectation | run()  |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> Snapshots of scenarios that didn't run are kept, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> the steps that take snapshots
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Showing the basket</span>
-<span class="st">        Then the snapshot of "1 apple" matches</span>
-<span class="st"></span>
-<span class="st">      Scenario: Showing an empty basket</span>
-<span class="st">        Then the snapshot of "nothing" matches</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span> and the name <span class="st">"^Showing the basket$"</span>
-  <span class="fu">Then</span> only these scenarios ran:
-    <span class="op">|</span> scenario           <span class="op">|</span>
-    <span class="op">|</span> Showing the basket <span class="op">|</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> has <span class="st">"nothing"</span> for <span class="st">"Showing an empty basket"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: Snapshots of scenarios that didn't run are kept, with <runner>
-  Given the steps that take snapshots
-  And a file named "tests/testthat/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Showing the basket
-        Then the snapshot of "1 apple" matches
-
-      Scenario: Showing an empty basket
-        Then the snapshot of "nothing" matches
-    """
-  And I run the feature files with "<runner>"
-  When I run the feature files with "<runner>" and the name "^Showing the basket$"
-  Then only these scenarios ran:
-    | scenario           |
-    | Showing the basket |
-  And the snapshot file "_snaps/basket.feature.md" has "nothing" for "Showing an empty basket"
-
-  Examples:
-    | runner |
-    | test() |
-    | run()  |
-%</pre>
-}}
-
-\strong{Rule: Snapshots of scenarios that aren't in the feature file anymore are deleted}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> The snapshot of a renamed scenario is deleted, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> a feature file <span class="st">"basket.feature"</span> with a scenario <span class="st">"Showing the basket"</span> that snapshots <span class="st">"1 apple"</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">And</span> the scenario <span class="st">"Showing the basket"</span> of <span class="st">"basket.feature"</span> is renamed <span class="st">"Showing the full basket"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">Then</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> has <span class="st">"1 apple"</span> for <span class="st">"Showing the full basket"</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> has no snapshot for <span class="st">"Showing the basket"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: The snapshot of a renamed scenario is deleted, with <runner>
-  Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
-  And I run the feature files with "<runner>"
-  And the scenario "Showing the basket" of "basket.feature" is renamed "Showing the full basket"
-  When I run the feature files with "<runner>"
-  Then the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the full basket"
-  And the snapshot file "_snaps/basket.feature.md" has no snapshot for "Showing the basket"
-
-  Examples:
-    | runner |
-    | test() |
-    | run()  |
-%</pre>
-}}
-
-\strong{Rule: Snapshots are kept however the scenarios run}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A retried scenario's snapshots are of its last attempt, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> the steps that take snapshots
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Showing the basket</span>
-<span class="st">        Then the snapshot of "1 apple" matches</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Showing the basket</span>
-<span class="st">        Then the snapshot of "1 apple" matches</span>
-<span class="st">        And it fails the first time</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span> and retry = 1
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario           <span class="op">|</span> status <span class="op">|</span> attempts <span class="op">|</span>
-    <span class="op">|</span> Showing the basket <span class="op">|</span> passed <span class="op">|</span> 2        <span class="op">|</span>
-  <span class="fu">And</span> the snapshot file <span class="st">"_snaps/basket.feature.md"</span> has 1 snapshot for <span class="st">"Showing the basket"</span>
-  <span class="fu">And</span> there is no snapshot file <span class="st">"_snaps/basket.feature.new.md"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A retried scenario's snapshots are of its last attempt, with <runner>
-  Given the steps that take snapshots
-  And a file named "tests/testthat/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Showing the basket
-        Then the snapshot of "1 apple" matches
-    """
-  And I run the feature files with "<runner>"
-  And a file named "tests/testthat/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Showing the basket
-        Then the snapshot of "1 apple" matches
-        And it fails the first time
-    """
-  When I run the feature files with "<runner>" and retry = 1
-  Then the scenarios have these results:
-    | scenario           | status | attempts |
-    | Showing the basket | passed | 2        |
-  And the snapshot file "_snaps/basket.feature.md" has 1 snapshot for "Showing the basket"
-  And there is no snapshot file "_snaps/basket.feature.new.md"
-
-  Examples:
-    | runner |
-    | test() |
-    | run()  |
-%</pre>
-}}
-
-\strong{Rule: Snapshot files that aren't used are deleted, like in testthat}
-
+\subsection{Background:}{
+\itemize{
+\item Given a package that uses the 3rd edition of testthat
+}
+}
+\subsection{Rule: A changed snapshot is accepted with testthat}{
+\subsection{Scenario Outline: A changed snapshot of <feature> is accepted with snapshot_accept("<accepted>"), with <runner>}{
+\itemize{
+\item Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
+\item And I run the feature files with "<runner>"
+\item And the scenario "Showing the basket" of "<feature>" snapshots "2 apples"
+\item When I run the feature files with "<runner>"
+\item Then the errors are
+\preformatted{[failure] Scenario: Showing the basket
+Step "the snapshot of "2 apples" matches" failed
+i Feature: <feature>:3
+i Scenario: Showing the basket
+i Step defined at: setup-snapshot-steps.R:9
+Snapshot of code has changed:
+    old             | new
+[1] Code            | Code             [1]
+[2]   value         |   value          [2]
+[3] Output          | Output           [3]
+[4]   [1] "1 apple" -   [1] "2 apples" [4]
+* Run `testthat::snapshot_accept("<accepted>")` to accept the change.
+* Run `testthat::snapshot_review("<accepted>")` to review the change.}
+\item When I run
+\preformatted{testthat::snapshot_accept("<accepted>", "tests/testthat")}
+\item Then the snapshot file "<snapshot file>.md" has "2 apples" for "Showing the basket"
+\item And there is no snapshot file "<snapshot file>.new.md"
+}
+\subsection{Examples:}{
+\tabular{llll}{
+feature \tab accepted \tab snapshot file \tab runner \cr
+basket.feature \tab basket.feature \tab _snaps/basket.feature \tab test() \cr
+basket.feature \tab basket.feature \tab _snaps/basket.feature \tab run() \cr
+checkout/basket.feature \tab checkout-basket.feature \tab _snaps/checkout-basket.feature \tab test() \cr
+checkout/basket.feature \tab checkout-basket.feature \tab _snaps/checkout-basket.feature \tab run()
+}
+}
+}
+}
+\subsection{Rule: Each feature file has a snapshot file of its own}{
+\subsection{Scenario Outline: The snapshot of <feature> is saved in <snapshot file> by <runner>}{
+\itemize{
+\item Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
+\item When I run the feature files with "<runner>"
+\item Then the snapshot file "<snapshot file>" has "1 apple" for "Showing the basket"
+}
+\subsection{Examples:}{
+\tabular{lll}{
+feature \tab snapshot file \tab runner \cr
+basket.feature \tab _snaps/basket.feature.md \tab test() \cr
+basket.feature \tab _snaps/basket.feature.md \tab run() \cr
+checkout/basket.feature \tab _snaps/checkout-basket.feature.md \tab test() \cr
+checkout/basket.feature \tab _snaps/checkout-basket.feature.md \tab run() \cr
+shop/checkout/cart.feature \tab _snaps/shop-checkout-cart.feature.md \tab test() \cr
+shop/checkout/cart.feature \tab _snaps/shop-checkout-cart.feature.md \tab run() \cr
+basket.feature.md \tab _snaps/basket.feature.md \tab test() \cr
+basket.feature.md \tab _snaps/basket.feature.md \tab run()
+}
+}
+}
+}
+\subsection{Rule: A snapshot is of a scenario}{
+\subsection{Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>}{
+\itemize{
+\item Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+\item And a file named "tests/testthat/setup-hooks.R" with
+\preformatted{<hook>(function(context, scenario) expect_snapshot(cat("<hook> hook of", scenario$name)))}
+\item And I run the feature files with "<runner>"
+\item When I run the feature files with "<runner>"
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Showing the basket \tab passed
+}
+\item And the snapshot file "_snaps/basket.feature.md" for "Showing the basket" has these lines:
+\preformatted{<hook> hook of Showing the basket}
+}
+\subsection{Examples:}{
+\tabular{ll}{
+hook \tab runner \cr
+before \tab test() \cr
+before \tab run() \cr
+after \tab test() \cr
+after \tab run()
+}
+}
+}
+}
+\subsection{Rule: A snapshot is checked by the runs after the one that saved it}{
+\subsection{Scenario Outline: A snapshot saved by <first> is checked by <second>}{
+\itemize{
+\item Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+\item And I run the feature files with "<first>"
+\item And the scenario "Showing the basket" of "basket.feature" snapshots "2 apples"
+\item When I run the feature files with "<second>"
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Showing the basket \tab failed
+}
+\item And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+\item And the snapshot file "_snaps/basket.feature.new.md" has "2 apples" for "Showing the basket"
+}
+\subsection{Examples:}{
+\tabular{ll}{
+first \tab second \cr
+test() \tab test() \cr
+run() \tab run() \cr
+test() \tab run() \cr
+run() \tab test()
+}
+}
+}
+}
+\subsection{Rule: A snapshot that isn't checked is kept}{
+\subsection{Scenario Outline: A scenario that stops before its snapshot keeps it, when "<step>", with <runner>}{
+\itemize{
+\item Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+\item And I run the feature files with "<runner>"
+\item And the scenario "Showing the basket" of "basket.feature" starts with "<step>"
+\item When I run the feature files with "<runner>"
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Showing the basket \tab failed
+}
+\item And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+}
+\subsection{Examples:}{
+\tabular{ll}{
+step \tab runner \cr
+it fails \tab test() \cr
+it fails \tab run() \cr
+it doesn't meet an expectation \tab test() \cr
+it doesn't meet an expectation \tab run()
+}
+}
+}
+\subsection{Scenario Outline: Snapshots of scenarios that didn't run are kept, with <runner>}{
+\itemize{
+\item Given the steps that take snapshots
+\item And a file named "tests/testthat/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Showing the basket&#10;    <span class="fu">Then</span> the snapshot of <span class="st">"1 apple"</span> matches&#10;&#10;  <span class="kw">Scenario:</span> Showing an empty basket&#10;    <span class="fu">Then</span> the snapshot of <span class="st">"nothing"</span> matches</code></pre >}
+\item And I run the feature files with "<runner>"
+\item When I run the feature files with "<runner>" and the name "^Showing the basket$"
+\item Then only these scenarios ran:
+\tabular{l}{
+scenario \cr
+Showing the basket
+}
+\item And the snapshot file "_snaps/basket.feature.md" has "nothing" for "Showing an empty basket"
+}
+\subsection{Examples:}{
+\tabular{l}{
+runner \cr
+test() \cr
+run()
+}
+}
+}
+}
+\subsection{Rule: Snapshots of scenarios that aren't in the feature file anymore are deleted}{
+\subsection{Scenario Outline: The snapshot of a renamed scenario is deleted, with <runner>}{
+\itemize{
+\item Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+\item And I run the feature files with "<runner>"
+\item And the scenario "Showing the basket" of "basket.feature" is renamed "Showing the full basket"
+\item When I run the feature files with "<runner>"
+\item Then the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the full basket"
+\item And the snapshot file "_snaps/basket.feature.md" has no snapshot for "Showing the basket"
+}
+\subsection{Examples:}{
+\tabular{l}{
+runner \cr
+test() \cr
+run()
+}
+}
+}
+}
+\subsection{Rule: Snapshots are kept however the scenarios run}{
+\subsection{Scenario Outline: A retried scenario's snapshots are of its last attempt, with <runner>}{
+\itemize{
+\item Given the steps that take snapshots
+\item And a file named "tests/testthat/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Showing the basket&#10;    <span class="fu">Then</span> the snapshot of <span class="st">"1 apple"</span> matches</code></pre >}
+\item And I run the feature files with "<runner>"
+\item And a file named "tests/testthat/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Showing the basket&#10;    <span class="fu">Then</span> the snapshot of <span class="st">"1 apple"</span> matches&#10;    <span class="fu">And</span> it fails the first time</code></pre >}
+\item When I run the feature files with "<runner>" and retry = 1
+\item Then the scenarios have these results:
+\tabular{lll}{
+scenario \tab status \tab attempts \cr
+Showing the basket \tab passed \tab 2
+}
+\item And the snapshot file "_snaps/basket.feature.md" has 1 snapshot for "Showing the basket"
+\item And there is no snapshot file "_snaps/basket.feature.new.md"
+}
+\subsection{Examples:}{
+\tabular{l}{
+runner \cr
+test() \cr
+run()
+}
+}
+}
+}
+\subsection{Rule: Snapshot files that aren't used are deleted, like in testthat}{
 After a run of every scenario, the \code{expect_snapshot_file()} files that weren't taken, like those of a
 scenario that failed before taking it, the snapshot files of feature files that don't exist anymore, and
-\verb{_snaps/__cucumber__.md}, where cucumber 2 saved the snapshots of \code{test()}, are deleted. \code{testthat::announce_snapshot_file()} keeps a file that isn't taken. A run of some of the
+\code{_snaps/__cucumber__.md}, where cucumber 2 saved the snapshots of \code{test()}, are deleted. \code{testthat::announce_snapshot_file()} keeps a file that isn't taken. A run of some of the
 scenarios, like with \code{filter}, \code{name}, \code{tags}, \code{features} or \code{dry_run}, or with \code{fail_fast} after a
 failed scenario, and a run on CI delete nothing.
+\subsection{Background:}{
+\itemize{
+\item Given the steps that take snapshots
+\item And a file named "tests/testthat/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Showing the basket&#10;    <span class="fu">Then</span> the file snapshot <span class="st">"basket.txt"</span> of <span class="st">"1 apple"</span> matches</code></pre >}
+\item And a file named "tests/testthat/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  <span class="kw">Scenario:</span> Paying&#10;    <span class="fu">Then</span> the file snapshot <span class="st">"receipt.txt"</span> of <span class="st">"1 euro"</span> matches</code></pre >}
+}
+}
+\subsection{Scenario Outline: The snapshots of a deleted feature file are deleted, with <runner>}{
+\itemize{
+\item Given I run the feature files with "<runner>"
+\item And the file "tests/testthat/checkout.feature" is deleted
+\item When I run the feature files with "<runner>"
+\item Then there is no file "tests/testthat/_snaps/checkout.feature/receipt.txt"
+\item And there is no snapshot file "_snaps/checkout.feature.md"
+}
+\subsection{Examples:}{
+\tabular{l}{
+runner \cr
+test() \cr
+run()
+}
+}
+}
+\subsection{Scenario Outline: Snapshot files are kept by a run with <selection>, with <runner>}{
+\itemize{
+\item Given I run the feature files with "<runner>"
+\item When I run the feature files with "<runner>" and <selection>
+\item Then the file "tests/testthat/_snaps/checkout.feature/receipt.txt" has these lines:
+\preformatted{1 euro}
+}
+\subsection{Examples:}{
+\tabular{ll}{
+selection \tab runner \cr
+the filter "basket" \tab test() \cr
+the filter "basket" \tab run() \cr
+the name "Showing" \tab test() \cr
+the name "Showing" \tab run() \cr
+the tags "@basket" \tab test() \cr
+the tags "@basket" \tab run() \cr
+the features "basket.feature" \tab test() \cr
+the features "basket.feature" \tab run() \cr
+dry_run = TRUE \tab test() \cr
+dry_run = TRUE \tab run()
+}
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Snapshots
+  `expect_snapshot()` in a step definition saves its snapshot next to the feature files, in `_snaps`.
+  Each feature file has a snapshot file of its own, named after its path with its directories joined by `-`,
+  as testthat's `_snaps` has a file for each test file and a directory for each variant: the snapshots of
+  `checkout/basket.feature` are in `_snaps/checkout-basket.feature.md`, and the snapshots of `basket.feature.md`,
+  a feature file in Markdown, are in `_snaps/basket.feature.md`.
+  A snapshot is named after its scenario. Scenarios of the same name in a feature file are numbered,
+  like the rows of an outline without placeholders in its name: `Showing the basket (1)` and `Showing the basket (2)`.
+  A scenario of the same name added above them renumbers them, so scenarios that take snapshots need names of their own.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> the steps that take snapshots
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Showing the basket</span>
-<span class="st">        Then the file snapshot "basket.txt" of "1 apple" matches</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      Scenario: Paying</span>
-<span class="st">        Then the file snapshot "receipt.txt" of "1 euro" matches</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given the steps that take snapshots
-  And a file named "tests/testthat/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Showing the basket
-        Then the file snapshot "basket.txt" of "1 apple" matches
-    """
-  And a file named "tests/testthat/checkout.feature" with
-    """
-    Feature: Checkout
-      Scenario: Paying
-        Then the file snapshot "receipt.txt" of "1 euro" matches
-    """
-%</pre>
-}}
+  The snapshots are the same whether the feature files are run by `test()` or by `run()` in a testthat file,
+  so either can check the snapshots of the other. Snapshots need the 3rd edition of testthat.
+  A changed snapshot is reviewed and accepted with `testthat::snapshot_review()` and `testthat::snapshot_accept()`,
+  given the snapshot file's name and the directory of the feature files, like
+  `snapshot_accept("checkout-basket.feature", "tests/acceptance")`, a variant's with its directory, like
+  `snapshot_accept("linux/checkout-basket.feature", "tests/acceptance")`, and `expect_snapshot_file()` files with
+  a `/`, like `snapshot_accept("checkout-basket.feature/", "tests/acceptance")`. The message of a changed snapshot says which.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> The snapshots of a deleted feature file are deleted, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">And</span> the file <span class="st">"tests/testthat/checkout.feature"</span> is deleted
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">Then</span> there is no file <span class="st">"tests/testthat/_snaps/checkout.feature/receipt.txt"</span>
-  <span class="fu">And</span> there is no snapshot file <span class="st">"_snaps/checkout.feature.md"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: The snapshots of a deleted feature file are deleted, with <runner>
-  Given I run the feature files with "<runner>"
-  And the file "tests/testthat/checkout.feature" is deleted
-  When I run the feature files with "<runner>"
-  Then there is no file "tests/testthat/_snaps/checkout.feature/receipt.txt"
-  And there is no snapshot file "_snaps/checkout.feature.md"
+  `expect_snapshot()` works in a step and in a `before()`, `after()`, `before_step()` or `after_step()` hook like in a testthat
+  test, with `error`, `transform` and `expect_snapshot_value()`. To skip the scenarios that take snapshots, skip them in a
+  `before_all()` or `before()` hook, not with `skip()` before `run()` in its test file: testthat deletes the snapshot files of
+  feature files that a run of every test file didn't run.
 
-  Examples:
-    | runner |
-    | test() |
-    | run()  |
-%</pre>
-}}
+  Background:
+    Given a package that uses the 3rd edition of testthat
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> Snapshot files are kept by a run with <span class="va">&lt;selection&gt;</span>, with <span class="va">&lt;runner&gt;</span>
-  <span class="fu">Given</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span>
-  <span class="fu">When</span> I run the feature files with <span class="st">"<span class="va">&lt;runner&gt;</span>"</span> and <span class="va">&lt;selection&gt;</span>
-  <span class="fu">Then</span> the file <span class="st">"tests/testthat/_snaps/checkout.feature/receipt.txt"</span> has these lines:
-<span class="st">    """</span>
-<span class="st">    1 euro</span>
-<span class="st">    """</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> selection                     <span class="op">|</span> runner <span class="op">|</span>
-    <span class="op">|</span> the filter <span class="st">"basket"</span>           <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> the filter <span class="st">"basket"</span>           <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> the name <span class="st">"Showing"</span>            <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> the name <span class="st">"Showing"</span>            <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> the tags <span class="st">"@basket"</span>            <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> the tags <span class="st">"@basket"</span>            <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> the features <span class="st">"basket.feature"</span> <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> the features <span class="st">"basket.feature"</span> <span class="op">|</span> run()  <span class="op">|</span>
-    <span class="op">|</span> dry_run = TRUE                <span class="op">|</span> test() <span class="op">|</span>
-    <span class="op">|</span> dry_run = TRUE                <span class="op">|</span> run()  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: Snapshot files are kept by a run with <selection>, with <runner>
-  Given I run the feature files with "<runner>"
-  When I run the feature files with "<runner>" and <selection>
-  Then the file "tests/testthat/_snaps/checkout.feature/receipt.txt" has these lines:
-    """
-    1 euro
-    """
+  Rule: A changed snapshot is accepted with testthat
 
-  Examples:
-    | selection                     | runner |
-    | the filter "basket"           | test() |
-    | the filter "basket"           | run()  |
-    | the name "Showing"            | test() |
-    | the name "Showing"            | run()  |
-    | the tags "@basket"            | test() |
-    | the tags "@basket"            | run()  |
-    | the features "basket.feature" | test() |
-    | the features "basket.feature" | run()  |
-    | dry_run = TRUE                | test() |
-    | dry_run = TRUE                | run()  |
+    Scenario Outline: A changed snapshot of <feature> is accepted with snapshot_accept("<accepted>"), with <runner>
+      Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
+      And I run the feature files with "<runner>"
+      And the scenario "Showing the basket" of "<feature>" snapshots "2 apples"
+      When I run the feature files with "<runner>"
+      Then the errors are
+        """
+        [failure] Scenario: Showing the basket
+        Step "the snapshot of "2 apples" matches" failed
+        i Feature: <feature>:3
+        i Scenario: Showing the basket
+        i Step defined at: setup-snapshot-steps.R:9
+        Snapshot of code has changed:
+            old             | new
+        [1] Code            | Code             [1]
+        [2]   value         |   value          [2]
+        [3] Output          | Output           [3]
+        [4]   [1] "1 apple" -   [1] "2 apples" [4]
+        * Run `testthat::snapshot_accept("<accepted>")` to accept the change.
+        * Run `testthat::snapshot_review("<accepted>")` to review the change.
+        """
+      When I run
+        """
+        testthat::snapshot_accept("<accepted>", "tests/testthat")
+        """
+      Then the snapshot file "<snapshot file>.md" has "2 apples" for "Showing the basket"
+      And there is no snapshot file "<snapshot file>.new.md"
+
+      Examples:
+        | feature                 | accepted                | snapshot file                  | runner |
+        | basket.feature          | basket.feature          | _snaps/basket.feature          | test() |
+        | basket.feature          | basket.feature          | _snaps/basket.feature          | run()  |
+        | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | test() |
+        | checkout/basket.feature | checkout-basket.feature | _snaps/checkout-basket.feature | run()  |
+
+  Rule: Each feature file has a snapshot file of its own
+
+    Scenario Outline: The snapshot of <feature> is saved in <snapshot file> by <runner>
+      Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
+      When I run the feature files with "<runner>"
+      Then the snapshot file "<snapshot file>" has "1 apple" for "Showing the basket"
+
+      Examples:
+        | feature                    | snapshot file                        | runner |
+        | basket.feature             | _snaps/basket.feature.md             | test() |
+        | basket.feature             | _snaps/basket.feature.md             | run()  |
+        | checkout/basket.feature    | _snaps/checkout-basket.feature.md    | test() |
+        | checkout/basket.feature    | _snaps/checkout-basket.feature.md    | run()  |
+        | shop/checkout/cart.feature | _snaps/shop-checkout-cart.feature.md | test() |
+        | shop/checkout/cart.feature | _snaps/shop-checkout-cart.feature.md | run()  |
+        | basket.feature.md          | _snaps/basket.feature.md             | test() |
+        | basket.feature.md          | _snaps/basket.feature.md             | run()  |
+
+  Rule: A snapshot is of a scenario
+
+    Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And a file named "tests/testthat/setup-hooks.R" with
+        """
+        <hook>(function(context, scenario) expect_snapshot(cat("<hook> hook of", scenario$name)))
+        """
+      And I run the feature files with "<runner>"
+      When I run the feature files with "<runner>"
+      Then the scenarios have these results:
+        | scenario           | status |
+        | Showing the basket | passed |
+      And the snapshot file "_snaps/basket.feature.md" for "Showing the basket" has these lines:
+        """
+        <hook> hook of Showing the basket
+        """
+
+      Examples:
+        | hook   | runner |
+        | before | test() |
+        | before | run()  |
+        | after  | test() |
+        | after  | run()  |
+
+  Rule: A snapshot is checked by the runs after the one that saved it
+
+    Scenario Outline: A snapshot saved by <first> is checked by <second>
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And I run the feature files with "<first>"
+      And the scenario "Showing the basket" of "basket.feature" snapshots "2 apples"
+      When I run the feature files with "<second>"
+      Then the scenarios have these results:
+        | scenario           | status |
+        | Showing the basket | failed |
+      And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+      And the snapshot file "_snaps/basket.feature.new.md" has "2 apples" for "Showing the basket"
+
+      Examples:
+        | first  | second |
+        | test() | test() |
+        | run()  | run()  |
+        | test() | run()  |
+        | run()  | test() |
+
+  Rule: A snapshot that isn't checked is kept
+
+    Scenario Outline: A scenario that stops before its snapshot keeps it, when "<step>", with <runner>
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And I run the feature files with "<runner>"
+      And the scenario "Showing the basket" of "basket.feature" starts with "<step>"
+      When I run the feature files with "<runner>"
+      Then the scenarios have these results:
+        | scenario           | status |
+        | Showing the basket | failed |
+      And the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the basket"
+
+      Examples:
+        | step                           | runner |
+        | it fails                       | test() |
+        | it fails                       | run()  |
+        | it doesn't meet an expectation | test() |
+        | it doesn't meet an expectation | run()  |
+
+    Scenario Outline: Snapshots of scenarios that didn't run are kept, with <runner>
+      Given the steps that take snapshots
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the snapshot of "1 apple" matches
+
+          Scenario: Showing an empty basket
+            Then the snapshot of "nothing" matches
+        """
+      And I run the feature files with "<runner>"
+      When I run the feature files with "<runner>" and the name "^Showing the basket$"
+      Then only these scenarios ran:
+        | scenario           |
+        | Showing the basket |
+      And the snapshot file "_snaps/basket.feature.md" has "nothing" for "Showing an empty basket"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
+  Rule: Snapshots of scenarios that aren't in the feature file anymore are deleted
+
+    Scenario Outline: The snapshot of a renamed scenario is deleted, with <runner>
+      Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
+      And I run the feature files with "<runner>"
+      And the scenario "Showing the basket" of "basket.feature" is renamed "Showing the full basket"
+      When I run the feature files with "<runner>"
+      Then the snapshot file "_snaps/basket.feature.md" has "1 apple" for "Showing the full basket"
+      And the snapshot file "_snaps/basket.feature.md" has no snapshot for "Showing the basket"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
+  Rule: Snapshots are kept however the scenarios run
+
+    Scenario Outline: A retried scenario's snapshots are of its last attempt, with <runner>
+      Given the steps that take snapshots
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the snapshot of "1 apple" matches
+        """
+      And I run the feature files with "<runner>"
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the snapshot of "1 apple" matches
+            And it fails the first time
+        """
+      When I run the feature files with "<runner>" and retry = 1
+      Then the scenarios have these results:
+        | scenario           | status | attempts |
+        | Showing the basket | passed | 2        |
+      And the snapshot file "_snaps/basket.feature.md" has 1 snapshot for "Showing the basket"
+      And there is no snapshot file "_snaps/basket.feature.new.md"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
+  Rule: Snapshot files that aren't used are deleted, like in testthat
+    After a run of every scenario, the `expect_snapshot_file()` files that weren't taken, like those of a
+    scenario that failed before taking it, the snapshot files of feature files that don't exist anymore, and
+    `_snaps/__cucumber__.md`, where cucumber 2 saved the snapshots of `test()`, are deleted. `testthat::announce_snapshot_file()` keeps a file that isn't taken. A run of some of the
+    scenarios, like with `filter`, `name`, `tags`, `features` or `dry_run`, or with `fail_fast` after a
+    failed scenario, and a run on CI delete nothing.
+
+    Background:
+      Given the steps that take snapshots
+      And a file named "tests/testthat/basket.feature" with
+        """
+        Feature: Basket
+          Scenario: Showing the basket
+            Then the file snapshot "basket.txt" of "1 apple" matches
+        """
+      And a file named "tests/testthat/checkout.feature" with
+        """
+        Feature: Checkout
+          Scenario: Paying
+            Then the file snapshot "receipt.txt" of "1 euro" matches
+        """
+
+    Scenario Outline: The snapshots of a deleted feature file are deleted, with <runner>
+      Given I run the feature files with "<runner>"
+      And the file "tests/testthat/checkout.feature" is deleted
+      When I run the feature files with "<runner>"
+      Then there is no file "tests/testthat/_snaps/checkout.feature/receipt.txt"
+      And there is no snapshot file "_snaps/checkout.feature.md"
+
+      Examples:
+        | runner |
+        | test() |
+        | run()  |
+
+    Scenario Outline: Snapshot files are kept by a run with <selection>, with <runner>
+      Given I run the feature files with "<runner>"
+      When I run the feature files with "<runner>" and <selection>
+      Then the file "tests/testthat/_snaps/checkout.feature/receipt.txt" has these lines:
+        """
+        1 euro
+        """
+
+      Examples:
+        | selection                     | runner |
+        | the filter "basket"           | test() |
+        | the filter "basket"           | run()  |
+        | the name "Showing"            | test() |
+        | the name "Showing"            | run()  |
+        | the tags "@basket"            | test() |
+        | the tags "@basket"            | run()  |
+        | the features "basket.feature" | test() |
+        | the features "basket.feature" | run()  |
+        | dry_run = TRUE                | test() |
+        | dry_run = TRUE                | run()  |
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-snapshots.feature}
-}
 }
 
 \seealso{

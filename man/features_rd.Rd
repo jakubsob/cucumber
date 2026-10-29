@@ -11,6 +11,7 @@ features_rd(
   name = NULL,
   features = NULL,
   section = getOption("cucumber.rd_section", "Specification"),
+  markdown = TRUE,
   ...
 )
 }
@@ -37,6 +38,9 @@ Add \verb{:line} to select only the scenario at that line, e.g.
 \item{section}{Name of the section. Defaults to the \code{cucumber.rd_section} option, or
 \code{"Specification"} if it's not set.}
 
+\item{markdown}{If TRUE, HTML pages show each feature like Markdown with Gherkin. If
+FALSE, they show it as one block of Gherkin, as it's written, like the help page.}
+
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }
 \value{
@@ -52,896 +56,347 @@ of the help find how it behaves. Call it with \verb{@eval} in the function's rox
 add <- function(basket, n) basket + n
 }\if{html}{\out{</div>}}
 
-It adds a section, "Specification" by default, with each selected feature: its name, its description,
-the Backgrounds of the selected scenarios and the scenarios as they are written, without
+It adds a section, "Specification" by default, with each selected feature: its name, its
+description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
 their tags. Of a Scenario Outline, only the selected Examples rows are shown.
+
+In the help page, each feature is one block of Gherkin, as it's written. On HTML pages,
+like the pkgdown reference page, it's shown like Markdown with Gherkin: the names of the
+feature and of its Rules, Backgrounds, scenarios and Examples are headers, steps are a
+list, tables are tables and Doc Strings are code, a Doc String of Gherkin highlighted as
+Gherkin. With \code{markdown = FALSE}, HTML pages show the block of Gherkin too.
 
 Scenarios are selected like in \code{\link[=test]{test()}}. By default only scenarios tagged \verb{@rd} are
 selected, so that you choose the ones that make good documentation. Set the
 \code{cucumber.rd_tags} option to use another tag expression, or pass \code{tags = NULL} to select
 scenarios without a tag.
 
-On a pkgdown site, the scenarios are highlighted by the site's theme, like other code.
+On a pkgdown site, code is highlighted by the site's theme.
 
 It turns on markdown for the roxygen block it's in.
 }
 \section{Specification}{
 
-\subsection{Scenarios as documentation}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Scenarios as documentation}{
 \code{features_rd()} puts scenarios of feature files in the help page of a function, in a
-"Specification" section, so readers of the help find how it behaves. Call it with \verb{@eval}
+"Specification" section, so readers of the help find how it behaves. Call it with \code{@eval}
 in the function's roxygen block. It selects scenarios like \code{test()}: by \code{features} and their
-lines, \code{filter}, \code{name} and \code{tags}. By default only scenarios tagged \verb{@rd} are selected,
+lines, \code{filter}, \code{name} and \code{tags}. By default only scenarios tagged \code{@rd} are selected,
 set the \code{cucumber.rd_tags} option to use another tag expression. Name the section with
 \code{section}, or for every help page with the \code{cucumber.rd_section} option.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      A basket holds the items a customer wants to buy.</span>
-<span class="st"></span>
-<span class="st">      Background:</span>
-<span class="st">        Given an empty basket</span>
-<span class="st"></span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add 1 item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st"></span>
-<span class="st">      @example</span>
-<span class="st">      Scenario: Remove an item from an empty basket</span>
-<span class="st">        When I remove 1 item</span>
-<span class="st">        Then the basket is empty</span>
-<span class="st"></span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario Outline: Add items</span>
-<span class="st">        When I add &lt;n&gt; items</span>
-<span class="st">        Then the basket has &lt;n&gt; items</span>
-<span class="st"></span>
-<span class="st">        Examples:</span>
-<span class="st">          | n |</span>
-<span class="st">          | 2 |</span>
-<span class="st">          | 3 |</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "tests/acceptance/basket.feature" with
-    """
-    Feature: Basket
-      A basket holds the items a customer wants to buy.
+In the help page, each feature is one block of Gherkin, as it's written. On HTML pages, like
+the pkgdown reference page, it's shown like Markdown with Gherkin: its name and the names of
+its Rules, Backgrounds, scenarios and Examples are headers, its steps a list, its tables tables
+and its Doc Strings code, a Doc String of Gherkin highlighted. With \code{markdown = FALSE}, HTML
+pages show the block of Gherkin too.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "tests/acceptance/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  A basket holds the items a customer wants to buy.&#10;&#10;  <span class="kw">Background:</span>&#10;    <span class="fu">Given</span> an empty basket&#10;&#10;  @rd&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add 1 item&#10;    <span class="fu">Then</span> the basket has 1 item&#10;&#10;  @example&#10;  <span class="kw">Scenario:</span> Remove an item from an empty basket&#10;    <span class="fu">When</span> I remove 1 item&#10;    <span class="fu">Then</span> the basket is empty&#10;&#10;  @rd&#10;  <span class="kw">Scenario Outline:</span> Add items&#10;    <span class="fu">When</span> I add <span class="va">&lt;n&gt;</span> items&#10;    <span class="fu">Then</span> the basket has <span class="va">&lt;n&gt;</span> items&#10;&#10;    <span class="kw">Examples:</span>&#10;      <span class="op">|</span> n <span class="op">|</span>&#10;      <span class="op">|</span> 2 <span class="op">|</span>&#10;      <span class="op">|</span> 3 <span class="op">|</span></code></pre >}
+}
+}
+\subsection{Scenario: The scenarios tagged @rd are in the help page}{
+\itemize{
+\item Given a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd()
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "add" includes
+\preformatted{Specification:
 
-      Background:
-        Given an empty basket
+Feature: Basket
+  A basket holds the items a customer wants to buy.
 
-      @rd
-      Scenario: Add an item
-        When I add 1 item
-        Then the basket has 1 item
+  Background:
+    Given an empty basket
 
-      @example
-      Scenario: Remove an item from an empty basket
-        When I remove 1 item
-        Then the basket is empty
+  Scenario: Add an item
+    When I add 1 item
+    Then the basket has 1 item
 
-      @rd
-      Scenario Outline: Add items
-        When I add <n> items
-        Then the basket has <n> items
+  Scenario Outline: Add items
+    When I add <n> items
+    Then the basket has <n> items
 
-        Examples:
-          | n |
-          | 2 |
-          | 3 |
-    """
-%</pre>
-}}
+    Examples:
+      | n |
+      | 2 |
+      | 3 |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios tagged @rd are in the help page
-  <span class="fu">Given</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd()</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes
-<span class="st">    """</span>
-<span class="st">    Specification:</span>
-<span class="st"></span>
-<span class="st">    Basket:</span>
-<span class="st"></span>
-<span class="st">    A basket holds the items a customer wants to buy.</span>
-<span class="st"></span>
-<span class="st">    Background:</span>
-<span class="st">      Given an empty basket</span>
-<span class="st"></span>
-<span class="st">    Scenario: Add an item</span>
-<span class="st">      When I add 1 item</span>
-<span class="st">      Then the basket has 1 item</span>
-<span class="st"></span>
-<span class="st">    Scenario Outline: Add items</span>
-<span class="st">      When I add &lt;n&gt; items</span>
-<span class="st">      Then the basket has &lt;n&gt; items</span>
-<span class="st"></span>
-<span class="st">      Examples:</span>
-<span class="st">        | n |</span>
-<span class="st">        | 2 |</span>
-<span class="st">        | 3 |</span>
-<span class="st"></span>
-<span class="st">    Source: 'tests/acceptance/basket.feature'</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"Remove an item"</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"@rd"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The scenarios tagged @rd are in the help page
-  Given a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd()
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "add" includes
-    """
-    Specification:
+Source: 'tests/acceptance/basket.feature'}
+\item And the help page "add" doesn't include "Remove an item"
+\item And the help page "add" doesn't include "@rd"
+}
+}
+\subsection{Scenario: A feature is Markdown in the pkgdown reference page}{
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd()
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "add", preview = FALSE)}
+\item Then the reference page "add" has the headings
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;<span class="kw">Background:</span>&#10;<span class="kw">Scenario:</span> Add an item&#10;<span class="kw">Scenario Outline:</span> Add items&#10;<span class="kw">Examples:</span></code></pre >}
+\item And the reference page "add" has the steps
+\preformatted{Given an empty basket
+When I add 1 item
+Then the basket has 1 item
+When I add <n> items
+Then the basket has <n> items}
+\item And the reference page "add" has the table
+\tabular{l}{
+n \cr
+2 \cr
+3
+}
+}
+}
+\subsection{Scenario: A feature is one Gherkin code block in the pkgdown reference page with markdown = FALSE}{
+The block has the feature's name and description, the Background and the selected
+scenarios, like a code block of a Markdown page.
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(features = "basket.feature:8", markdown = FALSE)
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "add", preview = FALSE)}
+\item Then the reference page "add" has the Gherkin block
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  A basket holds the items a customer wants to buy.&#10;&#10;  <span class="kw">Background:</span>&#10;    <span class="fu">Given</span> an empty basket&#10;&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add 1 item&#10;    <span class="fu">Then</span> the basket has 1 item</code></pre >}
+}
+}
+\subsection{Scenario: The blank lines of a scenario are kept in the pkgdown reference page with markdown = FALSE}{
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "tests/acceptance/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  @rd&#10;  <span class="kw">Scenario:</span> Pay for the basket&#10;    The customer pays for every item in the basket.&#10;&#10;    <span class="fu">Given</span> a basket with 2 items&#10;    <span class="fu">When</span> I pay&#10;    <span class="fu">Then</span> the basket is empty</code></pre >}
+\item And a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(features = "checkout.feature", markdown = FALSE)
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "add", preview = FALSE)}
+\item Then the reference page "add" has the Gherkin block
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;&#10;  <span class="kw">Scenario:</span> Pay for the basket&#10;    The customer pays for every item in the basket.&#10;&#10;    <span class="fu">Given</span> a basket with 2 items&#10;    <span class="fu">When</span> I pay&#10;    <span class="fu">Then</span> the basket is empty</code></pre >}
+}
+}
+\subsection{Scenario: The scenarios are highlighted in the pkgdown reference page with markdown = FALSE}{
+Their tokens have the classes pandoc gives tokens, so that the site's theme colours them
+like other code, without a script.
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "tests/acceptance/greeting.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Greeting&#10;  @rd&#10;  <span class="kw">Scenario Outline:</span> Greet a customer&#10;<span class="co">    # The customer gives their name</span>&#10;    <span class="fu">Given</span> a customer named <span class="st">"<span class="va">&lt;name&gt;</span>"</span>&#10;    <span class="fu">When</span> I greet them with&#10;<span class="st">      ```</span>&#10;<span class="st">      Hello!</span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">Then</span> they reply&#10;&#10;    <span class="kw">Examples:</span>&#10;      <span class="op">|</span> name <span class="op">|</span>&#10;      <span class="op">|</span> Ada  <span class="op">|</span></code></pre >}
+\item And a file named "R/greet.R" with
+\preformatted{#' Greet a customer
+#' @eval cucumber::features_rd(features = "greeting.feature", markdown = FALSE)
+#' @export
+greet <- function(name) paste("Hello", name)}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "greet", preview = FALSE)}
+\item Then the reference page "greet" highlights the Gherkin
+\tabular{ll}{
+token \tab class \cr
+Scenario Outline: \tab kw \cr
+Examples: \tab kw \cr
+Given \tab fu \cr
+When \tab fu \cr
+# The customer gives their name \tab co \cr
+"<name>" \tab st \cr
+<name> \tab va \cr
+Hello! \tab st \cr
+| \tab op
+}
+}
+}
+\subsection{Scenario: A scenario selected by its line}{
+\itemize{
+\item Given a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(features = "basket.feature:8")
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "add" includes "Scenario: Add an item"
+\item And the help page "add" doesn't include "Scenario Outline: Add items"
+}
+}
+\subsection{Scenario: An example of an outline selected by the line of its row}{
+\itemize{
+\item Given a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(features = "basket.feature:25")
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "add" includes
+\preformatted{Scenario Outline: Add items
+  When I add <n> items
+  Then the basket has <n> items
 
-    Basket:
+  Examples:
+    | n |
+    | 3 |}
+\item And the help page "add" doesn't include "| 2 |"
+}
+}
+\subsection{Scenario: Scenarios selected by name, whatever their tags, with tags = NULL}{
+\itemize{
+\item Given a file named "R/remove.R" with
+\preformatted{#' Remove items from a basket
+#' @eval cucumber::features_rd(name = "^Remove", tags = NULL)
+#' @export
+remove <- function(basket, n) basket - n}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "remove" includes
+\preformatted{Scenario: Remove an item from an empty basket
+  When I remove 1 item
+  Then the basket is empty}
+\item And the help page "remove" doesn't include "Scenario: Add an item"
+}
+}
+\subsection{Scenario: Scenarios of the feature files whose name matches a filter}{
+\itemize{
+\item Given a file named "tests/acceptance/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  @rd&#10;  <span class="kw">Scenario:</span> Pay for the basket&#10;    <span class="fu">When</span> I pay</code></pre >}
+\item And a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(filter = "^basket$")
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "add" includes "Scenario: Add an item"
+\item And the help page "add" doesn't include "Scenario: Pay for the basket"
+}
+}
+\subsection{Scenario: Only the selected Examples of a Scenario Outline are shown, without their tags}{
+\itemize{
+\item Given a file named "tests/acceptance/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  <span class="kw">Scenario Outline:</span> Pay with <span class="va">&lt;card&gt;</span>&#10;    <span class="fu">When</span> I pay with <span class="va">&lt;card&gt;</span>&#10;&#10;    @rd&#10;    <span class="kw">Examples:</span> Cards&#10;      <span class="op">|</span> card <span class="op">|</span>&#10;      <span class="op">|</span> Visa <span class="op">|</span>&#10;&#10;    <span class="kw">Examples:</span> Vouchers&#10;      <span class="op">|</span> card    <span class="op">|</span>&#10;      <span class="op">|</span> voucher <span class="op">|</span></code></pre >}
+\item And a file named "R/pay.R" with
+\preformatted{#' Pay for a basket
+#' @eval cucumber::features_rd(features = "checkout.feature")
+#' @export
+pay <- function(basket) basket}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "pay" includes
+\preformatted{Scenario Outline: Pay with <card>
+  When I pay with <card>
 
-    A basket holds the items a customer wants to buy.
+  Examples: Cards
+    | card |
+    | Visa |}
+\item And the help page "pay" doesn't include "Vouchers"
+\item And the help page "pay" doesn't include "@rd"
+}
+}
+\subsection{Scenario: Another tag marks the scenarios for documentation}{
+\itemize{
+\item Given a file named "R/remove.R" with
+\preformatted{#' Remove items from a basket
+#' @eval cucumber::features_rd()
+#' @export
+remove <- function(basket, n) basket - n}
+\item When I run
+\preformatted{withr::with_options(list(cucumber.rd_tags = "@example"), roxygen2::roxygenise())}
+\item Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
+\item And the help page "remove" doesn't include "Scenario: Add an item"
+}
+}
+\subsection{Scenario: The section has another name}{
+\itemize{
+\item Given a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "add" includes "Examples of use:"
+\item And the help page "add" doesn't include "Specification:"
+}
+}
+\subsection{Scenario: The sections of every help page have another name}{
+\itemize{
+\item Given a file named "R/add.R" with
+\preformatted{#' Add items to a basket
+#' @eval cucumber::features_rd(features = "basket.feature:8")
+#' @export
+add <- function(basket, n) basket + n}
+\item When I run
+\preformatted{withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())}
+\item Then the help page "add" includes "Behavior:"
+\item And the help page "add" doesn't include "Specification:"
+}
+}
+\subsection{Scenario: Scenarios of a Rule are under the Rule}{
+Only the selected Examples of a Scenario Outline are shown, and only the Rules with
+selected scenarios.
+\itemize{
+\item Given a file named "tests/acceptance/discounts.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Discounts&#10;&#10;  <span class="kw">Rule:</span> Orders over 100 get 10\% off&#10;&#10;    <span class="kw">Scenario Outline:</span> Discount of an order&#10;      <span class="fu">When</span> I order for <span class="va">&lt;total&gt;</span>&#10;      <span class="fu">Then</span> I pay <span class="va">&lt;paid&gt;</span>&#10;&#10;      @rd&#10;      <span class="kw">Examples:</span> Discounted&#10;        <span class="op">|</span> total <span class="op">|</span> paid <span class="op">|</span>&#10;        <span class="op">|</span> 200   <span class="op">|</span> 180  <span class="op">|</span>&#10;&#10;      <span class="kw">Examples:</span> Not discounted&#10;        <span class="op">|</span> total <span class="op">|</span> paid <span class="op">|</span>&#10;        <span class="op">|</span> 100   <span class="op">|</span> 100  <span class="op">|</span>&#10;&#10;  <span class="kw">Rule:</span> Members get free shipping&#10;&#10;    <span class="kw">Scenario:</span> A member orders&#10;      <span class="fu">When</span> a member orders&#10;      <span class="fu">Then</span> shipping is free</code></pre >}
+\item And a file named "R/discount.R" with
+\preformatted{#' Discount an order
+#' @eval cucumber::features_rd(features = "discounts.feature")
+#' @export
+discount <- function(total) total}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "discount" includes
+\preformatted{Feature: Discounts
 
-    Background:
-      Given an empty basket
-
-    Scenario: Add an item
-      When I add 1 item
-      Then the basket has 1 item
-
-    Scenario Outline: Add items
-      When I add <n> items
-      Then the basket has <n> items
-
-      Examples:
-        | n |
-        | 2 |
-        | 3 |
-
-    Source: 'tests/acceptance/basket.feature'
-    """
-  And the help page "add" doesn't include "Remove an item"
-  And the help page "add" doesn't include "@rd"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios are in the pkgdown reference page
-  They're Gherkin code blocks, like those of a Markdown page.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"DESCRIPTION"</span> with
-<span class="st">    """</span>
-<span class="st">    Package: example</span>
-<span class="st">    Version: 0.1.0</span>
-<span class="st">    Title: Example</span>
-<span class="st">    Description: An example.</span>
-<span class="st">    License: MIT</span>
-<span class="st">    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))</span>
-<span class="st">    Encoding: UTF-8</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "basket.feature:8")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    pkgdown::build_reference(".", topics = "add", preview = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the reference page <span class="st">"add"</span> has the Gherkin block
-<span class="st">    """</span>
-<span class="st">    Scenario: Add an item</span>
-<span class="st">      When I add 1 item</span>
-<span class="st">      Then the basket has 1 item</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The scenarios are in the pkgdown reference page
-  They're Gherkin code blocks, like those of a Markdown page.
-
-  Given a file named "DESCRIPTION" with
-    """
-    Package: example
-    Version: 0.1.0
-    Title: Example
-    Description: An example.
-    License: MIT
-    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
-    Encoding: UTF-8
-    """
-  And a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(features = "basket.feature:8")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "add", preview = FALSE)
-    """
-  Then the reference page "add" has the Gherkin block
-    """
-    Scenario: Add an item
-      When I add 1 item
-      Then the basket has 1 item
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The blank lines of a scenario are kept in the pkgdown reference page
-  <span class="fu">Given</span> a file named <span class="st">"DESCRIPTION"</span> with
-<span class="st">    """</span>
-<span class="st">    Package: example</span>
-<span class="st">    Version: 0.1.0</span>
-<span class="st">    Title: Example</span>
-<span class="st">    Description: An example.</span>
-<span class="st">    License: MIT</span>
-<span class="st">    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))</span>
-<span class="st">    Encoding: UTF-8</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario: Pay for the basket</span>
-<span class="st">        The customer pays for every item in the basket.</span>
-<span class="st"></span>
-<span class="st">        Given a basket with 2 items</span>
-<span class="st">        When I pay</span>
-<span class="st">        Then the basket is empty</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    pkgdown::build_reference(".", topics = "add", preview = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the reference page <span class="st">"add"</span> has the Gherkin block
-<span class="st">    """</span>
-<span class="st">    Scenario: Pay for the basket</span>
-<span class="st">      The customer pays for every item in the basket.</span>
-<span class="st"></span>
-<span class="st">      Given a basket with 2 items</span>
-<span class="st">      When I pay</span>
-<span class="st">      Then the basket is empty</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The blank lines of a scenario are kept in the pkgdown reference page
-  Given a file named "DESCRIPTION" with
-    """
-    Package: example
-    Version: 0.1.0
-    Title: Example
-    Description: An example.
-    License: MIT
-    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
-    Encoding: UTF-8
-    """
-  And a file named "tests/acceptance/checkout.feature" with
-    """
-    Feature: Checkout
-      @rd
-      Scenario: Pay for the basket
-        The customer pays for every item in the basket.
-
-        Given a basket with 2 items
-        When I pay
-        Then the basket is empty
-    """
-  And a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(features = "checkout.feature")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "add", preview = FALSE)
-    """
-  Then the reference page "add" has the Gherkin block
-    """
-    Scenario: Pay for the basket
-      The customer pays for every item in the basket.
-
-      Given a basket with 2 items
-      When I pay
-      Then the basket is empty
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios are highlighted in the pkgdown reference page
-  Their tokens have the classes pandoc gives tokens, so that the site's theme colours them
-  like other code, without a script.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"DESCRIPTION"</span> with
-<span class="st">    """</span>
-<span class="st">    Package: example</span>
-<span class="st">    Version: 0.1.0</span>
-<span class="st">    Title: Example</span>
-<span class="st">    Description: An example.</span>
-<span class="st">    License: MIT</span>
-<span class="st">    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))</span>
-<span class="st">    Encoding: UTF-8</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/greeting.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Greeting</span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario Outline: Greet a customer</span>
-<span class="st">        # The customer gives their name</span>
-<span class="st">        Given a customer named "&lt;name&gt;"</span>
-<span class="st">        When I greet them with</span>
-<span class="st">          ```</span>
-<span class="st">          Hello!</span>
-<span class="st">          ```</span>
-<span class="st">        Then they reply</span>
-<span class="st"></span>
-<span class="st">        Examples:</span>
-<span class="st">          | name |</span>
-<span class="st">          | Ada  |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/greet.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Greet a customer</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "greeting.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    greet &lt;- function(name) paste("Hello", name)</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    pkgdown::build_reference(".", topics = "greet", preview = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the reference page <span class="st">"greet"</span> highlights the Gherkin
-    <span class="op">|</span> token                           <span class="op">|</span> class <span class="op">|</span>
-    <span class="op">|</span> Scenario Outline:               <span class="op">|</span> kw    <span class="op">|</span>
-    <span class="op">|</span> Examples:                       <span class="op">|</span> kw    <span class="op">|</span>
-    <span class="op">|</span> Given                           <span class="op">|</span> fu    <span class="op">|</span>
-    <span class="op">|</span> When                            <span class="op">|</span> fu    <span class="op">|</span>
-    <span class="op">|</span> # The customer gives their name <span class="op">|</span> co    <span class="op">|</span>
-    <span class="op">|</span> <span class="st">"<span class="va">&lt;name&gt;</span>"</span>                        <span class="op">|</span> st    <span class="op">|</span>
-    <span class="op">|</span> <span class="va">&lt;name&gt;</span>                          <span class="op">|</span> va    <span class="op">|</span>
-    <span class="op">|</span> Hello!                          <span class="op">|</span> st    <span class="op">|</span>
-    <span class="op">|</span> \\|                              <span class="op">|</span> op    <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The scenarios are highlighted in the pkgdown reference page
-  Their tokens have the classes pandoc gives tokens, so that the site's theme colours them
-  like other code, without a script.
-
-  Given a file named "DESCRIPTION" with
-    """
-    Package: example
-    Version: 0.1.0
-    Title: Example
-    Description: An example.
-    License: MIT
-    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
-    Encoding: UTF-8
-    """
-  And a file named "tests/acceptance/greeting.feature" with
-    """
-    Feature: Greeting
-      @rd
-      Scenario Outline: Greet a customer
-        # The customer gives their name
-        Given a customer named "<name>"
-        When I greet them with
-          ```
-          Hello!
-          ```
-        Then they reply
-
-        Examples:
-          | name |
-          | Ada  |
-    """
-  And a file named "R/greet.R" with
-    """
-    #' Greet a customer
-    #' @eval cucumber::features_rd(features = "greeting.feature")
-    #' @export
-    greet <- function(name) paste("Hello", name)
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "greet", preview = FALSE)
-    """
-  Then the reference page "greet" highlights the Gherkin
-    | token                           | class |
-    | Scenario Outline:               | kw    |
-    | Examples:                       | kw    |
-    | Given                           | fu    |
-    | When                            | fu    |
-    | # The customer gives their name | co    |
-    | "<name>"                        | st    |
-    | <name>                          | va    |
-    | Hello!                          | st    |
-    | \\|                              | op    |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario selected by its line
-  <span class="fu">Given</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "basket.feature:8")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes <span class="st">"Scenario: Add an item"</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"Scenario Outline: Add items"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A scenario selected by its line
-  Given a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(features = "basket.feature:8")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "add" includes "Scenario: Add an item"
-  And the help page "add" doesn't include "Scenario Outline: Add items"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An example of an outline selected by the line of its row
-  <span class="fu">Given</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "basket.feature:25")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes
-<span class="st">    """</span>
-<span class="st">    Scenario Outline: Add items</span>
-<span class="st">      When I add &lt;n&gt; items</span>
-<span class="st">      Then the basket has &lt;n&gt; items</span>
-<span class="st"></span>
-<span class="st">      Examples:</span>
-<span class="st">        | n |</span>
-<span class="st">        | 3 |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"| 2 |"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An example of an outline selected by the line of its row
-  Given a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(features = "basket.feature:25")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "add" includes
-    """
-    Scenario Outline: Add items
-      When I add <n> items
-      Then the basket has <n> items
-
-      Examples:
-        | n |
-        | 3 |
-    """
-  And the help page "add" doesn't include "| 2 |"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios selected by name, whatever their tags, with tags = NULL
-  <span class="fu">Given</span> a file named <span class="st">"R/remove.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Remove items from a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(name = "^Remove", tags = NULL)</span>
-<span class="st">    #' @export</span>
-<span class="st">    remove &lt;- function(basket, n) basket - n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"remove"</span> includes
-<span class="st">    """</span>
-<span class="st">    Scenario: Remove an item from an empty basket</span>
-<span class="st">      When I remove 1 item</span>
-<span class="st">      Then the basket is empty</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the help page <span class="st">"remove"</span> doesn't include <span class="st">"Scenario: Add an item"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios selected by name, whatever their tags, with tags = NULL
-  Given a file named "R/remove.R" with
-    """
-    #' Remove items from a basket
-    #' @eval cucumber::features_rd(name = "^Remove", tags = NULL)
-    #' @export
-    remove <- function(basket, n) basket - n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "remove" includes
-    """
-    Scenario: Remove an item from an empty basket
-      When I remove 1 item
-      Then the basket is empty
-    """
-  And the help page "remove" doesn't include "Scenario: Add an item"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of the feature files whose name matches a filter
-  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario: Pay for the basket</span>
-<span class="st">        When I pay</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(filter = "^basket$")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes <span class="st">"Scenario: Add an item"</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"Scenario: Pay for the basket"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios of the feature files whose name matches a filter
-  Given a file named "tests/acceptance/checkout.feature" with
-    """
-    Feature: Checkout
-      @rd
-      Scenario: Pay for the basket
-        When I pay
-    """
-  And a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(filter = "^basket$")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "add" includes "Scenario: Add an item"
-  And the help page "add" doesn't include "Scenario: Pay for the basket"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Only the selected Examples of a Scenario Outline are shown, without their tags
-  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      Scenario Outline: Pay with &lt;card&gt;</span>
-<span class="st">        When I pay with &lt;card&gt;</span>
-<span class="st"></span>
-<span class="st">        @rd</span>
-<span class="st">        Examples: Cards</span>
-<span class="st">          | card |</span>
-<span class="st">          | Visa |</span>
-<span class="st"></span>
-<span class="st">        Examples: Vouchers</span>
-<span class="st">          | card    |</span>
-<span class="st">          | voucher |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/pay.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Pay for a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    pay &lt;- function(basket) basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"pay"</span> includes
-<span class="st">    """</span>
-<span class="st">    Scenario Outline: Pay with &lt;card&gt;</span>
-<span class="st">      When I pay with &lt;card&gt;</span>
-<span class="st"></span>
-<span class="st">      Examples: Cards</span>
-<span class="st">        | card |</span>
-<span class="st">        | Visa |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the help page <span class="st">"pay"</span> doesn't include <span class="st">"Vouchers"</span>
-  <span class="fu">And</span> the help page <span class="st">"pay"</span> doesn't include <span class="st">"@rd"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Only the selected Examples of a Scenario Outline are shown, without their tags
-  Given a file named "tests/acceptance/checkout.feature" with
-    """
-    Feature: Checkout
-      Scenario Outline: Pay with <card>
-        When I pay with <card>
-
-        @rd
-        Examples: Cards
-          | card |
-          | Visa |
-
-        Examples: Vouchers
-          | card    |
-          | voucher |
-    """
-  And a file named "R/pay.R" with
-    """
-    #' Pay for a basket
-    #' @eval cucumber::features_rd(features = "checkout.feature")
-    #' @export
-    pay <- function(basket) basket
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "pay" includes
-    """
-    Scenario Outline: Pay with <card>
-      When I pay with <card>
-
-      Examples: Cards
-        | card |
-        | Visa |
-    """
-  And the help page "pay" doesn't include "Vouchers"
-  And the help page "pay" doesn't include "@rd"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Another tag marks the scenarios for documentation
-  <span class="fu">Given</span> a file named <span class="st">"R/remove.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Remove items from a basket</span>
-<span class="st">    #' @eval cucumber::features_rd()</span>
-<span class="st">    #' @export</span>
-<span class="st">    remove &lt;- function(basket, n) basket - n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    withr::with_options(list(cucumber.rd_tags = "@example"), roxygen2::roxygenise())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"remove"</span> includes <span class="st">"Scenario: Remove an item from an empty basket"</span>
-  <span class="fu">And</span> the help page <span class="st">"remove"</span> doesn't include <span class="st">"Scenario: Add an item"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Another tag marks the scenarios for documentation
-  Given a file named "R/remove.R" with
-    """
-    #' Remove items from a basket
-    #' @eval cucumber::features_rd()
-    #' @export
-    remove <- function(basket, n) basket - n
-    """
-  When I run
-    """
-    withr::with_options(list(cucumber.rd_tags = "@example"), roxygen2::roxygenise())
-    """
-  Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
-  And the help page "remove" doesn't include "Scenario: Add an item"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The section has another name
-  <span class="fu">Given</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes <span class="st">"Examples of use:"</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"Specification:"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The section has another name
-  Given a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "add" includes "Examples of use:"
-  And the help page "add" doesn't include "Specification:"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The sections of every help page have another name
-  <span class="fu">Given</span> a file named <span class="st">"R/add.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Add items to a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "basket.feature:8")</span>
-<span class="st">    #' @export</span>
-<span class="st">    add &lt;- function(basket, n) basket + n</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"add"</span> includes <span class="st">"Behavior:"</span>
-  <span class="fu">And</span> the help page <span class="st">"add"</span> doesn't include <span class="st">"Specification:"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The sections of every help page have another name
-  Given a file named "R/add.R" with
-    """
-    #' Add items to a basket
-    #' @eval cucumber::features_rd(features = "basket.feature:8")
-    #' @export
-    add <- function(basket, n) basket + n
-    """
-  When I run
-    """
-    withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
-    """
-  Then the help page "add" includes "Behavior:"
-  And the help page "add" doesn't include "Specification:"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of a Rule are under the Rule
-  Only the selected Examples of a Scenario Outline are shown, and only the Rules with
-  selected scenarios.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/discounts.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Discounts</span>
-<span class="st"></span>
-<span class="st">      Rule: Orders over 100 get 10\% off</span>
-<span class="st"></span>
-<span class="st">        Scenario Outline: Discount of an order</span>
-<span class="st">          When I order for &lt;total&gt;</span>
-<span class="st">          Then I pay &lt;paid&gt;</span>
-<span class="st"></span>
-<span class="st">          @rd</span>
-<span class="st">          Examples: Discounted</span>
-<span class="st">            | total | paid |</span>
-<span class="st">            | 200   | 180  |</span>
-<span class="st"></span>
-<span class="st">          Examples: Not discounted</span>
-<span class="st">            | total | paid |</span>
-<span class="st">            | 100   | 100  |</span>
-<span class="st"></span>
-<span class="st">      Rule: Members get free shipping</span>
-<span class="st"></span>
-<span class="st">        Scenario: A member orders</span>
-<span class="st">          When a member orders</span>
-<span class="st">          Then shipping is free</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/discount.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Discount an order</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "discounts.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    discount &lt;- function(total) total</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"discount"</span> includes
-<span class="st">    """</span>
-<span class="st">    Discounts:</span>
-<span class="st"></span>
-<span class="st">    *Rule: Orders over 100 get 10\% off*</span>
-<span class="st"></span>
-<span class="st">    Scenario Outline: Discount of an order</span>
-<span class="st">      When I order for &lt;total&gt;</span>
-<span class="st">      Then I pay &lt;paid&gt;</span>
-<span class="st"></span>
-<span class="st">      Examples: Discounted</span>
-<span class="st">        | total | paid |</span>
-<span class="st">        | 200   | 180  |</span>
-<span class="st"></span>
-<span class="st">    Source: 'tests/acceptance/discounts.feature'</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the help page <span class="st">"discount"</span> doesn't include <span class="st">"Not discounted"</span>
-  <span class="fu">And</span> the help page <span class="st">"discount"</span> doesn't include <span class="st">"Members get free shipping"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios of a Rule are under the Rule
-  Only the selected Examples of a Scenario Outline are shown, and only the Rules with
-  selected scenarios.
-
-  Given a file named "tests/acceptance/discounts.feature" with
-    """
-    Feature: Discounts
-
-      Rule: Orders over 100 get 10\% off
-
-        Scenario Outline: Discount of an order
-          When I order for <total>
-          Then I pay <paid>
-
-          @rd
-          Examples: Discounted
-            | total | paid |
-            | 200   | 180  |
-
-          Examples: Not discounted
-            | total | paid |
-            | 100   | 100  |
-
-      Rule: Members get free shipping
-
-        Scenario: A member orders
-          When a member orders
-          Then shipping is free
-    """
-  And a file named "R/discount.R" with
-    """
-    #' Discount an order
-    #' @eval cucumber::features_rd(features = "discounts.feature")
-    #' @export
-    discount <- function(total) total
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "discount" includes
-    """
-    Discounts:
-
-    *Rule: Orders over 100 get 10\% off*
+  Rule: Orders over 100 get 10\% off
 
     Scenario Outline: Discount of an order
       When I order for <total>
@@ -951,466 +406,1026 @@ set the \code{cucumber.rd_tags} option to use another tag expression. Name the s
         | total | paid |
         | 200   | 180  |
 
-    Source: 'tests/acceptance/discounts.feature'
-    """
-  And the help page "discount" doesn't include "Not discounted"
-  And the help page "discount" doesn't include "Members get free shipping"
-%</pre>
-}}
+Source: 'tests/acceptance/discounts.feature'}
+\item And the help page "discount" doesn't include "Not discounted"
+\item And the help page "discount" doesn't include "Members get free shipping"
+}
+}
+\subsection{Scenario: Code between backticks is shown as written}{
+roxygen doesn't evaluate it as inline R code.
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "tests/acceptance/calculator.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Calculator&#10;  @rd&#10;  <span class="kw">Scenario:</span> Evaluate an expression&#10;    <span class="fu">When</span> I evaluate `r 1 + 1`&#10;    <span class="fu">Then</span> the result is 2</code></pre >}
+\item And a file named "R/calculate.R" with
+\preformatted{#' Evaluate an expression
+#' @eval cucumber::features_rd(features = "calculator.feature")
+#' @export
+calculate <- function(expression) eval(parse(text = expression))}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "calculate", preview = FALSE)}
+\item Then the help page "calculate" includes "When I evaluate \code{r 1 + 1}"
+\item And the reference page "calculate" has the steps
+\preformatted{When I evaluate r 1 + 1
+Then the result is 2}
+}
+}
+\subsection{Scenario: Scenarios with characters of more than one byte are shown as written}{
+\itemize{
+\item Given a file named "tests/acceptance/prices.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Prices&#10;  Prices are in pounds.&#10;&#10;  @rd&#10;  <span class="kw">Scenario:</span> A price in pounds&#10;    <span class="fu">Given</span> a price of £430&#10;    <span class="fu">Then</span> the price is £430</code></pre >}
+\item And a file named "R/price.R" with
+\preformatted{#' Price an item
+#' @eval cucumber::features_rd(features = "prices.feature")
+#' @export
+price <- function(x) x}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "price" includes
+\preformatted{Prices are in pounds.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Code between backticks is shown as written
-  roxygen doesn't evaluate it as inline R code.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"DESCRIPTION"</span> with
-<span class="st">    """</span>
-<span class="st">    Package: example</span>
-<span class="st">    Version: 0.1.0</span>
-<span class="st">    Title: Example</span>
-<span class="st">    Description: An example.</span>
-<span class="st">    License: MIT</span>
-<span class="st">    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))</span>
-<span class="st">    Encoding: UTF-8</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/calculator.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Calculator</span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario: Evaluate an expression</span>
-<span class="st">        When I evaluate `r 1 + 1`</span>
-<span class="st">        Then the result is 2</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/calculate.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Evaluate an expression</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "calculator.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    calculate &lt;- function(expression) eval(parse(text = expression))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    pkgdown::build_reference(".", topics = "calculate", preview = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"calculate"</span> includes
-<span class="st">    """</span>
-<span class="st">    Scenario: Evaluate an expression</span>
-<span class="st">      When I evaluate `r 1 + 1`</span>
-<span class="st">      Then the result is 2</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the reference page <span class="st">"calculate"</span> has the Gherkin block
-<span class="st">    """</span>
-<span class="st">    Scenario: Evaluate an expression</span>
-<span class="st">      When I evaluate `r 1 + 1`</span>
-<span class="st">      Then the result is 2</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Code between backticks is shown as written
-  roxygen doesn't evaluate it as inline R code.
+Scenario: A price in pounds
+  Given a price of £430
+  Then the price is £430}
+}
+}
+\subsection{Scenario: Names and descriptions of features and Rules are shown as written}{
+\itemize{
+\item Given a file named "tests/acceptance/discounts.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Discounts of \{percent\}\%&#10;  A discount is \{percent\}\% of the total, a `\{float\}`.&#10;&#10;  <span class="kw">Rule:</span> \{int\} items get 10\% off&#10;    Each \{item\} counts, a `\{word\}`.&#10;&#10;    @rd&#10;    <span class="kw">Scenario:</span> Order 3 items&#10;      <span class="fu">When</span> I order 3 items&#10;      <span class="fu">Then</span> I get 10\% off</code></pre >}
+\item And a file named "R/discount.R" with
+\preformatted{#' Discount an order
+#' @eval cucumber::features_rd(features = "discounts.feature")
+#' @export
+discount <- function(total) total}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "discount" includes
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Discounts of \{percent\}\%&#10;  A discount is \{percent\}\% of the total, a `\{float\}`.&#10;&#10;  <span class="kw">Rule:</span> \{int\} items get 10\% off&#10;    Each \{item\} counts, a `\{word\}`.</code></pre >}
+}
+}
+\subsection{Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written}{
+\itemize{
+\item Given a file named "tests/acceptance/checkout.feature.md" with
+\preformatted{# Feature: Checkout
 
-  Given a file named "DESCRIPTION" with
-    """
-    Package: example
-    Version: 0.1.0
-    Title: Example
-    Description: An example.
-    License: MIT
-    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
-    Encoding: UTF-8
-    """
-  And a file named "tests/acceptance/calculator.feature" with
-    """
-    Feature: Calculator
-      @rd
-      Scenario: Evaluate an expression
-        When I evaluate `r 1 + 1`
-        Then the result is 2
-    """
-  And a file named "R/calculate.R" with
-    """
-    #' Evaluate an expression
-    #' @eval cucumber::features_rd(features = "calculator.feature")
-    #' @export
-    calculate <- function(expression) eval(parse(text = expression))
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "calculate", preview = FALSE)
-    """
-  Then the help page "calculate" includes
-    """
-    Scenario: Evaluate an expression
-      When I evaluate `r 1 + 1`
+`@rd`
+## Scenario: Pay for the basket
+
+* Given a basket with 2 items
+* When I pay
+* Then the basket is empty}
+\item And a file named "R/pay.R" with
+\preformatted{#' Pay for a basket
+#' @eval cucumber::features_rd(features = "checkout.feature.md")
+#' @export
+pay <- function(basket) basket}
+\item When I run
+\preformatted{roxygen2::roxygenise()}
+\item Then the help page "pay" includes
+\preformatted{# Feature: Checkout
+
+## Scenario: Pay for the basket
+
+* Given a basket with 2 items
+* When I pay
+* Then the basket is empty}
+}
+}
+\subsection{Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page with markdown = FALSE}{
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "tests/acceptance/checkout.feature.md" with
+\preformatted{# Feature: Checkout
+
+`@rd`
+## Scenario Outline: Pay with <card>
+
+* Given a basket with 2 items
+* When I pay with "<card>"
+
+### Examples:
+
+  | card |
+  | ---- |
+  | visa |}
+\item And a file named "R/pay.R" with
+\preformatted{#' Pay for a basket
+#' @eval cucumber::features_rd(features = "checkout.feature.md", markdown = FALSE)
+#' @export
+pay <- function(basket) basket}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "pay", preview = FALSE)}
+\item Then the reference page "pay" highlights the Gherkin
+\tabular{ll}{
+token \tab class \cr
+Scenario Outline: \tab kw \cr
+Examples: \tab kw \cr
+Given \tab fu \cr
+When \tab fu \cr
+"<card>" \tab st \cr
+| \tab op
+}
+}
+}
+\subsection{Scenario: A Doc String of Gherkin is highlighted Gherkin, another one a code block of its media type}{
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "tests/acceptance/documentation.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Documentation&#10;  @rd&#10;  <span class="kw">Scenario:</span> Document a feature&#10;    <span class="fu">Given</span> a file named <span class="st">"basket.feature"</span> with&#10;<span class="st">      """</span>&#10;<span class="st">      Feature: Basket</span>&#10;<span class="st">        Scenario: Add an item</span>&#10;<span class="st">          Given an empty basket</span>&#10;<span class="st">      """</span>&#10;    <span class="fu">And</span> a file named <span class="st">"steps.R"</span> with&#10;<span class="st">      """r</span>&#10;<span class="st">      given("an empty basket", function(context) NULL)</span>&#10;<span class="st">      """</span></code></pre >}
+\item And a file named "R/document.R" with
+\preformatted{#' Document a feature
+#' @eval cucumber::features_rd(features = "documentation.feature")
+#' @export
+document <- function(feature) feature}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "document", preview = FALSE)}
+\item Then the reference page "document" has the Gherkin block
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And the reference page "document" highlights the Gherkin
+\tabular{ll}{
+token \tab class \cr
+Feature: \tab kw \cr
+Scenario: \tab kw \cr
+Given \tab fu
+}
+\item And the help page "document" includes
+\preformatted{given("an empty basket", function(context) NULL)}
+}
+}
+\subsection{Scenario: A cell of a table is on one line in the pkgdown reference page}{
+Its new lines are shown as \code{\\n}, like in Gherkin.
+\itemize{
+\item Given a file named "DESCRIPTION" with
+\preformatted{Package: example
+Version: 0.1.0
+Title: Example
+Description: An example.
+License: MIT
+Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+Encoding: UTF-8}
+\item And a file named "tests/acceptance/links.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Links&#10;  @rd&#10;  <span class="kw">Scenario:</span> Links&#10;    <span class="fu">Then</span> the links are:&#10;      <span class="op">|</span> links          <span class="op">|</span> separator <span class="op">|</span>&#10;      <span class="op">|</span> a.com\\nb.com   <span class="op">|</span> \\|        <span class="op">|</span></code></pre >}
+\item And a file named "R/link.R" with
+\preformatted{#' Link pages
+#' @eval cucumber::features_rd(features = "links.feature")
+#' @export
+link <- function(url) url}
+\item When I run
+\preformatted{roxygen2::roxygenise()
+pkgdown::build_reference(".", topics = "link", preview = FALSE)}
+\item Then the reference page "link" has the table
+\tabular{ll}{
+links \tab separator \cr
+a.com\\nb.com \tab |
+}
+}
+}
+\subsection{Scenario: A selection of scenarios that aren't tagged is an error}{
+\itemize{
+\item When I run it and it fails
+\preformatted{cucumber::features_rd(features = "basket.feature:13")}
+\item Then it fails with
+\preformatted{Error:
+! No scenarios to document.
+i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.}
+}
+}
+\subsection{Scenario: A selection without scenarios is an error}{
+\itemize{
+\item When I run it and it fails
+\preformatted{cucumber::features_rd(features = "basket.feature:14", tags = NULL)}
+\item Then it fails with
+\preformatted{Error:
+! No scenarios to document.
+i Select scenarios with `features`, `filter` or `name`.}
+}
+}
+}
+}    
+\if{text,latex}{\preformatted{Feature: Scenarios as documentation
+  `features_rd()` puts scenarios of feature files in the help page of a function, in a
+  "Specification" section, so readers of the help find how it behaves. Call it with `@eval`
+  in the function's roxygen block. It selects scenarios like `test()`: by `features` and their
+  lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected,
+  set the `cucumber.rd_tags` option to use another tag expression. Name the section with
+  `section`, or for every help page with the `cucumber.rd_section` option.
+
+  In the help page, each feature is one block of Gherkin, as it's written. On HTML pages, like
+  the pkgdown reference page, it's shown like Markdown with Gherkin: its name and the names of
+  its Rules, Backgrounds, scenarios and Examples are headers, its steps a list, its tables tables
+  and its Doc Strings code, a Doc String of Gherkin highlighted. With `markdown = FALSE`, HTML
+  pages show the block of Gherkin too.
+
+  Background:
+    Given a package
+    And a file named "tests/acceptance/basket.feature" with
+      """
+      Feature: Basket
+        A basket holds the items a customer wants to buy.
+
+        Background:
+          Given an empty basket
+
+        @rd
+        Scenario: Add an item
+          When I add 1 item
+          Then the basket has 1 item
+
+        @example
+        Scenario: Remove an item from an empty basket
+          When I remove 1 item
+          Then the basket is empty
+
+        @rd
+        Scenario Outline: Add items
+          When I add <n> items
+          Then the basket has <n> items
+
+          Examples:
+            | n |
+            | 2 |
+            | 3 |
+      """
+
+  Scenario: The scenarios tagged @rd are in the help page
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd()
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes
+      """
+      Specification:
+
+      Feature: Basket
+        A basket holds the items a customer wants to buy.
+
+        Background:
+          Given an empty basket
+
+        Scenario: Add an item
+          When I add 1 item
+          Then the basket has 1 item
+
+        Scenario Outline: Add items
+          When I add <n> items
+          Then the basket has <n> items
+
+          Examples:
+            | n |
+            | 2 |
+            | 3 |
+
+      Source: 'tests/acceptance/basket.feature'
+      """
+    And the help page "add" doesn't include "Remove an item"
+    And the help page "add" doesn't include "@rd"
+
+  Scenario: A feature is Markdown in the pkgdown reference page
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd()
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "add", preview = FALSE)
+      """
+    Then the reference page "add" has the headings
+      """
+      Feature: Basket
+      Background:
+      Scenario: Add an item
+      Scenario Outline: Add items
+      Examples:
+      """
+    And the reference page "add" has the steps
+      """
+      Given an empty basket
+      When I add 1 item
+      Then the basket has 1 item
+      When I add <n> items
+      Then the basket has <n> items
+      """
+    And the reference page "add" has the table
+      | n |
+      | 2 |
+      | 3 |
+
+  Scenario: A feature is one Gherkin code block in the pkgdown reference page with markdown = FALSE
+    The block has the feature's name and description, the Background and the selected
+    scenarios, like a code block of a Markdown page.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:8", markdown = FALSE)
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "add", preview = FALSE)
+      """
+    Then the reference page "add" has the Gherkin block
+      """
+      Feature: Basket
+        A basket holds the items a customer wants to buy.
+
+        Background:
+          Given an empty basket
+
+        Scenario: Add an item
+          When I add 1 item
+          Then the basket has 1 item
+      """
+
+  Scenario: The blank lines of a scenario are kept in the pkgdown reference page with markdown = FALSE
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/checkout.feature" with
+      """
+      Feature: Checkout
+        @rd
+        Scenario: Pay for the basket
+          The customer pays for every item in the basket.
+
+          Given a basket with 2 items
+          When I pay
+          Then the basket is empty
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature", markdown = FALSE)
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "add", preview = FALSE)
+      """
+    Then the reference page "add" has the Gherkin block
+      """
+      Feature: Checkout
+
+        Scenario: Pay for the basket
+          The customer pays for every item in the basket.
+
+          Given a basket with 2 items
+          When I pay
+          Then the basket is empty
+      """
+
+  Scenario: The scenarios are highlighted in the pkgdown reference page with markdown = FALSE
+    Their tokens have the classes pandoc gives tokens, so that the site's theme colours them
+    like other code, without a script.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/greeting.feature" with
+      """
+      Feature: Greeting
+        @rd
+        Scenario Outline: Greet a customer
+          # The customer gives their name
+          Given a customer named "<name>"
+          When I greet them with
+            ```
+            Hello!
+            ```
+          Then they reply
+
+          Examples:
+            | name |
+            | Ada  |
+      """
+    And a file named "R/greet.R" with
+      """
+      #' Greet a customer
+      #' @eval cucumber::features_rd(features = "greeting.feature", markdown = FALSE)
+      #' @export
+      greet <- function(name) paste("Hello", name)
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "greet", preview = FALSE)
+      """
+    Then the reference page "greet" highlights the Gherkin
+      | token                           | class |
+      | Scenario Outline:               | kw    |
+      | Examples:                       | kw    |
+      | Given                           | fu    |
+      | When                            | fu    |
+      | # The customer gives their name | co    |
+      | "<name>"                        | st    |
+      | <name>                          | va    |
+      | Hello!                          | st    |
+      | \\|                              | op    |
+
+  Scenario: A scenario selected by its line
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:8")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes "Scenario: Add an item"
+    And the help page "add" doesn't include "Scenario Outline: Add items"
+
+  Scenario: An example of an outline selected by the line of its row
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:25")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes
+      """
+      Scenario Outline: Add items
+        When I add <n> items
+        Then the basket has <n> items
+
+        Examples:
+          | n |
+          | 3 |
+      """
+    And the help page "add" doesn't include "| 2 |"
+
+  Scenario: Scenarios selected by name, whatever their tags, with tags = NULL
+    Given a file named "R/remove.R" with
+      """
+      #' Remove items from a basket
+      #' @eval cucumber::features_rd(name = "^Remove", tags = NULL)
+      #' @export
+      remove <- function(basket, n) basket - n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "remove" includes
+      """
+      Scenario: Remove an item from an empty basket
+        When I remove 1 item
+        Then the basket is empty
+      """
+    And the help page "remove" doesn't include "Scenario: Add an item"
+
+  Scenario: Scenarios of the feature files whose name matches a filter
+    Given a file named "tests/acceptance/checkout.feature" with
+      """
+      Feature: Checkout
+        @rd
+        Scenario: Pay for the basket
+          When I pay
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(filter = "^basket$")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes "Scenario: Add an item"
+    And the help page "add" doesn't include "Scenario: Pay for the basket"
+
+  Scenario: Only the selected Examples of a Scenario Outline are shown, without their tags
+    Given a file named "tests/acceptance/checkout.feature" with
+      """
+      Feature: Checkout
+        Scenario Outline: Pay with <card>
+          When I pay with <card>
+
+          @rd
+          Examples: Cards
+            | card |
+            | Visa |
+
+          Examples: Vouchers
+            | card    |
+            | voucher |
+      """
+    And a file named "R/pay.R" with
+      """
+      #' Pay for a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature")
+      #' @export
+      pay <- function(basket) basket
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "pay" includes
+      """
+      Scenario Outline: Pay with <card>
+        When I pay with <card>
+
+        Examples: Cards
+          | card |
+          | Visa |
+      """
+    And the help page "pay" doesn't include "Vouchers"
+    And the help page "pay" doesn't include "@rd"
+
+  Scenario: Another tag marks the scenarios for documentation
+    Given a file named "R/remove.R" with
+      """
+      #' Remove items from a basket
+      #' @eval cucumber::features_rd()
+      #' @export
+      remove <- function(basket, n) basket - n
+      """
+    When I run
+      """
+      withr::with_options(list(cucumber.rd_tags = "@example"), roxygen2::roxygenise())
+      """
+    Then the help page "remove" includes "Scenario: Remove an item from an empty basket"
+    And the help page "remove" doesn't include "Scenario: Add an item"
+
+  Scenario: The section has another name
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:8", section = "Examples of use")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "add" includes "Examples of use:"
+    And the help page "add" doesn't include "Specification:"
+
+  Scenario: The sections of every help page have another name
+    Given a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd(features = "basket.feature:8")
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
+      """
+    Then the help page "add" includes "Behavior:"
+    And the help page "add" doesn't include "Specification:"
+
+  Scenario: Scenarios of a Rule are under the Rule
+    Only the selected Examples of a Scenario Outline are shown, and only the Rules with
+    selected scenarios.
+
+    Given a file named "tests/acceptance/discounts.feature" with
+      """
+      Feature: Discounts
+
+        Rule: Orders over 100 get 10\% off
+
+          Scenario Outline: Discount of an order
+            When I order for <total>
+            Then I pay <paid>
+
+            @rd
+            Examples: Discounted
+              | total | paid |
+              | 200   | 180  |
+
+            Examples: Not discounted
+              | total | paid |
+              | 100   | 100  |
+
+        Rule: Members get free shipping
+
+          Scenario: A member orders
+            When a member orders
+            Then shipping is free
+      """
+    And a file named "R/discount.R" with
+      """
+      #' Discount an order
+      #' @eval cucumber::features_rd(features = "discounts.feature")
+      #' @export
+      discount <- function(total) total
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "discount" includes
+      """
+      Feature: Discounts
+
+        Rule: Orders over 100 get 10\% off
+
+          Scenario Outline: Discount of an order
+            When I order for <total>
+            Then I pay <paid>
+
+            Examples: Discounted
+              | total | paid |
+              | 200   | 180  |
+
+      Source: 'tests/acceptance/discounts.feature'
+      """
+    And the help page "discount" doesn't include "Not discounted"
+    And the help page "discount" doesn't include "Members get free shipping"
+
+  Scenario: Code between backticks is shown as written
+    roxygen doesn't evaluate it as inline R code.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/calculator.feature" with
+      """
+      Feature: Calculator
+        @rd
+        Scenario: Evaluate an expression
+          When I evaluate `r 1 + 1`
+          Then the result is 2
+      """
+    And a file named "R/calculate.R" with
+      """
+      #' Evaluate an expression
+      #' @eval cucumber::features_rd(features = "calculator.feature")
+      #' @export
+      calculate <- function(expression) eval(parse(text = expression))
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "calculate", preview = FALSE)
+      """
+    Then the help page "calculate" includes "When I evaluate `r 1 + 1`"
+    And the reference page "calculate" has the steps
+      """
+      When I evaluate r 1 + 1
       Then the result is 2
-    """
-  And the reference page "calculate" has the Gherkin block
-    """
-    Scenario: Evaluate an expression
-      When I evaluate `r 1 + 1`
-      Then the result is 2
-    """
-%</pre>
-}}
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios with characters of more than one byte are shown as written
-  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/prices.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Prices</span>
-<span class="st">      Prices are in pounds.</span>
-<span class="st"></span>
-<span class="st">      @rd</span>
-<span class="st">      Scenario: A price in pounds</span>
-<span class="st">        Given a price of £430</span>
-<span class="st">        Then the price is £430</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/price.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Price an item</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "prices.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    price &lt;- function(x) x</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"price"</span> includes
-<span class="st">    """</span>
-<span class="st">    Prices are in pounds.</span>
-<span class="st"></span>
-<span class="st">    Scenario: A price in pounds</span>
-<span class="st">      Given a price of £430</span>
-<span class="st">      Then the price is £430</span>
-<span class="st">    """</span></code></pre >}}    
-\if{text,latex}{\preformatted{Scenario: Scenarios with characters of more than one byte are shown as written
-  Given a file named "tests/acceptance/prices.feature" with
-    """
-    Feature: Prices
+  Scenario: Scenarios with characters of more than one byte are shown as written
+    Given a file named "tests/acceptance/prices.feature" with
+      """
+      Feature: Prices
+        Prices are in pounds.
+
+        @rd
+        Scenario: A price in pounds
+          Given a price of £430
+          Then the price is £430
+      """
+    And a file named "R/price.R" with
+      """
+      #' Price an item
+      #' @eval cucumber::features_rd(features = "prices.feature")
+      #' @export
+      price <- function(x) x
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "price" includes
+      """
       Prices are in pounds.
 
-      @rd
       Scenario: A price in pounds
         Given a price of £430
         Then the price is £430
-    """
-  And a file named "R/price.R" with
-    """
-    #' Price an item
-    #' @eval cucumber::features_rd(features = "prices.feature")
-    #' @export
-    price <- function(x) x
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "price" includes
-    """
-    Prices are in pounds.
+      """
 
-    Scenario: A price in pounds
-      Given a price of £430
-      Then the price is £430
-    """
+  Scenario: Names and descriptions of features and Rules are shown as written
+    Given a file named "tests/acceptance/discounts.feature" with
+      """
+      Feature: Discounts of \{percent\}\%
+        A discount is \{percent\}\% of the total, a `\{float\}`.
+
+        Rule: \{int\} items get 10\% off
+          Each \{item\} counts, a `\{word\}`.
+
+          @rd
+          Scenario: Order 3 items
+            When I order 3 items
+            Then I get 10\% off
+      """
+    And a file named "R/discount.R" with
+      """
+      #' Discount an order
+      #' @eval cucumber::features_rd(features = "discounts.feature")
+      #' @export
+      discount <- function(total) total
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "discount" includes
+      """
+      Feature: Discounts of \{percent\}\%
+        A discount is \{percent\}\% of the total, a `\{float\}`.
+
+        Rule: \{int\} items get 10\% off
+          Each \{item\} counts, a `\{word\}`.
+      """
+
+  Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written
+    Given a file named "tests/acceptance/checkout.feature.md" with
+      """
+      # Feature: Checkout
+
+      `@rd`
+      ## Scenario: Pay for the basket
+
+      * Given a basket with 2 items
+      * When I pay
+      * Then the basket is empty
+      """
+    And a file named "R/pay.R" with
+      """
+      #' Pay for a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature.md")
+      #' @export
+      pay <- function(basket) basket
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      """
+    Then the help page "pay" includes
+      """
+      # Feature: Checkout
+
+      ## Scenario: Pay for the basket
+
+      * Given a basket with 2 items
+      * When I pay
+      * Then the basket is empty
+      """
+
+  Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page with markdown = FALSE
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/checkout.feature.md" with
+      """
+      # Feature: Checkout
+
+      `@rd`
+      ## Scenario Outline: Pay with <card>
+
+      * Given a basket with 2 items
+      * When I pay with "<card>"
+
+      ### Examples:
+
+        | card |
+        | ---- |
+        | visa |
+      """
+    And a file named "R/pay.R" with
+      """
+      #' Pay for a basket
+      #' @eval cucumber::features_rd(features = "checkout.feature.md", markdown = FALSE)
+      #' @export
+      pay <- function(basket) basket
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "pay", preview = FALSE)
+      """
+    Then the reference page "pay" highlights the Gherkin
+      | token             | class |
+      | Scenario Outline: | kw    |
+      | Examples:         | kw    |
+      | Given             | fu    |
+      | When              | fu    |
+      | "<card>"          | st    |
+      | \\|                | op    |
+
+  Scenario: A Doc String of Gherkin is highlighted Gherkin, another one a code block of its media type
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/documentation.feature" with
+      ```
+      Feature: Documentation
+        @rd
+        Scenario: Document a feature
+          Given a file named "basket.feature" with
+            """
+            Feature: Basket
+              Scenario: Add an item
+                Given an empty basket
+            """
+          And a file named "steps.R" with
+            """r
+            given("an empty basket", function(context) NULL)
+            """
+      ```
+    And a file named "R/document.R" with
+      """
+      #' Document a feature
+      #' @eval cucumber::features_rd(features = "documentation.feature")
+      #' @export
+      document <- function(feature) feature
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "document", preview = FALSE)
+      """
+    Then the reference page "document" has the Gherkin block
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And the reference page "document" highlights the Gherkin
+      | token     | class |
+      | Feature:  | kw    |
+      | Scenario: | kw    |
+      | Given     | fu    |
+    And the help page "document" includes
+      """
+      given("an empty basket", function(context) NULL)
+      """
+
+  Scenario: A cell of a table is on one line in the pkgdown reference page
+    Its new lines are shown as `\\n`, like in Gherkin.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/links.feature" with
+      """
+      Feature: Links
+        @rd
+        Scenario: Links
+          Then the links are:
+            | links          | separator |
+            | a.com\\nb.com   | \\|        |
+      """
+    And a file named "R/link.R" with
+      """
+      #' Link pages
+      #' @eval cucumber::features_rd(features = "links.feature")
+      #' @export
+      link <- function(url) url
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "link", preview = FALSE)
+      """
+    Then the reference page "link" has the table
+      | links         | separator |
+      | a.com\\\\nb.com | \\|        |
+
+  Scenario: A selection of scenarios that aren't tagged is an error
+    When I run it and it fails
+      """
+      cucumber::features_rd(features = "basket.feature:13")
+      """
+    Then it fails with
+      """
+      Error:
+      ! No scenarios to document.
+      i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.
+      """
+
+  Scenario: A selection without scenarios is an error
+    When I run it and it fails
+      """
+      cucumber::features_rd(features = "basket.feature:14", tags = NULL)
+      """
+    Then it fails with
+      """
+      Error:
+      ! No scenarios to document.
+      i Select scenarios with `features`, `filter` or `name`.
+      """
 %</pre>
 }}    
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Names and descriptions of features and Rules are shown as written
-  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/discounts.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Discounts of \{percent\}\%</span>
-<span class="st">      A discount is \{percent\}\% of the total, a `\{float\}`.</span>
-<span class="st"></span>
-<span class="st">      Rule: \{int\} items get 10\% off</span>
-<span class="st">        Each \{item\} counts, a `\{word\}`.</span>
-<span class="st"></span>
-<span class="st">        @rd</span>
-<span class="st">        Scenario: Order 3 items</span>
-<span class="st">          When I order 3 items</span>
-<span class="st">          Then I get 10\% off</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/discount.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Discount an order</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "discounts.feature")</span>
-<span class="st">    #' @export</span>
-<span class="st">    discount &lt;- function(total) total</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"discount"</span> includes
-<span class="st">    """</span>
-<span class="st">    Discounts of \{percent\}\%:</span>
-<span class="st"></span>
-<span class="st">    A discount is \{percent\}\% of the total, a '\{float\}'.</span>
-<span class="st"></span>
-<span class="st">    *Rule: \{int\} items get 10\% off*</span>
-<span class="st"></span>
-<span class="st">    Each \{item\} counts, a '\{word\}'.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Names and descriptions of features and Rules are shown as written
-  Given a file named "tests/acceptance/discounts.feature" with
-    """
-    Feature: Discounts of \{percent\}\%
-      A discount is \{percent\}\% of the total, a `\{float\}`.
-
-      Rule: \{int\} items get 10\% off
-        Each \{item\} counts, a `\{word\}`.
-
-        @rd
-        Scenario: Order 3 items
-          When I order 3 items
-          Then I get 10\% off
-    """
-  And a file named "R/discount.R" with
-    """
-    #' Discount an order
-    #' @eval cucumber::features_rd(features = "discounts.feature")
-    #' @export
-    discount <- function(total) total
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "discount" includes
-    """
-    Discounts of \{percent\}\%:
-
-    A discount is \{percent\}\% of the total, a '\{float\}'.
-
-    *Rule: \{int\} items get 10\% off*
-
-    Each \{item\} counts, a '\{word\}'.
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of Markdown with Gherkin are in the help page as they are written
-  <span class="fu">Given</span> a file named <span class="st">"tests/acceptance/checkout.feature.md"</span> with
-<span class="st">    """</span>
-<span class="st">    # Feature: Checkout</span>
-<span class="st"></span>
-<span class="st">    `@rd`</span>
-<span class="st">    ## Scenario: Pay for the basket</span>
-<span class="st"></span>
-<span class="st">    * Given a basket with 2 items</span>
-<span class="st">    * When I pay</span>
-<span class="st">    * Then the basket is empty</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/pay.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Pay for a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature.md")</span>
-<span class="st">    #' @export</span>
-<span class="st">    pay &lt;- function(basket) basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the help page <span class="st">"pay"</span> includes
-<span class="st">    """</span>
-<span class="st">    Checkout:</span>
-<span class="st"></span>
-<span class="st">    ## Scenario: Pay for the basket</span>
-<span class="st"></span>
-<span class="st">    * Given a basket with 2 items</span>
-<span class="st">    * When I pay</span>
-<span class="st">    * Then the basket is empty</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written
-  Given a file named "tests/acceptance/checkout.feature.md" with
-    """
-    # Feature: Checkout
-
-    `@rd`
-    ## Scenario: Pay for the basket
-
-    * Given a basket with 2 items
-    * When I pay
-    * Then the basket is empty
-    """
-  And a file named "R/pay.R" with
-    """
-    #' Pay for a basket
-    #' @eval cucumber::features_rd(features = "checkout.feature.md")
-    #' @export
-    pay <- function(basket) basket
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    """
-  Then the help page "pay" includes
-    """
-    Checkout:
-
-    ## Scenario: Pay for the basket
-
-    * Given a basket with 2 items
-    * When I pay
-    * Then the basket is empty
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page
-  <span class="fu">Given</span> a file named <span class="st">"DESCRIPTION"</span> with
-<span class="st">    """</span>
-<span class="st">    Package: example</span>
-<span class="st">    Version: 0.1.0</span>
-<span class="st">    Title: Example</span>
-<span class="st">    Description: An example.</span>
-<span class="st">    License: MIT</span>
-<span class="st">    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))</span>
-<span class="st">    Encoding: UTF-8</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/acceptance/checkout.feature.md"</span> with
-<span class="st">    """</span>
-<span class="st">    # Feature: Checkout</span>
-<span class="st"></span>
-<span class="st">    `@rd`</span>
-<span class="st">    ## Scenario Outline: Pay with &lt;card&gt;</span>
-<span class="st"></span>
-<span class="st">    * Given a basket with 2 items</span>
-<span class="st">    * When I pay with "&lt;card&gt;"</span>
-<span class="st"></span>
-<span class="st">    ### Examples:</span>
-<span class="st"></span>
-<span class="st">      | card |</span>
-<span class="st">      | ---- |</span>
-<span class="st">      | visa |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"R/pay.R"</span> with
-<span class="st">    """</span>
-<span class="st">    #' Pay for a basket</span>
-<span class="st">    #' @eval cucumber::features_rd(features = "checkout.feature.md")</span>
-<span class="st">    #' @export</span>
-<span class="st">    pay &lt;- function(basket) basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    roxygen2::roxygenise()</span>
-<span class="st">    pkgdown::build_reference(".", topics = "pay", preview = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the reference page <span class="st">"pay"</span> highlights the Gherkin
-    <span class="op">|</span> token             <span class="op">|</span> class <span class="op">|</span>
-    <span class="op">|</span> Scenario Outline: <span class="op">|</span> kw    <span class="op">|</span>
-    <span class="op">|</span> Examples:         <span class="op">|</span> kw    <span class="op">|</span>
-    <span class="op">|</span> Given             <span class="op">|</span> fu    <span class="op">|</span>
-    <span class="op">|</span> When              <span class="op">|</span> fu    <span class="op">|</span>
-    <span class="op">|</span> <span class="st">"<span class="va">&lt;card&gt;</span>"</span>          <span class="op">|</span> st    <span class="op">|</span>
-    <span class="op">|</span> \\|                <span class="op">|</span> op    <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page
-  Given a file named "DESCRIPTION" with
-    """
-    Package: example
-    Version: 0.1.0
-    Title: Example
-    Description: An example.
-    License: MIT
-    Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
-    Encoding: UTF-8
-    """
-  And a file named "tests/acceptance/checkout.feature.md" with
-    """
-    # Feature: Checkout
-
-    `@rd`
-    ## Scenario Outline: Pay with <card>
-
-    * Given a basket with 2 items
-    * When I pay with "<card>"
-
-    ### Examples:
-
-      | card |
-      | ---- |
-      | visa |
-    """
-  And a file named "R/pay.R" with
-    """
-    #' Pay for a basket
-    #' @eval cucumber::features_rd(features = "checkout.feature.md")
-    #' @export
-    pay <- function(basket) basket
-    """
-  When I run
-    """
-    roxygen2::roxygenise()
-    pkgdown::build_reference(".", topics = "pay", preview = FALSE)
-    """
-  Then the reference page "pay" highlights the Gherkin
-    | token             | class |
-    | Scenario Outline: | kw    |
-    | Examples:         | kw    |
-    | Given             | fu    |
-    | When              | fu    |
-    | "<card>"          | st    |
-    | \\|                | op    |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A selection of scenarios that aren't tagged is an error
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    cucumber::features_rd(features = "basket.feature:13")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! No scenarios to document.</span>
-<span class="st">    i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A selection of scenarios that aren't tagged is an error
-  When I run it and it fails
-    """
-    cucumber::features_rd(features = "basket.feature:13")
-    """
-  Then it fails with
-    """
-    Error:
-    ! No scenarios to document.
-    i Tag the scenarios with `@rd`, or select them whatever their tags with `tags = NULL`.
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A selection without scenarios is an error
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    cucumber::features_rd(features = "basket.feature:14", tags = NULL)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! No scenarios to document.</span>
-<span class="st">    i Select scenarios with `features`, `filter` or `name`.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A selection without scenarios is an error
-  When I run it and it fails
-    """
-    cucumber::features_rd(features = "basket.feature:14", tags = NULL)
-    """
-  Then it fails with
-    """
-    Error:
-    ! No scenarios to document.
-    i Select scenarios with `features`, `filter` or `name`.
-    """
-%</pre>
-}}
-
 Source: \code{tests/acceptance/r-features_rd.feature}
-}
 }
 

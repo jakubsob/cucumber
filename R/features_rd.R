@@ -11,16 +11,22 @@
 #' add <- function(basket, n) basket + n
 #' ```
 #'
-#' It adds a section, "Specification" by default, with each selected feature: its name, its description,
-#' the Backgrounds of the selected scenarios and the scenarios as they are written, without
+#' It adds a section, "Specification" by default, with each selected feature: its name, its
+#' description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
 #' their tags. Of a Scenario Outline, only the selected Examples rows are shown.
+#'
+#' In the help page, each feature is one block of Gherkin, as it's written. On HTML pages,
+#' like the pkgdown reference page, it's shown like Markdown with Gherkin: the names of the
+#' feature and of its Rules, Backgrounds, scenarios and Examples are headers, steps are a
+#' list, tables are tables and Doc Strings are code, a Doc String of Gherkin highlighted as
+#' Gherkin. With `markdown = FALSE`, HTML pages show the block of Gherkin too.
 #'
 #' Scenarios are selected like in [test()]. By default only scenarios tagged `@rd` are
 #' selected, so that you choose the ones that make good documentation. Set the
 #' `cucumber.rd_tags` option to use another tag expression, or pass `tags = NULL` to select
 #' scenarios without a tag.
 #'
-#' On a pkgdown site, the scenarios are highlighted by the site's theme, like other code.
+#' On a pkgdown site, code is highlighted by the site's theme.
 #'
 #' It turns on markdown for the roxygen block it's in.
 #'
@@ -40,6 +46,8 @@
 #'   `"addition.feature:12"`. The line of an example row selects only that example.
 #' @param section Name of the section. Defaults to the `cucumber.rd_section` option, or
 #'   `"Specification"` if it's not set.
+#' @param markdown If TRUE, HTML pages show each feature like Markdown with Gherkin. If
+#'   FALSE, they show it as one block of Gherkin, as it's written, like the help page.
 #' @param ... Additional arguments passed to `grepl()`.
 #' @return Lines of roxygen tags, for `@eval`.
 #'
@@ -54,16 +62,18 @@ features_rd <- function(
   name = NULL,
   features = NULL,
   section = getOption("cucumber.rd_section", "Specification"),
+  markdown = TRUE,
   ...
 ) {
   checkmate::assert_string(section, min.chars = 1)
+  checkmate::assert_flag(markdown)
   check_selection(path, filter, tags, name, features, ...)
   lines <- feature_lines(features, path)
   files <- select_features(path, filter, lines, ...)
   sources <- parse_features(files)
   rd <- unlist(map(files, \(file) {
     pickles <- filter_pickles(sources[[file]]$pickles, tags, name, lines[[file]])
-    feature_rd(sources[[file]]$document, pickles, read_feature(file), file)
+    feature_rd(sources[[file]]$document, pickles, read_feature(file), file, markdown)
   }))
   if (length(rd) == 0) {
     abort_user(
@@ -78,15 +88,17 @@ features_rd <- function(
   c("@md", paste0("@section ", section, ":"), rd)
 }
 
-#' Markdown of a feature with its selected scenarios, written as in its source
+#' Rd of a feature with its selected scenarios: a block of Gherkin written as
+#' in its source, and for HTML like Markdown with Gherkin or the same block
 #'
 #' @param pickles The selected pickles of the document
 #' @param source The lines of the feature file
-#' @return Lines of markdown, or NULL if no scenario is selected
+#' @param markdown Whether HTML shows it like Markdown with Gherkin
+#' @return Lines of Rd, or NULL if no scenario is selected
 #' @importFrom purrr map map_chr map_int
 #' @keywords internal
 #' @noRd
-feature_rd <- function(document, pickles, source, file) {
+feature_rd <- function(document, pickles, source, file, markdown) {
   if (length(pickles) == 0) {
     return(NULL)
   }
@@ -101,7 +113,12 @@ feature_rd <- function(document, pickles, source, file) {
     node <- child$background %||% child$scenario %||% child$rule
     first_line(node)
   })), length(source) + 1)
-  block <- function(node, drop = integer()) {
+  # The lines of a node, from its keyword to the next child, without its tags
+  # and, of a Scenario Outline, without the Examples' tags and unselected rows
+  node_lines <- function(node, level) {
+    drop <- unlist(map(node$examples, \(examples) {
+      c(map_int(examples$tags, \(tag) tag$location$line), unselected_rows(examples, selected))
+    }))
     from <- node$location$line
     to <- min(starts[starts > from]) - 1
     lines <- setdiff(from:to, drop)
@@ -109,63 +126,175 @@ feature_rd <- function(document, pickles, source, file) {
     while (length(lines) > 0 && grepl(flavour$block_end, source[[lines[[length(lines)]]]])) {
       lines <- lines[-length(lines)]
     }
-    code <- flavour$block_code(source[lines], node$location$column)
-    # Rd, not a markdown code block: pkgdown empties code blocks of a language
-    # pandoc can't highlight, like gherkin, and highlights the others as R. In
-    # HTML it's a gherkin block, highlighted here as pandoc can't
-    rd_escape <- \(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
-    html <- rd_escape(gherkin_html(code, lines, tokens))
-    # pkgdown splits a section into paragraphs at blank lines, even in \out,
-    # and joins the lines around them, so a blank line gets an empty element
-    html[grepl("^\\s*$", html)] <- "<span></span>"
-    html[[1]] <- paste0("<pre class=\"gherkin\"><code>", html[[1]])
-    # roxygen finds the end of an \if in bytes, but cuts the text in
-    # characters, so each extra byte of a character like £ takes one more
-    # character after it: spaces, not the Rd that follows
-    padding <- \(x) strrep(" ", sum(nchar(x, "bytes") - nchar(x)))
-    # roxygen evaluates `r ` code of the markdown before it reads Rd, so a
-    # ```r Doc String and the backticks of a description would make R code.
-    # Markdown isn't read in an HTML block, from a line starting with <pre to
-    # a line with </pre>: both copies are in one, ended by an Rd comment
-    html[[length(html)]] <- paste0(html[[length(html)]], "</code></pre >}}", padding(html))
-    code <- rd_escape(code)
-    code[[1]] <- paste0("\\if{text,latex}{\\preformatted{", code[[1]])
-    c("\\if{html}{\\out{", html, code, "%</pre>", paste0("}}", padding(code)), "")
+    lines
   }
-  scenario_block <- function(scenario) {
-    if (is.null(scenario) || !scenario$id %in% selected) {
-      return(NULL)
-    }
-    # Without the Examples' tags, like the scenario's
-    drop <- unlist(map(scenario$examples, \(examples) {
-      c(map_int(examples$tags, \(tag) tag$location$line), unselected_rows(examples, selected))
-    }))
-    block(scenario, drop)
-  }
-  children_rd <- function(children) {
-    scenarios <- unlist(map(children, \(child) scenario_block(child$scenario)))
-    rules <- unlist(map(children, \(child) if (!is.null(child$rule)) rule_rd(child$rule)))
-    if (length(scenarios) == 0 && length(rules) == 0) {
+  # A list of the parts of the children, made by `part` of a node and its
+  # level: their Background and selected scenarios, and the Rules with selected
+  # scenarios
+  children_parts <- function(children, part, level = 1) {
+    parts <- unlist(map(children, \(child) {
+      if (!is.null(child$scenario) && child$scenario$id %in% selected) {
+        list(part(child$scenario, level))
+      } else if (!is.null(child$rule)) {
+        rule_parts <- children_parts(child$rule$children, part, level + 1)
+        if (length(rule_parts) > 0) c(list(part(child$rule, level)), rule_parts)
+      }
+    }), recursive = FALSE)
+    if (length(parts) == 0) {
       return(NULL)
     }
     background <- Find(\(child) !is.null(child$background), children)$background
-    c(if (!is.null(background)) block(background), scenarios, rules)
+    c(if (!is.null(background)) list(part(background, level)), parts)
   }
-  rule_rd <- function(rule) {
-    rd <- children_rd(rule$children)
-    if (is.null(rd)) {
-      return(NULL)
+  parts <- function(part) c(list(part(feature, 0)), children_parts(feature$children, part))
+  # Line 0 is the blank line between parts
+  lines <- unlist(map(parts(node_lines), \(part) c(0L, part)))[-1]
+  code <- flavour$block_code(c("", source)[lines + 1], feature$location$column)
+  html <- if (markdown) {
+    html <- nest_subsections(parts(\(node, level) node_rd(node, level, selected)))
+    # An empty block to start the HTML block of gherkin_rd()
+    c("<pre hidden></pre >}}", "\\if{html}{", html, paste0("}", padding(html)))
+  } else {
+    pre <- gherkin_pre(code, lines, tokens)
+    paste0(pre, "}}", padding(pre))
+  }
+  c(gherkin_rd(code, html), paste0("Source: `", file, "`"), "")
+}
+
+#' Rd of a node with its steps and selected Examples, like Markdown with
+#' Gherkin of `pretty()` of the Gherkin utilities: a subsection, a list of
+#' steps, tables, and Doc Strings as code
+#' @param level 0 for the Feature, 1 for its Rules and children, 2 for the
+#'   children of a Rule
+#' @param selected The ids of the selected Examples rows
+#' @return Lines of Rd, of a subsection left open, with its `level`
+#' @keywords internal
+#' @noRd
+node_rd <- function(node, level, selected) {
+  name <- if (nzchar(node$name)) paste0(": ", rd_text(node$name)) else ":"
+  description <- if (nzchar(node$description %||% "")) rd_text(trimws(strsplit(node$description, "\n")[[1]]))
+  steps <- unlist(map(node$steps, \(step) {
+    c(
+      paste0("\\item ", step$keyword, rd_text(step$text)),
+      if (!is.null(step$dataTable)) table_rd(step$dataTable$rows),
+      if (!is.null(step$docString)) doc_string_rd(step$docString)
+    )
+  }))
+  examples <- unlist(map(node$examples, \(examples) {
+    rows <- Filter(\(row) row$id %in% selected, examples$tableBody)
+    if (length(rows) > 0) {
+      c(node_rd(examples, level + 1, selected), table_rd(c(list(examples$tableHeader), rows)), "}")
     }
-    c(paste0("**", rule$keyword, ": ", escape_braces(rule$name), "**"), "", description_rd(rule$description), rd)
+  }))
+  structure(c(
+    paste0("\\subsection{", node$keyword, name, "}{"),
+    description,
+    if (length(steps) > 0) c("\\itemize{", steps, "}"),
+    examples
+  ), level = level)
+}
+
+#' Rd of subsections left open, each closed before the next one of its level
+#' or a lower one
+#' @param parts Lines of Rd, with their `level`
+#' @keywords internal
+#' @noRd
+nest_subsections <- function(parts) {
+  open <- integer()
+  rd <- character()
+  for (part in parts) {
+    level <- attr(part, "level")
+    rd <- c(rd, rep("}", sum(open >= level)), part)
+    open <- c(open[open < level], level)
   }
+  c(rd, rep("}", length(open)))
+}
+
+#' Rd of the rows of a table, the first one its header. A cell is on one
+#' line, its new lines shown as in Gherkin
+#' @keywords internal
+#' @noRd
+table_rd <- function(rows) {
+  cells <- map(rows, \(row) map_chr(row$cells, \(cell) rd_text(gsub("\n", "\\n", cell$value, fixed = TRUE))))
   c(
-    paste0("## ", escape_braces(if (nzchar(feature$name)) feature$name else feature$keyword)),
-    "",
-    description_rd(feature$description),
-    children_rd(feature$children),
-    paste0("Source: `", file, "`"),
-    ""
+    paste0("\\tabular{", strrep("l", length(cells[[1]])), "}{"),
+    # Without a \cr after the last row, which would be an empty row
+    paste(map_chr(cells, \(x) paste(x, collapse = " \\tab ")), collapse = " \\cr\n"),
+    "}"
   )
+}
+
+#' Rd of a Doc String: highlighted Gherkin when it's Gherkin, else code
+#' @keywords internal
+#' @noRd
+doc_string_rd <- function(doc_string) {
+  content <- strsplit(doc_string$content, "\n")[[1]]
+  content <- if (length(content) == 0) "" else content
+  media_type <- doc_string$mediaType %||% ""
+  document <- if (media_type %in% c("", "gherkin")) tryCatch(parse_gherkin(content), error = \(e) NULL)
+  if (!is.null(document$feature) || media_type == "gherkin") {
+    tokens <- gherkin_tokens(document %||% list(), content)
+    return(paste0("\\out{", gherkin_pre(content, seq_along(content), tokens), "}"))
+  }
+  code <- rd_escape(content)
+  code[[1]] <- paste0("\\preformatted{", code[[1]])
+  code[[length(code)]] <- paste0(code[[length(code)]], "}")
+  code
+}
+
+#' Rd of text: escaped, with its code spans as code
+#' @keywords internal
+#' @noRd
+rd_text <- function(x) {
+  map_chr(regmatches(x, gregexpr("`[^`]*`", x), invert = NA), \(pieces) {
+    code <- seq_along(pieces) %% 2 == 0
+    pieces[code] <- paste0("\\code{", rd_escape(substring(pieces[code], 2, nchar(pieces[code]) - 1)), "}")
+    pieces[!code] <- rd_escape(pieces[!code])
+    paste(pieces, collapse = "")
+  })
+}
+
+rd_escape <- function(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed = TRUE))
+
+#' Spaces after the end of an \if: roxygen finds it in bytes, but cuts the
+#' text in characters, so each extra byte of a character like £ takes one
+#' more character after it, spaces and not the Rd that follows
+#' @keywords internal
+#' @noRd
+padding <- function(x) strrep(" ", sum(nchar(x, "bytes") - nchar(x)))
+
+#' HTML of lines of Gherkin, highlighted, as a pkgdown code block: on one
+#' line, as pkgdown splits a section into paragraphs at blank lines, even in
+#' \out, and with `</pre >`, not ending the HTML block of `gherkin_rd()`
+#' @param lines Their numbers in the document of `tokens`
+#' @param tokens Of `gherkin_tokens()`
+#' @keywords internal
+#' @noRd
+gherkin_pre <- function(code, lines, tokens) {
+  paste0(
+    "<pre class=\"gherkin\"><code>",
+    rd_escape(paste(gherkin_html(code, lines, tokens), collapse = "&#10;")),
+    "</code></pre >"
+  )
+}
+
+#' Rd of a feature: the lines of Gherkin as they're written, and for HTML
+#' its Rd
+#' @param code The lines
+#' @param html Lines of Rd for HTML, after an opening `\\if` and `\\out`: the
+#'   first one starts with `<pre` and closes them
+#' @keywords internal
+#' @noRd
+gherkin_rd <- function(code, html) {
+  # Rd, not a markdown code block: pkgdown empties code blocks of a language
+  # pandoc can't highlight, like gherkin, and highlights the others as R.
+  # roxygen evaluates `r ` code of the markdown before it reads Rd, so a
+  # ```r Doc String and the backticks of a description would make R code.
+  # Markdown isn't read in an HTML block, from a line starting with <pre to
+  # a line with </pre>: all of it is in one, ended by an Rd comment
+  code <- rd_escape(code)
+  code[[1]] <- paste0("\\if{text,latex}{\\preformatted{", code[[1]])
+  c("\\if{html}{\\out{", html, code, "%</pre>", paste0("}}", padding(code)), "")
 }
 
 #' The first line of a node: of its tags, or of its keyword
@@ -187,21 +316,6 @@ unselected_rows <- function(examples, selected) {
   }
   last <- if (length(rows) > 0) rows[[length(rows)]] else examples$tableHeader
   seq(first_line(examples), last$location$line %||% examples$location$line)
-}
-
-#' Escape the braces of markdown text, which Rd would read as a group. roxygen
-#' escapes the rest, and the braces of code spans.
-#' @keywords internal
-#' @noRd
-escape_braces <- function(x) {
-  gsub("`[^`]*`(*SKIP)(*FAIL)|([{}])", "\\\\\\1", x, perl = TRUE)
-}
-
-description_rd <- function(description) {
-  if (!nzchar(description)) {
-    return(NULL)
-  }
-  c(escape_braces(trimws(strsplit(description, "\n")[[1]])), "")
 }
 
 #' The lines of a document's tokens that pandoc's highlighting classes are for

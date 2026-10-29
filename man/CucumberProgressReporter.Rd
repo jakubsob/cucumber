@@ -22,8 +22,10 @@ To see each step, use \link{CucumberPrettyReporter}.
 }
 \section{Specification}{
 
-\subsection{Progress reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Progress reporter}{
 \code{CucumberProgressReporter} is the default reporter. Like testthat's \code{ProgressReporter}, it prints
 one line for each feature, with its scenarios counted by status: failed (F), pending (P),
 undefined (U), skipped (S) and passed (OK). An ambiguous scenario counts as failed. A feature that
@@ -31,275 +33,230 @@ took a second or more shows how long it took. A scenario that didn't pass is pri
 it finishes, and again in the summary at the end.
 In a terminal that can redraw a line, a feature's line is redrawn with a spinner after each step.
 Elsewhere, like in CI, it's printed once the feature finishes.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 1 item&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I remove 1 item&#10;&#10;  <span class="kw">Scenario:</span> Pay for the items&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I pay</code></pre >}
+\item And a file named "features/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  <span class="kw">Scenario:</span> Check out an empty basket&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I add \{int\} item", function(n, context) \{\})
+when("I remove \{int\} item", function(n, context) stop("The basket is empty"))}
+}
+}
+\subsection{Scenario: Each feature is a line with its scenarios counted by status}{
+\itemize{
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{|  F  P  U  S  OK | Feature}
+\item And the output includes
+\preformatted{x |  1     1      1 | Basket}
+\item And the output includes
+\preformatted{v |               1 | Checkout}
+}
+}
+\subsection{Scenario: A scenario that didn't pass is printed when it finishes}{
+\itemize{
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the output includes
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;<span class="kw">Scenario:</span> Remove an item&#10;v Given an empty basket&#10;x When I remove 1 item</code></pre >}
+\item And the output includes
+\preformatted{Scenario: Pay for the items
+v Given an empty basket
+U When I pay}
+\item And the output includes
+\preformatted{4 scenarios (1 failed, 1 undefined, 2 passed)}
+}
+}
+\subsection{Scenario: A scenario that didn't pass is printed before its feature's line, and again in the summary}{
+\itemize{
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the output includes these lines in order:
+\preformatted{Scenario: Remove an item
+x When I remove 1 item
+x |  1     1      1 | Basket
+Failures:
+1) Scenario: Remove an item # basket.feature:6
+x When I remove 1 item}
+\item And the output includes "x When I remove 1 item" 2 times
+}
+}
+\subsection{Scenario: A warning is printed as it's raised}{
+\itemize{
+\item Given a file named "features/setup-hooks.R" with
+\preformatted{before(function(context, scenario) \{
+  if (scenario$name == "Add an item") warning("The shop is busy")
+\})}
+\item When I run it and it fails
+\preformatted{test("features")}
+\item Then the output includes
+\preformatted{Warning:
+The shop is busy}
+}
+}
+\subsection{Scenario: The error that stopped the run is printed}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{before_all(function() stop("the server didn't start"))
+given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{Error:
+Hook `before_all()` failed
+i Hook defined at: setup-steps.R:1
+Caused by error:
+! the server didn't start}
+\item And the output includes
+\preformatted{0 scenarios}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Progress reporter
+  `CucumberProgressReporter` is the default reporter. Like testthat's `ProgressReporter`, it prints
+  one line for each feature, with its scenarios counted by status: failed (F), pending (P),
+  undefined (U), skipped (S) and passed (OK). An ambiguous scenario counts as failed. A feature that
+  took a second or more shows how long it took. A scenario that didn't pass is printed as soon as
+  it finishes, and again in the summary at the end.
+  In a terminal that can redraw a line, a feature's line is redrawn with a spinner after each step.
+  Elsewhere, like in CI, it's printed once the feature finishes.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I remove 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Pay for the items</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I pay</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      Scenario: Check out an empty basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add \{int\} item", function(n, context) \{\})</span>
-<span class="st">    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add 1 item
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add 1 item
 
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove 1 item
+
+        Scenario: Pay for the items
+          Given an empty basket
+          When I pay
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+        Scenario: Check out an empty basket
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I add \{int\} item", function(n, context) \{\})
+      when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
+      """
+
+  Scenario: Each feature is a line with its scenarios counted by status
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      |  F  P  U  S  OK | Feature
+      """
+    And the output includes
+      """
+      x |  1     1      1 | Basket
+      """
+    And the output includes
+      """
+      v |               1 | Checkout
+      """
+
+  Scenario: A scenario that didn't pass is printed when it finishes
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      Feature: Basket
       Scenario: Remove an item
-        Given an empty basket
-        When I remove 1 item
-
+      v Given an empty basket
+      x When I remove 1 item
+      """
+    And the output includes
+      """
       Scenario: Pay for the items
-        Given an empty basket
-        When I pay
-    """
-  And a file named "features/checkout.feature" with
-    """
-    Feature: Checkout
-      Scenario: Check out an empty basket
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} item", function(n, context) \{\})
-    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
-    """
-%</pre>
-}}
+      v Given an empty basket
+      U When I pay
+      """
+    And the output includes
+      """
+      4 scenarios (1 failed, 1 undefined, 2 passed)
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each feature is a line with its scenarios counted by status
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    |  F  P  U  S  OK | Feature</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    x |  1     1      1 | Basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    v |               1 | Checkout</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each feature is a line with its scenarios counted by status
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    |  F  P  U  S  OK | Feature
-    """
-  And the output includes
-    """
-    x |  1     1      1 | Basket
-    """
-  And the output includes
-    """
-    v |               1 | Checkout
-    """
-%</pre>
-}}
+  Scenario: A scenario that didn't pass is printed before its feature's line, and again in the summary
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      Scenario: Remove an item
+      x When I remove 1 item
+      x |  1     1      1 | Basket
+      Failures:
+      1) Scenario: Remove an item # basket.feature:6
+      x When I remove 1 item
+      """
+    And the output includes "x When I remove 1 item" 2 times
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that didn't pass is printed when it finishes
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">    Scenario: Remove an item</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Scenario: Pay for the items</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    U When I pay</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    4 scenarios (1 failed, 1 undefined, 2 passed)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A scenario that didn't pass is printed when it finishes
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Feature: Basket
-    Scenario: Remove an item
-    v Given an empty basket
-    x When I remove 1 item
-    """
-  And the output includes
-    """
-    Scenario: Pay for the items
-    v Given an empty basket
-    U When I pay
-    """
-  And the output includes
-    """
-    4 scenarios (1 failed, 1 undefined, 2 passed)
-    """
-%</pre>
-}}
+  Scenario: A warning is printed as it's raised
+    Given a file named "features/setup-hooks.R" with
+      """
+      before(function(context, scenario) \{
+        if (scenario$name == "Add an item") warning("The shop is busy")
+      \})
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then the output includes
+      """
+      Warning:
+      The shop is busy
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that didn't pass is printed before its feature's line, and again in the summary
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    Scenario: Remove an item</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    x |  1     1      1 | Basket</span>
-<span class="st">    Failures:</span>
-<span class="st">    1) Scenario: Remove an item # basket.feature:6</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes <span class="st">"x When I remove 1 item"</span> 2 times</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A scenario that didn't pass is printed before its feature's line, and again in the summary
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes these lines in order:
-    """
-    Scenario: Remove an item
-    x When I remove 1 item
-    x |  1     1      1 | Basket
-    Failures:
-    1) Scenario: Remove an item # basket.feature:6
-    x When I remove 1 item
-    """
-  And the output includes "x When I remove 1 item" 2 times
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A warning is printed as it's raised
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-hooks.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) \{</span>
-<span class="st">      if (scenario$name == "Add an item") warning("The shop is busy")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Warning:</span>
-<span class="st">    The shop is busy</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A warning is printed as it's raised
-  Given a file named "features/setup-hooks.R" with
-    """
-    before(function(context, scenario) \{
-      if (scenario$name == "Add an item") warning("The shop is busy")
-    \})
-    """
-  When I run it and it fails
-    """
-    test("features")
-    """
-  Then the output includes
-    """
-    Warning:
-    The shop is busy
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The error that stopped the run is printed
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before_all(function() stop("the server didn't start"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    Hook `before_all()` failed</span>
-<span class="st">    i Hook defined at: setup-steps.R:1</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! the server didn't start</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    0 scenarios</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The error that stopped the run is printed
-  Given a file named "features/setup-steps.R" with
-    """
-    before_all(function() stop("the server didn't start"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Error:
-    Hook `before_all()` failed
-    i Hook defined at: setup-steps.R:1
-    Caused by error:
-    ! the server didn't start
-    """
-  And the output includes
-    """
-    0 scenarios
-    """
+  Scenario: The error that stopped the run is printed
+    Given a file named "features/setup-steps.R" with
+      """
+      before_all(function() stop("the server didn't start"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      Error:
+      Hook `before_all()` failed
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! the server didn't start
+      """
+    And the output includes
+      """
+      0 scenarios
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-progress_reporter.feature}
-}
 }
 
 \examples{

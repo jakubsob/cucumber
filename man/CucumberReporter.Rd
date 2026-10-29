@@ -36,373 +36,325 @@ Combine reporters with \link{CucumberMultiReporter}.
 
 \section{Specification}{
 
-\subsection{Custom reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Custom reporter}{
 Extend \code{CucumberReporter} to report the run your way. A reporter gets the start and the end of the
 run, each of its Cucumber Messages and the warnings raised in it.
 Pass the reporter to \code{test()} or \code{run()} with \code{reporter}. Only cucumber reporters can report a run,
 testthat reporters can't.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "event-reporter.R" with
+\preformatted{EventReporter <- R6::R6Class(
+  "EventReporter",
+  inherit = cucumber::CucumberReporter,
+  public = list(
+    start_run = function() cat("start run\\n"),
+    end_run = function(error) \{
+      cat("end run:", if (is.null(error)) "passed" else conditionMessage(error), "\\n")
+    \},
+    add_message = function(envelope) cat("message:", names(envelope), "\\n"),
+    add_warning = function(warning) cat("warning:", conditionMessage(warning), "\\n")
+  )
+)}
+}
+}
+\subsection{Scenario: A reporter gets the run as Cucumber Messages}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{source("event-reporter.R")
+test("features", reporter = EventReporter$new())}
+\item Then the output includes
+\preformatted{start run
+message: meta
+message: source
+message: gherkinDocument
+message: pickle
+message: stepDefinition
+message: testRunStarted
+message: testCase
+message: testCaseStarted
+message: testStepStarted
+message: testStepFinished
+message: testCaseFinished
+message: testRunFinished
+end run: passed}
+}
+}
+\subsection{Scenario: A reporter gets the warnings raised in steps and hooks}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) warning("the database is slow"))
+given("an empty basket", function(context) warning("the basket is dusty"))}
+\item When I run
+\preformatted{source("event-reporter.R")
+test("features", reporter = EventReporter$new())}
+\item Then the output includes
+\preformatted{message: testCaseStarted
+message: testStepStarted
+warning: the database is slow
+message: testStepFinished
+message: testStepStarted
+warning: the basket is dusty
+message: testStepFinished
+message: testCaseFinished}
+}
+}
+\subsection{Scenario: A reporter gets the error that stopped the run}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before_all(function() stop("the server didn't start"))
+given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{source("event-reporter.R")
+test("features", reporter = EventReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes these lines in order:
+\preformatted{start run
+end run: Hook `before_all()` failed
+i Hook defined at: setup-steps.R:1
+Caused by error:
+! the server didn't start}
+}
+}
+\subsection{Scenario: A reporter that fails stops the run with its error}{
+The scenarios after it don't run, and the error names the reporter and the event it failed in.
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})}
+\item And a file named "broken-reporter.R" with
+\preformatted{BrokenReporter <- R6::R6Class(
+  "BrokenReporter",
+  inherit = EventReporter,
+  public = list(
+    add_message = function(envelope) \{
+      if (!is.null(envelope$testStepFinished)) stop("can't format the step")
+      super$add_message(envelope)
+    \}
+  )
+)}
+\item When I run it and it fails
+\preformatted{source("event-reporter.R")
+source("broken-reporter.R")
+test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)}
+\item Then it fails with
+\preformatted{Error:
+! Reporter `BrokenReporter` failed in `add_message()`.
+Caused by error:
+! can't format the step}
+\item And the output includes "message: testCaseStarted" once
+}
+}
+\subsection{Scenario: A testthat reporter can't report a run}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})}
+\item When I run it and it fails
+\preformatted{test("features", reporter = testthat::ProgressReporter$new())}
+\item Then it fails with
+\preformatted{Error:
+! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
+i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Custom reporter
+  Extend `CucumberReporter` to report the run your way. A reporter gets the start and the end of the
+  run, each of its Cucumber Messages and the warnings raised in it.
+  Pass the reporter to `test()` or `run()` with `reporter`. Only cucumber reporters can report a run,
+  testthat reporters can't.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"event-reporter.R"</span> with
-<span class="st">    """</span>
-<span class="st">    EventReporter &lt;- R6::R6Class(</span>
-<span class="st">      "EventReporter",</span>
-<span class="st">      inherit = cucumber::CucumberReporter,</span>
-<span class="st">      public = list(</span>
-<span class="st">        start_run = function() cat("start run\\n"),</span>
-<span class="st">        end_run = function(error) \{</span>
-<span class="st">          cat("end run:", if (is.null(error)) "passed" else conditionMessage(error), "\\n")</span>
-<span class="st">        \},</span>
-<span class="st">        add_message = function(envelope) cat("message:", names(envelope), "\\n"),</span>
-<span class="st">        add_warning = function(warning) cat("warning:", conditionMessage(warning), "\\n")</span>
-<span class="st">      )</span>
-<span class="st">    )</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "event-reporter.R" with
-    """
-    EventReporter <- R6::R6Class(
-      "EventReporter",
-      inherit = cucumber::CucumberReporter,
-      public = list(
-        start_run = function() cat("start run\\n"),
-        end_run = function(error) \{
-          cat("end run:", if (is.null(error)) "passed" else conditionMessage(error), "\\n")
-        \},
-        add_message = function(envelope) cat("message:", names(envelope), "\\n"),
-        add_warning = function(warning) cat("warning:", conditionMessage(warning), "\\n")
+  Background:
+    Given a package
+    And a file named "event-reporter.R" with
+      """
+      EventReporter <- R6::R6Class(
+        "EventReporter",
+        inherit = cucumber::CucumberReporter,
+        public = list(
+          start_run = function() cat("start run\\n"),
+          end_run = function(error) \{
+            cat("end run:", if (is.null(error)) "passed" else conditionMessage(error), "\\n")
+          \},
+          add_message = function(envelope) cat("message:", names(envelope), "\\n"),
+          add_warning = function(warning) cat("warning:", conditionMessage(warning), "\\n")
+        )
       )
-    )
-    """
-%</pre>
-}}
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A reporter gets the run as Cucumber Messages
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    source("event-reporter.R")</span>
-<span class="st">    test("features", reporter = EventReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    start run</span>
-<span class="st">    message: meta</span>
-<span class="st">    message: source</span>
-<span class="st">    message: gherkinDocument</span>
-<span class="st">    message: pickle</span>
-<span class="st">    message: stepDefinition</span>
-<span class="st">    message: testRunStarted</span>
-<span class="st">    message: testCase</span>
-<span class="st">    message: testCaseStarted</span>
-<span class="st">    message: testStepStarted</span>
-<span class="st">    message: testStepFinished</span>
-<span class="st">    message: testCaseFinished</span>
-<span class="st">    message: testRunFinished</span>
-<span class="st">    end run: passed</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A reporter gets the run as Cucumber Messages
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    source("event-reporter.R")
-    test("features", reporter = EventReporter$new())
-    """
-  Then the output includes
-    """
-    start run
-    message: meta
-    message: source
-    message: gherkinDocument
-    message: pickle
-    message: stepDefinition
-    message: testRunStarted
-    message: testCase
-    message: testCaseStarted
-    message: testStepStarted
-    message: testStepFinished
-    message: testCaseFinished
-    message: testRunFinished
-    end run: passed
-    """
-%</pre>
-}}
+  Scenario: A reporter gets the run as Cucumber Messages
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      source("event-reporter.R")
+      test("features", reporter = EventReporter$new())
+      """
+    Then the output includes
+      """
+      start run
+      message: meta
+      message: source
+      message: gherkinDocument
+      message: pickle
+      message: stepDefinition
+      message: testRunStarted
+      message: testCase
+      message: testCaseStarted
+      message: testStepStarted
+      message: testStepFinished
+      message: testCaseFinished
+      message: testRunFinished
+      end run: passed
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A reporter gets the warnings raised in steps and hooks
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) warning("the database is slow"))</span>
-<span class="st">    given("an empty basket", function(context) warning("the basket is dusty"))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    source("event-reporter.R")</span>
-<span class="st">    test("features", reporter = EventReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    message: testCaseStarted</span>
-<span class="st">    message: testStepStarted</span>
-<span class="st">    warning: the database is slow</span>
-<span class="st">    message: testStepFinished</span>
-<span class="st">    message: testStepStarted</span>
-<span class="st">    warning: the basket is dusty</span>
-<span class="st">    message: testStepFinished</span>
-<span class="st">    message: testCaseFinished</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A reporter gets the warnings raised in steps and hooks
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) warning("the database is slow"))
-    given("an empty basket", function(context) warning("the basket is dusty"))
-    """
-  When I run
-    """
-    source("event-reporter.R")
-    test("features", reporter = EventReporter$new())
-    """
-  Then the output includes
-    """
-    message: testCaseStarted
-    message: testStepStarted
-    warning: the database is slow
-    message: testStepFinished
-    message: testStepStarted
-    warning: the basket is dusty
-    message: testStepFinished
-    message: testCaseFinished
-    """
-%</pre>
-}}
+  Scenario: A reporter gets the warnings raised in steps and hooks
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) warning("the database is slow"))
+      given("an empty basket", function(context) warning("the basket is dusty"))
+      """
+    When I run
+      """
+      source("event-reporter.R")
+      test("features", reporter = EventReporter$new())
+      """
+    Then the output includes
+      """
+      message: testCaseStarted
+      message: testStepStarted
+      warning: the database is slow
+      message: testStepFinished
+      message: testStepStarted
+      warning: the basket is dusty
+      message: testStepFinished
+      message: testCaseFinished
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A reporter gets the error that stopped the run
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before_all(function() stop("the server didn't start"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    source("event-reporter.R")</span>
-<span class="st">    test("features", reporter = EventReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    start run</span>
-<span class="st">    end run: Hook `before_all()` failed</span>
-<span class="st">    i Hook defined at: setup-steps.R:1</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! the server didn't start</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A reporter gets the error that stopped the run
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before_all(function() stop("the server didn't start"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    source("event-reporter.R")
-    test("features", reporter = EventReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes these lines in order:
-    """
-    start run
-    end run: Hook `before_all()` failed
-    i Hook defined at: setup-steps.R:1
-    Caused by error:
-    ! the server didn't start
-    """
-%</pre>
-}}
+  Scenario: A reporter gets the error that stopped the run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_all(function() stop("the server didn't start"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      source("event-reporter.R")
+      test("features", reporter = EventReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      start run
+      end run: Hook `before_all()` failed
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! the server didn't start
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A reporter that fails stops the run with its error
-  The scenarios after it don't run, and the error names the reporter and the event it failed in.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"broken-reporter.R"</span> with
-<span class="st">    """</span>
-<span class="st">    BrokenReporter &lt;- R6::R6Class(</span>
-<span class="st">      "BrokenReporter",</span>
-<span class="st">      inherit = EventReporter,</span>
-<span class="st">      public = list(</span>
-<span class="st">        add_message = function(envelope) \{</span>
-<span class="st">          if (!is.null(envelope$testStepFinished)) stop("can't format the step")</span>
-<span class="st">          super$add_message(envelope)</span>
-<span class="st">        \}</span>
-<span class="st">      )</span>
-<span class="st">    )</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    source("event-reporter.R")</span>
-<span class="st">    source("broken-reporter.R")</span>
-<span class="st">    test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! Reporter `BrokenReporter` failed in `add_message()`.</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! can't format the step</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes <span class="st">"message: testCaseStarted"</span> once</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A reporter that fails stops the run with its error
-  The scenarios after it don't run, and the error names the reporter and the event it failed in.
+  Scenario: A reporter that fails stops the run with its error
+    The scenarios after it don't run, and the error names the reporter and the event it failed in.
 
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
 
-      Scenario: Remove an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    """
-  And a file named "broken-reporter.R" with
-    """
-    BrokenReporter <- R6::R6Class(
-      "BrokenReporter",
-      inherit = EventReporter,
-      public = list(
-        add_message = function(envelope) \{
-          if (!is.null(envelope$testStepFinished)) stop("can't format the step")
-          super$add_message(envelope)
-        \}
+        Scenario: Remove an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      """
+    And a file named "broken-reporter.R" with
+      """
+      BrokenReporter <- R6::R6Class(
+        "BrokenReporter",
+        inherit = EventReporter,
+        public = list(
+          add_message = function(envelope) \{
+            if (!is.null(envelope$testStepFinished)) stop("can't format the step")
+            super$add_message(envelope)
+          \}
+        )
       )
-    )
-    """
-  When I run it and it fails
-    """
-    source("event-reporter.R")
-    source("broken-reporter.R")
-    test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
-    """
-  Then it fails with
-    """
-    Error:
-    ! Reporter `BrokenReporter` failed in `add_message()`.
-    Caused by error:
-    ! can't format the step
-    """
-  And the output includes "message: testCaseStarted" once
-%</pre>
-}}
+      """
+    When I run it and it fails
+      """
+      source("event-reporter.R")
+      source("broken-reporter.R")
+      test("features", reporter = BrokenReporter$new(), stop_on_failure = FALSE)
+      """
+    Then it fails with
+      """
+      Error:
+      ! Reporter `BrokenReporter` failed in `add_message()`.
+      Caused by error:
+      ! can't format the step
+      """
+    And the output includes "message: testCaseStarted" once
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A testthat reporter can't report a run
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = testthat::ProgressReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.</span>
-<span class="st">    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A testthat reporter can't report a run
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    """
-  When I run it and it fails
-    """
-    test("features", reporter = testthat::ProgressReporter$new())
-    """
-  Then it fails with
-    """
-    Error:
-    ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
-    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
-    """
+  Scenario: A testthat reporter can't report a run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      """
+    When I run it and it fails
+      """
+      test("features", reporter = testthat::ProgressReporter$new())
+      """
+    Then it fails with
+      """
+      Error:
+      ! `reporter` must be a `CucumberReporter`, or `NULL` to report nothing.
+      i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-custom_reporter.feature}
-}
 }
 
 \examples{

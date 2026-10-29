@@ -15,262 +15,239 @@ their source references, kept when the files are sourced with
 }
 \section{Specification}{
 
-\subsection{Messages reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Messages reporter}{
 \code{CucumberMessagesReporter} writes a run as Cucumber Messages, one JSON message per line (NDJSON),
 like the \code{message} formatter of other Cucumber implementations. Official tools read it,
 like the HTML, JUnit and JSON formatters.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 2 apples&#10;    <span class="fu">Then</span> the basket has 2 items</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) context$items <- 0)
+given("an empty basket", function(context) \{\})
+when("I add \{int\} apples", function(int, context) context$items <- context$items + int)
+then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))}
+}
+}
+\subsection{Scenario: The run is written as messages}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))
+messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+cat(vapply(messages, names, character(1)), sep = "\\n")}
+\item Then the output includes
+\preformatted{meta
+source
+gherkinDocument
+pickle
+hook
+stepDefinition
+stepDefinition
+stepDefinition
+testRunStarted
+testCase
+testCaseStarted
+testStepStarted
+testStepFinished
+testStepStarted
+testStepFinished
+testStepStarted
+testStepFinished
+testStepStarted
+testStepFinished
+testCaseFinished
+testRunFinished}
+}
+}
+\subsection{Scenario: The messages are written to a connection}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new(stdout()))}
+\item Then the output includes
+\preformatted{\{"testRunFinished":}
+}
+}
+\subsection{Scenario: Each step's result is written as a testStepFinished message}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I add \{int\} apples", function(int, context) pending())}
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+finished <- Filter(\\(message) !is.null(message$testStepFinished), messages)
+cat(vapply(finished, \\(message) message$testStepFinished$testStepResult$status, character(1)), sep = "\\n")}
+\item Then the output includes
+\preformatted{PASSED
+PENDING
+UNDEFINED}
+}
+}
+\subsection{Scenario: The run is written as messages and its progress is printed}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMultiReporter$new(list(
+  CucumberPrettyReporter$new(),
+  CucumberMessagesReporter$new("messages.ndjson")
+)))
+cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\\n")}
+\item Then the output includes
+\preformatted{Scenario: Add an item
+v Given an empty basket
+v When I add 2 apples
+v Then the basket has 2 items}
+\item And the output includes "1 scenario written"
+}
+}
+\subsection{Scenario: A failed step's error has the backtrace of the step as its stack trace}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{open_basket <- function() find_basket()
+find_basket <- function() stop("basket is missing")
+given("an empty basket", function(context) open_basket())}
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+finished <- Filter(\\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)
+cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)}
+\item Then the output includes lines matching these patterns in order:
+\preformatted{open_basket\\(\\)
+find_basket\\(\\)}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Messages reporter
+  `CucumberMessagesReporter` writes a run as Cucumber Messages, one JSON message per line (NDJSON),
+  like the `message` formatter of other Cucumber implementations. Official tools read it,
+  like the HTML, JUnit and JSON formatters.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 2 apples</span>
-<span class="st">        Then the basket has 2 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) context$items &lt;- 0)</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add \{int\} apples", function(int, context) context$items &lt;- context$items + int)</span>
-<span class="st">    then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add 2 apples
+          Then the basket has 2 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) context$items <- 0)
+      given("an empty basket", function(context) \{\})
+      when("I add \{int\} apples", function(int, context) context$items <- context$items + int)
+      then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))
+      """
+
+  Scenario: The run is written as messages
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))
+      messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+      cat(vapply(messages, names, character(1)), sep = "\\n")
+      """
+    Then the output includes
+      """
+      meta
+      source
+      gherkinDocument
+      pickle
+      hook
+      stepDefinition
+      stepDefinition
+      stepDefinition
+      testRunStarted
+      testCase
+      testCaseStarted
+      testStepStarted
+      testStepFinished
+      testStepStarted
+      testStepFinished
+      testStepStarted
+      testStepFinished
+      testStepStarted
+      testStepFinished
+      testCaseFinished
+      testRunFinished
+      """
+
+  Scenario: The messages are written to a connection
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new(stdout()))
+      """
+    Then the output includes
+      """
+      \{"testRunFinished":
+      """
+
+  Scenario: Each step's result is written as a testStepFinished message
+    Given a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I add \{int\} apples", function(int, context) pending())
+      """
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+      finished <- Filter(\\(message) !is.null(message$testStepFinished), messages)
+      cat(vapply(finished, \\(message) message$testStepFinished$testStepResult$status, character(1)), sep = "\\n")
+      """
+    Then the output includes
+      """
+      PASSED
+      PENDING
+      UNDEFINED
+      """
+
+  Scenario: The run is written as messages and its progress is printed
+    When I run
+      """
+      test("features", reporter = CucumberMultiReporter$new(list(
+        CucumberPrettyReporter$new(),
+        CucumberMessagesReporter$new("messages.ndjson")
+      )))
+      cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\\n")
+      """
+    Then the output includes
+      """
       Scenario: Add an item
-        Given an empty basket
-        When I add 2 apples
-        Then the basket has 2 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) context$items <- 0)
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} apples", function(int, context) context$items <- context$items + int)
-    then("the basket has \{int\} items", function(int, context) expect_equal(context$items, int))
-    """
-%</pre>
-}}
+      v Given an empty basket
+      v When I add 2 apples
+      v Then the basket has 2 items
+      """
+    And the output includes "1 scenario written"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The run is written as messages
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))</span>
-<span class="st">    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)</span>
-<span class="st">    cat(vapply(messages, names, character(1)), sep = "\\n")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    meta</span>
-<span class="st">    source</span>
-<span class="st">    gherkinDocument</span>
-<span class="st">    pickle</span>
-<span class="st">    hook</span>
-<span class="st">    stepDefinition</span>
-<span class="st">    stepDefinition</span>
-<span class="st">    stepDefinition</span>
-<span class="st">    testRunStarted</span>
-<span class="st">    testCase</span>
-<span class="st">    testCaseStarted</span>
-<span class="st">    testStepStarted</span>
-<span class="st">    testStepFinished</span>
-<span class="st">    testStepStarted</span>
-<span class="st">    testStepFinished</span>
-<span class="st">    testStepStarted</span>
-<span class="st">    testStepFinished</span>
-<span class="st">    testStepStarted</span>
-<span class="st">    testStepFinished</span>
-<span class="st">    testCaseFinished</span>
-<span class="st">    testRunFinished</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The run is written as messages
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"))
-    messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
-    cat(vapply(messages, names, character(1)), sep = "\\n")
-    """
-  Then the output includes
-    """
-    meta
-    source
-    gherkinDocument
-    pickle
-    hook
-    stepDefinition
-    stepDefinition
-    stepDefinition
-    testRunStarted
-    testCase
-    testCaseStarted
-    testStepStarted
-    testStepFinished
-    testStepStarted
-    testStepFinished
-    testStepStarted
-    testStepFinished
-    testStepStarted
-    testStepFinished
-    testCaseFinished
-    testRunFinished
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The messages are written to a connection
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new(stdout()))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    \{"testRunFinished":</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The messages are written to a connection
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new(stdout()))
-    """
-  Then the output includes
-    """
-    \{"testRunFinished":
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step's result is written as a testStepFinished message
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add \{int\} apples", function(int, context) pending())</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)</span>
-<span class="st">    finished &lt;- Filter(\\(message) !is.null(message$testStepFinished), messages)</span>
-<span class="st">    cat(vapply(finished, \\(message) message$testStepFinished$testStepResult$status, character(1)), sep = "\\n")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    PASSED</span>
-<span class="st">    PENDING</span>
-<span class="st">    UNDEFINED</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each step's result is written as a testStepFinished message
-  Given a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} apples", function(int, context) pending())
-    """
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
-    messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
-    finished <- Filter(\\(message) !is.null(message$testStepFinished), messages)
-    cat(vapply(finished, \\(message) message$testStepFinished$testStepResult$status, character(1)), sep = "\\n")
-    """
-  Then the output includes
-    """
-    PASSED
-    PENDING
-    UNDEFINED
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The run is written as messages and its progress is printed
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMultiReporter$new(list(</span>
-<span class="st">      CucumberPrettyReporter$new(),</span>
-<span class="st">      CucumberMessagesReporter$new("messages.ndjson")</span>
-<span class="st">    )))</span>
-<span class="st">    cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\\n")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Scenario: Add an item</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    v When I add 2 apples</span>
-<span class="st">    v Then the basket has 2 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes <span class="st">"1 scenario written"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The run is written as messages and its progress is printed
-  When I run
-    """
-    test("features", reporter = CucumberMultiReporter$new(list(
-      CucumberPrettyReporter$new(),
-      CucumberMessagesReporter$new("messages.ndjson")
-    )))
-    cat(nrow(read_messages("messages.ndjson")$scenarios), "scenario written\\n")
-    """
-  Then the output includes
-    """
-    Scenario: Add an item
-    v Given an empty basket
-    v When I add 2 apples
-    v Then the basket has 2 items
-    """
-  And the output includes "1 scenario written"
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A failed step's error has the backtrace of the step as its stack trace
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    open_basket &lt;- function() find_basket()</span>
-<span class="st">    find_basket &lt;- function() stop("basket is missing")</span>
-<span class="st">    given("an empty basket", function(context) open_basket())</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    messages &lt;- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)</span>
-<span class="st">    finished &lt;- Filter(\\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)</span>
-<span class="st">    cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes lines matching these patterns in order:
-<span class="st">    """</span>
-<span class="st">    open_basket\\(\\)</span>
-<span class="st">    find_basket\\(\\)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A failed step's error has the backtrace of the step as its stack trace
-  Given a file named "features/setup-steps.R" with
-    """
-    open_basket <- function() find_basket()
-    find_basket <- function() stop("basket is missing")
-    given("an empty basket", function(context) open_basket())
-    """
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
-    messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
-    finished <- Filter(\\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)
-    cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)
-    """
-  Then the output includes lines matching these patterns in order:
-    """
-    open_basket\\(\\)
-    find_basket\\(\\)
-    """
+  Scenario: A failed step's error has the backtrace of the step as its stack trace
+    Given a file named "features/setup-steps.R" with
+      """
+      open_basket <- function() find_basket()
+      find_basket <- function() stop("basket is missing")
+      given("an empty basket", function(context) open_basket())
+      """
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      messages <- lapply(readLines("messages.ndjson"), jsonlite::fromJSON)
+      finished <- Filter(\\(message) !is.null(message$testStepFinished$testStepResult$exception), messages)
+      cat(finished[[1]]$testStepFinished$testStepResult$exception$stackTrace)
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      open_basket\\(\\)
+      find_basket\\(\\)
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-messages_reporter.feature}
-}
 }
 
 \examples{

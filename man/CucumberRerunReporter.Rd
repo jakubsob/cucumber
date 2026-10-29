@@ -13,352 +13,300 @@ see the progress of the run, combine it with another reporter in a
 }
 \section{Specification}{
 
-\subsection{Rerun reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Rerun reporter}{
 \code{CucumberRerunReporter} writes where the scenarios that didn't pass are, like Cucumber's \code{rerun}
 formatter, when the run ends. Each line is a feature file with the lines of its scenarios that didn't
 pass, like \code{basket.feature:5:14}. Passed to \code{features}, they run only those scenarios again.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> a step that passes&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> a step that fails&#10;&#10;  <span class="kw">Scenario Outline:</span> Pay with <span class="va">&lt;card&gt;</span>&#10;    <span class="fu">Given</span> a step that <span class="va">&lt;result&gt;</span>&#10;&#10;    <span class="kw">Examples:</span>&#10;      <span class="op">|</span> card <span class="op">|</span> result <span class="op">|</span>&#10;      <span class="op">|</span> visa <span class="op">|</span> passes <span class="op">|</span>&#10;      <span class="op">|</span> amex <span class="op">|</span> fails  <span class="op">|</span></code></pre >}
+\item And a file named "features/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  <span class="kw">Scenario:</span> Ship&#10;    <span class="fu">Given</span> a step that is pending</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a step that passes", function(context) \{\})
+given("a step that fails", function(context) stop("Failed"))
+given("a step that is pending", function(context) pending())}
+}
+}
+\subsection{Scenario: Each feature file is a line with the scenarios that didn't pass}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)}
+\item Then the file "rerun.txt" has these lines:
+\preformatted{basket.feature:5:14
+checkout.feature:2}
+}
+}
+\subsection{Scenario: The scenarios that didn't pass run again}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Remove an item \tab failed \cr
+Pay with amex \tab failed \cr
+Ship \tab pending
+}
+}
+}
+\subsection{Scenario: A run of the scenarios of a rerun file writes the same rerun file}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)}
+\item Then the file "rerun-2.txt" has these lines:
+\preformatted{basket.feature:5:14
+checkout.feature:2}
+}
+}
+\subsection{Scenario: A scenario that passed when retried isn't in the file}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> a step that passes the second time&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> a step that fails</code></pre >}
+\item And a file named "features/setup-flaky.R" with
+\preformatted{attempts <- 0
+given("a step that passes the second time", function(context) \{
+  attempts <<- attempts + 1
+  if (attempts < 2) stop("Not yet")
+\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)}
+\item Then the file "rerun.txt" has these lines:
+\preformatted{basket.feature:5
+checkout.feature:2}
+}
+}
+\subsection{Scenario: The scenarios that fail_fast skipped are in the file}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Add an item \tab passed \cr
+Remove an item \tab failed \cr
+Pay with visa \tab skipped \cr
+Pay with amex \tab skipped \cr
+Ship \tab skipped
+}
+\item And the file "rerun.txt" has these lines:
+\preformatted{basket.feature:5:13:14
+checkout.feature:2}
+}
+}
+\subsection{Scenario: Empty lines of a rerun file are ignored}{
+Like a rerun file edited by hand, with an empty line at its end.
+\itemize{
+\item When I run
+\preformatted{writeLines(c("basket.feature:5", "", " "), "rerun.txt")
+test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Remove an item \tab failed
+}
+}
+}
+\subsection{Scenario: The file is empty when every scenario passed}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> a step that passes</code></pre >}
+\item And a file named "features/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout</code></pre >}
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"))}
+\item Then the file "rerun.txt" is empty
+}
+}
+\subsection{Scenario: No scenario runs again when every scenario passed}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> a step that passes</code></pre >}
+\item And a file named "features/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout</code></pre >}
+\item When I run
+\preformatted{test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
+test("features", features = readLines("rerun.txt"))}
+\item Then no scenario ran
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Rerun reporter
+  `CucumberRerunReporter` writes where the scenarios that didn't pass are, like Cucumber's `rerun`
+  formatter, when the run ends. Each line is a feature file with the lines of its scenarios that didn't
+  pass, like `basket.feature:5:14`. Passed to `features`, they run only those scenarios again.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given a step that passes</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given a step that fails</span>
-<span class="st"></span>
-<span class="st">      Scenario Outline: Pay with &lt;card&gt;</span>
-<span class="st">        Given a step that &lt;result&gt;</span>
-<span class="st"></span>
-<span class="st">        Examples:</span>
-<span class="st">          | card | result |</span>
-<span class="st">          | visa | passes |</span>
-<span class="st">          | amex | fails  |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      Scenario: Ship</span>
-<span class="st">        Given a step that is pending</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a step that passes", function(context) \{\})</span>
-<span class="st">    given("a step that fails", function(context) stop("Failed"))</span>
-<span class="st">    given("a step that is pending", function(context) pending())</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given a step that passes
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given a step that passes
 
-      Scenario: Remove an item
-        Given a step that fails
+        Scenario: Remove an item
+          Given a step that fails
 
-      Scenario Outline: Pay with <card>
-        Given a step that <result>
+        Scenario Outline: Pay with <card>
+          Given a step that <result>
 
-        Examples:
-          | card | result |
-          | visa | passes |
-          | amex | fails  |
-    """
-  And a file named "features/checkout.feature" with
-    """
-    Feature: Checkout
-      Scenario: Ship
-        Given a step that is pending
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a step that passes", function(context) \{\})
-    given("a step that fails", function(context) stop("Failed"))
-    given("a step that is pending", function(context) pending())
-    """
-%</pre>
-}}
+          Examples:
+            | card | result |
+            | visa | passes |
+            | amex | fails  |
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+        Scenario: Ship
+          Given a step that is pending
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a step that passes", function(context) \{\})
+      given("a step that fails", function(context) stop("Failed"))
+      given("a step that is pending", function(context) pending())
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each feature file is a line with the scenarios that didn't pass
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"rerun.txt"</span> has these lines:
-<span class="st">    """</span>
-<span class="st">    basket.feature:5:14</span>
-<span class="st">    checkout.feature:2</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each feature file is a line with the scenarios that didn't pass
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
-    """
-  Then the file "rerun.txt" has these lines:
-    """
-    basket.feature:5:14
-    checkout.feature:2
-    """
-%</pre>
-}}
+  Scenario: Each feature file is a line with the scenarios that didn't pass
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "rerun.txt" has these lines:
+      """
+      basket.feature:5:14
+      checkout.feature:2
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios that didn't pass run again
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario       <span class="op">|</span> status  <span class="op">|</span>
-    <span class="op">|</span> Remove an item <span class="op">|</span> failed  <span class="op">|</span>
-    <span class="op">|</span> Pay with amex  <span class="op">|</span> failed  <span class="op">|</span>
-    <span class="op">|</span> Ship           <span class="op">|</span> pending <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The scenarios that didn't pass run again
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
-    test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)
-    """
-  Then the scenarios have these results:
-    | scenario       | status  |
-    | Remove an item | failed  |
-    | Pay with amex  | failed  |
-    | Ship           | pending |
-%</pre>
-}}
+  Scenario: The scenarios that didn't pass run again
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+      test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario       | status  |
+      | Remove an item | failed  |
+      | Pay with amex  | failed  |
+      | Ship           | pending |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A run of the scenarios of a rerun file writes the same rerun file
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"rerun-2.txt"</span> has these lines:
-<span class="st">    """</span>
-<span class="st">    basket.feature:5:14</span>
-<span class="st">    checkout.feature:2</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A run of the scenarios of a rerun file writes the same rerun file
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
-    test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)
-    """
-  Then the file "rerun-2.txt" has these lines:
-    """
-    basket.feature:5:14
-    checkout.feature:2
-    """
-%</pre>
-}}
+  Scenario: A run of the scenarios of a rerun file writes the same rerun file
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), stop_on_failure = FALSE)
+      test("features", features = readLines("rerun.txt"), reporter = CucumberRerunReporter$new("rerun-2.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "rerun-2.txt" has these lines:
+      """
+      basket.feature:5:14
+      checkout.feature:2
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario that passed when retried isn't in the file
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given a step that passes the second time</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given a step that fails</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-flaky.R"</span> with
-<span class="st">    """</span>
-<span class="st">    attempts &lt;- 0</span>
-<span class="st">    given("a step that passes the second time", function(context) \{</span>
-<span class="st">      attempts &lt;&lt;- attempts + 1</span>
-<span class="st">      if (attempts &lt; 2) stop("Not yet")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"rerun.txt"</span> has these lines:
-<span class="st">    """</span>
-<span class="st">    basket.feature:5</span>
-<span class="st">    checkout.feature:2</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A scenario that passed when retried isn't in the file
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given a step that passes the second time
+  Scenario: A scenario that passed when retried isn't in the file
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given a step that passes the second time
 
-      Scenario: Remove an item
-        Given a step that fails
-    """
-  And a file named "features/setup-flaky.R" with
-    """
-    attempts <- 0
-    given("a step that passes the second time", function(context) \{
-      attempts <<- attempts + 1
-      if (attempts < 2) stop("Not yet")
-    \})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)
-    """
-  Then the file "rerun.txt" has these lines:
-    """
-    basket.feature:5
-    checkout.feature:2
-    """
-%</pre>
-}}
+        Scenario: Remove an item
+          Given a step that fails
+      """
+    And a file named "features/setup-flaky.R" with
+      """
+      attempts <- 0
+      given("a step that passes the second time", function(context) \{
+        attempts <<- attempts + 1
+        if (attempts < 2) stop("Not yet")
+      \})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), retry = 1, stop_on_failure = FALSE)
+      """
+    Then the file "rerun.txt" has these lines:
+      """
+      basket.feature:5
+      checkout.feature:2
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The scenarios that fail_fast skipped are in the file
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario       <span class="op">|</span> status  <span class="op">|</span>
-    <span class="op">|</span> Add an item    <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> Remove an item <span class="op">|</span> failed  <span class="op">|</span>
-    <span class="op">|</span> Pay with visa  <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Pay with amex  <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Ship           <span class="op">|</span> skipped <span class="op">|</span>
-  <span class="fu">And</span> the file <span class="st">"rerun.txt"</span> has these lines:
-<span class="st">    """</span>
-<span class="st">    basket.feature:5:13:14</span>
-<span class="st">    checkout.feature:2</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The scenarios that fail_fast skipped are in the file
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)
-    """
-  Then the scenarios have these results:
-    | scenario       | status  |
-    | Add an item    | passed  |
-    | Remove an item | failed  |
-    | Pay with visa  | skipped |
-    | Pay with amex  | skipped |
-    | Ship           | skipped |
-  And the file "rerun.txt" has these lines:
-    """
-    basket.feature:5:13:14
-    checkout.feature:2
-    """
-%</pre>
-}}
+  Scenario: The scenarios that fail_fast skipped are in the file
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"), fail_fast = TRUE, stop_on_failure = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario       | status  |
+      | Add an item    | passed  |
+      | Remove an item | failed  |
+      | Pay with visa  | skipped |
+      | Pay with amex  | skipped |
+      | Ship           | skipped |
+    And the file "rerun.txt" has these lines:
+      """
+      basket.feature:5:13:14
+      checkout.feature:2
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Empty lines of a rerun file are ignored
-  Like a rerun file edited by hand, with an empty line at its end.
-<span></span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    writeLines(c("basket.feature:5", "", " "), "rerun.txt")</span>
-<span class="st">    test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario       <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Remove an item <span class="op">|</span> failed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Empty lines of a rerun file are ignored
-  Like a rerun file edited by hand, with an empty line at its end.
+  Scenario: Empty lines of a rerun file are ignored
+    Like a rerun file edited by hand, with an empty line at its end.
 
-  When I run
-    """
-    writeLines(c("basket.feature:5", "", " "), "rerun.txt")
-    test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)
-    """
-  Then the scenarios have these results:
-    | scenario       | status |
-    | Remove an item | failed |
-%</pre>
-}}
+    When I run
+      """
+      writeLines(c("basket.feature:5", "", " "), "rerun.txt")
+      test("features", features = readLines("rerun.txt"), stop_on_failure = FALSE)
+      """
+    Then the scenarios have these results:
+      | scenario       | status |
+      | Remove an item | failed |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The file is empty when every scenario passed
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given a step that passes</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"rerun.txt"</span> is empty</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The file is empty when every scenario passed
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given a step that passes
-    """
-  And a file named "features/checkout.feature" with
-    """
-    Feature: Checkout
-    """
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
-    """
-  Then the file "rerun.txt" is empty
-%</pre>
-}}
+  Scenario: The file is empty when every scenario passed
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given a step that passes
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+      """
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
+      """
+    Then the file "rerun.txt" is empty
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> No scenario runs again when every scenario passed
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given a step that passes</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))</span>
-<span class="st">    test("features", features = readLines("rerun.txt"))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> no scenario ran</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: No scenario runs again when every scenario passed
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given a step that passes
-    """
-  And a file named "features/checkout.feature" with
-    """
-    Feature: Checkout
-    """
-  When I run
-    """
-    test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
-    test("features", features = readLines("rerun.txt"))
-    """
-  Then no scenario ran
+  Scenario: No scenario runs again when every scenario passed
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given a step that passes
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+      """
+    When I run
+      """
+      test("features", reporter = CucumberRerunReporter$new("rerun.txt"))
+      test("features", features = readLines("rerun.txt"))
+      """
+    Then no scenario ran
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-rerun_reporter.feature}
-}
 }
 
 \examples{

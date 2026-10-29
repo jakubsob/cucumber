@@ -30,2319 +30,2099 @@ Provide a description that matches steps in feature files and the implementation
 }
 \section{Specification}{
 
-\subsection{Cucumber Expressions}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Cucumber Expressions}{
 Step descriptions are Cucumber Expressions:
 text in parentheses is optional, words separated by "/" are alternatives,
 "\{\}" matches anything, and all other text is matched literally.
 An invalid expression is an error pointing at the problem.
+\subsection{Scenario: Optional text matches with or without it}{
+\itemize{
+\item Given a package
+\item And a file named "features/expressions.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Optional text&#10;  <span class="kw">Scenario:</span> Singular and plural&#10;    <span class="fu">Given</span> I have 1 cucumber&#10;    <span class="fu">When</span> I eat 2 cucumbers&#10;    <span class="fu">Then</span> I have eaten 2 cucumbers</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("I have \{int\} cucumber(s)", function(n, context) \{
+  context$n <- n
+\})
+when("I eat \{int\} cucumber(s)", function(n, context) \{
+  context$eaten <- n
+\})
+then("I have eaten \{int\} cucumber(s)", function(n, context) \{
+  expect_equal(context$eaten, n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: Alternative words match any of them}{
+\itemize{
+\item Given a package
+\item And a file named "features/expressions.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Alternatives&#10;  <span class="kw">Scenario:</span> Either key&#10;    <span class="fu">When</span> I press the Enter key&#10;    <span class="fu">And</span> I press the Return key&#10;    <span class="fu">Then</span> the key was pressed 2 times</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I press the Enter/Return key", function(context) \{
+  context$presses <- sum(context$presses, 1)
+\})
+then("the key was pressed \{int\} times", function(n, context) \{
+  expect_equal(context$presses, n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: Anonymous parameter matches anything as text}{
+\itemize{
+\item Given a package
+\item And a file named "features/expressions.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Anonymous parameter&#10;  <span class="kw">Scenario:</span> Any value&#10;    <span class="fu">Given</span> the user is John Smith from 42 Street&#10;    <span class="fu">Then</span> the user should be <span class="st">"John Smith from 42 Street"</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the user is \{\}", function(user, context) \{
+  context$user <- user
+\})
+then("the user should be \{string\}", function(user, context) \{
+  expect_identical(context$user, user)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: Text is matched literally, not as a regular expression}{
+\itemize{
+\item Given a package
+\item And a file named "features/expressions.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Literal text&#10;  <span class="kw">Scenario:</span> A dot&#10;    <span class="fu">Given</span> the version is 1.5&#10;&#10;  <span class="kw">Scenario:</span> Any character&#10;    <span class="fu">Given</span> the version is 105</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the version is 1.5", function(context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given the version is 1.5 \tab passed \cr
+Given the version is 105 \tab undefined
+}
+}
+}
+\subsection{Scenario: An escaped space keeps words together in an alternative}{
+\itemize{
+\item Given a package
+\item And a file named "features/expressions.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Alternatives with spaces&#10;  <span class="kw">Scenario:</span> Either city&#10;    <span class="fu">Given</span> I lived in New York&#10;    <span class="fu">And</span> I lived in Boston&#10;    <span class="fu">Then</span> I lived in 2 cities</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("I lived in New\\\\ York/Boston", function(context) \{
+  context$cities <- sum(context$cities, 1)
+\})
+then("I lived in \{int\} cities", function(n, context) \{
+  expect_equal(context$cities, n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Cucumber Expressions
+  Step descriptions are Cucumber Expressions:
+  text in parentheses is optional, words separated by "/" are alternatives,
+  "\{\}" matches anything, and all other text is matched literally.
+  An invalid expression is an error pointing at the problem.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Optional text matches with or without it
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/expressions.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Optional text</span>
-<span class="st">      Scenario: Singular and plural</span>
-<span class="st">        Given I have 1 cucumber</span>
-<span class="st">        When I eat 2 cucumbers</span>
-<span class="st">        Then I have eaten 2 cucumbers</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("I have \{int\} cucumber(s)", function(n, context) \{</span>
-<span class="st">      context$n &lt;- n</span>
-<span class="st">    \})</span>
-<span class="st">    when("I eat \{int\} cucumber(s)", function(n, context) \{</span>
-<span class="st">      context$eaten &lt;- n</span>
-<span class="st">    \})</span>
-<span class="st">    then("I have eaten \{int\} cucumber(s)", function(n, context) \{</span>
-<span class="st">      expect_equal(context$eaten, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Optional text matches with or without it
-  Given a package
-  And a file named "features/expressions.feature" with
-    """
-    Feature: Optional text
-      Scenario: Singular and plural
-        Given I have 1 cucumber
-        When I eat 2 cucumbers
-        Then I have eaten 2 cucumbers
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("I have \{int\} cucumber(s)", function(n, context) \{
-      context$n <- n
-    \})
-    when("I eat \{int\} cucumber(s)", function(n, context) \{
-      context$eaten <- n
-    \})
-    then("I have eaten \{int\} cucumber(s)", function(n, context) \{
-      expect_equal(context$eaten, n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+  Scenario: Optional text matches with or without it
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Optional text
+        Scenario: Singular and plural
+          Given I have 1 cucumber
+          When I eat 2 cucumbers
+          Then I have eaten 2 cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I have \{int\} cucumber(s)", function(n, context) \{
+        context$n <- n
+      \})
+      when("I eat \{int\} cucumber(s)", function(n, context) \{
+        context$eaten <- n
+      \})
+      then("I have eaten \{int\} cucumber(s)", function(n, context) \{
+        expect_equal(context$eaten, n)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Alternative words match any of them
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/expressions.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Alternatives</span>
-<span class="st">      Scenario: Either key</span>
-<span class="st">        When I press the Enter key</span>
-<span class="st">        And I press the Return key</span>
-<span class="st">        Then the key was pressed 2 times</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I press the Enter/Return key", function(context) \{</span>
-<span class="st">      context$presses &lt;- sum(context$presses, 1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the key was pressed \{int\} times", function(n, context) \{</span>
-<span class="st">      expect_equal(context$presses, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Alternative words match any of them
-  Given a package
-  And a file named "features/expressions.feature" with
-    """
-    Feature: Alternatives
-      Scenario: Either key
-        When I press the Enter key
-        And I press the Return key
-        Then the key was pressed 2 times
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I press the Enter/Return key", function(context) \{
-      context$presses <- sum(context$presses, 1)
-    \})
-    then("the key was pressed \{int\} times", function(n, context) \{
-      expect_equal(context$presses, n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+  Scenario: Alternative words match any of them
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Alternatives
+        Scenario: Either key
+          When I press the Enter key
+          And I press the Return key
+          Then the key was pressed 2 times
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I press the Enter/Return key", function(context) \{
+        context$presses <- sum(context$presses, 1)
+      \})
+      then("the key was pressed \{int\} times", function(n, context) \{
+        expect_equal(context$presses, n)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Anonymous parameter matches anything as text
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/expressions.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Anonymous parameter</span>
-<span class="st">      Scenario: Any value</span>
-<span class="st">        Given the user is John Smith from 42 Street</span>
-<span class="st">        Then the user should be "John Smith from 42 Street"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the user is \{\}", function(user, context) \{</span>
-<span class="st">      context$user &lt;- user</span>
-<span class="st">    \})</span>
-<span class="st">    then("the user should be \{string\}", function(user, context) \{</span>
-<span class="st">      expect_identical(context$user, user)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Anonymous parameter matches anything as text
-  Given a package
-  And a file named "features/expressions.feature" with
-    """
-    Feature: Anonymous parameter
-      Scenario: Any value
-        Given the user is John Smith from 42 Street
-        Then the user should be "John Smith from 42 Street"
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the user is \{\}", function(user, context) \{
-      context$user <- user
-    \})
-    then("the user should be \{string\}", function(user, context) \{
-      expect_identical(context$user, user)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+  Scenario: Anonymous parameter matches anything as text
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Anonymous parameter
+        Scenario: Any value
+          Given the user is John Smith from 42 Street
+          Then the user should be "John Smith from 42 Street"
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the user is \{\}", function(user, context) \{
+        context$user <- user
+      \})
+      then("the user should be \{string\}", function(user, context) \{
+        expect_identical(context$user, user)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Text is matched literally, not as a regular expression
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/expressions.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Literal text</span>
-<span class="st">      Scenario: A dot</span>
-<span class="st">        Given the version is 1.5</span>
-<span class="st"></span>
-<span class="st">      Scenario: Any character</span>
-<span class="st">        Given the version is 105</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the version is 1.5", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                     <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Given the version is 1.5 <span class="op">|</span> passed    <span class="op">|</span>
-    <span class="op">|</span> Given the version is 105 <span class="op">|</span> undefined <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Text is matched literally, not as a regular expression
-  Given a package
-  And a file named "features/expressions.feature" with
-    """
-    Feature: Literal text
-      Scenario: A dot
-        Given the version is 1.5
+  Scenario: Text is matched literally, not as a regular expression
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Literal text
+        Scenario: A dot
+          Given the version is 1.5
 
-      Scenario: Any character
-        Given the version is 105
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the version is 1.5", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                     | status    |
-    | Given the version is 1.5 | passed    |
-    | Given the version is 105 | undefined |
-%</pre>
-}}
+        Scenario: Any character
+          Given the version is 105
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the version is 1.5", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                     | status    |
+      | Given the version is 1.5 | passed    |
+      | Given the version is 105 | undefined |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An escaped space keeps words together in an alternative
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/expressions.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Alternatives with spaces</span>
-<span class="st">      Scenario: Either city</span>
-<span class="st">        Given I lived in New York</span>
-<span class="st">        And I lived in Boston</span>
-<span class="st">        Then I lived in 2 cities</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("I lived in New\\\\ York/Boston", function(context) \{</span>
-<span class="st">      context$cities &lt;- sum(context$cities, 1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("I lived in \{int\} cities", function(n, context) \{</span>
-<span class="st">      expect_equal(context$cities, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An escaped space keeps words together in an alternative
-  Given a package
-  And a file named "features/expressions.feature" with
-    """
-    Feature: Alternatives with spaces
-      Scenario: Either city
-        Given I lived in New York
-        And I lived in Boston
-        Then I lived in 2 cities
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("I lived in New\\\\ York/Boston", function(context) \{
-      context$cities <- sum(context$cities, 1)
-    \})
-    then("I lived in \{int\} cities", function(n, context) \{
-      expect_equal(context$cities, n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
+  Scenario: An escaped space keeps words together in an alternative
+    Given a package
+    And a file named "features/expressions.feature" with
+      """
+      Feature: Alternatives with spaces
+        Scenario: Either city
+          Given I lived in New York
+          And I lived in Boston
+          Then I lived in 2 cities
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I lived in New\\\\ York/Boston", function(context) \{
+        context$cities <- sum(context$cities, 1)
+      \})
+      then("I lived in \{int\} cities", function(n, context) \{
+        expect_equal(context$cities, n)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 %</pre>
 }}
 
 Source: \code{tests/acceptance/cucumber_expressions.feature}
-}
 
-\subsection{Regular expressions}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Regular expressions}{
 A step description that starts with "^", ends with "$" or is surrounded by "/"
 is a regular expression instead of a Cucumber Expression.
 Each capture group is passed to the step. A group whose regexp is the regexp of a parameter type,
-like \verb{(\\\\d+)} for \code{{int}}, is converted like that parameter; any other group is passed as text.
+like \code{(\\\\d+)} for \code{\{int\}}, is converted like that parameter; any other group is passed as text.
 A regular expression without "^" and "$" can match a part of the step's text.
+\subsection{Scenario: Capture groups are passed to the step, converted by parameter type}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Colours&#10;    <span class="fu">Given</span> I have a red cucumber&#10;    <span class="fu">And</span> I have a green cucumber&#10;    <span class="fu">Then</span> I have 2 cucumbers</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("^I have a (red|green) cucumber$", function(colour, context) \{
+  context$colours <- c(context$colours, colour)
+\})
+then("/I have (\\\\d+) cucumbers/", function(n, context) \{
+  expect_identical(n, 2L)
+  expect_equal(context$colours, c("red", "green"))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: A capture group that doesn't match passes NA}{
+\itemize{
+\item Given a package
+\item And a file named "features/vegetables.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Vegetables&#10;  <span class="kw">Scenario:</span> Optional groups&#10;    <span class="fu">Given</span> a cucumber and a carrot&#10;    <span class="fu">Then</span> the vegetables are cucumber and carrot</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) \{
+  context$vegetables <- c(first, second, third)
+\})
+then("^the vegetables are cucumber and carrot$", function(context) \{
+  expect_equal(context$vegetables, c("cucumber", "carrot", NA))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Regular expressions
+  A step description that starts with "^", ends with "$" or is surrounded by "/"
+  is a regular expression instead of a Cucumber Expression.
+  Each capture group is passed to the step. A group whose regexp is the regexp of a parameter type,
+  like `(\\\\d+)` for `\{int\}`, is converted like that parameter; any other group is passed as text.
+  A regular expression without "^" and "$" can match a part of the step's text.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Capture groups are passed to the step, converted by parameter type
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Colours</span>
-<span class="st">        Given I have a red cucumber</span>
-<span class="st">        And I have a green cucumber</span>
-<span class="st">        Then I have 2 cucumbers</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("^I have a (red|green) cucumber$", function(colour, context) \{</span>
-<span class="st">      context$colours &lt;- c(context$colours, colour)</span>
-<span class="st">    \})</span>
-<span class="st">    then("/I have (\\\\d+) cucumbers/", function(n, context) \{</span>
-<span class="st">      expect_identical(n, 2L)</span>
-<span class="st">      expect_equal(context$colours, c("red", "green"))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Capture groups are passed to the step, converted by parameter type
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Colours
-        Given I have a red cucumber
-        And I have a green cucumber
-        Then I have 2 cucumbers
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("^I have a (red|green) cucumber$", function(colour, context) \{
-      context$colours <- c(context$colours, colour)
-    \})
-    then("/I have (\\\\d+) cucumbers/", function(n, context) \{
-      expect_identical(n, 2L)
-      expect_equal(context$colours, c("red", "green"))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+  Scenario: Capture groups are passed to the step, converted by parameter type
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Colours
+          Given I have a red cucumber
+          And I have a green cucumber
+          Then I have 2 cucumbers
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("^I have a (red|green) cucumber$", function(colour, context) \{
+        context$colours <- c(context$colours, colour)
+      \})
+      then("/I have (\\\\d+) cucumbers/", function(n, context) \{
+        expect_identical(n, 2L)
+        expect_equal(context$colours, c("red", "green"))
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A capture group that doesn't match passes NA
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/vegetables.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Vegetables</span>
-<span class="st">      Scenario: Optional groups</span>
-<span class="st">        Given a cucumber and a carrot</span>
-<span class="st">        Then the vegetables are cucumber and carrot</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) \{</span>
-<span class="st">      context$vegetables &lt;- c(first, second, third)</span>
-<span class="st">    \})</span>
-<span class="st">    then("^the vegetables are cucumber and carrot$", function(context) \{</span>
-<span class="st">      expect_equal(context$vegetables, c("cucumber", "carrot", NA))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A capture group that doesn't match passes NA
-  Given a package
-  And a file named "features/vegetables.feature" with
-    """
-    Feature: Vegetables
-      Scenario: Optional groups
-        Given a cucumber and a carrot
-        Then the vegetables are cucumber and carrot
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) \{
-      context$vegetables <- c(first, second, third)
-    \})
-    then("^the vegetables are cucumber and carrot$", function(context) \{
-      expect_equal(context$vegetables, c("cucumber", "carrot", NA))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
+  Scenario: A capture group that doesn't match passes NA
+    Given a package
+    And a file named "features/vegetables.feature" with
+      """
+      Feature: Vegetables
+        Scenario: Optional groups
+          Given a cucumber and a carrot
+          Then the vegetables are cucumber and carrot
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("^a (.*?)(?: and a (.*?))?(?: and a (.*?))?$", function(first, second, third, context) \{
+        context$vegetables <- c(first, second, third)
+      \})
+      then("^the vegetables are cucumber and carrot$", function(context) \{
+        expect_equal(context$vegetables, c("cucumber", "carrot", NA))
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 %</pre>
 }}
 
 Source: \code{tests/acceptance/regular_expressions.feature}
-}
 
-\subsection{Step definition arguments}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Step definition arguments}{
 A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
 then \code{context}, in this order.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario Outline: A step definition without \code{context} as its last argument is an error, <case>}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">When</span> I add 3 items</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add \{int\} items", <definition>)}
+\item When I run it and it fails
+\preformatted{test("features")}
+\item Then it fails with
+\preformatted{Error in `source_dir()`:
+! Failed to evaluate './setup-steps.R'.
+Caused by error in `when()`:
+! A step definition must have `context` as its last argument.
+i <hint>}
+}
+\subsection{Examples:}{
+\tabular{lll}{
+case \tab definition \tab hint \cr
+missing context \tab function(n) \{\} \tab Use \code{function(n, context)}, or rename \code{n} to \code{context}. \cr
+misnamed context \tab function(n, ctx) \{\} \tab Use \code{function(n, ctx, context)}, or rename \code{ctx} to \code{context}. \cr
+context not last \tab function(context, n) \{\} \tab Use \code{function(n, context)}.
+}
+}
+}
+\subsection{Scenario: A step definition with \code{...} gets any number of arguments}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">When</span> I add 3 items</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add \{int\} items", function(..., context) \{
+  expect_equal(list(...), list(3L))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: A step definition's arguments with a default value can be left out}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">When</span> I add 3 items</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add \{int\} items", function(n, unit = "piece", context) \{
+  expect_equal(n, 3L)
+  expect_equal(unit, "piece")
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Step definition arguments
+  A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
+  then `context`, in this order.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A step definition without `context` as its last argument is an error, <span class="va">&lt;case&gt;</span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        When I add 3 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add \{int\} items", &lt;definition&gt;)</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error in `source_dir()`:</span>
-<span class="st">    ! Failed to evaluate './setup-steps.R'.</span>
-<span class="st">    Caused by error in `when()`:</span>
-<span class="st">    ! A step definition must have `context` as its last argument.</span>
-<span class="st">    i &lt;hint&gt;</span>
-<span class="st">    """</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> case             <span class="op">|</span> definition              <span class="op">|</span> hint                                                           <span class="op">|</span>
-    <span class="op">|</span> missing context  <span class="op">|</span> function(n) \{\}          <span class="op">|</span> Use `function(n, context)`, or rename `n` to `context`.        <span class="op">|</span>
-    <span class="op">|</span> misnamed context <span class="op">|</span> function(n, ctx) \{\}     <span class="op">|</span> Use `function(n, ctx, context)`, or rename `ctx` to `context`. <span class="op">|</span>
-    <span class="op">|</span> context not last <span class="op">|</span> function(context, n) \{\} <span class="op">|</span> Use `function(n, context)`.                                    <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A step definition without `context` as its last argument is an error, <case>
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        When I add 3 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add \{int\} items", <definition>)
-    """
-  When I run it and it fails
-    """
-    test("features")
-    """
-  Then it fails with
-    """
-    Error in `source_dir()`:
-    ! Failed to evaluate './setup-steps.R'.
-    Caused by error in `when()`:
-    ! A step definition must have `context` as its last argument.
-    i <hint>
-    """
+  Scenario Outline: A step definition without `context` as its last argument is an error, <case>
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          When I add 3 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add \{int\} items", <definition>)
+      """
+    When I run it and it fails
+      """
+      test("features")
+      """
+    Then it fails with
+      """
+      Error in `source_dir()`:
+      ! Failed to evaluate './setup-steps.R'.
+      Caused by error in `when()`:
+      ! A step definition must have `context` as its last argument.
+      i <hint>
+      """
 
-  Examples:
-    | case             | definition              | hint                                                           |
-    | missing context  | function(n) \{\}          | Use `function(n, context)`, or rename `n` to `context`.        |
-    | misnamed context | function(n, ctx) \{\}     | Use `function(n, ctx, context)`, or rename `ctx` to `context`. |
-    | context not last | function(context, n) \{\} | Use `function(n, context)`.                                    |
-%</pre>
-}}
+    Examples:
+      | case             | definition              | hint                                                           |
+      | missing context  | function(n) \{\}          | Use `function(n, context)`, or rename `n` to `context`.        |
+      | misnamed context | function(n, ctx) \{\}     | Use `function(n, ctx, context)`, or rename `ctx` to `context`. |
+      | context not last | function(context, n) \{\} | Use `function(n, context)`.                                    |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step definition with `...` gets any number of arguments
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        When I add 3 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add \{int\} items", function(..., context) \{</span>
-<span class="st">      expect_equal(list(...), list(3L))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step definition with `...` gets any number of arguments
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        When I add 3 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add \{int\} items", function(..., context) \{
-      expect_equal(list(...), list(3L))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+  Scenario: A step definition with `...` gets any number of arguments
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          When I add 3 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add \{int\} items", function(..., context) \{
+        expect_equal(list(...), list(3L))
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step definition's arguments with a default value can be left out
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        When I add 3 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add \{int\} items", function(n, unit = "piece", context) \{</span>
-<span class="st">      expect_equal(n, 3L)</span>
-<span class="st">      expect_equal(unit, "piece")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step definition's arguments with a default value can be left out
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        When I add 3 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add \{int\} items", function(n, unit = "piece", context) \{
-      expect_equal(n, 3L)
-      expect_equal(unit, "piece")
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
+  Scenario: A step definition's arguments with a default value can be left out
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          When I add 3 items
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add \{int\} items", function(n, unit = "piece", context) \{
+        expect_equal(n, 3L)
+        expect_equal(unit, "piece")
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-step_definition_arguments.feature}
-}
 
-\subsection{Sharing state with context}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Sharing state with context}{
 Every step definition and scenario hook gets \code{context}.
 It's an environment that steps and hooks of one scenario share.
 Each scenario starts with a new, empty \code{context}.
 
 Code a step or a hook defers in \code{context} runs when the scenario ends, after its \code{after()} hooks,
 like code deferred in a testthat test runs when the test ends. Pass \code{context} to \code{withr::defer()}
-or to a \verb{local_*()} function, like \code{withr::local_options(.local_envir = context)} or
+or to a \code{local_*()} function, like \code{withr::local_options(.local_envir = context)} or
 \code{testthat::local_mocked_bindings(.env = context)}, to undo what a step changes when its scenario ends.
 Without it, the change is undone when the step ends. An error of the deferred code is a warning of the
 scenario, as its steps already have their results.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add an item&#10;    <span class="fu">Then</span> the basket has 1 item&#10;&#10;  <span class="kw">Scenario:</span> Look into the basket&#10;    <span class="fu">Then</span> the basket has 0 items</code></pre >}
+}
+}
+\subsection{Scenario: Steps of a scenario share context}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) \{
+  context$items <- c(context$items, "apple")
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{
+  expect_length(context$items, n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Add an item \tab passed \cr
+Look into the basket \tab passed
+}
+}
+}
+\subsection{Scenario: Hooks share context with the steps}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) \{
+  context$items <- character()
+\})
+after(function(context, scenario) \{
+  cat(scenario$name, "ends with", length(context$items), "items\\n")
+\})
+when("I add an item", function(context) \{
+  context$items <- c(context$items, "apple")
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{
+  expect_length(context$items, n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+\item And the output includes "Add an item ends with 1 items"
+\item And the output includes "Look into the basket ends with 0 items"
+}
+}
+\subsection{Scenario: A printed context shows what steps and hooks put in it, and its methods}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) \{
+  context$items <- c("apple", "pear")
+  context$total <- 2
+  print(context)
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{\})}
+\item When I run
+\preformatted{test("features", filter = "basket", name = "Add an item")}
+\item Then the output includes these lines in order:
+\preformatted{<context>
+items: chr [1:2] "apple" "pear"
+total: num 2
+Methods:
+attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
+log(text): attach text to the report
+link(...): attach one or more URLs to the report}
+}
+}
+\subsection{Scenario: A printed context shows its first 10 items and how many more there are}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) \{
+  for (i in 1:12) assign(sprintf("item_\%02d", i), i, envir = context)
+  print(context)
+  print(context, n = 12)
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{\})}
+\item When I run
+\preformatted{test("features", filter = "basket", name = "Add an item")}
+\item Then the output includes these lines in order:
+\preformatted{<context>
+item_10: int 10
+# i 2 more items
+# i Use `print(n = ...)` to see more items
+Methods:
+<context>
+item_12: int 12
+Methods:}
+}
+}
+\subsection{Scenario: What a step defers in context runs when the scenario ends}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) \{
+  withr::local_options(basket.items = 1, .local_envir = context)
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{
+  expect_equal(getOption("basket.items", 0), n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Add an item \tab passed \cr
+Look into the basket \tab passed
+}
+}
+}
+\subsection{Scenario: What steps and hooks defer in context runs after the after hooks}{
+Like \code{withr::defer()}, what was deferred last runs first.
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add an item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) \{
+  withr::defer(cat("deferred by the before hook\\n"), envir = context)
+\})
+after(function(context, scenario) cat("after hook\\n"))
+when("I add an item", function(context) \{
+  withr::defer(cat("deferred by the step\\n"), envir = context)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the output includes these lines in order:
+\preformatted{after hook
+deferred by the step
+deferred by the before hook}
+}
+}
+\subsection{Scenario: What a step changes without context is undone when the step ends}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) \{
+  withr::local_options(basket.items = 1)
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{
+  expect_equal(getOption("basket.items", 0), n)
+\})}
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item for a moment&#10;    <span class="fu">When</span> I add an item&#10;    <span class="fu">Then</span> the basket has 0 items</code></pre >}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Add an item for a moment \tab passed
+}
+}
+}
+\subsection{Scenario: A function a step mocks in context stays mocked until the scenario ends}{
+\itemize{
+\item Given a file named "R/stock.R" with
+\preformatted{in_stock <- function() FALSE}
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Apples are delivered&#10;    <span class="fu">When</span> the apples are delivered&#10;    <span class="fu">Then</span> apples are in stock&#10;&#10;  <span class="kw">Scenario:</span> Apples aren't delivered&#10;    <span class="fu">Then</span> apples aren't in stock</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("the apples are delivered", function(context) \{
+  testthat::local_mocked_bindings(in_stock = function() TRUE, .env = context)
+\})
+then("apples are in stock", function(context) \{
+  expect_true(in_stock())
+\})
+then("apples aren't in stock", function(context) \{
+  expect_false(in_stock())
+\})}
+\item When I run
+\preformatted{pkgload::load_all(quiet = TRUE)
+test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Apples are delivered \tab passed \cr
+Apples aren't delivered \tab passed
+}
+}
+}
+\subsection{Scenario: An error of what a step deferred in context is a warning of its scenario}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) \{
+  withr::defer(stop("The basket is gone"), envir = context)
+\})
+then("the basket has \{int\} item(s)", function(n, context) \{
+  succeed()
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Add an item \tab passed \cr
+Look into the basket \tab passed
+}
+\item And the scenarios have these warnings:
+\tabular{ll}{
+scenario \tab warning \cr
+Add an item \tab Cleanup of the scenario failed: The basket is gone
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Sharing state with context
+  Every step definition and scenario hook gets `context`.
+  It's an environment that steps and hooks of one scenario share.
+  Each scenario starts with a new, empty `context`.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add an item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Look into the basket</span>
-<span class="st">        Then the basket has 0 items</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-        Then the basket has 1 item
+  Code a step or a hook defers in `context` runs when the scenario ends, after its `after()` hooks,
+  like code deferred in a testthat test runs when the test ends. Pass `context` to `withr::defer()`
+  or to a `local_*()` function, like `withr::local_options(.local_envir = context)` or
+  `testthat::local_mocked_bindings(.env = context)`, to undo what a step changes when its scenario ends.
+  Without it, the change is undone when the step ends. An error of the deferred code is a warning of the
+  scenario, as its steps already have their results.
 
-      Scenario: Look into the basket
-        Then the basket has 0 items
-    """
-%</pre>
-}}
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+          Then the basket has 1 item
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Steps of a scenario share context
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      context$items &lt;- c(context$items, "apple")</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
-<span class="st">      expect_length(context$items, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Steps of a scenario share context
-  Given a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      context$items <- c(context$items, "apple")
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{
-      expect_length(context$items, n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario             | status |
-    | Add an item          | passed |
-    | Look into the basket | passed |
-%</pre>
-}}
+        Scenario: Look into the basket
+          Then the basket has 0 items
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Hooks share context with the steps
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) \{</span>
-<span class="st">      context$items &lt;- character()</span>
-<span class="st">    \})</span>
-<span class="st">    after(function(context, scenario) \{</span>
-<span class="st">      cat(scenario$name, "ends with", length(context$items), "items\\n")</span>
-<span class="st">    \})</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      context$items &lt;- c(context$items, "apple")</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
-<span class="st">      expect_length(context$items, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes
-  <span class="fu">And</span> the output includes <span class="st">"Add an item ends with 1 items"</span>
-  <span class="fu">And</span> the output includes <span class="st">"Look into the basket ends with 0 items"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Hooks share context with the steps
-  Given a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) \{
-      context$items <- character()
-    \})
-    after(function(context, scenario) \{
-      cat(scenario$name, "ends with", length(context$items), "items\\n")
-    \})
-    when("I add an item", function(context) \{
-      context$items <- c(context$items, "apple")
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{
-      expect_length(context$items, n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-  And the output includes "Add an item ends with 1 items"
-  And the output includes "Look into the basket ends with 0 items"
-%</pre>
-}}
+  Scenario: Steps of a scenario share context
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) \{
+        context$items <- c(context$items, "apple")
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{
+        expect_length(context$items, n)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario             | status |
+      | Add an item          | passed |
+      | Look into the basket | passed |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A printed context shows what steps and hooks put in it, and its methods
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      context$items &lt;- c("apple", "pear")</span>
-<span class="st">      context$total &lt;- 2</span>
-<span class="st">      print(context)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", filter = "basket", name = "Add an item")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    &lt;context&gt;</span>
-<span class="st">    items: chr [1:2] "apple" "pear"</span>
-<span class="st">    total: num 2</span>
-<span class="st">    Methods:</span>
-<span class="st">    attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report</span>
-<span class="st">    log(text): attach text to the report</span>
-<span class="st">    link(...): attach one or more URLs to the report</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A printed context shows what steps and hooks put in it, and its methods
-  Given a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      context$items <- c("apple", "pear")
-      context$total <- 2
-      print(context)
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{\})
-    """
-  When I run
-    """
-    test("features", filter = "basket", name = "Add an item")
-    """
-  Then the output includes these lines in order:
-    """
-    <context>
-    items: chr [1:2] "apple" "pear"
-    total: num 2
-    Methods:
-    attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
-    log(text): attach text to the report
-    link(...): attach one or more URLs to the report
-    """
-%</pre>
-}}
+  Scenario: Hooks share context with the steps
+    Given a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) \{
+        context$items <- character()
+      \})
+      after(function(context, scenario) \{
+        cat(scenario$name, "ends with", length(context$items), "items\\n")
+      \})
+      when("I add an item", function(context) \{
+        context$items <- c(context$items, "apple")
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{
+        expect_length(context$items, n)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then it passes
+    And the output includes "Add an item ends with 1 items"
+    And the output includes "Look into the basket ends with 0 items"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A printed context shows its first 10 items and how many more there are
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      for (i in 1:12) assign(sprintf("item_\%02d", i), i, envir = context)</span>
-<span class="st">      print(context)</span>
-<span class="st">      print(context, n = 12)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", filter = "basket", name = "Add an item")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    &lt;context&gt;</span>
-<span class="st">    item_10: int 10</span>
-<span class="st">    # i 2 more items</span>
-<span class="st">    # i Use `print(n = ...)` to see more items</span>
-<span class="st">    Methods:</span>
-<span class="st">    &lt;context&gt;</span>
-<span class="st">    item_12: int 12</span>
-<span class="st">    Methods:</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A printed context shows its first 10 items and how many more there are
-  Given a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      for (i in 1:12) assign(sprintf("item_\%02d", i), i, envir = context)
-      print(context)
-      print(context, n = 12)
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{\})
-    """
-  When I run
-    """
-    test("features", filter = "basket", name = "Add an item")
-    """
-  Then the output includes these lines in order:
-    """
-    <context>
-    item_10: int 10
-    # i 2 more items
-    # i Use `print(n = ...)` to see more items
-    Methods:
-    <context>
-    item_12: int 12
-    Methods:
-    """
-%</pre>
-}}
+  Scenario: A printed context shows what steps and hooks put in it, and its methods
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) \{
+        context$items <- c("apple", "pear")
+        context$total <- 2
+        print(context)
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{\})
+      """
+    When I run
+      """
+      test("features", filter = "basket", name = "Add an item")
+      """
+    Then the output includes these lines in order:
+      """
+      <context>
+      items: chr [1:2] "apple" "pear"
+      total: num 2
+      Methods:
+      attach(data, media_type = NULL, file_name = NULL): attach a string or a raw vector to the report
+      log(text): attach text to the report
+      link(...): attach one or more URLs to the report
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> What a step defers in context runs when the scenario ends
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      withr::local_options(basket.items = 1, .local_envir = context)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
-<span class="st">      expect_equal(getOption("basket.items", 0), n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: What a step defers in context runs when the scenario ends
-  Given a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      withr::local_options(basket.items = 1, .local_envir = context)
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{
-      expect_equal(getOption("basket.items", 0), n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario             | status |
-    | Add an item          | passed |
-    | Look into the basket | passed |
-%</pre>
-}}
+  Scenario: A printed context shows its first 10 items and how many more there are
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) \{
+        for (i in 1:12) assign(sprintf("item_\%02d", i), i, envir = context)
+        print(context)
+        print(context, n = 12)
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{\})
+      """
+    When I run
+      """
+      test("features", filter = "basket", name = "Add an item")
+      """
+    Then the output includes these lines in order:
+      """
+      <context>
+      item_10: int 10
+      # i 2 more items
+      # i Use `print(n = ...)` to see more items
+      Methods:
+      <context>
+      item_12: int 12
+      Methods:
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> What steps and hooks defer in context runs after the after hooks
-  Like `withr::defer()`, what was deferred last runs first.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add an item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) \{</span>
-<span class="st">      withr::defer(cat("deferred by the before hook\\n"), envir = context)</span>
-<span class="st">    \})</span>
-<span class="st">    after(function(context, scenario) cat("after hook\\n"))</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      withr::defer(cat("deferred by the step\\n"), envir = context)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    after hook</span>
-<span class="st">    deferred by the step</span>
-<span class="st">    deferred by the before hook</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: What steps and hooks defer in context runs after the after hooks
-  Like `withr::defer()`, what was deferred last runs first.
+  Scenario: What a step defers in context runs when the scenario ends
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) \{
+        withr::local_options(basket.items = 1, .local_envir = context)
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{
+        expect_equal(getOption("basket.items", 0), n)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario             | status |
+      | Add an item          | passed |
+      | Look into the basket | passed |
 
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) \{
-      withr::defer(cat("deferred by the before hook\\n"), envir = context)
-    \})
-    after(function(context, scenario) cat("after hook\\n"))
-    when("I add an item", function(context) \{
-      withr::defer(cat("deferred by the step\\n"), envir = context)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the output includes these lines in order:
-    """
-    after hook
-    deferred by the step
-    deferred by the before hook
-    """
-%</pre>
-}}
+  Scenario: What steps and hooks defer in context runs after the after hooks
+    Like `withr::defer()`, what was deferred last runs first.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> What a step changes without context is undone when the step ends
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      withr::local_options(basket.items = 1)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
-<span class="st">      expect_equal(getOption("basket.items", 0), n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item for a moment</span>
-<span class="st">        When I add an item</span>
-<span class="st">        Then the basket has 0 items</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario                 <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Add an item for a moment <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: What a step changes without context is undone when the step ends
-  Given a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      withr::local_options(basket.items = 1)
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{
-      expect_equal(getOption("basket.items", 0), n)
-    \})
-    """
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item for a moment
-        When I add an item
-        Then the basket has 0 items
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario                 | status |
-    | Add an item for a moment | passed |
-%</pre>
-}}
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) \{
+        withr::defer(cat("deferred by the before hook\\n"), envir = context)
+      \})
+      after(function(context, scenario) cat("after hook\\n"))
+      when("I add an item", function(context) \{
+        withr::defer(cat("deferred by the step\\n"), envir = context)
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the output includes these lines in order:
+      """
+      after hook
+      deferred by the step
+      deferred by the before hook
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A function a step mocks in context stays mocked until the scenario ends
-  <span class="fu">Given</span> a file named <span class="st">"R/stock.R"</span> with
-<span class="st">    """</span>
-<span class="st">    in_stock &lt;- function() FALSE</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Apples are delivered</span>
-<span class="st">        When the apples are delivered</span>
-<span class="st">        Then apples are in stock</span>
-<span class="st"></span>
-<span class="st">      Scenario: Apples aren't delivered</span>
-<span class="st">        Then apples aren't in stock</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("the apples are delivered", function(context) \{</span>
-<span class="st">      testthat::local_mocked_bindings(in_stock = function() TRUE, .env = context)</span>
-<span class="st">    \})</span>
-<span class="st">    then("apples are in stock", function(context) \{</span>
-<span class="st">      expect_true(in_stock())</span>
-<span class="st">    \})</span>
-<span class="st">    then("apples aren't in stock", function(context) \{</span>
-<span class="st">      expect_false(in_stock())</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    pkgload::load_all(quiet = TRUE)</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario                <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Apples are delivered    <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Apples aren't delivered <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A function a step mocks in context stays mocked until the scenario ends
-  Given a file named "R/stock.R" with
-    """
-    in_stock <- function() FALSE
-    """
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Apples are delivered
-        When the apples are delivered
-        Then apples are in stock
+  Scenario: What a step changes without context is undone when the step ends
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) \{
+        withr::local_options(basket.items = 1)
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{
+        expect_equal(getOption("basket.items", 0), n)
+      \})
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item for a moment
+          When I add an item
+          Then the basket has 0 items
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario                 | status |
+      | Add an item for a moment | passed |
 
-      Scenario: Apples aren't delivered
-        Then apples aren't in stock
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("the apples are delivered", function(context) \{
-      testthat::local_mocked_bindings(in_stock = function() TRUE, .env = context)
-    \})
-    then("apples are in stock", function(context) \{
-      expect_true(in_stock())
-    \})
-    then("apples aren't in stock", function(context) \{
-      expect_false(in_stock())
-    \})
-    """
-  When I run
-    """
-    pkgload::load_all(quiet = TRUE)
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario                | status |
-    | Apples are delivered    | passed |
-    | Apples aren't delivered | passed |
-%</pre>
-}}
+  Scenario: A function a step mocks in context stays mocked until the scenario ends
+    Given a file named "R/stock.R" with
+      """
+      in_stock <- function() FALSE
+      """
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Apples are delivered
+          When the apples are delivered
+          Then apples are in stock
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An error of what a step deferred in context is a warning of its scenario
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      withr::defer(stop("The basket is gone"), envir = context)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) \{</span>
-<span class="st">      succeed()</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span>
-  <span class="fu">And</span> the scenarios have these warnings:
-    <span class="op">|</span> scenario    <span class="op">|</span> warning                                            <span class="op">|</span>
-    <span class="op">|</span> Add an item <span class="op">|</span> Cleanup of the scenario failed: The basket is gone <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An error of what a step deferred in context is a warning of its scenario
-  Given a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) \{
-      withr::defer(stop("The basket is gone"), envir = context)
-    \})
-    then("the basket has \{int\} item(s)", function(n, context) \{
-      succeed()
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario             | status |
-    | Add an item          | passed |
-    | Look into the basket | passed |
-  And the scenarios have these warnings:
-    | scenario    | warning                                            |
-    | Add an item | Cleanup of the scenario failed: The basket is gone |
+        Scenario: Apples aren't delivered
+          Then apples aren't in stock
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("the apples are delivered", function(context) \{
+        testthat::local_mocked_bindings(in_stock = function() TRUE, .env = context)
+      \})
+      then("apples are in stock", function(context) \{
+        expect_true(in_stock())
+      \})
+      then("apples aren't in stock", function(context) \{
+        expect_false(in_stock())
+      \})
+      """
+    When I run
+      """
+      pkgload::load_all(quiet = TRUE)
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario                | status |
+      | Apples are delivered    | passed |
+      | Apples aren't delivered | passed |
+
+  Scenario: An error of what a step deferred in context is a warning of its scenario
+    Given a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) \{
+        withr::defer(stop("The basket is gone"), envir = context)
+      \})
+      then("the basket has \{int\} item(s)", function(n, context) \{
+        succeed()
+      \})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario             | status |
+      | Add an item          | passed |
+      | Look into the basket | passed |
+    And the scenarios have these warnings:
+      | scenario    | warning                                            |
+      | Add an item | Cleanup of the scenario failed: The basket is gone |
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-sharing_state_with_context.feature}
-}
 
-\subsection{Data Tables}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Data Tables}{
 A Data Table is a table under a step. The step definition gets it after the step's parameters.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Rule: A step definition gets the Data Table after the step's parameters}{
+\subsection{Scenario: A Data Table comes after the step's parameters}{
+\itemize{
+\item Given a file named "features/table.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Tables&#10;  <span class="kw">Scenario:</span> Table with parameter&#10;    <span class="fu">Given</span> 2 items in the basket&#10;      <span class="op">|</span> item   <span class="op">|</span>&#10;      <span class="op">|</span> apple  <span class="op">|</span>&#10;      <span class="op">|</span> banana <span class="op">|</span>&#10;    <span class="fu">Then</span> verify the basket has 2 items</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("\{int\} items in the basket", function(count, table, context) \{
+  context$expected_count <- count
+  context$items <- table$item
+\})
+then("verify the basket has \{int\} items", function(n, context) \{
+  expect_equal(length(context$items), n)
+  expect_equal(context$expected_count, n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+\subsection{Rule: In R, a Data Table is a tibble whose first row holds the column names}{
+\subsection{Scenario: A step receives a Data Table as a tibble}{
+\itemize{
+\item Given a file named "features/table.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Tables&#10;  <span class="kw">Scenario:</span> Step with table&#10;    <span class="fu">Given</span> a list of numbers&#10;      <span class="op">|</span> value <span class="op">|</span>&#10;      <span class="op">|</span> 1     <span class="op">|</span>&#10;      <span class="op">|</span> 2     <span class="op">|</span>&#10;      <span class="op">|</span> 3     <span class="op">|</span>&#10;    <span class="fu">Then</span> the sum is 6</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a list of numbers", function(table, context) \{
+  expect_s3_class(table, "tbl_df")
+  context$numbers <- as.integer(table$value)
+\})
+then("the sum is \{int\}", function(n, context) \{
+  expect_equal(sum(context$numbers), n)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Data Tables
+  A Data Table is a table under a step. The step definition gets it after the step's parameters.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\strong{Rule: A step definition gets the Data Table after the step's parameters}
+  Rule: A step definition gets the Data Table after the step's parameters
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A Data Table comes after the step's parameters
-  <span class="fu">Given</span> a file named <span class="st">"features/table.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Tables</span>
-<span class="st">      Scenario: Table with parameter</span>
-<span class="st">        Given 2 items in the basket</span>
-<span class="st">          | item   |</span>
-<span class="st">          | apple  |</span>
-<span class="st">          | banana |</span>
-<span class="st">        Then verify the basket has 2 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("\{int\} items in the basket", function(count, table, context) \{</span>
-<span class="st">      context$expected_count &lt;- count</span>
-<span class="st">      context$items &lt;- table$item</span>
-<span class="st">    \})</span>
-<span class="st">    then("verify the basket has \{int\} items", function(n, context) \{</span>
-<span class="st">      expect_equal(length(context$items), n)</span>
-<span class="st">      expect_equal(context$expected_count, n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A Data Table comes after the step's parameters
-  Given a file named "features/table.feature" with
-    """
-    Feature: Tables
-      Scenario: Table with parameter
-        Given 2 items in the basket
-          | item   |
-          | apple  |
-          | banana |
-        Then verify the basket has 2 items
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("\{int\} items in the basket", function(count, table, context) \{
-      context$expected_count <- count
-      context$items <- table$item
-    \})
-    then("verify the basket has \{int\} items", function(n, context) \{
-      expect_equal(length(context$items), n)
-      expect_equal(context$expected_count, n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+    Scenario: A Data Table comes after the step's parameters
+      Given a file named "features/table.feature" with
+        """
+        Feature: Tables
+          Scenario: Table with parameter
+            Given 2 items in the basket
+              | item   |
+              | apple  |
+              | banana |
+            Then verify the basket has 2 items
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("\{int\} items in the basket", function(count, table, context) \{
+          context$expected_count <- count
+          context$items <- table$item
+        \})
+        then("verify the basket has \{int\} items", function(n, context) \{
+          expect_equal(length(context$items), n)
+          expect_equal(context$expected_count, n)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
 
-\strong{Rule: In R, a Data Table is a tibble whose first row holds the column names}
+  Rule: In R, a Data Table is a tibble whose first row holds the column names
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step receives a Data Table as a tibble
-  <span class="fu">Given</span> a file named <span class="st">"features/table.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Tables</span>
-<span class="st">      Scenario: Step with table</span>
-<span class="st">        Given a list of numbers</span>
-<span class="st">          | value |</span>
-<span class="st">          | 1     |</span>
-<span class="st">          | 2     |</span>
-<span class="st">          | 3     |</span>
-<span class="st">        Then the sum is 6</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a list of numbers", function(table, context) \{</span>
-<span class="st">      expect_s3_class(table, "tbl_df")</span>
-<span class="st">      context$numbers &lt;- as.integer(table$value)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the sum is \{int\}", function(n, context) \{</span>
-<span class="st">      expect_equal(sum(context$numbers), n)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step receives a Data Table as a tibble
-  Given a file named "features/table.feature" with
-    """
-    Feature: Tables
-      Scenario: Step with table
-        Given a list of numbers
-          | value |
-          | 1     |
-          | 2     |
-          | 3     |
-        Then the sum is 6
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a list of numbers", function(table, context) \{
-      expect_s3_class(table, "tbl_df")
-      context$numbers <- as.integer(table$value)
-    \})
-    then("the sum is \{int\}", function(n, context) \{
-      expect_equal(sum(context$numbers), n)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
+    Scenario: A step receives a Data Table as a tibble
+      Given a file named "features/table.feature" with
+        """
+        Feature: Tables
+          Scenario: Step with table
+            Given a list of numbers
+              | value |
+              | 1     |
+              | 2     |
+              | 3     |
+            Then the sum is 6
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("a list of numbers", function(table, context) \{
+          expect_s3_class(table, "tbl_df")
+          context$numbers <- as.integer(table$value)
+        \})
+        then("the sum is \{int\}", function(n, context) \{
+          expect_equal(sum(context$numbers), n)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
 %</pre>
 }}
 
 Source: \code{tests/acceptance/data_tables.feature}
-}
 
-\subsection{Doc Strings}{
-
-A Doc String is a block of text under a step, between ``` or """ delimiters.
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Doc Strings}{
+A Doc String is a block of text under a step, between \code{}` or """ delimiters.
 The step definition gets it as one string, after the step's parameters.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Rule: A step definition gets the Doc String as one string, after the step's parameters}{
+\subsection{Scenario: A step definition gets the Doc String}{
+\itemize{
+\item Given a file named "features/docstring.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Doc Strings&#10;  <span class="kw">Scenario:</span> Step with a Doc String&#10;    <span class="fu">Given</span> a message&#10;<span class="st">      ```</span>&#10;<span class="st">      Hello, world!</span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">Then</span> the message is <span class="st">"Hello, world!"</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a message", function(message, context) \{
+  context$message <- message
+\})
+then("the message is \{string\}", function(expected, context) \{
+  expect_identical(context$message, expected)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+\subsection{Rule: The media type is in the string's \code{media_type} attribute}{
+It is \code{json} for a Doc String opened with \code{}`json.
+\subsection{Scenario: A Doc String's media type is in its media_type attribute}{
+\itemize{
+\item Given a file named "features/docstring.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Doc Strings&#10;  <span class="kw">Scenario:</span> A request body&#10;    <span class="fu">Given</span> a body&#10;<span class="st">      ```json</span>&#10;<span class="st">      \{"id": 1\}</span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">Then</span> the body is JSON&#10;  <span class="kw">Scenario:</span> Text without a media type&#10;    <span class="fu">Given</span> a body&#10;<span class="st">      ```</span>&#10;<span class="st">      Hello</span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">Then</span> the body has no media type</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a body", function(body, context) \{
+  context$body <- body
+\})
+then("the body is JSON", function(context) \{
+  expect_equal(attr(context$body, "media_type"), "json")
+  expect_equal(c(context$body), "\{\\"id\\": 1\}")
+\})
+then("the body has no media type", function(context) \{
+  expect_null(attr(context$body, "media_type"))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+A request body \tab passed \cr
+Text without a media type \tab passed
+}
+}
+}
+}
+\subsection{Rule: In R, the \code{cucumber.docstring_as_lines} option passes a Doc String as a character vector of lines}{
+\subsection{Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines}{
+\itemize{
+\item Given a file named "features/docstring.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Doc Strings&#10;  <span class="kw">Scenario:</span> A script&#10;    <span class="fu">Given</span> a script&#10;<span class="st">      ```r</span>&#10;<span class="st">      x &lt;- 1</span>&#10;<span class="st">      y &lt;- 2</span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">Then</span> the script is a vector of lines</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a script", function(script, context) \{
+  context$script <- script
+\})
+then("the script is a vector of lines", function(context) \{
+  expect_equal(c(context$script), c("x <- 1", "y <- 2"))
+  expect_equal(attr(context$script, "media_type"), "r")
+\})}
+\item When I run
+\preformatted{withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))}
+\item Then it passes
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Doc Strings
+  A Doc String is a block of text under a step, between ``` or """ delimiters.
+  The step definition gets it as one string, after the step's parameters.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\strong{Rule: A step definition gets the Doc String as one string, after the step's parameters}
+  Rule: A step definition gets the Doc String as one string, after the step's parameters
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step definition gets the Doc String
-  <span class="fu">Given</span> a file named <span class="st">"features/docstring.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Doc Strings</span>
-<span class="st">      Scenario: Step with a Doc String</span>
-<span class="st">        Given a message</span>
-<span class="st">          ```</span>
-<span class="st">          Hello, world!</span>
-<span class="st">          ```</span>
-<span class="st">        Then the message is "Hello, world!"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a message", function(message, context) \{</span>
-<span class="st">      context$message &lt;- message</span>
-<span class="st">    \})</span>
-<span class="st">    then("the message is \{string\}", function(expected, context) \{</span>
-<span class="st">      expect_identical(context$message, expected)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step definition gets the Doc String
-  Given a file named "features/docstring.feature" with
-    """
-    Feature: Doc Strings
-      Scenario: Step with a Doc String
-        Given a message
-          ```
-          Hello, world!
-          ```
-        Then the message is "Hello, world!"
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a message", function(message, context) \{
-      context$message <- message
-    \})
-    then("the message is \{string\}", function(expected, context) \{
-      expect_identical(context$message, expected)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
+    Scenario: A step definition gets the Doc String
+      Given a file named "features/docstring.feature" with
+        """
+        Feature: Doc Strings
+          Scenario: Step with a Doc String
+            Given a message
+              ```
+              Hello, world!
+              ```
+            Then the message is "Hello, world!"
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("a message", function(message, context) \{
+          context$message <- message
+        \})
+        then("the message is \{string\}", function(expected, context) \{
+          expect_identical(context$message, expected)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
 
-\strong{Rule: The media type is in the string's \code{media_type} attribute}
+  Rule: The media type is in the string's `media_type` attribute
 
-It is \code{json} for a Doc String opened with ```json.
+    It is `json` for a Doc String opened with ```json.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A Doc String's media type is in its media_type attribute
-  <span class="fu">Given</span> a file named <span class="st">"features/docstring.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Doc Strings</span>
-<span class="st">      Scenario: A request body</span>
-<span class="st">        Given a body</span>
-<span class="st">          ```json</span>
-<span class="st">          \{"id": 1\}</span>
-<span class="st">          ```</span>
-<span class="st">        Then the body is JSON</span>
-<span class="st">      Scenario: Text without a media type</span>
-<span class="st">        Given a body</span>
-<span class="st">          ```</span>
-<span class="st">          Hello</span>
-<span class="st">          ```</span>
-<span class="st">        Then the body has no media type</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a body", function(body, context) \{</span>
-<span class="st">      context$body &lt;- body</span>
-<span class="st">    \})</span>
-<span class="st">    then("the body is JSON", function(context) \{</span>
-<span class="st">      expect_equal(attr(context$body, "media_type"), "json")</span>
-<span class="st">      expect_equal(c(context$body), "\{\\"id\\": 1\}")</span>
-<span class="st">    \})</span>
-<span class="st">    then("the body has no media type", function(context) \{</span>
-<span class="st">      expect_null(attr(context$body, "media_type"))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario                  <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> A request body            <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Text without a media type <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A Doc String's media type is in its media_type attribute
-  Given a file named "features/docstring.feature" with
-    """
-    Feature: Doc Strings
-      Scenario: A request body
-        Given a body
-          ```json
-          \{"id": 1\}
-          ```
-        Then the body is JSON
-      Scenario: Text without a media type
-        Given a body
-          ```
-          Hello
-          ```
-        Then the body has no media type
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a body", function(body, context) \{
-      context$body <- body
-    \})
-    then("the body is JSON", function(context) \{
-      expect_equal(attr(context$body, "media_type"), "json")
-      expect_equal(c(context$body), "\{\\"id\\": 1\}")
-    \})
-    then("the body has no media type", function(context) \{
-      expect_null(attr(context$body, "media_type"))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario                  | status |
-    | A request body            | passed |
-    | Text without a media type | passed |
-%</pre>
-}}
+    Scenario: A Doc String's media type is in its media_type attribute
+      Given a file named "features/docstring.feature" with
+        """
+        Feature: Doc Strings
+          Scenario: A request body
+            Given a body
+              ```json
+              \{"id": 1\}
+              ```
+            Then the body is JSON
+          Scenario: Text without a media type
+            Given a body
+              ```
+              Hello
+              ```
+            Then the body has no media type
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("a body", function(body, context) \{
+          context$body <- body
+        \})
+        then("the body is JSON", function(context) \{
+          expect_equal(attr(context$body, "media_type"), "json")
+          expect_equal(c(context$body), "\{\\"id\\": 1\}")
+        \})
+        then("the body has no media type", function(context) \{
+          expect_null(attr(context$body, "media_type"))
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then the scenarios have these results:
+        | scenario                  | status |
+        | A request body            | passed |
+        | Text without a media type | passed |
 
-\strong{Rule: In R, the \code{cucumber.docstring_as_lines} option passes a Doc String as a character vector of lines}
+  Rule: In R, the `cucumber.docstring_as_lines` option passes a Doc String as a character vector of lines
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
-  <span class="fu">Given</span> a file named <span class="st">"features/docstring.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Doc Strings</span>
-<span class="st">      Scenario: A script</span>
-<span class="st">        Given a script</span>
-<span class="st">          ```r</span>
-<span class="st">          x &lt;- 1</span>
-<span class="st">          y &lt;- 2</span>
-<span class="st">          ```</span>
-<span class="st">        Then the script is a vector of lines</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a script", function(script, context) \{</span>
-<span class="st">      context$script &lt;- script</span>
-<span class="st">    \})</span>
-<span class="st">    then("the script is a vector of lines", function(context) \{</span>
-<span class="st">      expect_equal(c(context$script), c("x &lt;- 1", "y &lt;- 2"))</span>
-<span class="st">      expect_equal(attr(context$script, "media_type"), "r")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
-  Given a file named "features/docstring.feature" with
-    """
-    Feature: Doc Strings
-      Scenario: A script
-        Given a script
-          ```r
-          x <- 1
-          y <- 2
-          ```
-        Then the script is a vector of lines
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a script", function(script, context) \{
-      context$script <- script
-    \})
-    then("the script is a vector of lines", function(context) \{
-      expect_equal(c(context$script), c("x <- 1", "y <- 2"))
-      expect_equal(attr(context$script, "media_type"), "r")
-    \})
-    """
-  When I run
-    """
-    withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
-    """
-  Then it passes
+    Scenario: The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines
+      Given a file named "features/docstring.feature" with
+        """
+        Feature: Doc Strings
+          Scenario: A script
+            Given a script
+              ```r
+              x <- 1
+              y <- 2
+              ```
+            Then the script is a vector of lines
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("a script", function(script, context) \{
+          context$script <- script
+        \})
+        then("the script is a vector of lines", function(context) \{
+          expect_equal(c(context$script), c("x <- 1", "y <- 2"))
+          expect_equal(attr(context$script, "media_type"), "r")
+        \})
+        """
+      When I run
+        """
+        withr::with_options(list(cucumber.docstring_as_lines = TRUE), test("features"))
+        """
+      Then it passes
 %</pre>
 }}
 
 Source: \code{tests/acceptance/doc_string.feature}
-}
 
-\subsection{Passing steps}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Passing steps}{
 A step passes when its step definition returns without an error.
 A scenario passes when all its steps pass, even if they have no expectations.
 testthat reports it as passed too, not skipped like an empty \code{test_that()} test.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: A scenario whose steps pass without expectations passes}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add an item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{
+  context$basket <- list()
+\})
+when("I add an item", function(context) \{
+  context$basket <- c(context$basket, "item")
+\})}
+\item When I run
+\preformatted{test("features", reporter = NULL)}
+\item Then it passes
+}
+}
+\subsection{Scenario: testthat reports a scenario without expectations or steps as passed}{
+\itemize{
+\item Given a file named "tests/testthat/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add an item&#10;&#10;  <span class="kw">Scenario:</span> Not written yet</code></pre >}
+\item And a file named "tests/testthat/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{
+  context$basket <- list()
+\})
+when("I add an item", function(context) \{
+  context$basket <- c(context$basket, "item")
+\})}
+\item And a file named "tests/testthat/test-acceptance.R" with
+\preformatted{run()}
+\item When I run
+\preformatted{testthat::test_local(reporter = "silent")}
+\item Then it passes
+\item And only these scenarios ran:
+\tabular{l}{
+scenario \cr
+Add an item \cr
+Not written yet
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Passing steps
+  A step passes when its step definition returns without an error.
+  A scenario passes when all its steps pass, even if they have no expectations.
+  testthat reports it as passed too, not skipped like an empty `test_that()` test.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A scenario whose steps pass without expectations passes
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{</span>
-<span class="st">      context$basket &lt;- list()</span>
-<span class="st">    \})</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      context$basket &lt;- c(context$basket, "item")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = NULL)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A scenario whose steps pass without expectations passes
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{
-      context$basket <- list()
-    \})
-    when("I add an item", function(context) \{
-      context$basket <- c(context$basket, "item")
-    \})
-    """
-  When I run
-    """
-    test("features", reporter = NULL)
-    """
-  Then it passes
-%</pre>
-}}
+  Scenario: A scenario whose steps pass without expectations passes
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{
+        context$basket <- list()
+      \})
+      when("I add an item", function(context) \{
+        context$basket <- c(context$basket, "item")
+      \})
+      """
+    When I run
+      """
+      test("features", reporter = NULL)
+      """
+    Then it passes
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> testthat reports a scenario without expectations or steps as passed
-  <span class="fu">Given</span> a file named <span class="st">"tests/testthat/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Not written yet</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{</span>
-<span class="st">      context$basket &lt;- list()</span>
-<span class="st">    \})</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      context$basket &lt;- c(context$basket, "item")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"tests/testthat/test-acceptance.R"</span> with
-<span class="st">    """</span>
-<span class="st">    run()</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    testthat::test_local(reporter = "silent")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes
-  <span class="fu">And</span> only these scenarios ran:
-    <span class="op">|</span> scenario        <span class="op">|</span>
-    <span class="op">|</span> Add an item     <span class="op">|</span>
-    <span class="op">|</span> Not written yet <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: testthat reports a scenario without expectations or steps as passed
-  Given a file named "tests/testthat/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
+  Scenario: testthat reports a scenario without expectations or steps as passed
+    Given a file named "tests/testthat/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
 
-      Scenario: Not written yet
-    """
-  And a file named "tests/testthat/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{
-      context$basket <- list()
-    \})
-    when("I add an item", function(context) \{
-      context$basket <- c(context$basket, "item")
-    \})
-    """
-  And a file named "tests/testthat/test-acceptance.R" with
-    """
-    run()
-    """
-  When I run
-    """
-    testthat::test_local(reporter = "silent")
-    """
-  Then it passes
-  And only these scenarios ran:
-    | scenario        |
-    | Add an item     |
-    | Not written yet |
+        Scenario: Not written yet
+      """
+    And a file named "tests/testthat/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{
+        context$basket <- list()
+      \})
+      when("I add an item", function(context) \{
+        context$basket <- c(context$basket, "item")
+      \})
+      """
+    And a file named "tests/testthat/test-acceptance.R" with
+      """
+      run()
+      """
+    When I run
+      """
+      testthat::test_local(reporter = "silent")
+      """
+    Then it passes
+    And only these scenarios ran:
+      | scenario        |
+      | Add an item     |
+      | Not written yet |
 %</pre>
 }}
 
 Source: \code{tests/acceptance/passing_steps.feature}
-}
 
-\subsection{Failing steps}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Failing steps}{
 A step fails when its step definition throws an error or a failed expectation.
 The steps after it are skipped, and the other scenarios still run.
 A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
 An error names the feature file and the line of the step that failed, like \code{basket.feature:3}.
 An error is shown with its backtrace, the calls of the step down to where it was thrown, like in a testthat test.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: Steps after a failing step are skipped}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add an item&#10;    <span class="fu">Then</span> the basket has 1 item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I add an item", function(context) \{
+  expect_equal(1, 2)
+\})
+then("the basket has \{int\} item", function(n, context) \{
+  stop("this step must not execute")
+\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab passed \cr
+When I add an item \tab failed \cr
+Then the basket has 1 item \tab skipped
+}
+}
+}
+\subsection{Scenario: Undefined and ambiguous steps after a failing step keep their status}{
+Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add an item&#10;    <span class="fu">Then</span> the basket is checked&#10;    <span class="fu">And</span> the basket is synced twice</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) stop("the basket is full"))
+then("the basket is synced \{word\}", function(word, context) \{\})
+then("the basket is synced \{\}", function(x, context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+When I add an item \tab failed \cr
+Then the basket is checked \tab undefined \cr
+And the basket is synced twice \tab ambiguous
+}
+}
+}
+\subsection{Scenario: A step stops at its first failed expectation}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Then</span> the basket has an apple</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{then("the basket has an apple", function(context) \{
+  context$items <- c("pear", "plum")
+  expect_equal(length(context$items), 1, label = "the number of items")
+  expect_equal(context$items[[1]], "apple", label = "the first item")
+\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Then the basket has an apple \tab failed
+}
+\item And the errors are
+\preformatted{[failure] Scenario: Add an item
+Step "the basket has an apple" failed
+i Feature: basket.feature:3
+i Scenario: Add an item
+i Step defined at: setup-steps.R:1
+Expected the number of items to equal 1.
+Differences:
+1/1 mismatches
+[1] 2 - 1 == 1}
+}
+}
+\subsection{Scenario: A step that throws an error fails, and the other scenarios still run}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add an item&#10;&#10;  <span class="kw">Scenario:</span> Look into the basket&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I add an item", function(context) \{
+  stop("basket is full")
+\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the errors are
+\preformatted{[error] Scenario: Add an item
+Error: Step "I add an item" failed
+i Feature: basket.feature:3
+i Scenario: Add an item
+i Step defined at: setup-steps.R:2
+Caused by error:
+! basket is full}
+\item And the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Add an item \tab failed \cr
+Look into the basket \tab passed
+}
+}
+}
+\subsection{Scenario: An error is shown with the errors that caused it}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Save the basket&#10;    <span class="fu">When</span> I save the basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{write_basket <- function() stop("the disk is full")
+when("I save the basket", function(context) \{
+  tryCatch(
+    write_basket(),
+    error = function(e) rlang::abort("The basket can't be saved.", parent = e)
+  )
+\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the errors are
+\preformatted{[error] Scenario: Save the basket
+Error: Step "I save the basket" failed
+i Feature: basket.feature:3
+i Scenario: Save the basket
+i Step defined at: setup-steps.R:2
+Caused by error:
+! The basket can't be saved.
+Caused by error in `write_basket()`:
+! the disk is full}
+}
+}
+\subsection{Scenario: An error is shown with the backtrace of the step}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add an item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{open_basket <- function() find_basket()
+find_basket <- function() stop("basket is missing")
+when("I add an item", function(context) \{
+  open_basket()
+\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the output includes lines matching these patterns in order:
+\preformatted{basket is missing
+Backtrace:
+open_basket\\(\\)
+find_basket\\(\\)}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Failing steps
+  A step fails when its step definition throws an error or a failed expectation.
+  The steps after it are skipped, and the other scenarios still run.
+  A step stops at its first failed expectation: unlike in a testthat test, the code after it doesn't run.
+  An error names the feature file and the line of the step that failed, like `basket.feature:3`.
+  An error is shown with its backtrace, the calls of the step down to where it was thrown, like in a testthat test.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Steps after a failing step are skipped
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      expect_equal(1, 2)</span>
-<span class="st">    \})</span>
-<span class="st">    then("the basket has \{int\} item", function(n, context) \{</span>
-<span class="st">      stop("this step must not execute")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                       <span class="op">|</span> status  <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket      <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> When I add an item         <span class="op">|</span> failed  <span class="op">|</span>
-    <span class="op">|</span> Then the basket has 1 item <span class="op">|</span> skipped <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Steps after a failing step are skipped
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-        Then the basket has 1 item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add an item", function(context) \{
-      expect_equal(1, 2)
-    \})
-    then("the basket has \{int\} item", function(n, context) \{
-      stop("this step must not execute")
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                       | status  |
-    | Given an empty basket      | passed  |
-    | When I add an item         | failed  |
-    | Then the basket has 1 item | skipped |
-%</pre>
-}}
+  Scenario: Steps after a failing step are skipped
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
+          Then the basket has 1 item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I add an item", function(context) \{
+        expect_equal(1, 2)
+      \})
+      then("the basket has \{int\} item", function(n, context) \{
+        stop("this step must not execute")
+      \})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                       | status  |
+      | Given an empty basket      | passed  |
+      | When I add an item         | failed  |
+      | Then the basket has 1 item | skipped |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Undefined and ambiguous steps after a failing step keep their status
-  Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add an item</span>
-<span class="st">        Then the basket is checked</span>
-<span class="st">        And the basket is synced twice</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) stop("the basket is full"))</span>
-<span class="st">    then("the basket is synced \{word\}", function(word, context) \{\})</span>
-<span class="st">    then("the basket is synced \{\}", function(x, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                           <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> When I add an item             <span class="op">|</span> failed    <span class="op">|</span>
-    <span class="op">|</span> Then the basket is checked     <span class="op">|</span> undefined <span class="op">|</span>
-    <span class="op">|</span> And the basket is synced twice <span class="op">|</span> ambiguous <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Undefined and ambiguous steps after a failing step keep their status
-  Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
+  Scenario: Undefined and ambiguous steps after a failing step keep their status
+    Like in Cucumber, they're reported as undefined and ambiguous, so they're found in the same run.
 
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-        Then the basket is checked
-        And the basket is synced twice
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) stop("the basket is full"))
-    then("the basket is synced \{word\}", function(word, context) \{\})
-    then("the basket is synced \{\}", function(x, context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                           | status    |
-    | When I add an item             | failed    |
-    | Then the basket is checked     | undefined |
-    | And the basket is synced twice | ambiguous |
-%</pre>
-}}
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+          Then the basket is checked
+          And the basket is synced twice
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) stop("the basket is full"))
+      then("the basket is synced \{word\}", function(word, context) \{\})
+      then("the basket is synced \{\}", function(x, context) \{\})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                           | status    |
+      | When I add an item             | failed    |
+      | Then the basket is checked     | undefined |
+      | And the basket is synced twice | ambiguous |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step stops at its first failed expectation
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Then the basket has an apple</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    then("the basket has an apple", function(context) \{</span>
-<span class="st">      context$items &lt;- c("pear", "plum")</span>
-<span class="st">      expect_equal(length(context$items), 1, label = "the number of items")</span>
-<span class="st">      expect_equal(context$items[[1]], "apple", label = "the first item")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                         <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Then the basket has an apple <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [failure] Scenario: Add an item</span>
-<span class="st">    Step "the basket has an apple" failed</span>
-<span class="st">    i Feature: basket.feature:3</span>
-<span class="st">    i Scenario: Add an item</span>
-<span class="st">    i Step defined at: setup-steps.R:1</span>
-<span class="st">    Expected the number of items to equal 1.</span>
-<span class="st">    Differences:</span>
-<span class="st">    1/1 mismatches</span>
-<span class="st">    [1] 2 - 1 == 1</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step stops at its first failed expectation
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Then the basket has an apple
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    then("the basket has an apple", function(context) \{
-      context$items <- c("pear", "plum")
-      expect_equal(length(context$items), 1, label = "the number of items")
-      expect_equal(context$items[[1]], "apple", label = "the first item")
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                         | status |
-    | Then the basket has an apple | failed |
-  And the errors are
-    """
-    [failure] Scenario: Add an item
-    Step "the basket has an apple" failed
-    i Feature: basket.feature:3
-    i Scenario: Add an item
-    i Step defined at: setup-steps.R:1
-    Expected the number of items to equal 1.
-    Differences:
-    1/1 mismatches
-    [1] 2 - 1 == 1
-    """
-%</pre>
-}}
+  Scenario: A step stops at its first failed expectation
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Then the basket has an apple
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      then("the basket has an apple", function(context) \{
+        context$items <- c("pear", "plum")
+        expect_equal(length(context$items), 1, label = "the number of items")
+        expect_equal(context$items[[1]], "apple", label = "the first item")
+      \})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                         | status |
+      | Then the basket has an apple | failed |
+    And the errors are
+      """
+      [failure] Scenario: Add an item
+      Step "the basket has an apple" failed
+      i Feature: basket.feature:3
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:1
+      Expected the number of items to equal 1.
+      Differences:
+      1/1 mismatches
+      [1] 2 - 1 == 1
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step that throws an error fails, and the other scenarios still run
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add an item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Look into the basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      stop("basket is full")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [error] Scenario: Add an item</span>
-<span class="st">    Error: Step "I add an item" failed</span>
-<span class="st">    i Feature: basket.feature:3</span>
-<span class="st">    i Scenario: Add an item</span>
-<span class="st">    i Step defined at: setup-steps.R:2</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! basket is full</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the scenarios have these results:
-    <span class="op">|</span> scenario             <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> failed <span class="op">|</span>
-    <span class="op">|</span> Look into the basket <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step that throws an error fails, and the other scenarios still run
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
+  Scenario: A step that throws an error fails, and the other scenarios still run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
 
-      Scenario: Look into the basket
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add an item", function(context) \{
-      stop("basket is full")
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the errors are
-    """
-    [error] Scenario: Add an item
-    Error: Step "I add an item" failed
-    i Feature: basket.feature:3
-    i Scenario: Add an item
-    i Step defined at: setup-steps.R:2
-    Caused by error:
-    ! basket is full
-    """
-  And the scenarios have these results:
-    | scenario             | status |
-    | Add an item          | failed |
-    | Look into the basket | passed |
-%</pre>
-}}
+        Scenario: Look into the basket
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I add an item", function(context) \{
+        stop("basket is full")
+      \})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error] Scenario: Add an item
+      Error: Step "I add an item" failed
+      i Feature: basket.feature:3
+      i Scenario: Add an item
+      i Step defined at: setup-steps.R:2
+      Caused by error:
+      ! basket is full
+      """
+    And the scenarios have these results:
+      | scenario             | status |
+      | Add an item          | failed |
+      | Look into the basket | passed |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An error is shown with the errors that caused it
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Save the basket</span>
-<span class="st">        When I save the basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    write_basket &lt;- function() stop("the disk is full")</span>
-<span class="st">    when("I save the basket", function(context) \{</span>
-<span class="st">      tryCatch(</span>
-<span class="st">        write_basket(),</span>
-<span class="st">        error = function(e) rlang::abort("The basket can't be saved.", parent = e)</span>
-<span class="st">      )</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [error] Scenario: Save the basket</span>
-<span class="st">    Error: Step "I save the basket" failed</span>
-<span class="st">    i Feature: basket.feature:3</span>
-<span class="st">    i Scenario: Save the basket</span>
-<span class="st">    i Step defined at: setup-steps.R:2</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! The basket can't be saved.</span>
-<span class="st">    Caused by error in `write_basket()`:</span>
-<span class="st">    ! the disk is full</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An error is shown with the errors that caused it
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Save the basket
-        When I save the basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    write_basket <- function() stop("the disk is full")
-    when("I save the basket", function(context) \{
-      tryCatch(
-        write_basket(),
-        error = function(e) rlang::abort("The basket can't be saved.", parent = e)
-      )
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the errors are
-    """
-    [error] Scenario: Save the basket
-    Error: Step "I save the basket" failed
-    i Feature: basket.feature:3
-    i Scenario: Save the basket
-    i Step defined at: setup-steps.R:2
-    Caused by error:
-    ! The basket can't be saved.
-    Caused by error in `write_basket()`:
-    ! the disk is full
-    """
-%</pre>
-}}
+  Scenario: An error is shown with the errors that caused it
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Save the basket
+          When I save the basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      write_basket <- function() stop("the disk is full")
+      when("I save the basket", function(context) \{
+        tryCatch(
+          write_basket(),
+          error = function(e) rlang::abort("The basket can't be saved.", parent = e)
+        )
+      \})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the errors are
+      """
+      [error] Scenario: Save the basket
+      Error: Step "I save the basket" failed
+      i Feature: basket.feature:3
+      i Scenario: Save the basket
+      i Step defined at: setup-steps.R:2
+      Caused by error:
+      ! The basket can't be saved.
+      Caused by error in `write_basket()`:
+      ! the disk is full
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An error is shown with the backtrace of the step
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add an item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    open_basket &lt;- function() find_basket()</span>
-<span class="st">    find_basket &lt;- function() stop("basket is missing")</span>
-<span class="st">    when("I add an item", function(context) \{</span>
-<span class="st">      open_basket()</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes lines matching these patterns in order:
-<span class="st">    """</span>
-<span class="st">    basket is missing</span>
-<span class="st">    Backtrace:</span>
-<span class="st">    open_basket\\(\\)</span>
-<span class="st">    find_basket\\(\\)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An error is shown with the backtrace of the step
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    open_basket <- function() find_basket()
-    find_basket <- function() stop("basket is missing")
-    when("I add an item", function(context) \{
-      open_basket()
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the output includes lines matching these patterns in order:
-    """
-    basket is missing
-    Backtrace:
-    open_basket\\(\\)
-    find_basket\\(\\)
-    """
+  Scenario: An error is shown with the backtrace of the step
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      open_basket <- function() find_basket()
+      find_basket <- function() stop("basket is missing")
+      when("I add an item", function(context) \{
+        open_basket()
+      \})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      basket is missing
+      Backtrace:
+      open_basket\\(\\)
+      find_basket\\(\\)
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/failing_steps.feature}
-}
 
-\subsection{Undefined steps}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Undefined steps}{
 A step that matches no step definition is undefined.
 It's reported with a snippet of the missing step definition, and the other scenarios still run.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: An undefined step doesn't stop the run}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add an item&#10;    <span class="fu">Then</span> the basket has 1 item&#10;&#10;  <span class="kw">Scenario:</span> Look into the basket&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/checkout.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Checkout&#10;  <span class="kw">Scenario:</span> Pay&#10;    <span class="fu">When</span> I pay 5 euro</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then it ran "Scenario: Pay"
+\item And the steps have these results:
+\tabular{lll}{
+scenario \tab step \tab status \cr
+Add an item \tab Given an empty basket \tab passed \cr
+Add an item \tab When I add an item \tab undefined \cr
+Add an item \tab Then the basket has 1 item \tab undefined \cr
+Look into the basket \tab Given an empty basket \tab passed \cr
+Pay \tab When I pay 5 euro \tab undefined
+}
+\item And the output includes
+\preformatted{when("I pay \{int\} euro", function(int, context) \{}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Undefined steps
+  A step that matches no step definition is undefined.
+  It's reported with a snippet of the missing step definition, and the other scenarios still run.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An undefined step doesn't stop the run
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Look into the basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/checkout.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Checkout</span>
-<span class="st">      Scenario: Pay</span>
-<span class="st">        When I pay 5 euro</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it ran <span class="st">"Scenario: Pay"</span>
-  <span class="fu">And</span> the steps have these results:
-    <span class="op">|</span> scenario             <span class="op">|</span> step                       <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> Given an empty basket      <span class="op">|</span> passed    <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> When I add an item         <span class="op">|</span> undefined <span class="op">|</span>
-    <span class="op">|</span> Add an item          <span class="op">|</span> Then the basket has 1 item <span class="op">|</span> undefined <span class="op">|</span>
-    <span class="op">|</span> Look into the basket <span class="op">|</span> Given an empty basket      <span class="op">|</span> passed    <span class="op">|</span>
-    <span class="op">|</span> Pay                  <span class="op">|</span> When I pay 5 euro          <span class="op">|</span> undefined <span class="op">|</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    when("I pay \{int\} euro", function(int, context) \{</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An undefined step doesn't stop the run
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-        Then the basket has 1 item
+  Scenario: An undefined step doesn't stop the run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
+          Then the basket has 1 item
 
-      Scenario: Look into the basket
-        Given an empty basket
-    """
-  And a file named "features/checkout.feature" with
-    """
-    Feature: Checkout
-      Scenario: Pay
-        When I pay 5 euro
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then it ran "Scenario: Pay"
-  And the steps have these results:
-    | scenario             | step                       | status    |
-    | Add an item          | Given an empty basket      | passed    |
-    | Add an item          | When I add an item         | undefined |
-    | Add an item          | Then the basket has 1 item | undefined |
-    | Look into the basket | Given an empty basket      | passed    |
-    | Pay                  | When I pay 5 euro          | undefined |
-  And the output includes
-    """
-    when("I pay \{int\} euro", function(int, context) \{
-    """
+        Scenario: Look into the basket
+          Given an empty basket
+      """
+    And a file named "features/checkout.feature" with
+      """
+      Feature: Checkout
+        Scenario: Pay
+          When I pay 5 euro
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then it ran "Scenario: Pay"
+    And the steps have these results:
+      | scenario             | step                       | status    |
+      | Add an item          | Given an empty basket      | passed    |
+      | Add an item          | When I add an item         | undefined |
+      | Add an item          | Then the basket has 1 item | undefined |
+      | Look into the basket | Given an empty basket      | passed    |
+      | Pay                  | When I pay 5 euro          | undefined |
+    And the output includes
+      """
+      when("I pay \{int\} euro", function(int, context) \{
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/undefined_step.feature}
-}
 
-\subsection{Step definition snippets}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Step definition snippets}{
 An undefined step is reported with a snippet of the step definition it needs, ready to paste into a setup file.
 When more than one parameter type matches a part of the step, the alternative step definitions are listed as comments.
 Keep only one of them, as a step that matches several step definitions is ambiguous.
+\subsection{Scenario: An undefined step is reported with a snippet}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Start shopping&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab undefined
+}
+\item And the errors are
+\preformatted{[failure] Scenario: Start shopping
+No step found for: "an empty basket"
+i Add a step definition:
+  given("an empty basket", function(context) \{
+    pending()
+  \})
+i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.}
+}
+}
+\subsection{Scenario: Alternative step definitions are listed when more than one parameter type matches}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Count cucumbers&#10;    <span class="fu">Given</span> I have 5 cucumbers in my basket</code></pre >}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given I have 5 cucumbers in my basket \tab undefined
+}
+\item And the errors are
+\preformatted{[failure] Scenario: Count cucumbers
+No step found for: "I have 5 cucumbers in my basket"
+i Add a step definition:
+  given("I have \{int\} cucumbers in my basket", function(int, context) \{
+  # given("I have \{float\} cucumbers in my basket", function(float, context) \{
+    pending()
+  \})
+i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Step definition snippets
+  An undefined step is reported with a snippet of the step definition it needs, ready to paste into a setup file.
+  When more than one parameter type matches a part of the step, the alternative step definitions are listed as comments.
+  Keep only one of them, as a step that matches several step definitions is ambiguous.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An undefined step is reported with a snippet
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Start shopping</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                  <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> undefined <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [failure] Scenario: Start shopping</span>
-<span class="st">    No step found for: "an empty basket"</span>
-<span class="st">    i Add a step definition:</span>
-<span class="st">      given("an empty basket", function(context) \{</span>
-<span class="st">        pending()</span>
-<span class="st">      \})</span>
-<span class="st">    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An undefined step is reported with a snippet
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Start shopping
-        Given an empty basket
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                  | status    |
-    | Given an empty basket | undefined |
-  And the errors are
-    """
-    [failure] Scenario: Start shopping
-    No step found for: "an empty basket"
-    i Add a step definition:
-      given("an empty basket", function(context) \{
-        pending()
-      \})
-    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
-    """
-%</pre>
-}}
+  Scenario: An undefined step is reported with a snippet
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Start shopping
+          Given an empty basket
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                  | status    |
+      | Given an empty basket | undefined |
+    And the errors are
+      """
+      [failure] Scenario: Start shopping
+      No step found for: "an empty basket"
+      i Add a step definition:
+        given("an empty basket", function(context) \{
+          pending()
+        \})
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Alternative step definitions are listed when more than one parameter type matches
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Count cucumbers</span>
-<span class="st">        Given I have 5 cucumbers in my basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                                  <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Given I have 5 cucumbers in my basket <span class="op">|</span> undefined <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [failure] Scenario: Count cucumbers</span>
-<span class="st">    No step found for: "I have 5 cucumbers in my basket"</span>
-<span class="st">    i Add a step definition:</span>
-<span class="st">      given("I have \{int\} cucumbers in my basket", function(int, context) \{</span>
-<span class="st">      # given("I have \{float\} cucumbers in my basket", function(float, context) \{</span>
-<span class="st">        pending()</span>
-<span class="st">      \})</span>
-<span class="st">    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Alternative step definitions are listed when more than one parameter type matches
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Count cucumbers
-        Given I have 5 cucumbers in my basket
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                                  | status    |
-    | Given I have 5 cucumbers in my basket | undefined |
-  And the errors are
-    """
-    [failure] Scenario: Count cucumbers
-    No step found for: "I have 5 cucumbers in my basket"
-    i Add a step definition:
-      given("I have \{int\} cucumbers in my basket", function(int, context) \{
-      # given("I have \{float\} cucumbers in my basket", function(float, context) \{
-        pending()
-      \})
-    i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
-    """
+  Scenario: Alternative step definitions are listed when more than one parameter type matches
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Count cucumbers
+          Given I have 5 cucumbers in my basket
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                                  | status    |
+      | Given I have 5 cucumbers in my basket | undefined |
+    And the errors are
+      """
+      [failure] Scenario: Count cucumbers
+      No step found for: "I have 5 cucumbers in my basket"
+      i Add a step definition:
+        given("I have \{int\} cucumbers in my basket", function(int, context) \{
+        # given("I have \{float\} cucumbers in my basket", function(float, context) \{
+          pending()
+        \})
+      i No step definitions are loaded. Define them in `setup-*.R` or `helper-*.R` files of the test directory.
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/step_definition_snippets.feature}
-}
 
-\subsection{Ambiguous steps}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Ambiguous steps}{
 A step must match exactly one step definition.
 When it matches more than one, the step is reported as ambiguous, listing
 every matching definition, and the scenario fails.
+\subsection{Scenario: A step matching two definitions fails with both definitions listed}{
+\itemize{
+\item Given a package
+\item And a file named "features/user.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> User&#10;  <span class="kw">Scenario:</span> Name a user&#10;    <span class="fu">Given</span> the user is <span class="st">"John"</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the user is \{\}", function(user, context) \{
+  context$user <- user
+\})
+given("the user is \{string\}", function(user, context) \{
+  context$user <- user
+\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given the user is "John" \tab ambiguous
+}
+\item And the errors are
+\preformatted{[failure] Scenario: Name a user
+Multiple step definitions match: "the user is "John""
+i Make the step match only one of:
+* "the user is \{\}" (setup-steps.R:1)
+* "the user is \{string\}" (setup-steps.R:4)}
+}
+}
+\subsection{Scenario: Steps are matched without their keyword}{
+A Given and a Then step with the same text match the same step definitions,
+so choose words that tell them apart, like "my account has a balance of £430"
+and "my account should have a balance of £430".
+\itemize{
+\item Given a package
+\item And a file named "features/account.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Account&#10;  <span class="kw">Scenario:</span> Withdraw&#10;    <span class="fu">Given</span> there is money in my account</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("there is money in my account", function(context) \{\})
+then("there is money in my account", function(context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given there is money in my account \tab ambiguous
+}
+\item And the errors are
+\preformatted{[failure] Scenario: Withdraw
+Multiple step definitions match: "there is money in my account"
+i Make the step match only one of:
+* "there is money in my account" (setup-steps.R:1)
+* "there is money in my account" (setup-steps.R:2)}
+}
+}
+}
+}  
+\if{text,latex}{\preformatted{Feature: Ambiguous steps
+  A step must match exactly one step definition.
+  When it matches more than one, the step is reported as ambiguous, listing
+  every matching definition, and the scenario fails.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step matching two definitions fails with both definitions listed
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/user.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: User</span>
-<span class="st">      Scenario: Name a user</span>
-<span class="st">        Given the user is "John"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the user is \{\}", function(user, context) \{</span>
-<span class="st">      context$user &lt;- user</span>
-<span class="st">    \})</span>
-<span class="st">    given("the user is \{string\}", function(user, context) \{</span>
-<span class="st">      context$user &lt;- user</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                     <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Given the user is <span class="st">"John"</span> <span class="op">|</span> ambiguous <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [failure] Scenario: Name a user</span>
-<span class="st">    Multiple step definitions match: "the user is "John""</span>
-<span class="st">    i Make the step match only one of:</span>
-<span class="st">    * "the user is \{\}" (setup-steps.R:1)</span>
-<span class="st">    * "the user is \{string\}" (setup-steps.R:4)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step matching two definitions fails with both definitions listed
-  Given a package
-  And a file named "features/user.feature" with
-    """
-    Feature: User
-      Scenario: Name a user
-        Given the user is "John"
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the user is \{\}", function(user, context) \{
-      context$user <- user
-    \})
-    given("the user is \{string\}", function(user, context) \{
-      context$user <- user
-    \})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                     | status    |
-    | Given the user is "John" | ambiguous |
-  And the errors are
-    """
-    [failure] Scenario: Name a user
-    Multiple step definitions match: "the user is "John""
-    i Make the step match only one of:
-    * "the user is \{\}" (setup-steps.R:1)
-    * "the user is \{string\}" (setup-steps.R:4)
-    """
-%</pre>
-}}
+  Scenario: A step matching two definitions fails with both definitions listed
+    Given a package
+    And a file named "features/user.feature" with
+      """
+      Feature: User
+        Scenario: Name a user
+          Given the user is "John"
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("the user is \{\}", function(user, context) \{
+        context$user <- user
+      \})
+      given("the user is \{string\}", function(user, context) \{
+        context$user <- user
+      \})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                     | status    |
+      | Given the user is "John" | ambiguous |
+    And the errors are
+      """
+      [failure] Scenario: Name a user
+      Multiple step definitions match: "the user is "John""
+      i Make the step match only one of:
+      * "the user is \{\}" (setup-steps.R:1)
+      * "the user is \{string\}" (setup-steps.R:4)
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Steps are matched without their keyword
-  A Given and a Then step with the same text match the same step definitions,
-  so choose words that tell them apart, like <span class="st">"my account has a balance of £430"</span>
-  and <span class="st">"my account should have a balance of £430"</span>.
-<span></span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/account.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Account</span>
-<span class="st">      Scenario: Withdraw</span>
-<span class="st">        Given there is money in my account</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("there is money in my account", function(context) \{\})</span>
-<span class="st">    then("there is money in my account", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                               <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Given there is money in my account <span class="op">|</span> ambiguous <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [failure] Scenario: Withdraw</span>
-<span class="st">    Multiple step definitions match: "there is money in my account"</span>
-<span class="st">    i Make the step match only one of:</span>
-<span class="st">    * "there is money in my account" (setup-steps.R:1)</span>
-<span class="st">    * "there is money in my account" (setup-steps.R:2)</span>
-<span class="st">    """</span></code></pre >}}  
-\if{text,latex}{\preformatted{Scenario: Steps are matched without their keyword
-  A Given and a Then step with the same text match the same step definitions,
-  so choose words that tell them apart, like "my account has a balance of £430"
-  and "my account should have a balance of £430".
+  Scenario: Steps are matched without their keyword
+    A Given and a Then step with the same text match the same step definitions,
+    so choose words that tell them apart, like "my account has a balance of £430"
+    and "my account should have a balance of £430".
 
-  Given a package
-  And a file named "features/account.feature" with
-    """
-    Feature: Account
-      Scenario: Withdraw
-        Given there is money in my account
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("there is money in my account", function(context) \{\})
-    then("there is money in my account", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                               | status    |
-    | Given there is money in my account | ambiguous |
-  And the errors are
-    """
-    [failure] Scenario: Withdraw
-    Multiple step definitions match: "there is money in my account"
-    i Make the step match only one of:
-    * "there is money in my account" (setup-steps.R:1)
-    * "there is money in my account" (setup-steps.R:2)
-    """
+    Given a package
+    And a file named "features/account.feature" with
+      """
+      Feature: Account
+        Scenario: Withdraw
+          Given there is money in my account
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("there is money in my account", function(context) \{\})
+      then("there is money in my account", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", stop_on_failure = FALSE)
+      """
+    Then the steps have these results:
+      | step                               | status    |
+      | Given there is money in my account | ambiguous |
+    And the errors are
+      """
+      [failure] Scenario: Withdraw
+      Multiple step definitions match: "there is money in my account"
+      i Make the step match only one of:
+      * "there is money in my account" (setup-steps.R:1)
+      * "there is money in my account" (setup-steps.R:2)
+      """
 %</pre>
 }}  
 
 Source: \code{tests/acceptance/ambiguous_step.feature}
-}
 }
 
 \examples{

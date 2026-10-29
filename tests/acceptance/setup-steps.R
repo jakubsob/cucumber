@@ -532,9 +532,35 @@ then("the help page {string} doesn't include {string}", function(topic, text, co
   expect_false(grepl(text, page, fixed = TRUE), info = page)
 })
 
+reference_page <- function(topic, context) {
+  xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
+}
+
+# The texts of elements of the Specification section of a pkgdown reference page,
+# whose id is on the section or on its header depending on the Bootstrap version
+specification <- function(topic, context, xpath) {
+  html <- reference_page(topic, context)
+  trimws(xml2::xml_text(xml2::xml_find_all(html, paste0("//*[@id='specification' or h2/@id='specification']", xpath))))
+}
+
+then("the reference page {string} has the headings", function(topic, text, context) {
+  headings <- specification(topic, context, "//*[self::h3 or self::h4 or self::h5 or self::h6]")
+  expect_equal(headings, strsplit(text, "\n")[[1]])
+})
+
+# The steps are list items, their text the first paragraph
+then("the reference page {string} has the steps", function(topic, text, context) {
+  expect_equal(specification(topic, context, "//li/p[1]"), strsplit(text, "\n")[[1]])
+})
+
+# Rd tables have no header cells: the header is the first row
+then("the reference page {string} has the table", function(topic, table, context) {
+  expect_equal(specification(topic, context, "//table//td"), c(names(table), t(as.matrix(table))))
+})
+
 # A block of Gherkin code of a pkgdown reference page, as text
 then("the reference page {string} has the Gherkin block", function(topic, text, context) {
-  html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
+  html <- reference_page(topic, context)
   blocks <- trimws(xml2::xml_text(xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code")))
   expect_true(
     text %in% blocks,
@@ -544,7 +570,7 @@ then("the reference page {string} has the Gherkin block", function(topic, text, 
 
 # The tokens of the Gherkin blocks of a pkgdown reference page, with their classes
 then("the reference page {string} highlights the Gherkin", function(topic, table, context) {
-  html <- xml2::read_html(fs::path(context$tempdir, "docs", "reference", paste0(topic, ".html")))
+  html <- reference_page(topic, context)
   spans <- xml2::xml_find_all(html, "//pre[contains(@class, 'gherkin')]/code//span[@class]")
   tokens <- paste(trimws(xml2::xml_text(spans)), "-", xml2::xml_attr(spans, "class"))
   expected <- paste(table$token, "-", table$class)

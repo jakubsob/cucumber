@@ -4,9 +4,9 @@
 #' - `extension` of its files.
 #' - `media_type` of its sources in Cucumber Messages.
 #' - `matchers` that classify its lines for the parser's state machine.
-#' - `block_end`: a regular expression of the lines a block of a scenario
-#'   doesn't end with in `features_rd()`, like blank lines and comments.
-#' - `block_code`: a function of a block's lines and the column of its
+#' - `block_end`: a regular expression of the lines a part of a feature, like
+#'   a scenario, doesn't end with in `features_rd()`, like blank lines and comments.
+#' - `block_code`: a function of a feature's lines and the column of its
 #'   keyword, giving them as they are shown in `features_rd()`.
 #'
 #' A function and not a constant, as the matchers are defined in other files.

@@ -12,218 +12,200 @@ write the report of a run after it ran, store its messages with
 }
 \section{Specification}{
 
-\subsection{HTML reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: HTML reporter}{
 \code{CucumberHtmlReporter} writes the official Cucumber HTML report of a run when the run ends,
 even when it fails. The page is one file, with the report's script and styles and the
 messages of the run, so it works offline. It can be searched and filtered by status, text and tags.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: Each step is shown with its result and the error of a step that didn't pass}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add an item&#10;    <span class="fu">Then</span> the basket has 1 item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) context$items <- 0)
+when("I add an item", function(context) context$items <- context$items + 1)
+then("the basket has \{int\} item(s)", function(int, context) expect_equal(context$items, 2))}
+\item When I run
+\preformatted{test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)}
+\item Then the HTML report "report.html" shows these steps:
+\tabular{lll}{
+step \tab status \tab error \cr
+Given an empty basket \tab passed \tab  \cr
+When I add an item \tab passed \tab  \cr
+Then the basket has 1 item \tab failed \tab expectation_failure Expected \code{context$items} to equal 2.
+}
+}
+}
+\subsection{Scenario: The report is written to cucumber-report.html by default}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) context$items <- 0)}
+\item When I run
+\preformatted{test("features", reporter = CucumberHtmlReporter$new())}
+\item Then the HTML report "cucumber-report.html" shows these steps:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab passed
+}
+}
+}
+\subsection{Scenario: Text of the messages can't end the report's script}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add a &lt;!--<span class="va">&lt;script&gt;</span> to the basket&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) context$items <- 0)}
+\item When I run
+\preformatted{test("features", reporter = CucumberHtmlReporter$new("report.html"))}
+\item Then the HTML report "report.html" shows these steps:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab passed
+}
+}
+}
+\subsection{Scenario: The attachments of a step are shown under it}{
+A screenshot and the logs attached when a step fails are shown under the step that failed.
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add an item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add an item", function(context) stop("The basket is full"))
+after_step(function(context, step) \{
+  if (step$status == "failed") \{
+    png("basket.png")
+    plot(1:3)
+    dev.off()
+    context$attach(readBin("basket.png", "raw", file.size("basket.png")), "image/png", file_name = "basket.png")
+    context$log("Opened the basket")
+  \}
+\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)}
+\item Then the HTML report "report.html" shows these attachments:
+\tabular{lll}{
+step \tab kind \tab content \cr
+When I add an item \tab image \tab basket.png \cr
+When I add an item \tab text \tab Opened the basket
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: HTML reporter
+  `CucumberHtmlReporter` writes the official Cucumber HTML report of a run when the run ends,
+  even when it fails. The page is one file, with the report's script and styles and the
+  messages of the run, so it works offline. It can be searched and filtered by status, text and tags.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step is shown with its result and the error of a step that didn't pass
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) context$items &lt;- 0)</span>
-<span class="st">    when("I add an item", function(context) context$items &lt;- context$items + 1)</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(int, context) expect_equal(context$items, 2))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the HTML report <span class="st">"report.html"</span> shows these steps:
-    <span class="op">|</span> step                       <span class="op">|</span> status <span class="op">|</span> error                                                    <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket      <span class="op">|</span> passed <span class="op">|</span>                                                          <span class="op">|</span>
-    <span class="op">|</span> When I add an item         <span class="op">|</span> passed <span class="op">|</span>                                                          <span class="op">|</span>
-    <span class="op">|</span> Then the basket has 1 item <span class="op">|</span> failed <span class="op">|</span> expectation_failure Expected `context$items` to equal 2. <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each step is shown with its result and the error of a step that didn't pass
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
-        Then the basket has 1 item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$items <- 0)
-    when("I add an item", function(context) context$items <- context$items + 1)
-    then("the basket has \{int\} item(s)", function(int, context) expect_equal(context$items, 2))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)
-    """
-  Then the HTML report "report.html" shows these steps:
-    | step                       | status | error                                                    |
-    | Given an empty basket      | passed |                                                          |
-    | When I add an item         | passed |                                                          |
-    | Then the basket has 1 item | failed | expectation_failure Expected `context$items` to equal 2. |
-%</pre>
-}}
+  Scenario: Each step is shown with its result and the error of a step that didn't pass
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
+          Then the basket has 1 item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$items <- 0)
+      when("I add an item", function(context) context$items <- context$items + 1)
+      then("the basket has \{int\} item(s)", function(int, context) expect_equal(context$items, 2))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)
+      """
+    Then the HTML report "report.html" shows these steps:
+      | step                       | status | error                                                    |
+      | Given an empty basket      | passed |                                                          |
+      | When I add an item         | passed |                                                          |
+      | Then the basket has 1 item | failed | expectation_failure Expected `context$items` to equal 2. |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The report is written to cucumber-report.html by default
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) context$items &lt;- 0)</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberHtmlReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the HTML report <span class="st">"cucumber-report.html"</span> shows these steps:
-    <span class="op">|</span> step                  <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The report is written to cucumber-report.html by default
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$items <- 0)
-    """
-  When I run
-    """
-    test("features", reporter = CucumberHtmlReporter$new())
-    """
-  Then the HTML report "cucumber-report.html" shows these steps:
-    | step                  | status |
-    | Given an empty basket | passed |
-%</pre>
-}}
+  Scenario: The report is written to cucumber-report.html by default
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$items <- 0)
+      """
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new())
+      """
+    Then the HTML report "cucumber-report.html" shows these steps:
+      | step                  | status |
+      | Given an empty basket | passed |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Text of the messages can't end the report's script
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add a &lt;!--&lt;script&gt; to the basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) context$items &lt;- 0)</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberHtmlReporter$new("report.html"))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the HTML report <span class="st">"report.html"</span> shows these steps:
-    <span class="op">|</span> step                  <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Text of the messages can't end the report's script
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add a <!--<script> to the basket
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$items <- 0)
-    """
-  When I run
-    """
-    test("features", reporter = CucumberHtmlReporter$new("report.html"))
-    """
-  Then the HTML report "report.html" shows these steps:
-    | step                  | status |
-    | Given an empty basket | passed |
-%</pre>
-}}
+  Scenario: Text of the messages can't end the report's script
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add a <!--<script> to the basket
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$items <- 0)
+      """
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new("report.html"))
+      """
+    Then the HTML report "report.html" shows these steps:
+      | step                  | status |
+      | Given an empty basket | passed |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The attachments of a step are shown under it
-  A screenshot and the logs attached when a step fails are shown under the step that failed.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add an item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add an item", function(context) stop("The basket is full"))</span>
-<span class="st">    after_step(function(context, step) \{</span>
-<span class="st">      if (step$status == "failed") \{</span>
-<span class="st">        png("basket.png")</span>
-<span class="st">        plot(1:3)</span>
-<span class="st">        dev.off()</span>
-<span class="st">        context$attach(readBin("basket.png", "raw", file.size("basket.png")), "image/png", file_name = "basket.png")</span>
-<span class="st">        context$log("Opened the basket")</span>
-<span class="st">      \}</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the HTML report <span class="st">"report.html"</span> shows these attachments:
-    <span class="op">|</span> step               <span class="op">|</span> kind  <span class="op">|</span> content           <span class="op">|</span>
-    <span class="op">|</span> When I add an item <span class="op">|</span> image <span class="op">|</span> basket.png        <span class="op">|</span>
-    <span class="op">|</span> When I add an item <span class="op">|</span> text  <span class="op">|</span> Opened the basket <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The attachments of a step are shown under it
-  A screenshot and the logs attached when a step fails are shown under the step that failed.
+  Scenario: The attachments of a step are shown under it
+    A screenshot and the logs attached when a step fails are shown under the step that failed.
 
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add an item", function(context) stop("The basket is full"))
-    after_step(function(context, step) \{
-      if (step$status == "failed") \{
-        png("basket.png")
-        plot(1:3)
-        dev.off()
-        context$attach(readBin("basket.png", "raw", file.size("basket.png")), "image/png", file_name = "basket.png")
-        context$log("Opened the basket")
-      \}
-    \})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)
-    """
-  Then the HTML report "report.html" shows these attachments:
-    | step               | kind  | content           |
-    | When I add an item | image | basket.png        |
-    | When I add an item | text  | Opened the basket |
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add an item", function(context) stop("The basket is full"))
+      after_step(function(context, step) \{
+        if (step$status == "failed") \{
+          png("basket.png")
+          plot(1:3)
+          dev.off()
+          context$attach(readBin("basket.png", "raw", file.size("basket.png")), "image/png", file_name = "basket.png")
+          context$log("Opened the basket")
+        \}
+      \})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberHtmlReporter$new("report.html"), stop_on_failure = FALSE)
+      """
+    Then the HTML report "report.html" shows these attachments:
+      | step               | kind  | content           |
+      | When I add an item | image | basket.png        |
+      | When I add an item | text  | Opened the basket |
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-html_reporter.feature}
-}
 }
 
 \examples{

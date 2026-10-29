@@ -9,351 +9,336 @@ the progress of a run and write its messages.
 }
 \section{Specification}{
 
-\subsection{Reporters}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Reporters}{
 Every reporter gets the run as Cucumber Messages. \code{CucumberMultiReporter} sends them to
 several reporters, to show the progress of a run and write its reports at once.
 \code{report()} sends a reporter the messages stored in an ndjson file, like the one a
 \code{CucumberMessagesReporter} writes, to report a run after it ran.
 A reporter that prints, like \code{CucumberSummaryReporter}, prints to a \code{file} instead of the console
 when it's given one, replaced by each run.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add an item&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I remove an item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) context$items <- 0)
+when("I add an item", function(context) context$items <- context$items + 1)
+when("I remove an item", function(context) stop("The basket is empty"))}
+}
+}
+\subsection{Scenario: A run shows its progress and writes its reports}{
+The run's messages aren't stored, only the reports written from them.
+\itemize{
+\item When I run it and it fails
+\preformatted{test("features", reporter = CucumberMultiReporter$new(list(
+  CucumberProgressReporter$new(),
+  CucumberHtmlReporter$new("report.html"),
+  CucumberJunitReporter$new("report.xml")
+)))}
+\item Then the output includes
+\preformatted{2 scenarios (1 failed, 1 passed)
+4 steps (1 failed, 3 passed)}
+\item And the HTML report "report.html" shows these steps:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab passed \cr
+When I add an item \tab passed \cr
+Given an empty basket \tab passed \cr
+When I remove an item \tab failed
+}
+\item And the JUnit report "report.xml" has these test cases:
+\tabular{ll}{
+name \tab result \cr
+Add an item \tab passed \cr
+Remove an item \tab failure
+}
+\item And there is no file "cucumber.ndjson"
+}
+}
+\subsection{Scenario: The reports of a stored run are written after the run}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+CucumberHtmlReporter$new("report.html")$report("cucumber.ndjson")
+CucumberJunitReporter$new("report.xml")$report("cucumber.ndjson")}
+\item Then the HTML report "report.html" shows these steps:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab passed \cr
+When I add an item \tab passed \cr
+Given an empty basket \tab passed \cr
+When I remove an item \tab failed
+}
+\item And the JUnit report "report.xml" has these test cases:
+\tabular{ll}{
+name \tab result \cr
+Add an item \tab passed \cr
+Remove an item \tab failure
+}
+}
+}
+\subsection{Scenario: A stored run is printed again}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+CucumberProgressReporter$new()$report("cucumber.ndjson")}
+\item Then the output includes
+\preformatted{2 scenarios (1 failed, 1 passed)
+4 steps (1 failed, 3 passed)}
+}
+}
+\subsection{Scenario Outline: A report is written into directories that don't exist yet}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = <reporter>$new("test-results/<file>"), stop_on_failure = FALSE)}
+\item Then there is a file "test-results/<file>"
+}
+\subsection{Examples:}{
+\tabular{ll}{
+reporter \tab file \cr
+CucumberMessagesReporter \tab cucumber.ndjson \cr
+CucumberHtmlReporter \tab report.html \cr
+CucumberJunitReporter \tab junit.xml \cr
+CucumberRerunReporter \tab rerun.txt
+}
+}
+}
+\subsection{Scenario Outline: <reporter> prints to a file}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = <reporter>$new(file = "test-results/output.txt"), stop_on_failure = FALSE)}
+\item Then the file "test-results/output.txt" includes "<text>" 1 time
+\item And the output doesn't include "<text>"
+}
+\subsection{Examples:}{
+\tabular{ll}{
+reporter \tab text \cr
+CucumberSummaryReporter \tab 2 scenarios (1 failed, 1 passed) \cr
+CucumberDotsReporter \tab 2 scenarios (1 failed, 1 passed) \cr
+CucumberProgressReporter \tab 2 scenarios (1 failed, 1 passed) \cr
+CucumberProgressBarReporter \tab 2 scenarios (1 failed, 1 passed) \cr
+CucumberPrettyReporter \tab Scenario: Add an item \cr
+CucumberUsageReporter \tab Step definition / Step
+}
+}
+}
+\subsection{Scenario: Each run replaces the file a reporter prints to}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)}
+\item Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+}
+}
+\subsection{Scenario: A stored run is printed to a file}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")}
+\item Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+\item And the output doesn't include "2 scenarios"
+}
+}
+\subsection{Scenario: A report that can't be written fails the run}{
+The scenarios run, and the error names the reporter that failed when the run ended.
+\itemize{
+\item When I run it and it fails
+\preformatted{test("features", reporter = CucumberMultiReporter$new(list(
+  CucumberProgressReporter$new(),
+  CucumberHtmlReporter$new("features")
+)), stop_on_failure = FALSE)}
+\item Then it fails with
+\preformatted{Error:
+! Reporter `CucumberHtmlReporter` failed in `end_run()`.
+Caused by error:
+! cannot open the connection}
+\item And the output includes "2 scenarios (1 failed, 1 passed)"
+}
+}
+\subsection{Scenario: Only cucumber's reporters can be combined}{
+\itemize{
+\item When I run it and it fails
+\preformatted{CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))}
+\item Then it fails with
+\preformatted{Error:
+! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.
+i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Reporters
+  Every reporter gets the run as Cucumber Messages. `CucumberMultiReporter` sends them to
+  several reporters, to show the progress of a run and write its reports at once.
+  `report()` sends a reporter the messages stored in an ndjson file, like the one a
+  `CucumberMessagesReporter` writes, to report a run after it ran.
+  A reporter that prints, like `CucumberSummaryReporter`, prints to a `file` instead of the console
+  when it's given one, replaced by each run.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add an item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I remove an item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) context$items &lt;- 0)</span>
-<span class="st">    when("I add an item", function(context) context$items &lt;- context$items + 1)</span>
-<span class="st">    when("I remove an item", function(context) stop("The basket is empty"))</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add an item
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add an item
 
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$items <- 0)
-    when("I add an item", function(context) context$items <- context$items + 1)
-    when("I remove an item", function(context) stop("The basket is empty"))
-    """
-%</pre>
-}}
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$items <- 0)
+      when("I add an item", function(context) context$items <- context$items + 1)
+      when("I remove an item", function(context) stop("The basket is empty"))
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A run shows its progress and writes its reports
-  The run's messages aren't stored, only the reports written from them.
-<span></span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMultiReporter$new(list(</span>
-<span class="st">      CucumberProgressReporter$new(),</span>
-<span class="st">      CucumberHtmlReporter$new("report.html"),</span>
-<span class="st">      CucumberJunitReporter$new("report.xml")</span>
-<span class="st">    )))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    2 scenarios (1 failed, 1 passed)</span>
-<span class="st">    4 steps (1 failed, 3 passed)</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the HTML report <span class="st">"report.html"</span> shows these steps:
-    <span class="op">|</span> step                  <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> When I add an item    <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> When I remove an item <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> name           <span class="op">|</span> result  <span class="op">|</span>
-    <span class="op">|</span> Add an item    <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> Remove an item <span class="op">|</span> failure <span class="op">|</span>
-  <span class="fu">And</span> there is no file <span class="st">"cucumber.ndjson"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A run shows its progress and writes its reports
-  The run's messages aren't stored, only the reports written from them.
+  Scenario: A run shows its progress and writes its reports
+    The run's messages aren't stored, only the reports written from them.
 
-  When I run it and it fails
-    """
-    test("features", reporter = CucumberMultiReporter$new(list(
-      CucumberProgressReporter$new(),
-      CucumberHtmlReporter$new("report.html"),
-      CucumberJunitReporter$new("report.xml")
-    )))
-    """
-  Then the output includes
-    """
-    2 scenarios (1 failed, 1 passed)
-    4 steps (1 failed, 3 passed)
-    """
-  And the HTML report "report.html" shows these steps:
-    | step                  | status |
-    | Given an empty basket | passed |
-    | When I add an item    | passed |
-    | Given an empty basket | passed |
-    | When I remove an item | failed |
-  And the JUnit report "report.xml" has these test cases:
-    | name           | result  |
-    | Add an item    | passed  |
-    | Remove an item | failure |
-  And there is no file "cucumber.ndjson"
-%</pre>
-}}
+    When I run it and it fails
+      """
+      test("features", reporter = CucumberMultiReporter$new(list(
+        CucumberProgressReporter$new(),
+        CucumberHtmlReporter$new("report.html"),
+        CucumberJunitReporter$new("report.xml")
+      )))
+      """
+    Then the output includes
+      """
+      2 scenarios (1 failed, 1 passed)
+      4 steps (1 failed, 3 passed)
+      """
+    And the HTML report "report.html" shows these steps:
+      | step                  | status |
+      | Given an empty basket | passed |
+      | When I add an item    | passed |
+      | Given an empty basket | passed |
+      | When I remove an item | failed |
+    And the JUnit report "report.xml" has these test cases:
+      | name           | result  |
+      | Add an item    | passed  |
+      | Remove an item | failure |
+    And there is no file "cucumber.ndjson"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The reports of a stored run are written after the run
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    CucumberHtmlReporter$new("report.html")$report("cucumber.ndjson")</span>
-<span class="st">    CucumberJunitReporter$new("report.xml")$report("cucumber.ndjson")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the HTML report <span class="st">"report.html"</span> shows these steps:
-    <span class="op">|</span> step                  <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> When I add an item    <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> When I remove an item <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> name           <span class="op">|</span> result  <span class="op">|</span>
-    <span class="op">|</span> Add an item    <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> Remove an item <span class="op">|</span> failure <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The reports of a stored run are written after the run
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
-    CucumberHtmlReporter$new("report.html")$report("cucumber.ndjson")
-    CucumberJunitReporter$new("report.xml")$report("cucumber.ndjson")
-    """
-  Then the HTML report "report.html" shows these steps:
-    | step                  | status |
-    | Given an empty basket | passed |
-    | When I add an item    | passed |
-    | Given an empty basket | passed |
-    | When I remove an item | failed |
-  And the JUnit report "report.xml" has these test cases:
-    | name           | result  |
-    | Add an item    | passed  |
-    | Remove an item | failure |
-%</pre>
-}}
+  Scenario: The reports of a stored run are written after the run
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+      CucumberHtmlReporter$new("report.html")$report("cucumber.ndjson")
+      CucumberJunitReporter$new("report.xml")$report("cucumber.ndjson")
+      """
+    Then the HTML report "report.html" shows these steps:
+      | step                  | status |
+      | Given an empty basket | passed |
+      | When I add an item    | passed |
+      | Given an empty basket | passed |
+      | When I remove an item | failed |
+    And the JUnit report "report.xml" has these test cases:
+      | name           | result  |
+      | Add an item    | passed  |
+      | Remove an item | failure |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A stored run is printed again
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    CucumberProgressReporter$new()$report("cucumber.ndjson")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    2 scenarios (1 failed, 1 passed)</span>
-<span class="st">    4 steps (1 failed, 3 passed)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A stored run is printed again
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
-    CucumberProgressReporter$new()$report("cucumber.ndjson")
-    """
-  Then the output includes
-    """
-    2 scenarios (1 failed, 1 passed)
-    4 steps (1 failed, 3 passed)
-    """
-%</pre>
-}}
+  Scenario: A stored run is printed again
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+      CucumberProgressReporter$new()$report("cucumber.ndjson")
+      """
+    Then the output includes
+      """
+      2 scenarios (1 failed, 1 passed)
+      4 steps (1 failed, 3 passed)
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> A report is written into directories that don't exist yet
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = &lt;reporter&gt;$new("test-results/&lt;file&gt;"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> there is a file <span class="st">"test-results/<span class="va">&lt;file&gt;</span>"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> reporter                 <span class="op">|</span> file            <span class="op">|</span>
-    <span class="op">|</span> CucumberMessagesReporter <span class="op">|</span> cucumber.ndjson <span class="op">|</span>
-    <span class="op">|</span> CucumberHtmlReporter     <span class="op">|</span> report.html     <span class="op">|</span>
-    <span class="op">|</span> CucumberJunitReporter    <span class="op">|</span> junit.xml       <span class="op">|</span>
-    <span class="op">|</span> CucumberRerunReporter    <span class="op">|</span> rerun.txt       <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: A report is written into directories that don't exist yet
-  When I run
-    """
-    test("features", reporter = <reporter>$new("test-results/<file>"), stop_on_failure = FALSE)
-    """
-  Then there is a file "test-results/<file>"
+  Scenario Outline: A report is written into directories that don't exist yet
+    When I run
+      """
+      test("features", reporter = <reporter>$new("test-results/<file>"), stop_on_failure = FALSE)
+      """
+    Then there is a file "test-results/<file>"
 
-  Examples:
-    | reporter                 | file            |
-    | CucumberMessagesReporter | cucumber.ndjson |
-    | CucumberHtmlReporter     | report.html     |
-    | CucumberJunitReporter    | junit.xml       |
-    | CucumberRerunReporter    | rerun.txt       |
-%</pre>
-}}
+    Examples:
+      | reporter                 | file            |
+      | CucumberMessagesReporter | cucumber.ndjson |
+      | CucumberHtmlReporter     | report.html     |
+      | CucumberJunitReporter    | junit.xml       |
+      | CucumberRerunReporter    | rerun.txt       |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> <span class="va">&lt;reporter&gt;</span> prints to a file
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = &lt;reporter&gt;$new(file = "test-results/output.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"test-results/output.txt"</span> includes <span class="st">"<span class="va">&lt;text&gt;</span>"</span> 1 time
-  <span class="fu">And</span> the output doesn't include <span class="st">"<span class="va">&lt;text&gt;</span>"</span>
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> reporter                    <span class="op">|</span> text                             <span class="op">|</span>
-    <span class="op">|</span> CucumberSummaryReporter     <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
-    <span class="op">|</span> CucumberDotsReporter        <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
-    <span class="op">|</span> CucumberProgressReporter    <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
-    <span class="op">|</span> CucumberProgressBarReporter <span class="op">|</span> 2 scenarios (1 failed, 1 passed) <span class="op">|</span>
-    <span class="op">|</span> CucumberPrettyReporter      <span class="op">|</span> Scenario: Add an item            <span class="op">|</span>
-    <span class="op">|</span> CucumberUsageReporter       <span class="op">|</span> Step definition / Step           <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: <reporter> prints to a file
-  When I run
-    """
-    test("features", reporter = <reporter>$new(file = "test-results/output.txt"), stop_on_failure = FALSE)
-    """
-  Then the file "test-results/output.txt" includes "<text>" 1 time
-  And the output doesn't include "<text>"
+  Scenario Outline: <reporter> prints to a file
+    When I run
+      """
+      test("features", reporter = <reporter>$new(file = "test-results/output.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "test-results/output.txt" includes "<text>" 1 time
+    And the output doesn't include "<text>"
 
-  Examples:
-    | reporter                    | text                             |
-    | CucumberSummaryReporter     | 2 scenarios (1 failed, 1 passed) |
-    | CucumberDotsReporter        | 2 scenarios (1 failed, 1 passed) |
-    | CucumberProgressReporter    | 2 scenarios (1 failed, 1 passed) |
-    | CucumberProgressBarReporter | 2 scenarios (1 failed, 1 passed) |
-    | CucumberPrettyReporter      | Scenario: Add an item            |
-    | CucumberUsageReporter       | Step definition / Step           |
-%</pre>
-}}
+    Examples:
+      | reporter                    | text                             |
+      | CucumberSummaryReporter     | 2 scenarios (1 failed, 1 passed) |
+      | CucumberDotsReporter        | 2 scenarios (1 failed, 1 passed) |
+      | CucumberProgressReporter    | 2 scenarios (1 failed, 1 passed) |
+      | CucumberProgressBarReporter | 2 scenarios (1 failed, 1 passed) |
+      | CucumberPrettyReporter      | Scenario: Add an item            |
+      | CucumberUsageReporter       | Step definition / Step           |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each run replaces the file a reporter prints to
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"summary.txt"</span> includes <span class="st">"2 scenarios (1 failed, 1 passed)"</span> 1 time</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each run replaces the file a reporter prints to
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
-    test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
-    """
-  Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
-%</pre>
-}}
+  Scenario: Each run replaces the file a reporter prints to
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+      test("features", reporter = CucumberSummaryReporter$new(file = "summary.txt"), stop_on_failure = FALSE)
+      """
+    Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A stored run is printed to a file
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the file <span class="st">"summary.txt"</span> includes <span class="st">"2 scenarios (1 failed, 1 passed)"</span> 1 time
-  <span class="fu">And</span> the output doesn't include <span class="st">"2 scenarios"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A stored run is printed to a file
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
-    CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")
-    """
-  Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
-  And the output doesn't include "2 scenarios"
-%</pre>
-}}
+  Scenario: A stored run is printed to a file
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("cucumber.ndjson"), stop_on_failure = FALSE)
+      CucumberSummaryReporter$new(file = "summary.txt")$report("cucumber.ndjson")
+      """
+    Then the file "summary.txt" includes "2 scenarios (1 failed, 1 passed)" 1 time
+    And the output doesn't include "2 scenarios"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A report that can't be written fails the run
-  The scenarios run, and the error names the reporter that failed when the run ended.
-<span></span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMultiReporter$new(list(</span>
-<span class="st">      CucumberProgressReporter$new(),</span>
-<span class="st">      CucumberHtmlReporter$new("features")</span>
-<span class="st">    )), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! Reporter `CucumberHtmlReporter` failed in `end_run()`.</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! cannot open the connection</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes <span class="st">"2 scenarios (1 failed, 1 passed)"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A report that can't be written fails the run
-  The scenarios run, and the error names the reporter that failed when the run ended.
+  Scenario: A report that can't be written fails the run
+    The scenarios run, and the error names the reporter that failed when the run ended.
 
-  When I run it and it fails
-    """
-    test("features", reporter = CucumberMultiReporter$new(list(
-      CucumberProgressReporter$new(),
-      CucumberHtmlReporter$new("features")
-    )), stop_on_failure = FALSE)
-    """
-  Then it fails with
-    """
-    Error:
-    ! Reporter `CucumberHtmlReporter` failed in `end_run()`.
-    Caused by error:
-    ! cannot open the connection
-    """
-  And the output includes "2 scenarios (1 failed, 1 passed)"
-%</pre>
-}}
+    When I run it and it fails
+      """
+      test("features", reporter = CucumberMultiReporter$new(list(
+        CucumberProgressReporter$new(),
+        CucumberHtmlReporter$new("features")
+      )), stop_on_failure = FALSE)
+      """
+    Then it fails with
+      """
+      Error:
+      ! Reporter `CucumberHtmlReporter` failed in `end_run()`.
+      Caused by error:
+      ! cannot open the connection
+      """
+    And the output includes "2 scenarios (1 failed, 1 passed)"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Only cucumber's reporters can be combined
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it fails with
-<span class="st">    """</span>
-<span class="st">    Error:</span>
-<span class="st">    ! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.</span>
-<span class="st">    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Only cucumber's reporters can be combined
-  When I run it and it fails
-    """
-    CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))
-    """
-  Then it fails with
-    """
-    Error:
-    ! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.
-    i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
-    """
+  Scenario: Only cucumber's reporters can be combined
+    When I run it and it fails
+      """
+      CucumberMultiReporter$new(list(CucumberProgressReporter$new(), testthat::ProgressReporter$new()))
+      """
+    Then it fails with
+      """
+      Error:
+      ! `reporters[[2]]` must be a `CucumberReporter`, or `NULL` to report nothing.
+      i testthat reporters can't report a cucumber run, use one of cucumber's, like `CucumberProgressReporter$new()`.
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-reporters.feature}
-}
 }
 
 \examples{

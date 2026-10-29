@@ -14,8 +14,10 @@ its messages with \link{CucumberMessagesReporter} and pass their file to
 }
 \section{Specification}{
 
-\subsection{JUnit reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: JUnit reporter}{
 \code{CucumberJunitReporter} writes the JUnit XML report of a run when the run ends, even when it
 fails. CI services read it to show the results of the run.
 
@@ -24,327 +26,275 @@ name and its name is the scenario's, after the rule's, followed by the name and 
 A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
 undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
 A \code{before_all()} or \code{after_all()} hook that failed is a failed test case too, named after where it's defined.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: Each scenario is a test case, with its result}{
+A pending, undefined or ambiguous scenario is a failed test case.
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I remove an item&#10;&#10;  <span class="kw">Scenario:</span> Pay&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I pay&#10;&#10;  <span class="kw">Scenario:</span> Skip&#10;    <span class="fu">Given</span> the basket isn't ready&#10;&#10;  <span class="kw">Scenario:</span> Undefined&#10;    <span class="fu">When</span> I empty the basket&#10;&#10;  <span class="kw">Scenario:</span> Ambiguous&#10;    <span class="fu">When</span> I check the basket&#10;&#10;  <span class="kw">Rule:</span> Items are counted&#10;    <span class="kw">Scenario Outline:</span> Add <span class="va">&lt;n&gt;</span> items&#10;      <span class="fu">When</span> I add <span class="va">&lt;n&gt;</span> items&#10;&#10;      <span class="kw">Examples:</span> Few&#10;        <span class="op">|</span> n <span class="op">|</span>&#10;        <span class="op">|</span> 1 <span class="op">|</span>&#10;        <span class="op">|</span> 2 <span class="op">|</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I remove an item", function(context) stop("The basket is empty"))
+when("I pay", function(context) pending())
+given("the basket isn't ready", function(context) skip_scenario("Not ready"))
+when("I add \{int\} items", function(n, context) \{\})
+when("I check the basket", function(context) \{\})
+when("I check the \{word\}", function(thing, context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)}
+\item Then the JUnit report "report.xml" has these test cases:
+\tabular{llll}{
+classname \tab name \tab result \tab message \cr
+Basket \tab Add an item \tab passed \tab  \cr
+Basket \tab Remove an item \tab failure \tab The basket is empty \cr
+Basket \tab Pay \tab failure \tab Step "I pay" is pending: TODO \cr
+Basket \tab Skip \tab skipped \tab  \cr
+Basket \tab Undefined \tab failure \tab  \cr
+Basket \tab Ambiguous \tab failure \tab  \cr
+Basket \tab Items are counted - Add <n> items - Few - #1.1: Add 1 items \tab passed \tab  \cr
+Basket \tab Items are counted - Add <n> items - Few - #1.2: Add 2 items \tab passed \tab 
+}
+}
+}
+\subsection{Scenario: A failed before_all() or after_all() hook is a failed test case}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before_all(function() \{\})
+after_all(function() stop("The server didn't stop"))
+given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)}
+\item Then the JUnit report "report.xml" has these test cases:
+\tabular{lll}{
+name \tab result \tab message \cr
+setup-steps.R:2 \tab failure \tab The server didn't stop \cr
+Add an item \tab passed \tab 
+}
+}
+}
+\subsection{Scenario: A test case's output is its steps and their results}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I remove an item&#10;    <span class="fu">Then</span> the basket is empty</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I remove an item", function(context) stop("The basket is empty"))
+then("the basket is empty", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)}
+\item Then the output of the test case "Remove an item" in the JUnit report "report.xml" is
+\preformatted{Given an empty basket.......................................................passed
+When I remove an item.......................................................failed
+Then the basket is empty....................................................skipped}
+}
+}
+\subsection{Scenario: An error with characters XML doesn't allow is written as the message of the failure}{
+An error can have characters XML doesn't allow, like the escape character of the colors of
+a terminal. Each is written as the text of its character reference, like \code{&#27;}, so the
+report is still XML that CI services read.
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">When</span> I remove an item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I remove an item", function(context) stop("The basket is \\033[31mempty\\033[39m"))}
+\item When I run
+\preformatted{test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)}
+\item Then the JUnit report "report.xml" has these test cases:
+\tabular{lll}{
+name \tab result \tab message \cr
+Remove an item \tab failure \tab The basket is &#27;[31mempty&#27;[39m
+}
+}
+}
+\subsection{Scenario: The report is written to cucumber-junit.xml by default}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberJunitReporter$new())}
+\item Then the JUnit report "cucumber-junit.xml" has these test cases:
+\tabular{ll}{
+name \tab result \cr
+Add an item \tab passed
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: JUnit reporter
+  `CucumberJunitReporter` writes the JUnit XML report of a run when the run ends, even when it
+  fails. CI services read it to show the results of the run.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Each scenario is a test case, each example of an outline being one. Its class name is the feature's
+  name and its name is the scenario's, after the rule's, followed by the name and number of the example.
+  A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
+  undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
+  A `before_all()` or `after_all()` hook that failed is a failed test case too, named after where it's defined.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each scenario is a test case, with its result
-  A pending, undefined or ambiguous scenario is a failed test case.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I remove an item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Pay</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I pay</span>
-<span class="st"></span>
-<span class="st">      Scenario: Skip</span>
-<span class="st">        Given the basket isn't ready</span>
-<span class="st"></span>
-<span class="st">      Scenario: Undefined</span>
-<span class="st">        When I empty the basket</span>
-<span class="st"></span>
-<span class="st">      Scenario: Ambiguous</span>
-<span class="st">        When I check the basket</span>
-<span class="st"></span>
-<span class="st">      Rule: Items are counted</span>
-<span class="st">        Scenario Outline: Add &lt;n&gt; items</span>
-<span class="st">          When I add &lt;n&gt; items</span>
-<span class="st"></span>
-<span class="st">          Examples: Few</span>
-<span class="st">            | n |</span>
-<span class="st">            | 1 |</span>
-<span class="st">            | 2 |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I remove an item", function(context) stop("The basket is empty"))</span>
-<span class="st">    when("I pay", function(context) pending())</span>
-<span class="st">    given("the basket isn't ready", function(context) skip_scenario("Not ready"))</span>
-<span class="st">    when("I add \{int\} items", function(n, context) \{\})</span>
-<span class="st">    when("I check the basket", function(context) \{\})</span>
-<span class="st">    when("I check the \{word\}", function(thing, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> classname <span class="op">|</span> name                                                        <span class="op">|</span> result  <span class="op">|</span> message                       <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Add an item                                                 <span class="op">|</span> passed  <span class="op">|</span>                               <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Remove an item                                              <span class="op">|</span> failure <span class="op">|</span> The basket is empty           <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Pay                                                         <span class="op">|</span> failure <span class="op">|</span> Step <span class="st">"I pay"</span> is pending: TODO <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Skip                                                        <span class="op">|</span> skipped <span class="op">|</span>                               <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Undefined                                                   <span class="op">|</span> failure <span class="op">|</span>                               <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Ambiguous                                                   <span class="op">|</span> failure <span class="op">|</span>                               <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Items are counted - Add <span class="va">&lt;n&gt;</span> items - Few - #1.1: Add 1 items <span class="op">|</span> passed  <span class="op">|</span>                               <span class="op">|</span>
-    <span class="op">|</span> Basket    <span class="op">|</span> Items are counted - Add <span class="va">&lt;n&gt;</span> items - Few - #1.2: Add 2 items <span class="op">|</span> passed  <span class="op">|</span>                               <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each scenario is a test case, with its result
-  A pending, undefined or ambiguous scenario is a failed test case.
+  Background:
+    Given a package
 
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
+  Scenario: Each scenario is a test case, with its result
+    A pending, undefined or ambiguous scenario is a failed test case.
 
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove an item
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
 
-      Scenario: Pay
-        Given an empty basket
-        When I pay
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove an item
 
-      Scenario: Skip
-        Given the basket isn't ready
+        Scenario: Pay
+          Given an empty basket
+          When I pay
 
-      Scenario: Undefined
-        When I empty the basket
+        Scenario: Skip
+          Given the basket isn't ready
 
-      Scenario: Ambiguous
-        When I check the basket
+        Scenario: Undefined
+          When I empty the basket
 
-      Rule: Items are counted
-        Scenario Outline: Add <n> items
-          When I add <n> items
+        Scenario: Ambiguous
+          When I check the basket
 
-          Examples: Few
-            | n |
-            | 1 |
-            | 2 |
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I remove an item", function(context) stop("The basket is empty"))
-    when("I pay", function(context) pending())
-    given("the basket isn't ready", function(context) skip_scenario("Not ready"))
-    when("I add \{int\} items", function(n, context) \{\})
-    when("I check the basket", function(context) \{\})
-    when("I check the \{word\}", function(thing, context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
-    """
-  Then the JUnit report "report.xml" has these test cases:
-    | classname | name                                                        | result  | message                       |
-    | Basket    | Add an item                                                 | passed  |                               |
-    | Basket    | Remove an item                                              | failure | The basket is empty           |
-    | Basket    | Pay                                                         | failure | Step "I pay" is pending: TODO |
-    | Basket    | Skip                                                        | skipped |                               |
-    | Basket    | Undefined                                                   | failure |                               |
-    | Basket    | Ambiguous                                                   | failure |                               |
-    | Basket    | Items are counted - Add <n> items - Few - #1.1: Add 1 items | passed  |                               |
-    | Basket    | Items are counted - Add <n> items - Few - #1.2: Add 2 items | passed  |                               |
-%</pre>
-}}
+        Rule: Items are counted
+          Scenario Outline: Add <n> items
+            When I add <n> items
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A failed before_all() or after_all() hook is a failed test case
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before_all(function() \{\})</span>
-<span class="st">    after_all(function() stop("The server didn't stop"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> name            <span class="op">|</span> result  <span class="op">|</span> message                <span class="op">|</span>
-    <span class="op">|</span> setup-steps.R:2 <span class="op">|</span> failure <span class="op">|</span> The server didn't stop <span class="op">|</span>
-    <span class="op">|</span> Add an item     <span class="op">|</span> passed  <span class="op">|</span>                        <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A failed before_all() or after_all() hook is a failed test case
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before_all(function() \{\})
-    after_all(function() stop("The server didn't stop"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
-    """
-  Then the JUnit report "report.xml" has these test cases:
-    | name            | result  | message                |
-    | setup-steps.R:2 | failure | The server didn't stop |
-    | Add an item     | passed  |                        |
-%</pre>
-}}
+            Examples: Few
+              | n |
+              | 1 |
+              | 2 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I remove an item", function(context) stop("The basket is empty"))
+      when("I pay", function(context) pending())
+      given("the basket isn't ready", function(context) skip_scenario("Not ready"))
+      when("I add \{int\} items", function(n, context) \{\})
+      when("I check the basket", function(context) \{\})
+      when("I check the \{word\}", function(thing, context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+      """
+    Then the JUnit report "report.xml" has these test cases:
+      | classname | name                                                        | result  | message                       |
+      | Basket    | Add an item                                                 | passed  |                               |
+      | Basket    | Remove an item                                              | failure | The basket is empty           |
+      | Basket    | Pay                                                         | failure | Step "I pay" is pending: TODO |
+      | Basket    | Skip                                                        | skipped |                               |
+      | Basket    | Undefined                                                   | failure |                               |
+      | Basket    | Ambiguous                                                   | failure |                               |
+      | Basket    | Items are counted - Add <n> items - Few - #1.1: Add 1 items | passed  |                               |
+      | Basket    | Items are counted - Add <n> items - Few - #1.2: Add 2 items | passed  |                               |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A test case's output is its steps and their results
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I remove an item</span>
-<span class="st">        Then the basket is empty</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I remove an item", function(context) stop("The basket is empty"))</span>
-<span class="st">    then("the basket is empty", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output of the test case <span class="st">"Remove an item"</span> in the JUnit report <span class="st">"report.xml"</span> is
-<span class="st">    """</span>
-<span class="st">    Given an empty basket.......................................................passed</span>
-<span class="st">    When I remove an item.......................................................failed</span>
-<span class="st">    Then the basket is empty....................................................skipped</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A test case's output is its steps and their results
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove an item
-        Then the basket is empty
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I remove an item", function(context) stop("The basket is empty"))
-    then("the basket is empty", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
-    """
-  Then the output of the test case "Remove an item" in the JUnit report "report.xml" is
-    """
-    Given an empty basket.......................................................passed
-    When I remove an item.......................................................failed
-    Then the basket is empty....................................................skipped
-    """
-%</pre>
-}}
+  Scenario: A failed before_all() or after_all() hook is a failed test case
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before_all(function() \{\})
+      after_all(function() stop("The server didn't stop"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+      """
+    Then the JUnit report "report.xml" has these test cases:
+      | name            | result  | message                |
+      | setup-steps.R:2 | failure | The server didn't stop |
+      | Add an item     | passed  |                        |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An error with characters XML doesn't allow is written as the message of the failure
-  An error can have characters XML doesn't allow, like the escape character of the colors of
-  a terminal. Each is written as the text of its character reference, like `&amp;#27;`, so the
-  report is still XML that CI services read.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        When I remove an item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I remove an item", function(context) stop("The basket is \\033[31mempty\\033[39m"))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the JUnit report <span class="st">"report.xml"</span> has these test cases:
-    <span class="op">|</span> name           <span class="op">|</span> result  <span class="op">|</span> message                               <span class="op">|</span>
-    <span class="op">|</span> Remove an item <span class="op">|</span> failure <span class="op">|</span> The basket is &amp;#27;[31mempty&amp;#27;[39m <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An error with characters XML doesn't allow is written as the message of the failure
-  An error can have characters XML doesn't allow, like the escape character of the colors of
-  a terminal. Each is written as the text of its character reference, like `&#27;`, so the
-  report is still XML that CI services read.
+  Scenario: A test case's output is its steps and their results
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove an item
+          Then the basket is empty
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I remove an item", function(context) stop("The basket is empty"))
+      then("the basket is empty", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+      """
+    Then the output of the test case "Remove an item" in the JUnit report "report.xml" is
+      """
+      Given an empty basket.......................................................passed
+      When I remove an item.......................................................failed
+      Then the basket is empty....................................................skipped
+      """
 
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Remove an item
-        When I remove an item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I remove an item", function(context) stop("The basket is \\033[31mempty\\033[39m"))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
-    """
-  Then the JUnit report "report.xml" has these test cases:
-    | name           | result  | message                               |
-    | Remove an item | failure | The basket is &#27;[31mempty&#27;[39m |
-%</pre>
-}}
+  Scenario: An error with characters XML doesn't allow is written as the message of the failure
+    An error can have characters XML doesn't allow, like the escape character of the colors of
+    a terminal. Each is written as the text of its character reference, like `&#27;`, so the
+    report is still XML that CI services read.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The report is written to cucumber-junit.xml by default
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberJunitReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the JUnit report <span class="st">"cucumber-junit.xml"</span> has these test cases:
-    <span class="op">|</span> name        <span class="op">|</span> result <span class="op">|</span>
-    <span class="op">|</span> Add an item <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The report is written to cucumber-junit.xml by default
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberJunitReporter$new())
-    """
-  Then the JUnit report "cucumber-junit.xml" has these test cases:
-    | name        | result |
-    | Add an item | passed |
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Remove an item
+          When I remove an item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I remove an item", function(context) stop("The basket is \\033[31mempty\\033[39m"))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new("report.xml"), stop_on_failure = FALSE)
+      """
+    Then the JUnit report "report.xml" has these test cases:
+      | name           | result  | message                               |
+      | Remove an item | failure | The basket is &#27;[31mempty&#27;[39m |
+
+  Scenario: The report is written to cucumber-junit.xml by default
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberJunitReporter$new())
+      """
+    Then the JUnit report "cucumber-junit.xml" has these test cases:
+      | name        | result |
+      | Add an item | passed |
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-junit_reporter.feature}
-}
 }
 
 \examples{

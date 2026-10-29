@@ -281,16 +281,15 @@ feature’s description and the tagged scenarios:
          
     Specification:
 
-      Basket:
-
+         Feature: Basket
            A basket holds the items a customer wants to buy.
-
+         
            Scenario: Add an item
              Given an empty basket
              When I add 1 item
              Then the basket has 1 item
-           
-           Source: 'tests/acceptance/basket.feature'
+         
+         Source: 'tests/acceptance/basket.feature'
 
 The help pages of this package are written this way, see
 [`?hook`](https://jakubsob.github.io/cucumber/reference/hook.html) or

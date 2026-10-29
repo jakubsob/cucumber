@@ -38,749 +38,652 @@ Define your own before the steps that use it are run, e.g. in a \verb{setup-*.R}
 }
 \section{Specification}{
 
-\subsection{Parameter types}{
-
-A parameter like \code{{int}} in a step definition's Cucumber Expression captures a part of the step
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Parameter types}{
+A parameter like \code{\{int\}} in a step definition's Cucumber Expression captures a part of the step
 and passes it to the step definition converted to an R value.
 Register your own with \code{define_parameter_type()}.
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
-
-\strong{Rule: Built-in parameter types convert the text to R values}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> \{int\} captures an integer from step text
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Integer parameter</span>
-<span class="st">        Given the count is 42</span>
-<span class="st">        Then I verify the count is 42</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the count is \{int\}", function(n, context) \{</span>
-<span class="st">      context$value &lt;- n</span>
-<span class="st">    \})</span>
-<span class="st">    then("I verify the count is 42", function(context) \{</span>
-<span class="st">      expect_identical(context$value, 42L)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: \{int\} captures an integer from step text
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Integer parameter
-        Given the count is 42
-        Then I verify the count is 42
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the count is \{int\}", function(n, context) \{
-      context$value <- n
-    \})
-    then("I verify the count is 42", function(context) \{
-      expect_identical(context$value, 42L)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> \{float\} captures a decimal number from step text
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Float parameter</span>
-<span class="st">        Given the price is 3.99</span>
-<span class="st">        Then I verify the price is 3.99</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the price is \{float\}", function(price, context) \{</span>
-<span class="st">      context$price &lt;- price</span>
-<span class="st">    \})</span>
-<span class="st">    then("I verify the price is 3.99", function(context) \{</span>
-<span class="st">      expect_identical(context$price, 3.99)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: \{float\} captures a decimal number from step text
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Float parameter
-        Given the price is 3.99
-        Then I verify the price is 3.99
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the price is \{float\}", function(price, context) \{
-      context$price <- price
-    \})
-    then("I verify the price is 3.99", function(context) \{
-      expect_identical(context$price, 3.99)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> \{float\} also captures an integer
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Integer as a float</span>
-<span class="st">        Given the price is 12</span>
-<span class="st">        Then I verify the price is 12</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the price is \{float\}", function(price, context) \{</span>
-<span class="st">      context$price &lt;- price</span>
-<span class="st">    \})</span>
-<span class="st">    then("I verify the price is \{float\}", function(price, context) \{</span>
-<span class="st">      expect_identical(context$price, price)</span>
-<span class="st">      expect_identical(context$price, 12)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: \{float\} also captures an integer
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Integer as a float
-        Given the price is 12
-        Then I verify the price is 12
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the price is \{float\}", function(price, context) \{
-      context$price <- price
-    \})
-    then("I verify the price is \{float\}", function(price, context) \{
-      expect_identical(context$price, price)
-      expect_identical(context$price, 12)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> \{string\} captures a quoted string and strips quotes
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: String parameter double quotes</span>
-<span class="st">        Given the name is "Alice"</span>
-<span class="st">        Then I verify the name is "Alice"</span>
-<span class="st"></span>
-<span class="st">      Scenario: String parameter single quotes</span>
-<span class="st">        Given the name is 'Bob'</span>
-<span class="st">        Then I verify the name is "Bob"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the name is \{string\}", function(name, context) \{</span>
-<span class="st">      context$name &lt;- name</span>
-<span class="st">    \})</span>
-<span class="st">    then("I verify the name is \{string\}", function(name, context) \{</span>
-<span class="st">      expect_equal(context$name, name)</span>
-<span class="st">      expect_false(startsWith(context$name, "\\""))</span>
-<span class="st">      expect_false(startsWith(context$name, "'"))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenarios have these results:
-    <span class="op">|</span> scenario                       <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> String parameter double quotes <span class="op">|</span> passed <span class="op">|</span>
-    <span class="op">|</span> String parameter single quotes <span class="op">|</span> passed <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: \{string\} captures a quoted string and strips quotes
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: String parameter double quotes
-        Given the name is "Alice"
-        Then I verify the name is "Alice"
-
-      Scenario: String parameter single quotes
-        Given the name is 'Bob'
-        Then I verify the name is "Bob"
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the name is \{string\}", function(name, context) \{
-      context$name <- name
-    \})
-    then("I verify the name is \{string\}", function(name, context) \{
-      expect_equal(context$name, name)
-      expect_false(startsWith(context$name, "\\""))
-      expect_false(startsWith(context$name, "'"))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenarios have these results:
-    | scenario                       | status |
-    | String parameter double quotes | passed |
-    | String parameter single quotes | passed |
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> \{word\} captures a single unquoted word
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Word parameter</span>
-<span class="st">        Given the colour is red</span>
-<span class="st">        Then I verify the colour is red</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the colour is \{word\}", function(colour, context) \{</span>
-<span class="st">      context$colour &lt;- colour</span>
-<span class="st">    \})</span>
-<span class="st">    then("I verify the colour is red", function(context) \{</span>
-<span class="st">      expect_identical(context$colour, "red")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: \{word\} captures a single unquoted word
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Word parameter
-        Given the colour is red
-        Then I verify the colour is red
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the colour is \{word\}", function(colour, context) \{
-      context$colour <- colour
-    \})
-    then("I verify the colour is red", function(context) \{
-      expect_identical(context$colour, "red")
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\strong{Rule: \{int\} is an R integer}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> \{int\} fails on a value too big for an R integer
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Big number</span>
-<span class="st">        Given the count is 3000000000</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the count is \{int\}", function(n, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                          <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Given the count is 3000000000 <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [error] Scenario: Big number</span>
-<span class="st">    Error: Step "the count is 3000000000" failed</span>
-<span class="st">    i Feature: params.feature:3</span>
-<span class="st">    i Scenario: Big number</span>
-<span class="st">    i Step defined at: setup-steps.R:1</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! Parameter type \{int\} failed to transform "3000000000".</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! It's out of the range of an R integer.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: \{int\} fails on a value too big for an R integer
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Big number
-        Given the count is 3000000000
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the count is \{int\}", function(n, context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                          | status |
-    | Given the count is 3000000000 | failed |
-  And the errors are
-    """
-    [error] Scenario: Big number
-    Error: Step "the count is 3000000000" failed
-    i Feature: params.feature:3
-    i Scenario: Big number
-    i Step defined at: setup-steps.R:1
-    Caused by error:
-    ! Parameter type \{int\} failed to transform "3000000000".
-    Caused by error:
-    ! It's out of the range of an R integer.
-    """
-%</pre>
-}}
-
-\strong{Rule: \{byte\}, \{short\}, \{long\} and \{double\} are built in too, for feature files shared with other Cucumber implementations}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario Outline:</span> \{<span class="va">&lt;type&gt;</span>\} gives <span class="va">&lt;value&gt;</span>
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Number</span>
-<span class="st">        Given the number is &lt;text&gt;</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("the number is \{&lt;type&gt;\}", function(x, context) \{</span>
-<span class="st">      expect_identical(x, &lt;value&gt;)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes
-<span></span>
-  <span class="kw">Examples:</span>
-    <span class="op">|</span> type   <span class="op">|</span> text       <span class="op">|</span> value <span class="op">|</span>
-    <span class="op">|</span> byte   <span class="op">|</span> -12        <span class="op">|</span> -12L  <span class="op">|</span>
-    <span class="op">|</span> short  <span class="op">|</span> 300        <span class="op">|</span> 300L  <span class="op">|</span>
-    <span class="op">|</span> long   <span class="op">|</span> 3000000000 <span class="op">|</span> 3e9   <span class="op">|</span>
-    <span class="op">|</span> double <span class="op">|</span> 1.5E3      <span class="op">|</span> 1500  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario Outline: \{<type>\} gives <value>
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Number
-        Given the number is <text>
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("the number is \{<type>\}", function(x, context) \{
-      expect_identical(x, <value>)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-
-  Examples:
-    | type   | text       | value |
-    | byte   | -12        | -12L  |
-    | short  | 300        | 300L  |
-    | long   | 3000000000 | 3e9   |
-    | double | 1.5E3      | 1500  |
-%</pre>
-}}
-
-\strong{Rule: Custom parameter types are defined with define_parameter_type()}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A custom parameter type can be registered and used in steps
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Custom parameter</span>
-<span class="st">        Given the direction is north</span>
-<span class="st">        Then I verify the direction is north</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    define_parameter_type(</span>
-<span class="st">      name = "direction",</span>
-<span class="st">      regexp = "north|south|east|west",</span>
-<span class="st">      transformer = toupper</span>
-<span class="st">    )</span>
-<span class="st">    given("the direction is \{direction\}", function(dir, context) \{</span>
-<span class="st">      context$direction &lt;- dir</span>
-<span class="st">    \})</span>
-<span class="st">    then("I verify the direction is \{direction\}", function(dir, context) \{</span>
-<span class="st">      expect_equal(context$direction, "NORTH")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A custom parameter type can be registered and used in steps
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Custom parameter
-        Given the direction is north
-        Then I verify the direction is north
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    define_parameter_type(
-      name = "direction",
-      regexp = "north|south|east|west",
-      transformer = toupper
-    )
-    given("the direction is \{direction\}", function(dir, context) \{
-      context$direction <- dir
-    \})
-    then("I verify the direction is \{direction\}", function(dir, context) \{
-      expect_equal(context$direction, "NORTH")
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A custom parameter type's regexp is a plain regular expression
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Version</span>
-<span class="st">        Given the version is 1.2</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    define_parameter_type("version", "\\\\d+\\\\.\\\\d+", numeric_version)</span>
-<span class="st">    given("the version is \{version\}", function(version, context) \{</span>
-<span class="st">      expect_equal(version, numeric_version("1.2"))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A custom parameter type's regexp is a plain regular expression
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Version
-        Given the version is 1.2
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    define_parameter_type("version", "\\\\d+\\\\.\\\\d+", numeric_version)
-    given("the version is \{version\}", function(version, context) \{
-      expect_equal(version, numeric_version("1.2"))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A custom parameter type can have several regexps
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Answers</span>
-<span class="st">        Given the answer is yes</span>
-<span class="st">        And the answer is no</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    define_parameter_type("answer", c("yes", "no"), \\(x) x == "yes")</span>
-<span class="st">    given("the answer is \{answer\}", function(answer, context) \{</span>
-<span class="st">      context$answers &lt;- c(context$answers, answer)</span>
-<span class="st">      if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A custom parameter type can have several regexps
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Answers
-        Given the answer is yes
-        And the answer is no
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    define_parameter_type("answer", c("yes", "no"), \\(x) x == "yes")
-    given("the answer is \{answer\}", function(answer, context) \{
-      context$answers <- c(context$answers, answer)
-      if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A custom parameter type's transformer gets the text of each capture group
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Point</span>
-<span class="st">        Given a point at 1,2 and 3 more</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    define_parameter_type("point", "(\\\\d+),(\\\\d+)", function(x, y) as.integer(c(x, y)))</span>
-<span class="st">    given("a point at \{point\} and \{int\} more", function(point, n, context) \{</span>
-<span class="st">      expect_equal(point, c(1L, 2L))</span>
-<span class="st">      expect_equal(n, 3L)</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> it passes</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A custom parameter type's transformer gets the text of each capture group
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Point
-        Given a point at 1,2 and 3 more
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    define_parameter_type("point", "(\\\\d+),(\\\\d+)", function(x, y) as.integer(c(x, y)))
-    given("a point at \{point\} and \{int\} more", function(point, n, context) \{
-      expect_equal(point, c(1L, 2L))
-      expect_equal(n, 3L)
-    \})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then it passes
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A transformer's error fails the step and names the parameter type
-  The error is shown with the backtrace of the transformer.
-<span></span>
-  <span class="fu">Given</span> a file named <span class="st">"features/params.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Parameters</span>
-<span class="st">      Scenario: Colour</span>
-<span class="st">        Given the colour is blue</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    check_colour &lt;- function(x) stop("Unknown colour: ", x)</span>
-<span class="st">    define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))</span>
-<span class="st">    given("the colour is \{colour\}", function(colour, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> step                     <span class="op">|</span> status <span class="op">|</span>
-    <span class="op">|</span> Given the colour is blue <span class="op">|</span> failed <span class="op">|</span>
-  <span class="fu">And</span> the errors are
-<span class="st">    """</span>
-<span class="st">    [error] Scenario: Colour</span>
-<span class="st">    Error: Step "the colour is blue" failed</span>
-<span class="st">    i Feature: params.feature:3</span>
-<span class="st">    i Scenario: Colour</span>
-<span class="st">    i Step defined at: setup-steps.R:3</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! Parameter type \{colour\} failed to transform "blue".</span>
-<span class="st">    Caused by error in `check_colour()`:</span>
-<span class="st">    ! Unknown colour: blue</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes lines matching these patterns in order:
-<span class="st">    """</span>
-<span class="st">    Unknown colour: blue</span>
-<span class="st">    ^Backtrace:$</span>
-<span class="st">    1\\. .*check_colour\\(x\\)</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"test_that"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A transformer's error fails the step and names the parameter type
-  The error is shown with the backtrace of the transformer.
-
-  Given a file named "features/params.feature" with
-    """
-    Feature: Parameters
-      Scenario: Colour
-        Given the colour is blue
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    check_colour <- function(x) stop("Unknown colour: ", x)
-    define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))
-    given("the colour is \{colour\}", function(colour, context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | step                     | status |
-    | Given the colour is blue | failed |
-  And the errors are
-    """
-    [error] Scenario: Colour
-    Error: Step "the colour is blue" failed
-    i Feature: params.feature:3
-    i Scenario: Colour
-    i Step defined at: setup-steps.R:3
-    Caused by error:
-    ! Parameter type \{colour\} failed to transform "blue".
-    Caused by error in `check_colour()`:
-    ! Unknown colour: blue
-    """
-  And the output includes lines matching these patterns in order:
-    """
-    Unknown colour: blue
-    ^Backtrace:$
-    1\\. .*check_colour\\(x\\)
-    """
-  And the output doesn't include "test_that"
-%</pre>
-}}
-
-\strong{Rule: A step definition with an undefined parameter type defines no step}
-
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Rule: Built-in parameter types convert the text to R values}{
+\subsection{Scenario: \{int\} captures an integer from step text}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Integer parameter&#10;    <span class="fu">Given</span> the count is 42&#10;    <span class="fu">Then</span> I verify the count is 42</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the count is \{int\}", function(n, context) \{
+  context$value <- n
+\})
+then("I verify the count is 42", function(context) \{
+  expect_identical(context$value, 42L)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: \{float\} captures a decimal number from step text}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Float parameter&#10;    <span class="fu">Given</span> the price is 3.99&#10;    <span class="fu">Then</span> I verify the price is 3.99</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the price is \{float\}", function(price, context) \{
+  context$price <- price
+\})
+then("I verify the price is 3.99", function(context) \{
+  expect_identical(context$price, 3.99)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: \{float\} also captures an integer}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Integer as a float&#10;    <span class="fu">Given</span> the price is 12&#10;    <span class="fu">Then</span> I verify the price is 12</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the price is \{float\}", function(price, context) \{
+  context$price <- price
+\})
+then("I verify the price is \{float\}", function(price, context) \{
+  expect_identical(context$price, price)
+  expect_identical(context$price, 12)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: \{string\} captures a quoted string and strips quotes}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> String parameter double quotes&#10;    <span class="fu">Given</span> the name is <span class="st">"Alice"</span>&#10;    <span class="fu">Then</span> I verify the name is <span class="st">"Alice"</span>&#10;&#10;  <span class="kw">Scenario:</span> String parameter single quotes&#10;    <span class="fu">Given</span> the name is 'Bob'&#10;    <span class="fu">Then</span> I verify the name is <span class="st">"Bob"</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the name is \{string\}", function(name, context) \{
+  context$name <- name
+\})
+then("I verify the name is \{string\}", function(name, context) \{
+  expect_equal(context$name, name)
+  expect_false(startsWith(context$name, "\\""))
+  expect_false(startsWith(context$name, "'"))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+String parameter double quotes \tab passed \cr
+String parameter single quotes \tab passed
+}
+}
+}
+\subsection{Scenario: \{word\} captures a single unquoted word}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Word parameter&#10;    <span class="fu">Given</span> the colour is red&#10;    <span class="fu">Then</span> I verify the colour is red</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the colour is \{word\}", function(colour, context) \{
+  context$colour <- colour
+\})
+then("I verify the colour is red", function(context) \{
+  expect_identical(context$colour, "red")
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+}
+\subsection{Rule: \{int\} is an R integer}{
+\subsection{Scenario: \{int\} fails on a value too big for an R integer}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Big number&#10;    <span class="fu">Given</span> the count is 3000000000</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the count is \{int\}", function(n, context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given the count is 3000000000 \tab failed
+}
+\item And the errors are
+\preformatted{[error] Scenario: Big number
+Error: Step "the count is 3000000000" failed
+i Feature: params.feature:3
+i Scenario: Big number
+i Step defined at: setup-steps.R:1
+Caused by error:
+! Parameter type \{int\} failed to transform "3000000000".
+Caused by error:
+! It's out of the range of an R integer.}
+}
+}
+}
+\subsection{Rule: \{byte\}, \{short\}, \{long\} and \{double\} are built in too, for feature files shared with other Cucumber implementations}{
+\subsection{Scenario Outline: \{<type>\} gives <value>}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Number&#10;    <span class="fu">Given</span> the number is <span class="va">&lt;text&gt;</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("the number is \{<type>\}", function(x, context) \{
+  expect_identical(x, <value>)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+\subsection{Examples:}{
+\tabular{lll}{
+type \tab text \tab value \cr
+byte \tab -12 \tab -12L \cr
+short \tab 300 \tab 300L \cr
+long \tab 3000000000 \tab 3e9 \cr
+double \tab 1.5E3 \tab 1500
+}
+}
+}
+}
+\subsection{Rule: Custom parameter types are defined with define_parameter_type()}{
+\subsection{Scenario: A custom parameter type can be registered and used in steps}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Custom parameter&#10;    <span class="fu">Given</span> the direction is north&#10;    <span class="fu">Then</span> I verify the direction is north</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{define_parameter_type(
+  name = "direction",
+  regexp = "north|south|east|west",
+  transformer = toupper
+)
+given("the direction is \{direction\}", function(dir, context) \{
+  context$direction <- dir
+\})
+then("I verify the direction is \{direction\}", function(dir, context) \{
+  expect_equal(context$direction, "NORTH")
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: A custom parameter type's regexp is a plain regular expression}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Version&#10;    <span class="fu">Given</span> the version is 1.2</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{define_parameter_type("version", "\\\\d+\\\\.\\\\d+", numeric_version)
+given("the version is \{version\}", function(version, context) \{
+  expect_equal(version, numeric_version("1.2"))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: A custom parameter type can have several regexps}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Answers&#10;    <span class="fu">Given</span> the answer is yes&#10;    <span class="fu">And</span> the answer is no</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{define_parameter_type("answer", c("yes", "no"), \\(x) x == "yes")
+given("the answer is \{answer\}", function(answer, context) \{
+  context$answers <- c(context$answers, answer)
+  if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: A custom parameter type's transformer gets the text of each capture group}{
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Point&#10;    <span class="fu">Given</span> a point at 1,2 and 3 more</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{define_parameter_type("point", "(\\\\d+),(\\\\d+)", function(x, y) as.integer(c(x, y)))
+given("a point at \{point\} and \{int\} more", function(point, n, context) \{
+  expect_equal(point, c(1L, 2L))
+  expect_equal(n, 3L)
+\})}
+\item When I run
+\preformatted{test("features")}
+\item Then it passes
+}
+}
+\subsection{Scenario: A transformer's error fails the step and names the parameter type}{
+The error is shown with the backtrace of the transformer.
+\itemize{
+\item Given a file named "features/params.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Parameters&#10;  <span class="kw">Scenario:</span> Colour&#10;    <span class="fu">Given</span> the colour is blue</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{check_colour <- function(x) stop("Unknown colour: ", x)
+define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))
+given("the colour is \{colour\}", function(colour, context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given the colour is blue \tab failed
+}
+\item And the errors are
+\preformatted{[error] Scenario: Colour
+Error: Step "the colour is blue" failed
+i Feature: params.feature:3
+i Scenario: Colour
+i Step defined at: setup-steps.R:3
+Caused by error:
+! Parameter type \{colour\} failed to transform "blue".
+Caused by error in `check_colour()`:
+! Unknown colour: blue}
+\item And the output includes lines matching these patterns in order:
+\preformatted{Unknown colour: blue
+^Backtrace:$
+1\\. .*check_colour\\(x\\)}
+\item And the output doesn't include "test_that"
+}
+}
+}
+\subsection{Rule: A step definition with an undefined parameter type defines no step}{
 The run goes on: the steps it would match are undefined, and the
 summary lists the undefined parameter types.
+\subsection{Scenario: Steps of a step definition with an undefined parameter type are undefined}{
+\itemize{
+\item Given a file named "features/airports.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Airports&#10;  <span class="kw">Scenario:</span> Strike&#10;    <span class="fu">Given</span> CDG is closed because of a strike&#10;&#10;  <span class="kw">Scenario:</span> Open&#10;    <span class="fu">Given</span> LHR is open</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("\{airport\} is closed because of a strike", function(airport, context) \{\})
+given("LHR is open", function(context) \{\})}
+\item When I run
+\preformatted{test("features", stop_on_failure = FALSE)}
+\item Then the steps have these results:
+\tabular{lll}{
+scenario \tab step \tab status \cr
+Strike \tab Given CDG is closed because of a strike \tab undefined \cr
+Open \tab Given LHR is open \tab passed
+}
+\item And the output includes
+\preformatted{Undefined parameter types:
+- "airport" e.g. `\{airport\} is closed because of a strike`}
+}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Parameter types
+  A parameter like `\{int\}` in a step definition's Cucumber Expression captures a part of the step
+  and passes it to the step definition converted to an R value.
+  Register your own with `define_parameter_type()`.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Steps of a step definition with an undefined parameter type are undefined
-  <span class="fu">Given</span> a file named <span class="st">"features/airports.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Airports</span>
-<span class="st">      Scenario: Strike</span>
-<span class="st">        Given CDG is closed because of a strike</span>
-<span class="st"></span>
-<span class="st">      Scenario: Open</span>
-<span class="st">        Given LHR is open</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("\{airport\} is closed because of a strike", function(airport, context) \{\})</span>
-<span class="st">    given("LHR is open", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the steps have these results:
-    <span class="op">|</span> scenario <span class="op">|</span> step                                    <span class="op">|</span> status    <span class="op">|</span>
-    <span class="op">|</span> Strike   <span class="op">|</span> Given CDG is closed because of a strike <span class="op">|</span> undefined <span class="op">|</span>
-    <span class="op">|</span> Open     <span class="op">|</span> Given LHR is open                       <span class="op">|</span> passed    <span class="op">|</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Undefined parameter types:</span>
-<span class="st">    - "airport" e.g. `\{airport\} is closed because of a strike`</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Steps of a step definition with an undefined parameter type are undefined
-  Given a file named "features/airports.feature" with
-    """
-    Feature: Airports
-      Scenario: Strike
-        Given CDG is closed because of a strike
+  Background:
+    Given a package
 
-      Scenario: Open
-        Given LHR is open
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("\{airport\} is closed because of a strike", function(airport, context) \{\})
-    given("LHR is open", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", stop_on_failure = FALSE)
-    """
-  Then the steps have these results:
-    | scenario | step                                    | status    |
-    | Strike   | Given CDG is closed because of a strike | undefined |
-    | Open     | Given LHR is open                       | passed    |
-  And the output includes
-    """
-    Undefined parameter types:
-    - "airport" e.g. `\{airport\} is closed because of a strike`
-    """
+  Rule: Built-in parameter types convert the text to R values
+
+    Scenario: \{int\} captures an integer from step text
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Integer parameter
+            Given the count is 42
+            Then I verify the count is 42
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the count is \{int\}", function(n, context) \{
+          context$value <- n
+        \})
+        then("I verify the count is 42", function(context) \{
+          expect_identical(context$value, 42L)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: \{float\} captures a decimal number from step text
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Float parameter
+            Given the price is 3.99
+            Then I verify the price is 3.99
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the price is \{float\}", function(price, context) \{
+          context$price <- price
+        \})
+        then("I verify the price is 3.99", function(context) \{
+          expect_identical(context$price, 3.99)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: \{float\} also captures an integer
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Integer as a float
+            Given the price is 12
+            Then I verify the price is 12
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the price is \{float\}", function(price, context) \{
+          context$price <- price
+        \})
+        then("I verify the price is \{float\}", function(price, context) \{
+          expect_identical(context$price, price)
+          expect_identical(context$price, 12)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: \{string\} captures a quoted string and strips quotes
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: String parameter double quotes
+            Given the name is "Alice"
+            Then I verify the name is "Alice"
+
+          Scenario: String parameter single quotes
+            Given the name is 'Bob'
+            Then I verify the name is "Bob"
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the name is \{string\}", function(name, context) \{
+          context$name <- name
+        \})
+        then("I verify the name is \{string\}", function(name, context) \{
+          expect_equal(context$name, name)
+          expect_false(startsWith(context$name, "\\""))
+          expect_false(startsWith(context$name, "'"))
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then the scenarios have these results:
+        | scenario                       | status |
+        | String parameter double quotes | passed |
+        | String parameter single quotes | passed |
+
+    Scenario: \{word\} captures a single unquoted word
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Word parameter
+            Given the colour is red
+            Then I verify the colour is red
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the colour is \{word\}", function(colour, context) \{
+          context$colour <- colour
+        \})
+        then("I verify the colour is red", function(context) \{
+          expect_identical(context$colour, "red")
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+  Rule: \{int\} is an R integer
+
+    Scenario: \{int\} fails on a value too big for an R integer
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Big number
+            Given the count is 3000000000
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the count is \{int\}", function(n, context) \{\})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the steps have these results:
+        | step                          | status |
+        | Given the count is 3000000000 | failed |
+      And the errors are
+        """
+        [error] Scenario: Big number
+        Error: Step "the count is 3000000000" failed
+        i Feature: params.feature:3
+        i Scenario: Big number
+        i Step defined at: setup-steps.R:1
+        Caused by error:
+        ! Parameter type \{int\} failed to transform "3000000000".
+        Caused by error:
+        ! It's out of the range of an R integer.
+        """
+
+  Rule: \{byte\}, \{short\}, \{long\} and \{double\} are built in too, for feature files shared with other Cucumber implementations
+
+    Scenario Outline: \{<type>\} gives <value>
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Number
+            Given the number is <text>
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("the number is \{<type>\}", function(x, context) \{
+          expect_identical(x, <value>)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+      Examples:
+        | type   | text       | value |
+        | byte   | -12        | -12L  |
+        | short  | 300        | 300L  |
+        | long   | 3000000000 | 3e9   |
+        | double | 1.5E3      | 1500  |
+
+  Rule: Custom parameter types are defined with define_parameter_type()
+
+    Scenario: A custom parameter type can be registered and used in steps
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Custom parameter
+            Given the direction is north
+            Then I verify the direction is north
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        define_parameter_type(
+          name = "direction",
+          regexp = "north|south|east|west",
+          transformer = toupper
+        )
+        given("the direction is \{direction\}", function(dir, context) \{
+          context$direction <- dir
+        \})
+        then("I verify the direction is \{direction\}", function(dir, context) \{
+          expect_equal(context$direction, "NORTH")
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: A custom parameter type's regexp is a plain regular expression
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Version
+            Given the version is 1.2
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        define_parameter_type("version", "\\\\d+\\\\.\\\\d+", numeric_version)
+        given("the version is \{version\}", function(version, context) \{
+          expect_equal(version, numeric_version("1.2"))
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: A custom parameter type can have several regexps
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Answers
+            Given the answer is yes
+            And the answer is no
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        define_parameter_type("answer", c("yes", "no"), \\(x) x == "yes")
+        given("the answer is \{answer\}", function(answer, context) \{
+          context$answers <- c(context$answers, answer)
+          if (length(context$answers) == 2) expect_identical(context$answers, c(TRUE, FALSE))
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: A custom parameter type's transformer gets the text of each capture group
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Point
+            Given a point at 1,2 and 3 more
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        define_parameter_type("point", "(\\\\d+),(\\\\d+)", function(x, y) as.integer(c(x, y)))
+        given("a point at \{point\} and \{int\} more", function(point, n, context) \{
+          expect_equal(point, c(1L, 2L))
+          expect_equal(n, 3L)
+        \})
+        """
+      When I run
+        """
+        test("features")
+        """
+      Then it passes
+
+    Scenario: A transformer's error fails the step and names the parameter type
+      The error is shown with the backtrace of the transformer.
+
+      Given a file named "features/params.feature" with
+        """
+        Feature: Parameters
+          Scenario: Colour
+            Given the colour is blue
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        check_colour <- function(x) stop("Unknown colour: ", x)
+        define_parameter_type("colour", "[a-z]+", function(x) check_colour(x))
+        given("the colour is \{colour\}", function(colour, context) \{\})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the steps have these results:
+        | step                     | status |
+        | Given the colour is blue | failed |
+      And the errors are
+        """
+        [error] Scenario: Colour
+        Error: Step "the colour is blue" failed
+        i Feature: params.feature:3
+        i Scenario: Colour
+        i Step defined at: setup-steps.R:3
+        Caused by error:
+        ! Parameter type \{colour\} failed to transform "blue".
+        Caused by error in `check_colour()`:
+        ! Unknown colour: blue
+        """
+      And the output includes lines matching these patterns in order:
+        """
+        Unknown colour: blue
+        ^Backtrace:$
+        1\\. .*check_colour\\(x\\)
+        """
+      And the output doesn't include "test_that"
+
+  Rule: A step definition with an undefined parameter type defines no step
+    The run goes on: the steps it would match are undefined, and the
+    summary lists the undefined parameter types.
+
+    Scenario: Steps of a step definition with an undefined parameter type are undefined
+      Given a file named "features/airports.feature" with
+        """
+        Feature: Airports
+          Scenario: Strike
+            Given CDG is closed because of a strike
+
+          Scenario: Open
+            Given LHR is open
+        """
+      And a file named "features/setup-steps.R" with
+        """
+        given("\{airport\} is closed because of a strike", function(airport, context) \{\})
+        given("LHR is open", function(context) \{\})
+        """
+      When I run
+        """
+        test("features", stop_on_failure = FALSE)
+        """
+      Then the steps have these results:
+        | scenario | step                                    | status    |
+        | Strike   | Given CDG is closed because of a strike | undefined |
+        | Open     | Given LHR is open                       | passed    |
+      And the output includes
+        """
+        Undefined parameter types:
+        - "airport" e.g. `\{airport\} is closed because of a strike`
+        """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/parameter_types.feature}
-}
 }
 
 \examples{

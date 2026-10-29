@@ -34,167 +34,149 @@ your own.
 }
 \section{Specification}{
 
-\subsection{Custom report}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Custom report}{
 \code{read_messages()} reads the messages a \code{CucumberMessagesReporter} wrote as tibbles of the run's
 features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">When</span> I add 1 item&#10;    <span class="fu">Then</span> the basket has 1 item&#10;&#10;  <span class="kw">Scenario Outline:</span> Add items&#10;    <span class="fu">When</span> I add <span class="va">&lt;n&gt;</span> items&#10;    <span class="fu">Then</span> the basket has <span class="va">&lt;expected&gt;</span> items&#10;&#10;    <span class="kw">Examples:</span>&#10;      <span class="op">|</span> n <span class="op">|</span> expected <span class="op">|</span>&#10;      <span class="op">|</span> 2 <span class="op">|</span> 2        <span class="op">|</span>&#10;      <span class="op">|</span> 3 <span class="op">|</span> 4        <span class="op">|</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add \{int\} item(s)", function(n, context) context$items <- n)
+then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))}
+}
+}
+\subsection{Scenario: A summary of the steps that failed, with their errors}{
+\itemize{
+\item When I run
+\preformatted{write_failures <- function(messages, output) \{
+  run <- read_messages(messages)
+  failed <- run$steps[run$steps$status == "failed", ]
+  writeLines(c(
+    paste(sum(run$scenarios$status == "failed"), "of", nrow(run$scenarios), "scenarios failed"),
+    paste0("- ", failed$scenario, ": ", failed$keyword, " ", failed$text, "\\n  ", failed$error)
+  ), output)
+\}
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        When I add 1 item</span>
-<span class="st">        Then the basket has 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario Outline: Add items</span>
-<span class="st">        When I add &lt;n&gt; items</span>
-<span class="st">        Then the basket has &lt;expected&gt; items</span>
-<span class="st"></span>
-<span class="st">        Examples:</span>
-<span class="st">          | n | expected |</span>
-<span class="st">          | 2 | 2        |</span>
-<span class="st">          | 3 | 4        |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add \{int\} item(s)", function(n, context) context$items &lt;- n)</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        When I add 1 item
-        Then the basket has 1 item
+test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+write_failures("messages.ndjson", "failures.md")
+cat(readLines("failures.md"), sep = "\\n")}
+\item Then the output includes
+\preformatted{1 of 3 scenarios failed
+- Add items: Then the basket has 4 items
+  Step "the basket has 4 items" failed
+  i Feature: basket.feature:8
+  i Scenario: Add items
+  i Step defined at: setup-steps.R:2
+  Expected `context$items` to equal `n`.}
+}
+}
+\subsection{Scenario: Each example of an outline is a scenario, at the line of its row}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+run <- read_messages("messages.ndjson")
+cat(paste0(run$scenarios$uri, ":", run$scenarios$line, " ", run$scenarios$name, " ", run$scenarios$status), sep = "\\n")}
+\item Then the output includes
+\preformatted{basket.feature:2 Add an item passed
+basket.feature:12 Add items passed
+basket.feature:13 Add items failed}
+}
+}
+\subsection{Scenario: The messages print how many features and scenarios ran, by status}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+print(read_messages("messages.ndjson"))}
+\item Then the output includes "<cucumber_messages> 1 feature, 3 scenarios (1 failed, 2 passed)"
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Custom report
+  `read_messages()` reads the messages a `CucumberMessagesReporter` wrote as tibbles of the run's
+  features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.
 
-      Scenario Outline: Add items
-        When I add <n> items
-        Then the basket has <expected> items
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          When I add 1 item
+          Then the basket has 1 item
 
-        Examples:
-          | n | expected |
-          | 2 | 2        |
-          | 3 | 4        |
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add \{int\} item(s)", function(n, context) context$items <- n)
-    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
-    """
-%</pre>
-}}
+        Scenario Outline: Add items
+          When I add <n> items
+          Then the basket has <expected> items
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A summary of the steps that failed, with their errors
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    write_failures &lt;- function(messages, output) \{</span>
-<span class="st">      run &lt;- read_messages(messages)</span>
-<span class="st">      failed &lt;- run$steps[run$steps$status == "failed", ]</span>
-<span class="st">      writeLines(c(</span>
-<span class="st">        paste(sum(run$scenarios$status == "failed"), "of", nrow(run$scenarios), "scenarios failed"),</span>
-<span class="st">        paste0("- ", failed$scenario, ": ", failed$keyword, " ", failed$text, "\\n  ", failed$error)</span>
-<span class="st">      ), output)</span>
-<span class="st">    \}</span>
-<span class="st"></span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    write_failures("messages.ndjson", "failures.md")</span>
-<span class="st">    cat(readLines("failures.md"), sep = "\\n")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    1 of 3 scenarios failed</span>
-<span class="st">    - Add items: Then the basket has 4 items</span>
-<span class="st">      Step "the basket has 4 items" failed</span>
-<span class="st">      i Feature: basket.feature:8</span>
-<span class="st">      i Scenario: Add items</span>
-<span class="st">      i Step defined at: setup-steps.R:2</span>
-<span class="st">      Expected `context$items` to equal `n`.</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A summary of the steps that failed, with their errors
-  When I run
-    """
-    write_failures <- function(messages, output) \{
-      run <- read_messages(messages)
-      failed <- run$steps[run$steps$status == "failed", ]
-      writeLines(c(
-        paste(sum(run$scenarios$status == "failed"), "of", nrow(run$scenarios), "scenarios failed"),
-        paste0("- ", failed$scenario, ": ", failed$keyword, " ", failed$text, "\\n  ", failed$error)
-      ), output)
-    \}
+          Examples:
+            | n | expected |
+            | 2 | 2        |
+            | 3 | 4        |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add \{int\} item(s)", function(n, context) context$items <- n)
+      then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$items, n))
+      """
 
-    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
-    write_failures("messages.ndjson", "failures.md")
-    cat(readLines("failures.md"), sep = "\\n")
-    """
-  Then the output includes
-    """
-    1 of 3 scenarios failed
-    - Add items: Then the basket has 4 items
-      Step "the basket has 4 items" failed
-      i Feature: basket.feature:8
-      i Scenario: Add items
-      i Step defined at: setup-steps.R:2
-      Expected `context$items` to equal `n`.
-    """
-%</pre>
-}}
+  Scenario: A summary of the steps that failed, with their errors
+    When I run
+      """
+      write_failures <- function(messages, output) \{
+        run <- read_messages(messages)
+        failed <- run$steps[run$steps$status == "failed", ]
+        writeLines(c(
+          paste(sum(run$scenarios$status == "failed"), "of", nrow(run$scenarios), "scenarios failed"),
+          paste0("- ", failed$scenario, ": ", failed$keyword, " ", failed$text, "\\n  ", failed$error)
+        ), output)
+      \}
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each example of an outline is a scenario, at the line of its row
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    run &lt;- read_messages("messages.ndjson")</span>
-<span class="st">    cat(paste0(run$scenarios$uri, ":", run$scenarios$line, " ", run$scenarios$name, " ", run$scenarios$status), sep = "\\n")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    basket.feature:2 Add an item passed</span>
-<span class="st">    basket.feature:12 Add items passed</span>
-<span class="st">    basket.feature:13 Add items failed</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each example of an outline is a scenario, at the line of its row
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
-    run <- read_messages("messages.ndjson")
-    cat(paste0(run$scenarios$uri, ":", run$scenarios$line, " ", run$scenarios$name, " ", run$scenarios$status), sep = "\\n")
-    """
-  Then the output includes
-    """
-    basket.feature:2 Add an item passed
-    basket.feature:12 Add items passed
-    basket.feature:13 Add items failed
-    """
-%</pre>
-}}
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      write_failures("messages.ndjson", "failures.md")
+      cat(readLines("failures.md"), sep = "\\n")
+      """
+    Then the output includes
+      """
+      1 of 3 scenarios failed
+      - Add items: Then the basket has 4 items
+        Step "the basket has 4 items" failed
+        i Feature: basket.feature:8
+        i Scenario: Add items
+        i Step defined at: setup-steps.R:2
+        Expected `context$items` to equal `n`.
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The messages print how many features and scenarios ran, by status
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)</span>
-<span class="st">    print(read_messages("messages.ndjson"))</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"<span class="va">&lt;cucumber_messages&gt;</span> 1 feature, 3 scenarios (1 failed, 2 passed)"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The messages print how many features and scenarios ran, by status
-  When I run
-    """
-    test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
-    print(read_messages("messages.ndjson"))
-    """
-  Then the output includes "<cucumber_messages> 1 feature, 3 scenarios (1 failed, 2 passed)"
+  Scenario: Each example of an outline is a scenario, at the line of its row
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      run <- read_messages("messages.ndjson")
+      cat(paste0(run$scenarios$uri, ":", run$scenarios$line, " ", run$scenarios$name, " ", run$scenarios$status), sep = "\\n")
+      """
+    Then the output includes
+      """
+      basket.feature:2 Add an item passed
+      basket.feature:12 Add items passed
+      basket.feature:13 Add items failed
+      """
+
+  Scenario: The messages print how many features and scenarios ran, by status
+    When I run
+      """
+      test("features", reporter = CucumberMessagesReporter$new("messages.ndjson"), stop_on_failure = FALSE)
+      print(read_messages("messages.ndjson"))
+      """
+    Then the output includes "<cucumber_messages> 1 feature, 3 scenarios (1 failed, 2 passed)"
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-custom_report.feature}
-}
 }
 
 \examples{

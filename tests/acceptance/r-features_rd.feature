@@ -7,6 +7,12 @@ Feature: Scenarios as documentation
   set the `cucumber.rd_tags` option to use another tag expression. Name the section with
   `section`, or for every help page with the `cucumber.rd_section` option.
 
+  In the help page, each feature is one block of Gherkin, as it's written. On HTML pages, like
+  the pkgdown reference page, it's shown like Markdown with Gherkin: its name and the names of
+  its Rules, Backgrounds, scenarios and Examples are headers, its steps a list, its tables tables
+  and its Doc Strings code, a Doc String of Gherkin highlighted. With `markdown = FALSE`, HTML
+  pages show the block of Gherkin too.
+
   Background:
     Given a package
     And a file named "tests/acceptance/basket.feature" with
@@ -54,33 +60,77 @@ Feature: Scenarios as documentation
       """
       Specification:
 
-      Basket:
+      Feature: Basket
+        A basket holds the items a customer wants to buy.
 
-      A basket holds the items a customer wants to buy.
+        Background:
+          Given an empty basket
 
-      Background:
-        Given an empty basket
+        Scenario: Add an item
+          When I add 1 item
+          Then the basket has 1 item
 
-      Scenario: Add an item
-        When I add 1 item
-        Then the basket has 1 item
+        Scenario Outline: Add items
+          When I add <n> items
+          Then the basket has <n> items
 
-      Scenario Outline: Add items
-        When I add <n> items
-        Then the basket has <n> items
-
-        Examples:
-          | n |
-          | 2 |
-          | 3 |
+          Examples:
+            | n |
+            | 2 |
+            | 3 |
 
       Source: 'tests/acceptance/basket.feature'
       """
     And the help page "add" doesn't include "Remove an item"
     And the help page "add" doesn't include "@rd"
 
-  Scenario: The scenarios are in the pkgdown reference page
-    They're Gherkin code blocks, like those of a Markdown page.
+  Scenario: A feature is Markdown in the pkgdown reference page
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "R/add.R" with
+      """
+      #' Add items to a basket
+      #' @eval cucumber::features_rd()
+      #' @export
+      add <- function(basket, n) basket + n
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "add", preview = FALSE)
+      """
+    Then the reference page "add" has the headings
+      """
+      Feature: Basket
+      Background:
+      Scenario: Add an item
+      Scenario Outline: Add items
+      Examples:
+      """
+    And the reference page "add" has the steps
+      """
+      Given an empty basket
+      When I add 1 item
+      Then the basket has 1 item
+      When I add <n> items
+      Then the basket has <n> items
+      """
+    And the reference page "add" has the table
+      | n |
+      | 2 |
+      | 3 |
+
+  Scenario: A feature is one Gherkin code block in the pkgdown reference page with markdown = FALSE
+    The block has the feature's name and description, the Background and the selected
+    scenarios, like a code block of a Markdown page.
 
     Given a file named "DESCRIPTION" with
       """
@@ -95,7 +145,7 @@ Feature: Scenarios as documentation
     And a file named "R/add.R" with
       """
       #' Add items to a basket
-      #' @eval cucumber::features_rd(features = "basket.feature:8")
+      #' @eval cucumber::features_rd(features = "basket.feature:8", markdown = FALSE)
       #' @export
       add <- function(basket, n) basket + n
       """
@@ -106,12 +156,18 @@ Feature: Scenarios as documentation
       """
     Then the reference page "add" has the Gherkin block
       """
-      Scenario: Add an item
-        When I add 1 item
-        Then the basket has 1 item
+      Feature: Basket
+        A basket holds the items a customer wants to buy.
+
+        Background:
+          Given an empty basket
+
+        Scenario: Add an item
+          When I add 1 item
+          Then the basket has 1 item
       """
 
-  Scenario: The blank lines of a scenario are kept in the pkgdown reference page
+  Scenario: The blank lines of a scenario are kept in the pkgdown reference page with markdown = FALSE
     Given a file named "DESCRIPTION" with
       """
       Package: example
@@ -136,7 +192,7 @@ Feature: Scenarios as documentation
     And a file named "R/add.R" with
       """
       #' Add items to a basket
-      #' @eval cucumber::features_rd(features = "checkout.feature")
+      #' @eval cucumber::features_rd(features = "checkout.feature", markdown = FALSE)
       #' @export
       add <- function(basket, n) basket + n
       """
@@ -147,15 +203,17 @@ Feature: Scenarios as documentation
       """
     Then the reference page "add" has the Gherkin block
       """
-      Scenario: Pay for the basket
-        The customer pays for every item in the basket.
+      Feature: Checkout
 
-        Given a basket with 2 items
-        When I pay
-        Then the basket is empty
+        Scenario: Pay for the basket
+          The customer pays for every item in the basket.
+
+          Given a basket with 2 items
+          When I pay
+          Then the basket is empty
       """
 
-  Scenario: The scenarios are highlighted in the pkgdown reference page
+  Scenario: The scenarios are highlighted in the pkgdown reference page with markdown = FALSE
     Their tokens have the classes pandoc gives tokens, so that the site's theme colours them
     like other code, without a script.
 
@@ -189,7 +247,7 @@ Feature: Scenarios as documentation
     And a file named "R/greet.R" with
       """
       #' Greet a customer
-      #' @eval cucumber::features_rd(features = "greeting.feature")
+      #' @eval cucumber::features_rd(features = "greeting.feature", markdown = FALSE)
       #' @export
       greet <- function(name) paste("Hello", name)
       """
@@ -417,17 +475,17 @@ Feature: Scenarios as documentation
       """
     Then the help page "discount" includes
       """
-      Discounts:
+      Feature: Discounts
 
-      *Rule: Orders over 100 get 10% off*
+        Rule: Orders over 100 get 10% off
 
-      Scenario Outline: Discount of an order
-        When I order for <total>
-        Then I pay <paid>
+          Scenario Outline: Discount of an order
+            When I order for <total>
+            Then I pay <paid>
 
-        Examples: Discounted
-          | total | paid |
-          | 200   | 180  |
+            Examples: Discounted
+              | total | paid |
+              | 200   | 180  |
 
       Source: 'tests/acceptance/discounts.feature'
       """
@@ -467,17 +525,11 @@ Feature: Scenarios as documentation
       roxygen2::roxygenise()
       pkgdown::build_reference(".", topics = "calculate", preview = FALSE)
       """
-    Then the help page "calculate" includes
+    Then the help page "calculate" includes "When I evaluate `r 1 + 1`"
+    And the reference page "calculate" has the steps
       """
-      Scenario: Evaluate an expression
-        When I evaluate `r 1 + 1`
-        Then the result is 2
-      """
-    And the reference page "calculate" has the Gherkin block
-      """
-      Scenario: Evaluate an expression
-        When I evaluate `r 1 + 1`
-        Then the result is 2
+      When I evaluate r 1 + 1
+      Then the result is 2
       """
 
   Scenario: Scenarios with characters of more than one byte are shown as written
@@ -538,13 +590,11 @@ Feature: Scenarios as documentation
       """
     Then the help page "discount" includes
       """
-      Discounts of {percent}%:
+      Feature: Discounts of {percent}%
+        A discount is {percent}% of the total, a `{float}`.
 
-      A discount is {percent}% of the total, a '{float}'.
-
-      *Rule: {int} items get 10% off*
-
-      Each {item} counts, a '{word}'.
+        Rule: {int} items get 10% off
+          Each {item} counts, a `{word}`.
       """
 
   Scenario: Scenarios of Markdown with Gherkin are in the help page as they are written
@@ -572,7 +622,7 @@ Feature: Scenarios as documentation
       """
     Then the help page "pay" includes
       """
-      Checkout:
+      # Feature: Checkout
 
       ## Scenario: Pay for the basket
 
@@ -581,7 +631,7 @@ Feature: Scenarios as documentation
       * Then the basket is empty
       """
 
-  Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page
+  Scenario: Scenarios of Markdown with Gherkin are highlighted in the pkgdown reference page with markdown = FALSE
     Given a file named "DESCRIPTION" with
       """
       Package: example
@@ -611,7 +661,7 @@ Feature: Scenarios as documentation
     And a file named "R/pay.R" with
       """
       #' Pay for a basket
-      #' @eval cucumber::features_rd(features = "checkout.feature.md")
+      #' @eval cucumber::features_rd(features = "checkout.feature.md", markdown = FALSE)
       #' @export
       pay <- function(basket) basket
       """
@@ -628,6 +678,99 @@ Feature: Scenarios as documentation
       | When              | fu    |
       | "<card>"          | st    |
       | \|                | op    |
+
+  Scenario: A Doc String of Gherkin is highlighted Gherkin, another one a code block of its media type
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/documentation.feature" with
+      ```
+      Feature: Documentation
+        @rd
+        Scenario: Document a feature
+          Given a file named "basket.feature" with
+            """
+            Feature: Basket
+              Scenario: Add an item
+                Given an empty basket
+            """
+          And a file named "steps.R" with
+            """r
+            given("an empty basket", function(context) NULL)
+            """
+      ```
+    And a file named "R/document.R" with
+      """
+      #' Document a feature
+      #' @eval cucumber::features_rd(features = "documentation.feature")
+      #' @export
+      document <- function(feature) feature
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "document", preview = FALSE)
+      """
+    Then the reference page "document" has the Gherkin block
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And the reference page "document" highlights the Gherkin
+      | token     | class |
+      | Feature:  | kw    |
+      | Scenario: | kw    |
+      | Given     | fu    |
+    And the help page "document" includes
+      """
+      given("an empty basket", function(context) NULL)
+      """
+
+  Scenario: A cell of a table is on one line in the pkgdown reference page
+    Its new lines are shown as `\n`, like in Gherkin.
+
+    Given a file named "DESCRIPTION" with
+      """
+      Package: example
+      Version: 0.1.0
+      Title: Example
+      Description: An example.
+      License: MIT
+      Authors@R: person("Ada", "Lovelace", role = c("aut", "cre"))
+      Encoding: UTF-8
+      """
+    And a file named "tests/acceptance/links.feature" with
+      """
+      Feature: Links
+        @rd
+        Scenario: Links
+          Then the links are:
+            | links          | separator |
+            | a.com\nb.com   | \|        |
+      """
+    And a file named "R/link.R" with
+      """
+      #' Link pages
+      #' @eval cucumber::features_rd(features = "links.feature")
+      #' @export
+      link <- function(url) url
+      """
+    When I run
+      """
+      roxygen2::roxygenise()
+      pkgdown::build_reference(".", topics = "link", preview = FALSE)
+      """
+    Then the reference page "link" has the table
+      | links         | separator |
+      | a.com\\nb.com | \|        |
 
   Scenario: A selection of scenarios that aren't tagged is an error
     When I run it and it fails

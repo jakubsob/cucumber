@@ -16,209 +16,192 @@ scenario, e.g. when a service it needs isn't available. Outside of a Cucumber ru
 }
 \section{Specification}{
 
-\subsection{Skipped steps}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Skipped steps}{
 Call \code{skip_scenario()} in a step or a \code{before()} hook to skip the rest of the scenario,
 for example when a service it needs is down. The scenario is reported as skipped with its reason,
 and after hooks still run and get \code{"skipped"} as its status.
 In an \code{after()} hook, it skips only that hook, and the scenario is skipped unless it failed.
 In a \code{before_all()} hook, it skips every scenario of the run. Calling it in a \code{before_step()}, \code{after_step()}
 or \code{after_all()} hook is an error of the hook. \code{testthat::skip()} does the same.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: A step skips the scenario with skip_scenario()}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Sync the basket&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I sync the basket&#10;    <span class="fu">Then</span> the basket is synced</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
+given("an empty basket", function(context) \{\})
+when("I sync the basket", function(context) skip_scenario("the API is down"))
+then("the basket is synced", function(context) stop("this step must not execute"))}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
+\item And the output includes "after: Sync the basket skipped"
+\item And the steps have these results:
+\tabular{ll}{
+step \tab status \cr
+Given an empty basket \tab passed \cr
+When I sync the basket \tab skipped \cr
+Then the basket is synced \tab skipped
+}
+}
+}
+\subsection{Scenario: A before hook skips the scenario with skip_scenario()}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  @api&#10;  <span class="kw">Scenario:</span> Sync the basket&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I sync the basket&#10;&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) skip_scenario("the API is down"), tags = "@api")
+before(function(context, scenario) cat("this hook must not run for", scenario$name, "\\n"), tags = "@api")
+after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
+given("an empty basket", function(context) \{\})
+when("I sync the basket", function(context) stop("this step must not execute"))}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
+\item And the output includes
+\preformatted{after: Sync the basket skipped
+after: Add an item passed}
+\item And the output doesn't include "this hook must not run"
+\item And the steps and hooks have these results:
+\tabular{lll}{
+scenario \tab step \tab status \cr
+Sync the basket \tab Before \tab skipped \cr
+Sync the basket \tab Before \tab skipped \cr
+Sync the basket \tab Given an empty basket \tab skipped \cr
+Sync the basket \tab When I sync the basket \tab skipped \cr
+Sync the basket \tab After \tab passed \cr
+Add an item \tab Given an empty basket \tab passed \cr
+Add an item \tab After \tab passed
+}
+}
+}
+\subsection{Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{after(function(context, scenario) cat("this hook still runs\\n"))
+after(function(context, scenario) skip_scenario("too late"))
+given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features")}
+\item Then the scenario "Add an item" is skipped with "Reason: too late"
+\item And the output includes "this hook still runs"
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Skipped steps
+  Call `skip_scenario()` in a step or a `before()` hook to skip the rest of the scenario,
+  for example when a service it needs is down. The scenario is reported as skipped with its reason,
+  and after hooks still run and get `"skipped"` as its status.
+  In an `after()` hook, it skips only that hook, and the scenario is skipped unless it failed.
+  In a `before_all()` hook, it skips every scenario of the run. Calling it in a `before_step()`, `after_step()`
+  or `after_all()` hook is an error of the hook. `testthat::skip()` does the same.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+  Background:
+    Given a package
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step skips the scenario with skip_scenario()
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Sync the basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I sync the basket</span>
-<span class="st">        Then the basket is synced</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I sync the basket", function(context) skip_scenario("the API is down"))</span>
-<span class="st">    then("the basket is synced", function(context) stop("this step must not execute"))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenario <span class="st">"Sync the basket"</span> is skipped with <span class="st">"Reason: the API is down"</span>
-  <span class="fu">And</span> the output includes <span class="st">"after: Sync the basket skipped"</span>
-  <span class="fu">And</span> the steps have these results:
-    <span class="op">|</span> step                      <span class="op">|</span> status  <span class="op">|</span>
-    <span class="op">|</span> Given an empty basket     <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> When I sync the basket    <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Then the basket is synced <span class="op">|</span> skipped <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step skips the scenario with skip_scenario()
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Sync the basket
-        Given an empty basket
-        When I sync the basket
-        Then the basket is synced
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
-    given("an empty basket", function(context) \{\})
-    when("I sync the basket", function(context) skip_scenario("the API is down"))
-    then("the basket is synced", function(context) stop("this step must not execute"))
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
-  And the output includes "after: Sync the basket skipped"
-  And the steps have these results:
-    | step                      | status  |
-    | Given an empty basket     | passed  |
-    | When I sync the basket    | skipped |
-    | Then the basket is synced | skipped |
-%</pre>
-}}
+  Scenario: A step skips the scenario with skip_scenario()
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Sync the basket
+          Given an empty basket
+          When I sync the basket
+          Then the basket is synced
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
+      given("an empty basket", function(context) \{\})
+      when("I sync the basket", function(context) skip_scenario("the API is down"))
+      then("the basket is synced", function(context) stop("this step must not execute"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    And the output includes "after: Sync the basket skipped"
+    And the steps have these results:
+      | step                      | status  |
+      | Given an empty basket     | passed  |
+      | When I sync the basket    | skipped |
+      | Then the basket is synced | skipped |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A before hook skips the scenario with skip_scenario()
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      @api</span>
-<span class="st">      Scenario: Sync the basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I sync the basket</span>
-<span class="st"></span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) skip_scenario("the API is down"), tags = "@api")</span>
-<span class="st">    before(function(context, scenario) cat("this hook must not run for", scenario$name, "\\n"), tags = "@api")</span>
-<span class="st">    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I sync the basket", function(context) stop("this step must not execute"))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenario <span class="st">"Sync the basket"</span> is skipped with <span class="st">"Reason: the API is down"</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    after: Sync the basket skipped</span>
-<span class="st">    after: Add an item passed</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"this hook must not run"</span>
-  <span class="fu">And</span> the steps and hooks have these results:
-    <span class="op">|</span> scenario        <span class="op">|</span> step                   <span class="op">|</span> status  <span class="op">|</span>
-    <span class="op">|</span> Sync the basket <span class="op">|</span> Before                 <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Sync the basket <span class="op">|</span> Before                 <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Sync the basket <span class="op">|</span> Given an empty basket  <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Sync the basket <span class="op">|</span> When I sync the basket <span class="op">|</span> skipped <span class="op">|</span>
-    <span class="op">|</span> Sync the basket <span class="op">|</span> After                  <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> Add an item     <span class="op">|</span> Given an empty basket  <span class="op">|</span> passed  <span class="op">|</span>
-    <span class="op">|</span> Add an item     <span class="op">|</span> After                  <span class="op">|</span> passed  <span class="op">|</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A before hook skips the scenario with skip_scenario()
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      @api
-      Scenario: Sync the basket
-        Given an empty basket
-        When I sync the basket
+  Scenario: A before hook skips the scenario with skip_scenario()
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        @api
+        Scenario: Sync the basket
+          Given an empty basket
+          When I sync the basket
 
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) skip_scenario("the API is down"), tags = "@api")
-    before(function(context, scenario) cat("this hook must not run for", scenario$name, "\\n"), tags = "@api")
-    after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
-    given("an empty basket", function(context) \{\})
-    when("I sync the basket", function(context) stop("this step must not execute"))
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
-  And the output includes
-    """
-    after: Sync the basket skipped
-    after: Add an item passed
-    """
-  And the output doesn't include "this hook must not run"
-  And the steps and hooks have these results:
-    | scenario        | step                   | status  |
-    | Sync the basket | Before                 | skipped |
-    | Sync the basket | Before                 | skipped |
-    | Sync the basket | Given an empty basket  | skipped |
-    | Sync the basket | When I sync the basket | skipped |
-    | Sync the basket | After                  | passed  |
-    | Add an item     | Given an empty basket  | passed  |
-    | Add an item     | After                  | passed  |
-%</pre>
-}}
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) skip_scenario("the API is down"), tags = "@api")
+      before(function(context, scenario) cat("this hook must not run for", scenario$name, "\\n"), tags = "@api")
+      after(function(context, scenario) cat("after:", scenario$name, scenario$status, "\\n"))
+      given("an empty basket", function(context) \{\})
+      when("I sync the basket", function(context) stop("this step must not execute"))
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenario "Sync the basket" is skipped with "Reason: the API is down"
+    And the output includes
+      """
+      after: Sync the basket skipped
+      after: Add an item passed
+      """
+    And the output doesn't include "this hook must not run"
+    And the steps and hooks have these results:
+      | scenario        | step                   | status  |
+      | Sync the basket | Before                 | skipped |
+      | Sync the basket | Before                 | skipped |
+      | Sync the basket | Given an empty basket  | skipped |
+      | Sync the basket | When I sync the basket | skipped |
+      | Sync the basket | After                  | passed  |
+      | Add an item     | Given an empty basket  | passed  |
+      | Add an item     | After                  | passed  |
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> skip_scenario() in an after hook skips the hook, and the after hooks after it still run
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    after(function(context, scenario) cat("this hook still runs\\n"))</span>
-<span class="st">    after(function(context, scenario) skip_scenario("too late"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features")</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the scenario <span class="st">"Add an item"</span> is skipped with <span class="st">"Reason: too late"</span>
-  <span class="fu">And</span> the output includes <span class="st">"this hook still runs"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    after(function(context, scenario) cat("this hook still runs\\n"))
-    after(function(context, scenario) skip_scenario("too late"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features")
-    """
-  Then the scenario "Add an item" is skipped with "Reason: too late"
-  And the output includes "this hook still runs"
+  Scenario: skip_scenario() in an after hook skips the hook, and the after hooks after it still run
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      after(function(context, scenario) cat("this hook still runs\\n"))
+      after(function(context, scenario) skip_scenario("too late"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenario "Add an item" is skipped with "Reason: too late"
+    And the output includes "this hook still runs"
 %</pre>
 }}
 
 Source: \code{tests/acceptance/skipped_steps.feature}
-}
 }
 
 \examples{

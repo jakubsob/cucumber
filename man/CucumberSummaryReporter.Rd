@@ -31,317 +31,271 @@ scenarios under Warnings.
 }
 \section{Specification}{
 
-\subsection{Summary reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Summary reporter}{
 \code{CucumberSummaryReporter} prints only the summary of the run: the scenarios that didn't pass, numbered
 and with where they are, then the scenarios and steps counted by status and how long the run took.
 Scenarios that failed, are ambiguous or undefined are Failures. Pending scenarios, and failed attempts of
 retried scenarios, are Warnings.
+\subsection{Scenario: Only the summary is printed}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 1 item&#10;&#10;  <span class="kw">Scenario:</span> Remove an item&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I remove 1 item</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I add \{int\} item", function(n, context) \{\})
+when("I remove \{int\} item", function(n, context) stop("The basket is empty"))}
+\item When I run
+\preformatted{test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{Failures:
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Only the summary is printed
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 1 item</span>
-<span class="st"></span>
-<span class="st">      Scenario: Remove an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I remove 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add \{int\} item", function(n, context) \{\})</span>
-<span class="st">    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Failures:</span>
-<span class="st"></span>
-<span class="st">    1) Scenario: Remove an item # basket.feature:6</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    x When I remove 1 item</span>
-<span class="st">    Summary</span>
-<span class="st">    2 scenarios (1 failed, 1 passed)</span>
-<span class="st">    4 steps (1 failed, 3 passed)</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"Scenario: Add an item"</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"Feature: Basket"</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"...."</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Only the summary is printed
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-        When I add 1 item
+1) Scenario: Remove an item # basket.feature:6
+v Given an empty basket
+x When I remove 1 item}
+\item And the output includes these lines in order:
+\preformatted{x When I remove 1 item
+Summary
+2 scenarios (1 failed, 1 passed)
+4 steps (1 failed, 3 passed)}
+\item And the output doesn't include "Scenario: Add an item"
+\item And the output doesn't include "Feature: Basket"
+\item And the output doesn't include "...."
+}
+}
+\subsection{Scenario: Pending scenarios and failed attempts that were retried are warnings}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Pay&#10;    <span class="fu">Given</span> I pay&#10;&#10;  <span class="kw">Scenario:</span> Sync&#10;    <span class="fu">When</span> I sync</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{attempts <- 0
+given("I pay", function(context) pending())
+when("I sync", function(context) \{
+  attempts <<- attempts + 1
+  if (attempts == 1) stop("The server is busy")
+\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberSummaryReporter$new(), retry = 1, stop_on_failure = FALSE)}
+\item Then the output includes these lines in order:
+\preformatted{Warnings:
+1) Scenario: Pay # basket.feature:2
+P Given I pay
+2) Scenario: Sync (attempt 1, retried) # basket.feature:5
+x When I sync
+Summary
+2 scenarios (1 pending, 1 passed)}
+\item And the output doesn't include "Failures:"
+}
+}
+\subsection{Scenario: The summary ends with how long the run took, and how long its steps took}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Wait for the basket&#10;    <span class="fu">When</span> I wait</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I wait", function(context) Sys.sleep(0.2))}
+\item When I run
+\preformatted{test("features", reporter = CucumberSummaryReporter$new())}
+\item Then the output includes lines matching these patterns in order:
+\preformatted{^1 step \\(1 passed\\)$
+^0m00\\.[2-9][0-9]\{2\}s \\(executing steps: 0m00\\.[2-9][0-9]\{2\}s\\)$}
+}
+}
+\subsection{Scenario: A run without scenarios counts no scenarios and no steps}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket</code></pre >}
+\item When I run
+\preformatted{test("features", reporter = CucumberSummaryReporter$new())}
+\item Then the output includes
+\preformatted{Summary
+0 scenarios
+0 steps}
+}
+}
+\subsection{Scenario: A hook's error is printed in the summary where the hook ran}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) stop("The shop is closed"))
+after(function(context, scenario) stop("The till is broken"))
+given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes these lines in order:
+\preformatted{Failures:
+1) Scenario: Add an item # basket.feature:2
+Hook `before()` failed
+! The shop is closed
+- Given an empty basket
+Hook `after()` failed
+! The till is broken}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Summary reporter
+  `CucumberSummaryReporter` prints only the summary of the run: the scenarios that didn't pass, numbered
+  and with where they are, then the scenarios and steps counted by status and how long the run took.
+  Scenarios that failed, are ambiguous or undefined are Failures. Pending scenarios, and failed attempts of
+  retried scenarios, are Warnings.
 
-      Scenario: Remove an item
-        Given an empty basket
-        When I remove 1 item
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} item", function(n, context) \{\})
-    when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    Failures:
+  Scenario: Only the summary is printed
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+          When I add 1 item
 
-    1) Scenario: Remove an item # basket.feature:6
-    v Given an empty basket
-    x When I remove 1 item
-    """
-  And the output includes these lines in order:
-    """
-    x When I remove 1 item
-    Summary
-    2 scenarios (1 failed, 1 passed)
-    4 steps (1 failed, 3 passed)
-    """
-  And the output doesn't include "Scenario: Add an item"
-  And the output doesn't include "Feature: Basket"
-  And the output doesn't include "...."
-%</pre>
-}}
+        Scenario: Remove an item
+          Given an empty basket
+          When I remove 1 item
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I add \{int\} item", function(n, context) \{\})
+      when("I remove \{int\} item", function(n, context) stop("The basket is empty"))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      Failures:
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Pending scenarios and failed attempts that were retried are warnings
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Pay</span>
-<span class="st">        Given I pay</span>
-<span class="st"></span>
-<span class="st">      Scenario: Sync</span>
-<span class="st">        When I sync</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    attempts &lt;- 0</span>
-<span class="st">    given("I pay", function(context) pending())</span>
-<span class="st">    when("I sync", function(context) \{</span>
-<span class="st">      attempts &lt;&lt;- attempts + 1</span>
-<span class="st">      if (attempts == 1) stop("The server is busy")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new(), retry = 1, stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    Warnings:</span>
-<span class="st">    1) Scenario: Pay # basket.feature:2</span>
-<span class="st">    P Given I pay</span>
-<span class="st">    2) Scenario: Sync (attempt 1, retried) # basket.feature:5</span>
-<span class="st">    x When I sync</span>
-<span class="st">    Summary</span>
-<span class="st">    2 scenarios (1 pending, 1 passed)</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"Failures:"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Pending scenarios and failed attempts that were retried are warnings
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Pay
-        Given I pay
+      1) Scenario: Remove an item # basket.feature:6
+      v Given an empty basket
+      x When I remove 1 item
+      """
+    And the output includes these lines in order:
+      """
+      x When I remove 1 item
+      Summary
+      2 scenarios (1 failed, 1 passed)
+      4 steps (1 failed, 3 passed)
+      """
+    And the output doesn't include "Scenario: Add an item"
+    And the output doesn't include "Feature: Basket"
+    And the output doesn't include "...."
 
-      Scenario: Sync
-        When I sync
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    attempts <- 0
-    given("I pay", function(context) pending())
-    when("I sync", function(context) \{
-      attempts <<- attempts + 1
-      if (attempts == 1) stop("The server is busy")
-    \})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new(), retry = 1, stop_on_failure = FALSE)
-    """
-  Then the output includes these lines in order:
-    """
-    Warnings:
-    1) Scenario: Pay # basket.feature:2
-    P Given I pay
-    2) Scenario: Sync (attempt 1, retried) # basket.feature:5
-    x When I sync
-    Summary
-    2 scenarios (1 pending, 1 passed)
-    """
-  And the output doesn't include "Failures:"
-%</pre>
-}}
+  Scenario: Pending scenarios and failed attempts that were retried are warnings
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Pay
+          Given I pay
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The summary ends with how long the run took, and how long its steps took
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Wait for the basket</span>
-<span class="st">        When I wait</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I wait", function(context) Sys.sleep(0.2))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes lines matching these patterns in order:
-<span class="st">    """</span>
-<span class="st">    ^1 step \\(1 passed\\)$</span>
-<span class="st">    ^0m00\\.[2-9][0-9]\{2\}s \\(executing steps: 0m00\\.[2-9][0-9]\{2\}s\\)$</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The summary ends with how long the run took, and how long its steps took
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Wait for the basket
-        When I wait
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I wait", function(context) Sys.sleep(0.2))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new())
-    """
-  Then the output includes lines matching these patterns in order:
-    """
-    ^1 step \\(1 passed\\)$
-    ^0m00\\.[2-9][0-9]\{2\}s \\(executing steps: 0m00\\.[2-9][0-9]\{2\}s\\)$
-    """
-%</pre>
-}}
+        Scenario: Sync
+          When I sync
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      attempts <- 0
+      given("I pay", function(context) pending())
+      when("I sync", function(context) \{
+        attempts <<- attempts + 1
+        if (attempts == 1) stop("The server is busy")
+      \})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new(), retry = 1, stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      Warnings:
+      1) Scenario: Pay # basket.feature:2
+      P Given I pay
+      2) Scenario: Sync (attempt 1, retried) # basket.feature:5
+      x When I sync
+      Summary
+      2 scenarios (1 pending, 1 passed)
+      """
+    And the output doesn't include "Failures:"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A run without scenarios counts no scenarios and no steps
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Summary</span>
-<span class="st">    0 scenarios</span>
-<span class="st">    0 steps</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A run without scenarios counts no scenarios and no steps
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new())
-    """
-  Then the output includes
-    """
-    Summary
-    0 scenarios
-    0 steps
-    """
-%</pre>
-}}
+  Scenario: The summary ends with how long the run took, and how long its steps took
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Wait for the basket
+          When I wait
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I wait", function(context) Sys.sleep(0.2))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new())
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      ^1 step \\(1 passed\\)$
+      ^0m00\\.[2-9][0-9]\{2\}s \\(executing steps: 0m00\\.[2-9][0-9]\{2\}s\\)$
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's error is printed in the summary where the hook ran
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) stop("The shop is closed"))</span>
-<span class="st">    after(function(context, scenario) stop("The till is broken"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    Failures:</span>
-<span class="st">    1) Scenario: Add an item # basket.feature:2</span>
-<span class="st">    Hook `before()` failed</span>
-<span class="st">    ! The shop is closed</span>
-<span class="st">    - Given an empty basket</span>
-<span class="st">    Hook `after()` failed</span>
-<span class="st">    ! The till is broken</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A hook's error is printed in the summary where the hook ran
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) stop("The shop is closed"))
-    after(function(context, scenario) stop("The till is broken"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes these lines in order:
-    """
-    Failures:
-    1) Scenario: Add an item # basket.feature:2
-    Hook `before()` failed
-    ! The shop is closed
-    - Given an empty basket
-    Hook `after()` failed
-    ! The till is broken
-    """
+  Scenario: A run without scenarios counts no scenarios and no steps
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new())
+      """
+    Then the output includes
+      """
+      Summary
+      0 scenarios
+      0 steps
+      """
+
+  Scenario: A hook's error is printed in the summary where the hook ran
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) stop("The shop is closed"))
+      after(function(context, scenario) stop("The till is broken"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSummaryReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes these lines in order:
+      """
+      Failures:
+      1) Scenario: Add an item # basket.feature:2
+      Hook `before()` failed
+      ! The shop is closed
+      - Given an empty basket
+      Hook `after()` failed
+      ! The till is broken
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-summary_reporter.feature}
-}
 }
 
 \examples{

@@ -16,164 +16,142 @@ undefined in several scenarios gets one snippet.
 }
 \section{Specification}{
 
-\subsection{Snippets reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Snippets reporter}{
 \code{CucumberSnippetsReporter} prints only the snippets of the step definitions that undefined steps
 need, like Cucumber's \code{snippets} formatter, to paste them into a setup file. A step undefined in
 several scenarios gets one snippet.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add cucumbers&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 5 cucumbers&#10;    <span class="fu">Then</span> the basket is full&#10;&#10;  <span class="kw">Scenario:</span> Empty the basket&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I empty the basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})}
+}
+}
+\subsection{Scenario: Only the snippets of undefined steps are printed}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes
+\preformatted{when("I add \{int\} cucumbers", function(int, context) \{
+# when("I add \{float\} cucumbers", function(float, context) \{
+pending()
+\})
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add cucumbers</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 5 cucumbers</span>
-<span class="st">        Then the basket is full</span>
-<span class="st"></span>
-<span class="st">      Scenario: Empty the basket</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I empty the basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add cucumbers
-        Given an empty basket
-        When I add 5 cucumbers
-        Then the basket is full
+then("the basket is full", function(context) \{
+pending()
+\})
 
-      Scenario: Empty the basket
-        Given an empty basket
-        When I empty the basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    """
-%</pre>
-}}
+when("I empty the basket", function(context) \{
+pending()
+\})}
+\item And the output doesn't include "Scenario"
+\item And the output doesn't include "an empty basket"
+}
+}
+\subsection{Scenario: A step undefined in several scenarios gets one snippet}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add cucumbers&#10;    <span class="fu">Given</span> a full basket&#10;&#10;  <span class="kw">Scenario:</span> Empty the basket&#10;    <span class="fu">Given</span> a full basket</code></pre >}
+\item When I run
+\preformatted{test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)}
+\item Then the output includes 'given("a full basket", function(context) \{' 1 time
+}
+}
+\subsection{Scenario: A run without undefined steps prints nothing}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Start shopping&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item When I run
+\preformatted{test("features", reporter = CucumberSnippetsReporter$new())}
+\item Then the output is empty
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Snippets reporter
+  `CucumberSnippetsReporter` prints only the snippets of the step definitions that undefined steps
+  need, like Cucumber's `snippets` formatter, to paste them into a setup file. A step undefined in
+  several scenarios gets one snippet.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Only the snippets of undefined steps are printed
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    when("I add \{int\} cucumbers", function(int, context) \{</span>
-<span class="st">    # when("I add \{float\} cucumbers", function(float, context) \{</span>
-<span class="st">    pending()</span>
-<span class="st">    \})</span>
-<span class="st"></span>
-<span class="st">    then("the basket is full", function(context) \{</span>
-<span class="st">    pending()</span>
-<span class="st">    \})</span>
-<span class="st"></span>
-<span class="st">    when("I empty the basket", function(context) \{</span>
-<span class="st">    pending()</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"Scenario"</span>
-  <span class="fu">And</span> the output doesn't include <span class="st">"an empty basket"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Only the snippets of undefined steps are printed
-  When I run
-    """
-    test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes
-    """
-    when("I add \{int\} cucumbers", function(int, context) \{
-    # when("I add \{float\} cucumbers", function(float, context) \{
-    pending()
-    \})
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add cucumbers
+          Given an empty basket
+          When I add 5 cucumbers
+          Then the basket is full
 
-    then("the basket is full", function(context) \{
-    pending()
-    \})
+        Scenario: Empty the basket
+          Given an empty basket
+          When I empty the basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      """
 
-    when("I empty the basket", function(context) \{
-    pending()
-    \})
-    """
-  And the output doesn't include "Scenario"
-  And the output doesn't include "an empty basket"
-%</pre>
-}}
+  Scenario: Only the snippets of undefined steps are printed
+    When I run
+      """
+      test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes
+      """
+      when("I add \{int\} cucumbers", function(int, context) \{
+      # when("I add \{float\} cucumbers", function(float, context) \{
+      pending()
+      \})
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step undefined in several scenarios gets one snippet
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add cucumbers</span>
-<span class="st">        Given a full basket</span>
-<span class="st"></span>
-<span class="st">      Scenario: Empty the basket</span>
-<span class="st">        Given a full basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes 'given(<span class="st">"a full basket"</span>, function(context) \{' 1 time</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step undefined in several scenarios gets one snippet
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add cucumbers
-        Given a full basket
+      then("the basket is full", function(context) \{
+      pending()
+      \})
 
-      Scenario: Empty the basket
-        Given a full basket
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)
-    """
-  Then the output includes 'given("a full basket", function(context) \{' 1 time
-%</pre>
-}}
+      when("I empty the basket", function(context) \{
+      pending()
+      \})
+      """
+    And the output doesn't include "Scenario"
+    And the output doesn't include "an empty basket"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A run without undefined steps prints nothing
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Start shopping</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberSnippetsReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output is empty</code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A run without undefined steps prints nothing
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Start shopping
-        Given an empty basket
-    """
-  When I run
-    """
-    test("features", reporter = CucumberSnippetsReporter$new())
-    """
-  Then the output is empty
+  Scenario: A step undefined in several scenarios gets one snippet
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add cucumbers
+          Given a full basket
+
+        Scenario: Empty the basket
+          Given a full basket
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSnippetsReporter$new(), stop_on_failure = FALSE)
+      """
+    Then the output includes 'given("a full basket", function(context) \{' 1 time
+
+  Scenario: A run without undefined steps prints nothing
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Start shopping
+          Given an empty basket
+      """
+    When I run
+      """
+      test("features", reporter = CucumberSnippetsReporter$new())
+      """
+    Then the output is empty
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-snippets_reporter.feature}
-}
 }
 
 \examples{

@@ -20,307 +20,263 @@ I remove \{int\} apples          UNUSED    setup-steps.R:6
 }
 \section{Specification}{
 
-\subsection{Usage reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Usage reporter}{
 \code{CucumberUsageReporter} prints how each step definition was used when the run ends, like Cucumber's
 \code{usage} formatter. Each step definition is listed with the mean duration of its steps and where it's
 defined, followed by the steps it matched, the slowest first, with where they are. A step definition
 that no step matched is \code{UNUSED}. It finds slow steps, and step definitions to remove.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add apples&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 2 apples&#10;    <span class="fu">And</span> I add 1 apples&#10;&#10;  <span class="kw">Scenario:</span> Wait&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I wait</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("I add \{int\} apples", function(n, context) \{\})
+when("I wait", function(context) Sys.sleep(0.1))
+when("I remove \{int\} apples", function(n, context) \{\})}
+}
+}
+\subsection{Scenario: Each step definition is listed with the steps it matched}{
+A dry run doesn't run the steps, so they have no duration.
+\itemize{
+\item When I run
+\preformatted{test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())}
+\item Then the output includes
+\preformatted{Step definition / Step  Duration  Location
+an empty basket         -         setup-steps.R:1
+  an empty basket       -         basket.feature:3
+  an empty basket       -         basket.feature:8
+I add \{int\} apples      -         setup-steps.R:2
+  I add 2 apples        -         basket.feature:4
+  I add 1 apples        -         basket.feature:5
+I wait                  -         setup-steps.R:3
+  I wait                -         basket.feature:9
+I remove \{int\} apples   UNUSED    setup-steps.R:4}
+}
+}
+\subsection{Scenario: A regular expression is shown between slashes}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{\})
+when("^I add (\\\\d+) apples$", function(n, context) \{\})
+when("I wait", function(context) \{\})}
+\item When I run
+\preformatted{test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())}
+\item Then the output includes
+\preformatted{Step definition / Step  Duration  Location
+an empty basket         -         setup-steps.R:1
+  an empty basket       -         basket.feature:3
+  an empty basket       -         basket.feature:8
+/^I add (\\d+) apples$/  -         setup-steps.R:2
+  I add 2 apples        -         basket.feature:4
+  I add 1 apples        -         basket.feature:5
+I wait                  -         setup-steps.R:3
+  I wait                -         basket.feature:9}
+}
+}
+\subsection{Scenario: A run without step definitions has no usage to show}{
+\itemize{
+\item Given a file named "features/setup-steps.R" with
+\preformatted{}
+\item When I run
+\preformatted{test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())}
+\item Then the output includes "No step definitions"
+}
+}
+\subsection{Scenario: The slowest step definitions come first, and the unused ones last}{
+\itemize{
+\item When I run
+\preformatted{test("features", reporter = CucumberUsageReporter$new())}
+\item Then the output includes lines matching these patterns in order:
+\preformatted{^I wait +[0-9.]+ms +setup-steps.R:3$
+^I wait +[0-9.]+ms +basket.feature:9$
+^I remove \\\{int\\\} apples +UNUSED +setup-steps.R:4$}
+}
+}
+\subsection{Scenario: Only the five slowest steps of a step definition are listed}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add apples&#10;    <span class="fu">When</span> I add 1 apples&#10;    <span class="fu">And</span> I add 2 apples&#10;    <span class="fu">And</span> I add 3 apples&#10;    <span class="fu">And</span> I add 4 apples&#10;    <span class="fu">And</span> I add 5 apples&#10;    <span class="fu">And</span> I add 6 apples&#10;    <span class="fu">And</span> I add 7 apples</code></pre >}
+\item When I run
+\preformatted{test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())}
+\item Then the output includes
+\preformatted{I add \{int\} apples      -         setup-steps.R:2
+  I add 1 apples        -         basket.feature:3
+  I add 2 apples        -         basket.feature:4
+  I add 3 apples        -         basket.feature:5
+  I add 4 apples        -         basket.feature:6
+  I add 5 apples        -         basket.feature:7
+  ... 2 more}
+}
+}
+\subsection{Scenario: An ambiguous step isn't a use of its step definitions}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add apples&#10;    <span class="fu">When</span> I add 2 apples</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{when("I add \{int\} apples", function(n, context) \{\})
+when("I add \{float\} apples", function(n, context) \{\})}
+\item When I run
+\preformatted{test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())}
+\item Then the output includes
+\preformatted{I add \{int\} apples      UNUSED    setup-steps.R:1
+I add \{float\} apples    UNUSED    setup-steps.R:2}
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Usage reporter
+  `CucumberUsageReporter` prints how each step definition was used when the run ends, like Cucumber's
+  `usage` formatter. Each step definition is listed with the mean duration of its steps and where it's
+  defined, followed by the steps it matched, the slowest first, with where they are. A step definition
+  that no step matched is `UNUSED`. It finds slow steps, and step definitions to remove.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package
-  <span class="fu">And</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add apples</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 2 apples</span>
-<span class="st">        And I add 1 apples</span>
-<span class="st"></span>
-<span class="st">      Scenario: Wait</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I wait</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("I add \{int\} apples", function(n, context) \{\})</span>
-<span class="st">    when("I wait", function(context) Sys.sleep(0.1))</span>
-<span class="st">    when("I remove \{int\} apples", function(n, context) \{\})</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-  And a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add apples
-        Given an empty basket
-        When I add 2 apples
-        And I add 1 apples
+  Background:
+    Given a package
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add apples
+          Given an empty basket
+          When I add 2 apples
+          And I add 1 apples
 
-      Scenario: Wait
-        Given an empty basket
-        When I wait
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("I add \{int\} apples", function(n, context) \{\})
-    when("I wait", function(context) Sys.sleep(0.1))
-    when("I remove \{int\} apples", function(n, context) \{\})
-    """
-%</pre>
-}}
+        Scenario: Wait
+          Given an empty basket
+          When I wait
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("I add \{int\} apples", function(n, context) \{\})
+      when("I wait", function(context) Sys.sleep(0.1))
+      when("I remove \{int\} apples", function(n, context) \{\})
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step definition is listed with the steps it matched
-  A dry run doesn't run the steps, so they have no duration.
-<span></span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Step definition / Step  Duration  Location</span>
-<span class="st">    an empty basket         -         setup-steps.R:1</span>
-<span class="st">      an empty basket       -         basket.feature:3</span>
-<span class="st">      an empty basket       -         basket.feature:8</span>
-<span class="st">    I add \{int\} apples      -         setup-steps.R:2</span>
-<span class="st">      I add 2 apples        -         basket.feature:4</span>
-<span class="st">      I add 1 apples        -         basket.feature:5</span>
-<span class="st">    I wait                  -         setup-steps.R:3</span>
-<span class="st">      I wait                -         basket.feature:9</span>
-<span class="st">    I remove \{int\} apples   UNUSED    setup-steps.R:4</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each step definition is listed with the steps it matched
-  A dry run doesn't run the steps, so they have no duration.
+  Scenario: Each step definition is listed with the steps it matched
+    A dry run doesn't run the steps, so they have no duration.
 
-  When I run
-    """
-    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
-    """
-  Then the output includes
-    """
-    Step definition / Step  Duration  Location
-    an empty basket         -         setup-steps.R:1
-      an empty basket       -         basket.feature:3
-      an empty basket       -         basket.feature:8
-    I add \{int\} apples      -         setup-steps.R:2
-      I add 2 apples        -         basket.feature:4
-      I add 1 apples        -         basket.feature:5
-    I wait                  -         setup-steps.R:3
-      I wait                -         basket.feature:9
-    I remove \{int\} apples   UNUSED    setup-steps.R:4
-    """
-%</pre>
-}}
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes
+      """
+      Step definition / Step  Duration  Location
+      an empty basket         -         setup-steps.R:1
+        an empty basket       -         basket.feature:3
+        an empty basket       -         basket.feature:8
+      I add \{int\} apples      -         setup-steps.R:2
+        I add 2 apples        -         basket.feature:4
+        I add 1 apples        -         basket.feature:5
+      I wait                  -         setup-steps.R:3
+        I wait                -         basket.feature:9
+      I remove \{int\} apples   UNUSED    setup-steps.R:4
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A regular expression is shown between slashes
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    when("^I add (\\\\d+) apples$", function(n, context) \{\})</span>
-<span class="st">    when("I wait", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Step definition / Step  Duration  Location</span>
-<span class="st">    an empty basket         -         setup-steps.R:1</span>
-<span class="st">      an empty basket       -         basket.feature:3</span>
-<span class="st">      an empty basket       -         basket.feature:8</span>
-<span class="st">    /^I add (\\d+) apples$/  -         setup-steps.R:2</span>
-<span class="st">      I add 2 apples        -         basket.feature:4</span>
-<span class="st">      I add 1 apples        -         basket.feature:5</span>
-<span class="st">    I wait                  -         setup-steps.R:3</span>
-<span class="st">      I wait                -         basket.feature:9</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A regular expression is shown between slashes
-  Given a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{\})
-    when("^I add (\\\\d+) apples$", function(n, context) \{\})
-    when("I wait", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
-    """
-  Then the output includes
-    """
-    Step definition / Step  Duration  Location
-    an empty basket         -         setup-steps.R:1
-      an empty basket       -         basket.feature:3
-      an empty basket       -         basket.feature:8
-    /^I add (\\d+) apples$/  -         setup-steps.R:2
-      I add 2 apples        -         basket.feature:4
-      I add 1 apples        -         basket.feature:5
-    I wait                  -         setup-steps.R:3
-      I wait                -         basket.feature:9
-    """
-%</pre>
-}}
+  Scenario: A regular expression is shown between slashes
+    Given a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{\})
+      when("^I add (\\\\d+) apples$", function(n, context) \{\})
+      when("I wait", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes
+      """
+      Step definition / Step  Duration  Location
+      an empty basket         -         setup-steps.R:1
+        an empty basket       -         basket.feature:3
+        an empty basket       -         basket.feature:8
+      /^I add (\\d+) apples$/  -         setup-steps.R:2
+        I add 2 apples        -         basket.feature:4
+        I add 1 apples        -         basket.feature:5
+      I wait                  -         setup-steps.R:3
+        I wait                -         basket.feature:9
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A run without step definitions has no usage to show
-  <span class="fu">Given</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"No step definitions"</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A run without step definitions has no usage to show
-  Given a file named "features/setup-steps.R" with
-    """
-    """
-  When I run
-    """
-    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
-    """
-  Then the output includes "No step definitions"
-%</pre>
-}}
+  Scenario: A run without step definitions has no usage to show
+    Given a file named "features/setup-steps.R" with
+      """
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes "No step definitions"
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> The slowest step definitions come first, and the unused ones last
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberUsageReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes lines matching these patterns in order:
-<span class="st">    """</span>
-<span class="st">    ^I wait +[0-9.]+ms +setup-steps.R:3$</span>
-<span class="st">    ^I wait +[0-9.]+ms +basket.feature:9$</span>
-<span class="st">    ^I remove \\\{int\\\} apples +UNUSED +setup-steps.R:4$</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: The slowest step definitions come first, and the unused ones last
-  When I run
-    """
-    test("features", reporter = CucumberUsageReporter$new())
-    """
-  Then the output includes lines matching these patterns in order:
-    """
-    ^I wait +[0-9.]+ms +setup-steps.R:3$
-    ^I wait +[0-9.]+ms +basket.feature:9$
-    ^I remove \\\{int\\\} apples +UNUSED +setup-steps.R:4$
-    """
-%</pre>
-}}
+  Scenario: The slowest step definitions come first, and the unused ones last
+    When I run
+      """
+      test("features", reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes lines matching these patterns in order:
+      """
+      ^I wait +[0-9.]+ms +setup-steps.R:3$
+      ^I wait +[0-9.]+ms +basket.feature:9$
+      ^I remove \\\{int\\\} apples +UNUSED +setup-steps.R:4$
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Only the five slowest steps of a step definition are listed
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add apples</span>
-<span class="st">        When I add 1 apples</span>
-<span class="st">        And I add 2 apples</span>
-<span class="st">        And I add 3 apples</span>
-<span class="st">        And I add 4 apples</span>
-<span class="st">        And I add 5 apples</span>
-<span class="st">        And I add 6 apples</span>
-<span class="st">        And I add 7 apples</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    I add \{int\} apples      -         setup-steps.R:2</span>
-<span class="st">      I add 1 apples        -         basket.feature:3</span>
-<span class="st">      I add 2 apples        -         basket.feature:4</span>
-<span class="st">      I add 3 apples        -         basket.feature:5</span>
-<span class="st">      I add 4 apples        -         basket.feature:6</span>
-<span class="st">      I add 5 apples        -         basket.feature:7</span>
-<span class="st">      ... 2 more</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Only the five slowest steps of a step definition are listed
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add apples
-        When I add 1 apples
-        And I add 2 apples
-        And I add 3 apples
-        And I add 4 apples
-        And I add 5 apples
-        And I add 6 apples
-        And I add 7 apples
-    """
-  When I run
-    """
-    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
-    """
-  Then the output includes
-    """
-    I add \{int\} apples      -         setup-steps.R:2
-      I add 1 apples        -         basket.feature:3
-      I add 2 apples        -         basket.feature:4
-      I add 3 apples        -         basket.feature:5
-      I add 4 apples        -         basket.feature:6
-      I add 5 apples        -         basket.feature:7
-      ... 2 more
-    """
-%</pre>
-}}
+  Scenario: Only the five slowest steps of a step definition are listed
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add apples
+          When I add 1 apples
+          And I add 2 apples
+          And I add 3 apples
+          And I add 4 apples
+          And I add 5 apples
+          And I add 6 apples
+          And I add 7 apples
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes
+      """
+      I add \{int\} apples      -         setup-steps.R:2
+        I add 1 apples        -         basket.feature:3
+        I add 2 apples        -         basket.feature:4
+        I add 3 apples        -         basket.feature:5
+        I add 4 apples        -         basket.feature:6
+        I add 5 apples        -         basket.feature:7
+        ... 2 more
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> An ambiguous step isn't a use of its step definitions
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add apples</span>
-<span class="st">        When I add 2 apples</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    when("I add \{int\} apples", function(n, context) \{\})</span>
-<span class="st">    when("I add \{float\} apples", function(n, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    I add \{int\} apples      UNUSED    setup-steps.R:1</span>
-<span class="st">    I add \{float\} apples    UNUSED    setup-steps.R:2</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: An ambiguous step isn't a use of its step definitions
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add apples
-        When I add 2 apples
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    when("I add \{int\} apples", function(n, context) \{\})
-    when("I add \{float\} apples", function(n, context) \{\})
-    """
-  When I run
-    """
-    test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
-    """
-  Then the output includes
-    """
-    I add \{int\} apples      UNUSED    setup-steps.R:1
-    I add \{float\} apples    UNUSED    setup-steps.R:2
-    """
+  Scenario: An ambiguous step isn't a use of its step definitions
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add apples
+          When I add 2 apples
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      when("I add \{int\} apples", function(n, context) \{\})
+      when("I add \{float\} apples", function(n, context) \{\})
+      """
+    When I run
+      """
+      test("features", dry_run = TRUE, reporter = CucumberUsageReporter$new())
+      """
+    Then the output includes
+      """
+      I add \{int\} apples      UNUSED    setup-steps.R:1
+      I add \{float\} apples    UNUSED    setup-steps.R:2
+      """
 %</pre>
 }}
 
 Source: \code{tests/acceptance/r-usage_reporter.feature}
-}
 }
 
 \examples{

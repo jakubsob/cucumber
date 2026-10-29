@@ -655,7 +655,7 @@ See `vignette("reporting")` for how to write the HTML report of a run, attach a 
 #' @eval cucumber::features_rd(features = "basket.feature")
 ```
 
-It selects scenarios like `test()`, by `features` and their lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected; the `cucumber.rd_tags` option sets another tag expression, and `section` or the `cucumber.rd_section` option names the section. Scenarios of a Rule are shown under the Rule, and of a Scenario Outline only the selected Examples. On a pkgdown site, the scenarios are highlighted Gherkin code blocks.
+It selects scenarios like `test()`, by `features` and their lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected; the `cucumber.rd_tags` option sets another tag expression, and `section` or the `cucumber.rd_section` option names the section. In the help page, each feature is one block of Gherkin, as written, with only the Rules and Backgrounds of the selected scenarios, and of a Scenario Outline only the selected Examples. On a pkgdown site, it's shown like Markdown with Gherkin: headers for the feature and its Rules, Backgrounds, scenarios and Examples, a list of steps, tables, and Doc Strings as code, Gherkin ones highlighted. `markdown = FALSE` shows the block of Gherkin there too.
 
 # Snippets
 

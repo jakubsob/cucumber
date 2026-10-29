@@ -17,676 +17,531 @@ Prints each feature, scenario and step as it runs, then the summary of
 }
 \section{Specification}{
 
-\subsection{Pretty reporter}{
-
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Pretty reporter}{
 \code{CucumberPrettyReporter} prints each step as it runs, with its Doc String or Data Table
 and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
 with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+}
+}
+\subsection{Scenario: Each step is printed with the keyword it's written with, under its scenario and Rule}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Example:</span> Add items&#10;    <span class="fu">Given</span> an empty basket&#10;    <span class="fu">When</span> I add 1 item&#10;    <span class="fu">And</span> I add 1 item&#10;    <span class="fu">But</span> I don't pay&#10;    <span class="fu">Then</span> the basket has 2 items&#10;    <span class="fu">*</span> the basket is full&#10;&#10;  <span class="kw">Rule:</span> Removing items&#10;    <span class="kw">Scenario Outline:</span> Remove items&#10;      <span class="fu">Given</span> a basket with <span class="va">&lt;n&gt;</span> items&#10;      <span class="fu">When</span> I remove <span class="va">&lt;n&gt;</span> items&#10;      <span class="fu">Then</span> the basket has 0 items&#10;&#10;      <span class="kw">Examples:</span>&#10;        <span class="op">|</span> n <span class="op">|</span>&#10;        <span class="op">|</span> 1 <span class="op">|</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) context$n <- 0)
+given("a basket with \{int\} item(s)", function(n, context) context$n <- n)
+when("I add \{int\} item(s)", function(n, context) context$n <- context$n + n)
+when("I remove \{int\} item(s)", function(n, context) context$n <- context$n - n)
+when("I don't pay", function(context) \{\})
+then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$n, n))
+then("the basket is full", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;<span class="kw">Example:</span> Add items&#10;v Given an empty basket&#10;v When I add 1 item&#10;v And I add 1 item&#10;v But I don't pay&#10;v Then the basket has 2 items&#10;v * the basket is full&#10;<span class="kw">Rule:</span> Removing items&#10;<span class="kw">Scenario Outline:</span> Remove items&#10;v Given a basket with 1 items&#10;v When I remove 1 items&#10;v Then the basket has 0 items</code></pre >}
+\item And the output includes
+\preformatted{2 scenarios (2 passed)
+9 steps (9 passed)}
+}
+}
+\subsection{Scenario: A step's warnings are printed under it}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) warning("the basket is dusty"))}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes
+\preformatted{v Given an empty basket
+Warning:
+the basket is dusty}
+}
+}
+\subsection{Scenario: A step's error is printed under it, after its warnings}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("an empty basket", function(context) \{
+  warning("the basket is dusty")
+  stop("the basket is broken")
+\})}
+\item When I run it and it fails
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes
+\preformatted{x Given an empty basket
+Warning:
+the basket is dusty
+Error:
+Step "an empty basket" failed}
+}
+}
+\subsection{Scenario: A hook's error is printed where the hook runs}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) stop("The shop is closed"))
+given("an empty basket", function(context) \{\})}
+\item When I run it and it fails
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes these lines in order:
+\preformatted{Scenario: Add an item
+Error:
+Hook `before()` failed
+i Feature: basket.feature:2
+i Scenario: Add an item
+i Hook defined at: setup-steps.R:1
+Caused by error:
+! The shop is closed
+- Given an empty basket}
+}
+}
+\subsection{Scenario: A hook's warning is printed where the hook runs}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add an item&#10;    <span class="fu">Given</span> an empty basket</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) warning("The shop is busy"))
+given("an empty basket", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes these lines in order:
+\preformatted{Scenario: Add an item
+Warning:
+The shop is busy
+v Given an empty basket}
+}
+}
+\subsection{Scenario: Long Doc Strings and Data Tables are cut short}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">Given</span> a note&#10;<span class="st">      ```</span>&#10;<span class="st">      line 1</span>&#10;<span class="st">      line 2</span>&#10;<span class="st">      line 3</span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">And</span> these items&#10;      <span class="op">|</span> item     <span class="op">|</span>&#10;      <span class="op">|</span> cucumber <span class="op">|</span>&#10;      <span class="op">|</span> tomato   <span class="op">|</span>&#10;      <span class="op">|</span> pepper   <span class="op">|</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a note", function(doc_string, context) \{\})
+given("these items", function(data_table, context) \{\})}
+\item When I run
+\preformatted{test(
+  "features",
+  reporter = CucumberPrettyReporter$new(
+    reporter_max_docstring_lines = 1,
+    reporter_max_table_lines = 2
+  )
+)}
+\item Then the output includes
+\preformatted{v Given a note
+```
+line 1
+... and 2 more line(s)
+```
+v And these items
+| item     |
+| cucumber |
+| tomato   |
+... and 1 more line(s)}
+}
+}
+\subsection{Scenario: Data Table cells are printed escaped, as they are written}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">Given</span> these items&#10;      <span class="op">|</span> item     <span class="op">|</span> note <span class="op">|</span>&#10;      <span class="op">|</span> a\\|b     <span class="op">|</span> x\\\\y <span class="op">|</span>&#10;      <span class="op">|</span> cucumber <span class="op">|</span> 1\\n2 <span class="op">|</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("these items", function(data_table, context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes
+\preformatted{v Given these items
+| item     | note |
+| a\\|b     | x\\\\y |
+| cucumber | 1\\n2 |}
+}
+}
+\subsection{Scenario: A Doc String is printed as it's written, with its delimiter, media type and empty lines}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">Given</span> a receipt&#10;<span class="st">      ```json</span>&#10;<span class="st">      \{"items": 2\}</span>&#10;<span class="st"></span>&#10;<span class="st">      ```</span>&#10;    <span class="fu">And</span> a note&#10;<span class="st">      """</span>&#10;<span class="st">      Thanks</span>&#10;<span class="st">      """</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("a receipt", function(doc_string, context) \{\})
+given("a note", function(doc_string, context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes
+\preformatted{v Given a receipt
+```json
+\{"items": 2\}
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Background:</span>
-  <span class="fu">Given</span> a package</code></pre >}}
-\if{text,latex}{\preformatted{Background:
-  Given a package
-%</pre>
-}}
+```
+v And a note
+"""
+Thanks
+"""}
+}
+}
+\subsection{Scenario: A Data Table and a Doc String are printed in the order they're written}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;  <span class="kw">Scenario:</span> Add items&#10;    <span class="fu">Given</span> these items and a note&#10;      <span class="op">|</span> item     <span class="op">|</span>&#10;      <span class="op">|</span> cucumber <span class="op">|</span>&#10;<span class="st">      """</span>&#10;<span class="st">      Fresh</span>&#10;<span class="st">      """</span></code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("these items and a note", function(data_table, doc_string, context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes
+\preformatted{v Given these items and a note
+| item     |
+| cucumber |
+"""
+Fresh
+"""}
+}
+}
+\subsection{Scenario: A keyword is printed as it's written, without a space it doesn't have}{
+\itemize{
+\item Given a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code># language: zh-CN&#10;<span class="kw">功能:</span> 购物篮&#10;  <span class="kw">场景:</span> 添加商品&#10;    <span class="fu">假如</span>购物篮是空的</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("购物篮是空的", function(context) \{\})}
+\item When I run
+\preformatted{test("features", reporter = CucumberPrettyReporter$new())}
+\item Then the output includes "v 假如购物篮是空的"
+}
+}
+}
+}                                                                  
+\if{text,latex}{\preformatted{Feature: Pretty reporter
+  `CucumberPrettyReporter` prints each step as it runs, with its Doc String or Data Table
+  and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
+  with `reporter_max_docstring_lines` and `reporter_max_table_lines`.
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Each step is printed with the keyword it's written with, under its scenario and Rule
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Example: Add items</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">        When I add 1 item</span>
-<span class="st">        And I add 1 item</span>
-<span class="st">        But I don't pay</span>
-<span class="st">        Then the basket has 2 items</span>
-<span class="st">        * the basket is full</span>
-<span class="st"></span>
-<span class="st">      Rule: Removing items</span>
-<span class="st">        Scenario Outline: Remove items</span>
-<span class="st">          Given a basket with &lt;n&gt; items</span>
-<span class="st">          When I remove &lt;n&gt; items</span>
-<span class="st">          Then the basket has 0 items</span>
-<span class="st"></span>
-<span class="st">          Examples:</span>
-<span class="st">            | n |</span>
-<span class="st">            | 1 |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) context$n &lt;- 0)</span>
-<span class="st">    given("a basket with \{int\} item(s)", function(n, context) context$n &lt;- n)</span>
-<span class="st">    when("I add \{int\} item(s)", function(n, context) context$n &lt;- context$n + n)</span>
-<span class="st">    when("I remove \{int\} item(s)", function(n, context) context$n &lt;- context$n - n)</span>
-<span class="st">    when("I don't pay", function(context) \{\})</span>
-<span class="st">    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$n, n))</span>
-<span class="st">    then("the basket is full", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">    Example: Add items</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    v When I add 1 item</span>
-<span class="st">    v And I add 1 item</span>
-<span class="st">    v But I don't pay</span>
-<span class="st">    v Then the basket has 2 items</span>
-<span class="st">    v * the basket is full</span>
-<span class="st">    Rule: Removing items</span>
-<span class="st">    Scenario Outline: Remove items</span>
-<span class="st">    v Given a basket with 1 items</span>
-<span class="st">    v When I remove 1 items</span>
-<span class="st">    v Then the basket has 0 items</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> the output includes
-<span class="st">    """</span>
-<span class="st">    2 scenarios (2 passed)</span>
-<span class="st">    9 steps (9 passed)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Each step is printed with the keyword it's written with, under its scenario and Rule
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
+  Background:
+    Given a package
+
+  Scenario: Each step is printed with the keyword it's written with, under its scenario and Rule
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Example: Add items
+          Given an empty basket
+          When I add 1 item
+          And I add 1 item
+          But I don't pay
+          Then the basket has 2 items
+          * the basket is full
+
+        Rule: Removing items
+          Scenario Outline: Remove items
+            Given a basket with <n> items
+            When I remove <n> items
+            Then the basket has 0 items
+
+            Examples:
+              | n |
+              | 1 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) context$n <- 0)
+      given("a basket with \{int\} item(s)", function(n, context) context$n <- n)
+      when("I add \{int\} item(s)", function(n, context) context$n <- context$n + n)
+      when("I remove \{int\} item(s)", function(n, context) context$n <- context$n - n)
+      when("I don't pay", function(context) \{\})
+      then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$n, n))
+      then("the basket is full", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      Feature: Basket
       Example: Add items
-        Given an empty basket
-        When I add 1 item
-        And I add 1 item
-        But I don't pay
-        Then the basket has 2 items
-        * the basket is full
-
+      v Given an empty basket
+      v When I add 1 item
+      v And I add 1 item
+      v But I don't pay
+      v Then the basket has 2 items
+      v * the basket is full
       Rule: Removing items
-        Scenario Outline: Remove items
-          Given a basket with <n> items
-          When I remove <n> items
-          Then the basket has 0 items
+      Scenario Outline: Remove items
+      v Given a basket with 1 items
+      v When I remove 1 items
+      v Then the basket has 0 items
+      """
+    And the output includes
+      """
+      2 scenarios (2 passed)
+      9 steps (9 passed)
+      """
 
-          Examples:
-            | n |
-            | 1 |
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) context$n <- 0)
-    given("a basket with \{int\} item(s)", function(n, context) context$n <- n)
-    when("I add \{int\} item(s)", function(n, context) context$n <- context$n + n)
-    when("I remove \{int\} item(s)", function(n, context) context$n <- context$n - n)
-    when("I don't pay", function(context) \{\})
-    then("the basket has \{int\} item(s)", function(n, context) expect_equal(context$n, n))
-    then("the basket is full", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    Feature: Basket
-    Example: Add items
-    v Given an empty basket
-    v When I add 1 item
-    v And I add 1 item
-    v But I don't pay
-    v Then the basket has 2 items
-    v * the basket is full
-    Rule: Removing items
-    Scenario Outline: Remove items
-    v Given a basket with 1 items
-    v When I remove 1 items
-    v Then the basket has 0 items
-    """
-  And the output includes
-    """
-    2 scenarios (2 passed)
-    9 steps (9 passed)
-    """
-%</pre>
-}}
+  Scenario: A step's warnings are printed under it
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) warning("the basket is dusty"))
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given an empty basket
+      Warning:
+      the basket is dusty
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step's warnings are printed under it
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) warning("the basket is dusty"))</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    Warning:</span>
-<span class="st">    the basket is dusty</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step's warnings are printed under it
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
+  Scenario: A step's error is printed under it, after its warnings
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("an empty basket", function(context) \{
+        warning("the basket is dusty")
+        stop("the basket is broken")
+      \})
+      """
+    When I run it and it fails
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      x Given an empty basket
+      Warning:
+      the basket is dusty
+      Error:
+      Step "an empty basket" failed
+      """
+
+  Scenario: A hook's error is printed where the hook runs
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) stop("The shop is closed"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run it and it fails
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes these lines in order:
+      """
       Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) warning("the basket is dusty"))
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    v Given an empty basket
-    Warning:
-    the basket is dusty
-    """
-%</pre>
-}}
+      Error:
+      Hook `before()` failed
+      i Feature: basket.feature:2
+      i Scenario: Add an item
+      i Hook defined at: setup-steps.R:1
+      Caused by error:
+      ! The shop is closed
+      - Given an empty basket
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A step's error is printed under it, after its warnings
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("an empty basket", function(context) \{</span>
-<span class="st">      warning("the basket is dusty")</span>
-<span class="st">      stop("the basket is broken")</span>
-<span class="st">    \})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    x Given an empty basket</span>
-<span class="st">    Warning:</span>
-<span class="st">    the basket is dusty</span>
-<span class="st">    Error:</span>
-<span class="st">    Step "an empty basket" failed</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A step's error is printed under it, after its warnings
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
+  Scenario: A hook's warning is printed where the hook runs
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) warning("The shop is busy"))
+      given("an empty basket", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes these lines in order:
+      """
       Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("an empty basket", function(context) \{
-      warning("the basket is dusty")
-      stop("the basket is broken")
-    \})
-    """
-  When I run it and it fails
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    x Given an empty basket
-    Warning:
-    the basket is dusty
-    Error:
-    Step "an empty basket" failed
-    """
-%</pre>
-}}
+      Warning:
+      The shop is busy
+      v Given an empty basket
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's error is printed where the hook runs
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) stop("The shop is closed"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run it and it fails
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    Scenario: Add an item</span>
-<span class="st">    Error:</span>
-<span class="st">    Hook `before()` failed</span>
-<span class="st">    i Feature: basket.feature:2</span>
-<span class="st">    i Scenario: Add an item</span>
-<span class="st">    i Hook defined at: setup-steps.R:1</span>
-<span class="st">    Caused by error:</span>
-<span class="st">    ! The shop is closed</span>
-<span class="st">    - Given an empty basket</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A hook's error is printed where the hook runs
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) stop("The shop is closed"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run it and it fails
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes these lines in order:
-    """
-    Scenario: Add an item
-    Error:
-    Hook `before()` failed
-    i Feature: basket.feature:2
-    i Scenario: Add an item
-    i Hook defined at: setup-steps.R:1
-    Caused by error:
-    ! The shop is closed
-    - Given an empty basket
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A hook's warning is printed where the hook runs
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add an item</span>
-<span class="st">        Given an empty basket</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    before(function(context, scenario) warning("The shop is busy"))</span>
-<span class="st">    given("an empty basket", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes these lines in order:
-<span class="st">    """</span>
-<span class="st">    Scenario: Add an item</span>
-<span class="st">    Warning:</span>
-<span class="st">    The shop is busy</span>
-<span class="st">    v Given an empty basket</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A hook's warning is printed where the hook runs
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add an item
-        Given an empty basket
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    before(function(context, scenario) warning("The shop is busy"))
-    given("an empty basket", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes these lines in order:
-    """
-    Scenario: Add an item
-    Warning:
-    The shop is busy
-    v Given an empty basket
-    """
-%</pre>
-}}
-
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Long Doc Strings and Data Tables are cut short
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        Given a note</span>
-<span class="st">          ```</span>
-<span class="st">          line 1</span>
-<span class="st">          line 2</span>
-<span class="st">          line 3</span>
-<span class="st">          ```</span>
-<span class="st">        And these items</span>
-<span class="st">          | item     |</span>
-<span class="st">          | cucumber |</span>
-<span class="st">          | tomato   |</span>
-<span class="st">          | pepper   |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a note", function(doc_string, context) \{\})</span>
-<span class="st">    given("these items", function(data_table, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test(</span>
-<span class="st">      "features",</span>
-<span class="st">      reporter = CucumberPrettyReporter$new(</span>
-<span class="st">        reporter_max_docstring_lines = 1,</span>
-<span class="st">        reporter_max_table_lines = 2</span>
-<span class="st">      )</span>
-<span class="st">    )</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    v Given a note</span>
-<span class="st">    ```</span>
-<span class="st">    line 1</span>
-<span class="st">    ... and 2 more line(s)</span>
-<span class="st">    ```</span>
-<span class="st">    v And these items</span>
-<span class="st">    | item     |</span>
-<span class="st">    | cucumber |</span>
-<span class="st">    | tomato   |</span>
-<span class="st">    ... and 1 more line(s)</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Long Doc Strings and Data Tables are cut short
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        Given a note
-          ```
-          line 1
-          line 2
-          line 3
-          ```
-        And these items
-          | item     |
-          | cucumber |
-          | tomato   |
-          | pepper   |
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a note", function(doc_string, context) \{\})
-    given("these items", function(data_table, context) \{\})
-    """
-  When I run
-    """
-    test(
-      "features",
-      reporter = CucumberPrettyReporter$new(
-        reporter_max_docstring_lines = 1,
-        reporter_max_table_lines = 2
+  Scenario: Long Doc Strings and Data Tables are cut short
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given a note
+            ```
+            line 1
+            line 2
+            line 3
+            ```
+          And these items
+            | item     |
+            | cucumber |
+            | tomato   |
+            | pepper   |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a note", function(doc_string, context) \{\})
+      given("these items", function(data_table, context) \{\})
+      """
+    When I run
+      """
+      test(
+        "features",
+        reporter = CucumberPrettyReporter$new(
+          reporter_max_docstring_lines = 1,
+          reporter_max_table_lines = 2
+        )
       )
-    )
-    """
-  Then the output includes
-    """
-    v Given a note
-    ```
-    line 1
-    ... and 2 more line(s)
-    ```
-    v And these items
-    | item     |
-    | cucumber |
-    | tomato   |
-    ... and 1 more line(s)
-    """
-%</pre>
-}}
+      """
+    Then the output includes
+      """
+      v Given a note
+      ```
+      line 1
+      ... and 2 more line(s)
+      ```
+      v And these items
+      | item     |
+      | cucumber |
+      | tomato   |
+      ... and 1 more line(s)
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> Data Table cells are printed escaped, as they are written
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        Given these items</span>
-<span class="st">          | item     | note |</span>
-<span class="st">          | a\\|b     | x\\\\y |</span>
-<span class="st">          | cucumber | 1\\n2 |</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("these items", function(data_table, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    v Given these items</span>
-<span class="st">    | item     | note |</span>
-<span class="st">    | a\\|b     | x\\\\y |</span>
-<span class="st">    | cucumber | 1\\n2 |</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: Data Table cells are printed escaped, as they are written
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        Given these items
-          | item     | note |
-          | a\\|b     | x\\\\y |
-          | cucumber | 1\\n2 |
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("these items", function(data_table, context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    v Given these items
-    | item     | note |
-    | a\\|b     | x\\\\y |
-    | cucumber | 1\\n2 |
-    """
-%</pre>
-}}
+  Scenario: Data Table cells are printed escaped, as they are written
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given these items
+            | item     | note |
+            | a\\|b     | x\\\\y |
+            | cucumber | 1\\n2 |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("these items", function(data_table, context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given these items
+      | item     | note |
+      | a\\|b     | x\\\\y |
+      | cucumber | 1\\n2 |
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A Doc String is printed as it's written, with its delimiter, media type and empty lines
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        Given a receipt</span>
-<span class="st">          ```json</span>
-<span class="st">          \{"items": 2\}</span>
-<span class="st"></span>
-<span class="st">          ```</span>
-<span class="st">        And a note</span>
-<span class="st">          \\"\\"\\"</span>
-<span class="st">          Thanks</span>
-<span class="st">          \\"\\"\\"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("a receipt", function(doc_string, context) \{\})</span>
-<span class="st">    given("a note", function(doc_string, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    v Given a receipt</span>
-<span class="st">    ```json</span>
-<span class="st">    \{"items": 2\}</span>
-<span class="st"></span>
-<span class="st">    ```</span>
-<span class="st">    v And a note</span>
-<span class="st">    \\"\\"\\"</span>
-<span class="st">    Thanks</span>
-<span class="st">    \\"\\"\\"</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A Doc String is printed as it's written, with its delimiter, media type and empty lines
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        Given a receipt
-          ```json
-          \{"items": 2\}
+  Scenario: A Doc String is printed as it's written, with its delimiter, media type and empty lines
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given a receipt
+            ```json
+            \{"items": 2\}
 
-          ```
-        And a note
-          \\"\\"\\"
-          Thanks
-          \\"\\"\\"
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("a receipt", function(doc_string, context) \{\})
-    given("a note", function(doc_string, context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    v Given a receipt
-    ```json
-    \{"items": 2\}
+            ```
+          And a note
+            \\"\\"\\"
+            Thanks
+            \\"\\"\\"
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("a receipt", function(doc_string, context) \{\})
+      given("a note", function(doc_string, context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given a receipt
+      ```json
+      \{"items": 2\}
 
-    ```
-    v And a note
-    \\"\\"\\"
-    Thanks
-    \\"\\"\\"
-    """
-%</pre>
-}}
+      ```
+      v And a note
+      \\"\\"\\"
+      Thanks
+      \\"\\"\\"
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A Data Table and a Doc String are printed in the order they're written
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    Feature: Basket</span>
-<span class="st">      Scenario: Add items</span>
-<span class="st">        Given these items and a note</span>
-<span class="st">          | item     |</span>
-<span class="st">          | cucumber |</span>
-<span class="st">          \\"\\"\\"</span>
-<span class="st">          Fresh</span>
-<span class="st">          \\"\\"\\"</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("these items and a note", function(data_table, doc_string, context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes
-<span class="st">    """</span>
-<span class="st">    v Given these items and a note</span>
-<span class="st">    | item     |</span>
-<span class="st">    | cucumber |</span>
-<span class="st">    \\"\\"\\"</span>
-<span class="st">    Fresh</span>
-<span class="st">    \\"\\"\\"</span>
-<span class="st">    """</span></code></pre >}}
-\if{text,latex}{\preformatted{Scenario: A Data Table and a Doc String are printed in the order they're written
-  Given a file named "features/basket.feature" with
-    """
-    Feature: Basket
-      Scenario: Add items
-        Given these items and a note
-          | item     |
-          | cucumber |
-          \\"\\"\\"
-          Fresh
-          \\"\\"\\"
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("these items and a note", function(data_table, doc_string, context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes
-    """
-    v Given these items and a note
-    | item     |
-    | cucumber |
-    \\"\\"\\"
-    Fresh
-    \\"\\"\\"
-    """
-%</pre>
-}}
+  Scenario: A Data Table and a Doc String are printed in the order they're written
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add items
+          Given these items and a note
+            | item     |
+            | cucumber |
+            \\"\\"\\"
+            Fresh
+            \\"\\"\\"
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("these items and a note", function(data_table, doc_string, context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes
+      """
+      v Given these items and a note
+      | item     |
+      | cucumber |
+      \\"\\"\\"
+      Fresh
+      \\"\\"\\"
+      """
 
-\if{html}{\out{
-<pre class="gherkin"><code><span class="kw">Scenario:</span> A keyword is printed as it's written, without a space it doesn't have
-  <span class="fu">Given</span> a file named <span class="st">"features/basket.feature"</span> with
-<span class="st">    """</span>
-<span class="st">    # language: zh-CN</span>
-<span class="st">    功能: 购物篮</span>
-<span class="st">      场景: 添加商品</span>
-<span class="st">        假如购物篮是空的</span>
-<span class="st">    """</span>
-  <span class="fu">And</span> a file named <span class="st">"features/setup-steps.R"</span> with
-<span class="st">    """</span>
-<span class="st">    given("购物篮是空的", function(context) \{\})</span>
-<span class="st">    """</span>
-  <span class="fu">When</span> I run
-<span class="st">    """</span>
-<span class="st">    test("features", reporter = CucumberPrettyReporter$new())</span>
-<span class="st">    """</span>
-  <span class="fu">Then</span> the output includes <span class="st">"v 假如购物篮是空的"</span></code></pre >}}                                                                  
-\if{text,latex}{\preformatted{Scenario: A keyword is printed as it's written, without a space it doesn't have
-  Given a file named "features/basket.feature" with
-    """
-    # language: zh-CN
-    功能: 购物篮
-      场景: 添加商品
-        假如购物篮是空的
-    """
-  And a file named "features/setup-steps.R" with
-    """
-    given("购物篮是空的", function(context) \{\})
-    """
-  When I run
-    """
-    test("features", reporter = CucumberPrettyReporter$new())
-    """
-  Then the output includes "v 假如购物篮是空的"
+  Scenario: A keyword is printed as it's written, without a space it doesn't have
+    Given a file named "features/basket.feature" with
+      """
+      # language: zh-CN
+      功能: 购物篮
+        场景: 添加商品
+          假如购物篮是空的
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("购物篮是空的", function(context) \{\})
+      """
+    When I run
+      """
+      test("features", reporter = CucumberPrettyReporter$new())
+      """
+    Then the output includes "v 假如购物篮是空的"
 %</pre>
 }}                                                                  
 
 Source: \code{tests/acceptance/r-pretty_reporter.feature}
-}
 }
 
 \examples{
