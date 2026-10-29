@@ -9,7 +9,7 @@
 #'
 #' - `cucumber.path`
 #'
-#'   Directory with `.feature` files that [test()] runs when called without `path`.
+#'   Directory with `.feature` files that [test()] runs and [features_rd()] reads when called without `path`.
 #'
 #'   default: `r format_option_default("cucumber.path")`
 #'

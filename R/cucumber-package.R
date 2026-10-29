@@ -1,6 +1,6 @@
 #' @keywords internal
 #' @section Getting started:
-#' Write scenarios in `.feature` files in `tests/acceptance`, see
+#' Write scenarios in `.feature` files in `r format_option_default("cucumber.path")`, see
 #' `vignette("reference-gherkin", package = "cucumber")`. Define their steps with [given()],
 #' [when()] and [then()], and hooks with [before()] and [after()], in `setup-*.R` files next
 #' to them. Run them with [test()], or with [run()] in a testthat test file.

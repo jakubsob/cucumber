@@ -4,10 +4,9 @@
 \alias{CucumberSummaryReporter}
 \title{Summary Reporter for Cucumber}
 \description{
-Prints only the summary of the run. The other cucumber reporters print it at
-the end of the run too:
-\link{CucumberProgressReporter}, \link{CucumberProgressBarReporter} and
-\link{CucumberPrettyReporter}.
+Prints only the summary of the run. \link{CucumberProgressReporter},
+\link{CucumberPrettyReporter} and \link{CucumberDotsReporter} print it at the end of
+the run too, and \link{CucumberProgressBarReporter} prints its counts.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Failures:
 

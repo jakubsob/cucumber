@@ -2,7 +2,7 @@ Feature: Running scenarios by tag
   Run only the scenarios whose tags match a tag expression, like `test(tags = "@smoke and not @slow")`.
   A tag expression combines tags with `and`, `or`, `not` and parentheses, like the official
   cucumber/tag-expressions. Tags are written with their `@`, and `and`, `or` and `not` are lowercase.
-  Scenarios inherit the tags of their Feature, and examples inherit the tags of their Examples.
+  Scenarios inherit the tags of their Feature and Rule, and examples inherit the tags of their Examples.
 
   Background:
     Given a package
@@ -184,7 +184,7 @@ Feature: Running scenarios by tag
         | Running on 1 |
         | Running on 2 |
 
-    Scenario: A tag expression combines the tags of different Examples
+    Scenario: An example has only the tags of its own Examples
       Given a file named "features/outline.feature" with
         """
         Feature: Platforms

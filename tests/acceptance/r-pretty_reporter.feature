@@ -1,7 +1,7 @@
 @rd
 Feature: Pretty reporter
-  `CucumberPrettyReporter` prints each step as it runs, with its Doc String or Data Table
-  and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
+  `CucumberPrettyReporter` prints each step as it runs, with its Doc String and Data Table,
+  its attachments and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
   with `reporter_max_docstring_lines` and `reporter_max_table_lines`.
 
   Background:

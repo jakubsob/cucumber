@@ -67,6 +67,9 @@ is chosen and shown, to run them in the same order again.}
 
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
+\value{
+The results of the run, like \code{\link[testthat:test_dir]{testthat::test_dir()}}, invisibly.
+}
 \description{
 It runs  tests from specifications in \code{.feature} files found in the \code{path}.
 
@@ -113,7 +116,7 @@ Those tests won't be run when calling \code{\link[=test]{test()}}. To run those 
 \if{html}{
 \subsection{Feature: Running tests with test()}{
 \code{test()} runs the feature files in \code{tests/acceptance}, or in the directory set in the \code{cucumber.path} option.
-Pass \code{path} to run another directory. A mistake in an argument is an error that names the argument.
+Pass \code{path} to run another directory. A mistake in an argument is an error that says what is wrong.
 \subsection{Background:}{
 \itemize{
 \item Given a package
@@ -163,7 +166,7 @@ Adding in features
 }
 \if{text,latex}{\preformatted{Feature: Running tests with test()
   `test()` runs the feature files in `tests/acceptance`, or in the directory set in the `cucumber.path` option.
-  Pass `path` to run another directory. A mistake in an argument is an error that names the argument.
+  Pass `path` to run another directory. A mistake in an argument is an error that says what is wrong.
 
   Background:
     Given a package
@@ -481,7 +484,7 @@ Source: \code{tests/acceptance/r-projects_that_arent_packages.feature}
 <pre hidden></pre >}}
 \if{html}{
 \subsection{Feature: Choosing feature files}{
-\code{test(path)} runs every \code{.feature} file in \code{path}, searched recursively.
+\code{test(path)} runs every \code{.feature} and \code{.feature.md} file in \code{path}, searched recursively.
 Run only some of them by listing them in \code{features}, or with a \code{filter} on their file names.
 \subsection{Background:}{
 \itemize{
@@ -529,7 +532,7 @@ Subtracting
 }
 }
 \subsection{Rule: \code{filter} runs the feature files whose name matches a regular expression}{
-The name is the file name without \code{.feature}. Extra arguments of \code{test()} are passed to \code{grepl()}.
+The name is the file name without its \code{.feature} or \code{.feature.md} extension. Extra arguments of \code{test()} are passed to \code{grepl()}.
 \subsection{Scenario: Only feature files whose name matches are run}{
 \itemize{
 \item When I run
@@ -546,7 +549,7 @@ Dividing
 }
 }
 \if{text,latex}{\preformatted{Feature: Choosing feature files
-  `test(path)` runs every `.feature` file in `path`, searched recursively.
+  `test(path)` runs every `.feature` and `.feature.md` file in `path`, searched recursively.
   Run only some of them by listing them in `features`, or with a `filter` on their file names.
 
   Background:
@@ -607,7 +610,7 @@ Dividing
 
   Rule: `filter` runs the feature files whose name matches a regular expression
 
-    The name is the file name without `.feature`. Extra arguments of `test()` are passed to `grepl()`.
+    The name is the file name without its `.feature` or `.feature.md` extension. Extra arguments of `test()` are passed to `grepl()`.
 
     Scenario: Only feature files whose name matches are run
       When I run
@@ -630,7 +633,7 @@ Source: \code{tests/acceptance/paths.feature}
 Run only the scenarios whose tags match a tag expression, like \code{test(tags = "@smoke and not @slow")}.
 A tag expression combines tags with \code{and}, \code{or}, \code{not} and parentheses, like the official
 cucumber/tag-expressions. Tags are written with their \code{@}, and \code{and}, \code{or} and \code{not} are lowercase.
-Scenarios inherit the tags of their Feature, and examples inherit the tags of their Examples.
+Scenarios inherit the tags of their Feature and Rule, and examples inherit the tags of their Examples.
 \subsection{Background:}{
 \itemize{
 \item Given a package
@@ -715,7 +718,7 @@ With parentheses
   Run only the scenarios whose tags match a tag expression, like `test(tags = "@smoke and not @slow")`.
   A tag expression combines tags with `and`, `or`, `not` and parentheses, like the official
   cucumber/tag-expressions. Tags are written with their `@`, and `and`, `or` and `not` are lowercase.
-  Scenarios inherit the tags of their Feature, and examples inherit the tags of their Examples.
+  Scenarios inherit the tags of their Feature and Rule, and examples inherit the tags of their Examples.
 
   Background:
     Given a package
@@ -1666,7 +1669,7 @@ Source: \code{tests/acceptance/retry.feature}
 <pre hidden></pre >}}
 \if{html}{
 \subsection{Feature: Order}{
-Scenarios run in the order they are defined: feature files in order of their path, and the scenarios
+Scenarios run in the order they are defined: feature files in order of their path, or in the order \code{features} lists them, and the scenarios
 of each file from top to bottom. With \code{order}, they run in reverse or in random order instead,
 which shows scenarios that pass only after another one left something behind.
 \subsection{Background:}{
@@ -1718,7 +1721,7 @@ A2 \tab passed
 }
 }
 \if{text,latex}{\preformatted{Feature: Order
-  Scenarios run in the order they are defined: feature files in order of their path, and the scenarios
+  Scenarios run in the order they are defined: feature files in order of their path, or in the order `features` lists them, and the scenarios
   of each file from top to bottom. With `order`, they run in reverse or in random order instead,
   which shows scenarios that pass only after another one left something behind.
 
@@ -2115,7 +2118,7 @@ Source: \code{tests/acceptance/markdown_with_gherkin.feature}
 <pre hidden></pre >}}
 \if{html}{
 \subsection{Feature: Gherkin parse failure}{
-A feature file that isn't valid Gherkin fails with every error and its line:column.
+A feature file that isn't valid Gherkin fails with its errors and their line:column, up to 11 errors per file.
 Every feature file is parsed before anything runs,
 so if any of them can't be parsed, no scenario runs.
 \subsection{Background:}{
@@ -2169,7 +2172,7 @@ x Parse error in "c.feature" (1:1): expected: #EOF, #Language, #TagLine, #Featur
 }
 }
 \if{text,latex}{\preformatted{Feature: Gherkin parse failure
-  A feature file that isn't valid Gherkin fails with every error and its line:column.
+  A feature file that isn't valid Gherkin fails with its errors and their line:column, up to 11 errors per file.
   Every feature file is parsed before anything runs,
   so if any of them can't be parsed, no scenario runs.
 
@@ -2255,7 +2258,7 @@ when a \code{test_that()} test in it fails. With the 3rd edition, steps run with
 output, like its tests, and their messages are shown, while the 2nd edition hides them. What the setup files and steps defer to \code{testthat::teardown_env()} runs
 when \code{test()} ends. Each feature file is the file of its scenarios' results, and a failure, a skip
 or a warning is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, \code{test()} sets
-\code{NOT_CRAN} to \code{"true"}, like \code{testthat::test_local()}, so snapshots are checked. In a testthat
+\code{NOT_CRAN} to \code{"true"} when it isn't set, like \code{testthat::test_local()}, so snapshots are checked. In a testthat
 run or in R CMD check, \code{NOT_CRAN} is left as it is, so \code{skip_on_cran()} still skips on CRAN.
 \code{skip()} in a \code{before_all()} hook skips every scenario, like \code{skip()} at the top of a test file skips its tests.
 \code{skip()} in a setup or helper file stops the run instead, like in \code{testthat::test_dir()}.
@@ -2409,7 +2412,7 @@ Paying for an apple \tab checkout/payment.feature:2
   output, like its tests, and their messages are shown, while the 2nd edition hides them. What the setup files and steps defer to `testthat::teardown_env()` runs
   when `test()` ends. Each feature file is the file of its scenarios' results, and a failure, a skip
   or a warning is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
-  `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
+  `NOT_CRAN` to `"true"` when it isn't set, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
   `skip()` in a `before_all()` hook skips every scenario, like `skip()` at the top of a test file skips its tests.
   `skip()` in a setup or helper file stops the run instead, like in `testthat::test_dir()`.

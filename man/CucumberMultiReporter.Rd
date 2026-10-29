@@ -15,7 +15,7 @@ the progress of a run and write its messages.
 \subsection{Feature: Reporters}{
 Every reporter gets the run as Cucumber Messages. \code{CucumberMultiReporter} sends them to
 several reporters, to show the progress of a run and write its reports at once.
-\code{report()} sends a reporter the messages stored in an ndjson file, like the one a
+A reporter's \code{$report()} method sends it the messages stored in an ndjson file, like the one a
 \code{CucumberMessagesReporter} writes, to report a run after it ran.
 A reporter that prints, like \code{CucumberSummaryReporter}, prints to a \code{file} instead of the console
 when it's given one, replaced by each run.
@@ -174,7 +174,7 @@ i testthat reporters can't report a cucumber run, use one of cucumber's, like `C
 \if{text,latex}{\preformatted{Feature: Reporters
   Every reporter gets the run as Cucumber Messages. `CucumberMultiReporter` sends them to
   several reporters, to show the progress of a run and write its reports at once.
-  `report()` sends a reporter the messages stored in an ndjson file, like the one a
+  A reporter's `$report()` method sends it the messages stored in an ndjson file, like the one a
   `CucumberMessagesReporter` writes, to report a run after it ran.
   A reporter that prints, like `CucumberSummaryReporter`, prints to a `file` instead of the console
   when it's given one, replaced by each run.

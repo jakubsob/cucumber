@@ -633,6 +633,7 @@ filter_features <- function(features, filter = NULL, ...) {
 #'   is chosen and shown, to run them in the same order again.
 #' @param env Environment in which to run the tests, e.g. with step definitions and
 #'   code sourced into it, for a project that isn't a package.
+#' @return The results of the run, like [testthat::test_dir()], invisibly.
 #'
 #' @examples
 #' \dontrun{

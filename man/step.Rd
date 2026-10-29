@@ -375,8 +375,8 @@ Source: \code{tests/acceptance/regular_expressions.feature}
 <pre hidden></pre >}}
 \if{html}{
 \subsection{Feature: Step definition arguments}{
-A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
-then \code{context}, in this order.
+A step definition is a function. It gets the step's parameters, then its Data Table and Doc String in the order
+they are written, then \code{context}, in this order.
 \subsection{Background:}{
 \itemize{
 \item Given a package
@@ -436,8 +436,8 @@ context not last \tab function(context, n) \{\} \tab Use \code{function(n, conte
 }
 }
 \if{text,latex}{\preformatted{Feature: Step definition arguments
-  A step definition is a function. It gets the step's parameters, then its Data Table or Doc String,
-  then `context`, in this order.
+  A step definition is a function. It gets the step's parameters, then its Data Table and Doc String in the order
+  they are written, then `context`, in this order.
 
   Background:
     Given a package

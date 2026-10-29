@@ -10,7 +10,7 @@ for CI services like Jenkins, GitHub Actions or GitLab. To also see the
 progress of the run, combine it with another reporter in a
 \link{CucumberMultiReporter}. To write the report of a run after it ran, store
 its messages with \link{CucumberMessagesReporter} and pass their file to
-\code{report()}.
+the \verb{$report()} method.
 }
 \section{Behavior}{
 
@@ -22,7 +22,8 @@ its messages with \link{CucumberMessagesReporter} and pass their file to
 fails. CI services read it to show the results of the run.
 
 Each scenario is a test case, each example of an outline being one. Its class name is the feature's
-name and its name is the scenario's, after the rule's, followed by the name and number of the example.
+name and its name is the scenario's, after the rule's, followed by the name and number of the example,
+and the example's own name when the outline's name has placeholders.
 A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
 undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
 A \code{before_all()} or \code{after_all()} hook that failed is a failed test case too, named after where it's defined.
@@ -134,7 +135,8 @@ Add an item \tab passed
   fails. CI services read it to show the results of the run.
 
   Each scenario is a test case, each example of an outline being one. Its class name is the feature's
-  name and its name is the scenario's, after the rule's, followed by the name and number of the example.
+  name and its name is the scenario's, after the rule's, followed by the name and number of the example,
+  and the example's own name when the outline's name has placeholders.
   A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
   undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
   A `before_all()` or `after_all()` hook that failed is a failed test case too, named after where it's defined.

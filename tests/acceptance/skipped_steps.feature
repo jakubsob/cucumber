@@ -2,7 +2,7 @@ Feature: Skipped steps
   Call `skip_scenario()` in a step or a `before()` hook to skip the rest of the scenario,
   for example when a service it needs is down. The scenario is reported as skipped with its reason,
   and after hooks still run and get `"skipped"` as its status.
-  In an `after()` hook, it skips only that hook, and the scenario is skipped unless it failed.
+  In an `after()` hook, it skips only that hook, and the scenario is skipped unless it already failed, or is pending, undefined or ambiguous.
   In a `before_all()` hook, it skips every scenario of the run. Calling it in a `before_step()`, `after_step()`
   or `after_all()` hook is an error of the hook. `testthat::skip()` does the same.
 

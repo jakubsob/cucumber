@@ -12,7 +12,7 @@ The following options are available:
 \itemize{
 \item \code{cucumber.path}
 
-Directory with \code{.feature} files that \code{\link[=test]{test()}} runs when called without \code{path}.
+Directory with \code{.feature} files that \code{\link[=test]{test()}} runs and \code{\link[=features_rd]{features_rd()}} reads when called without \code{path}.
 
 default: \code{"tests/acceptance"}
 \item \code{cucumber.language}

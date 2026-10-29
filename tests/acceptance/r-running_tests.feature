@@ -1,6 +1,6 @@
 Feature: Running tests with test()
   `test()` runs the feature files in `tests/acceptance`, or in the directory set in the `cucumber.path` option.
-  Pass `path` to run another directory. A mistake in an argument is an error that names the argument.
+  Pass `path` to run another directory. A mistake in an argument is an error that says what is wrong.
 
   Background:
     Given a package
@@ -75,7 +75,7 @@ Feature: Running tests with test()
       i Add `.feature` files describing your scenarios.
       """
 
-  Rule: A mistake in an argument is an error that names the argument
+  Rule: A mistake in an argument is an error that says what is wrong
 
     Scenario: A directory that doesn't exist is an error
       When I run it and it fails

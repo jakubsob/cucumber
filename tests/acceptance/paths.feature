@@ -1,5 +1,5 @@
 Feature: Choosing feature files
-  `test(path)` runs every `.feature` file in `path`, searched recursively.
+  `test(path)` runs every `.feature` and `.feature.md` file in `path`, searched recursively.
   Run only some of them by listing them in `features`, or with a `filter` on their file names.
 
   Background:
@@ -117,7 +117,7 @@ Feature: Choosing feature files
 
   Rule: `filter` runs the feature files whose name matches a regular expression
 
-    The name is the file name without `.feature`. Extra arguments of `test()` are passed to `grepl()`.
+    The name is the file name without its `.feature` or `.feature.md` extension. Extra arguments of `test()` are passed to `grepl()`.
 
     @rd
     Scenario: Only feature files whose name matches are run

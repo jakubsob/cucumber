@@ -23,7 +23,7 @@ An envelope is a list with one element, named by the message's type. The
 messages of a scenario are, in order:
 \itemize{
 \item \code{testCaseStarted}, with the \code{id} its other messages refer to and the
-\code{testCaseId} of its \code{testCase}, sent before the run starts, whose
+\code{testCaseId} of its \code{testCase}, sent before any scenario runs, whose
 \code{pickleId} is the id of its \code{pickle}: the scenario's name, tags and steps.
 \item \code{testStepStarted} and \code{testStepFinished} of each hook and step, with the
 \code{testStepResult}: its \code{status}, like \code{"PASSED"}, \code{duration} and the

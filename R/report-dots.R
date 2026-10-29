@@ -16,6 +16,14 @@ DOTS_CHARACTERS <- c(
 #' ```
 #' ......F--
 #'
+#' Failures:
+#'
+#' 1) Scenario: Remove an item # basket.feature:6
+#'     ✔ Given a basket with 2 apples
+#'     ✖ When I remove 3 apples
+#'     Error:
+#'       Can't remove more apples than there are.
+#'
 #' ────────────────────────────────────────────────────────────────────────
 #' Summary
 #'   3 scenarios (1 failed, 2 passed)

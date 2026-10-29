@@ -8,7 +8,8 @@
 #'   Scenario: Remove an item
 #'     ✔ Given a basket with 2 apples
 #'     ✖ When I remove 3 apples
-#'       Error: Can't remove more apples than there are.
+#'       Error:
+#'         Can't remove more apples than there are.
 #' 12/40 steps [==============                                         ]
 #' ```
 #'

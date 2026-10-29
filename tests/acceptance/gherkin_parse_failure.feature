@@ -1,5 +1,5 @@
 Feature: Gherkin parse failure
-  A feature file that isn't valid Gherkin fails with every error and its line:column.
+  A feature file that isn't valid Gherkin fails with its errors and their line:column, up to 11 errors per file.
   Every feature file is parsed before anything runs,
   so if any of them can't be parsed, no scenario runs.
 

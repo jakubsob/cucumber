@@ -1,5 +1,5 @@
 Feature: Order
-  Scenarios run in the order they are defined: feature files in order of their path, and the scenarios
+  Scenarios run in the order they are defined: feature files in order of their path, or in the order `features` lists them, and the scenarios
   of each file from top to bottom. With `order`, they run in reverse or in random order instead,
   which shows scenarios that pass only after another one left something behind.
 

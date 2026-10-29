@@ -8,7 +8,7 @@ Writes the run as the official Cucumber HTML report
 (\url{https://github.com/cucumber/html-formatter}). To also see the progress of
 the run, combine it with another reporter in a \link{CucumberMultiReporter}. To
 write the report of a run after it ran, store its messages with
-\link{CucumberMessagesReporter} and pass their file to \code{report()}.
+\link{CucumberMessagesReporter} and pass their file to the \verb{$report()} method.
 }
 \section{Behavior}{
 

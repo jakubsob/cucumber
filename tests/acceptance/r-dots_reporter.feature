@@ -61,7 +61,7 @@ Feature: Dots reporter
     And the output includes "The basket is empty"
     And the output doesn't include "Scenario: Add an item"
 
-  Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too
+  Scenario: Pending, undefined and ambiguous steps are printed as characters too
     Given a file named "features/basket.feature" with
       """
       Feature: Statuses

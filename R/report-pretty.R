@@ -7,10 +7,10 @@
 #' ```
 #' Feature: Addition
 #'   Scenario: Add two numbers
-#'     [x] Given I have entered 50 into the calculator
-#'     [x] Given I have entered 70 into the calculator
-#'     [x] When I press add
-#'     [x] Then the result should be 120 on the screen
+#'     ✔ Given I have entered 50 into the calculator
+#'     ✔ Given I have entered 70 into the calculator
+#'     ✔ When I press add
+#'     ✔ Then the result should be 120 on the screen
 #' ```
 #'
 #' @seealso [CucumberReporter]

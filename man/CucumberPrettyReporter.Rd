@@ -9,10 +9,10 @@ Prints each feature, scenario and step as it runs, then the summary of
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{Feature: Addition
   Scenario: Add two numbers
-    [x] Given I have entered 50 into the calculator
-    [x] Given I have entered 70 into the calculator
-    [x] When I press add
-    [x] Then the result should be 120 on the screen
+    ✔ Given I have entered 50 into the calculator
+    ✔ Given I have entered 70 into the calculator
+    ✔ When I press add
+    ✔ Then the result should be 120 on the screen
 }\if{html}{\out{</div>}}
 }
 \section{Behavior}{
@@ -21,8 +21,8 @@ Prints each feature, scenario and step as it runs, then the summary of
 <pre hidden></pre >}}
 \if{html}{
 \subsection{Feature: Pretty reporter}{
-\code{CucumberPrettyReporter} prints each step as it runs, with its Doc String or Data Table
-and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
+\code{CucumberPrettyReporter} prints each step as it runs, with its Doc String and Data Table,
+its attachments and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
 with \code{reporter_max_docstring_lines} and \code{reporter_max_table_lines}.
 \subsection{Background:}{
 \itemize{
@@ -215,8 +215,8 @@ Fresh
 }
 }                                                                  
 \if{text,latex}{\preformatted{Feature: Pretty reporter
-  `CucumberPrettyReporter` prints each step as it runs, with its Doc String or Data Table
-  and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
+  `CucumberPrettyReporter` prints each step as it runs, with its Doc String and Data Table,
+  its attachments and the warnings it raised, and the error and warnings of a hook where the hook runs. Long Doc Strings and Data Tables can be cut short
   with `reporter_max_docstring_lines` and `reporter_max_table_lines`.
 
   Background:

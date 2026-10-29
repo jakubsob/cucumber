@@ -4,6 +4,7 @@ vignette: >
   %\VignetteIndexEntry{cucumber and testthat}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+engine: knitr
 format:
   html:
     syntax-definitions: [gherkin.xml]
@@ -18,7 +19,7 @@ format:
 
 cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a `test_that()` test, and step definitions use testthat's expectations. If you know testthat, most of cucumber works the way you expect. This article lists where the two are alike and where they differ.
 
-`test()` is cucumber's `testthat::test_dir()`: it runs the feature files of a directory, by default `tests/acceptance`. `run()`, called in a `tests/testthat/test-*.R` file, runs feature files as part of the package's testthat tests, e.g. with `devtools::test()` or `R CMD check`.
+`test()` is cucumber's `testthat::test_dir()`: it runs the feature files of a directory, by default `{r} I(cucumber:::format_option_default("cucumber.path"))`. `run()`, called in a `tests/testthat/test-*.R` file, runs feature files as part of the package's testthat tests, e.g. with `devtools::test()` or `R CMD check`.
 
 # Writing tests
 
@@ -49,7 +50,7 @@ cucumber runs on testthat. A feature file is run like a testthat test file, each
 
 |                                      | `testthat::test_dir()`                                  | `cucumber::test()`                                                      |
 | ------------------------------------ | -------------------------------------------------------- | ----------------------------------------------------------------------- |
-| Default directory                    | Required `path`                                          | `tests/acceptance`, or the `cucumber.path` option                       |
+| Default directory                    | Required `path`                                          | `{r} I(cucumber:::format_option_default("cucumber.path"))`, or the `cucumber.path` option |
 | Package code                         | `load_package` argument                                  | Load the package first, e.g. with `pkgload::load_all()`                 |
 | Environment                          | `env` argument                                           | The same                                                                |
 | testthat edition                     | From the package's `DESCRIPTION`                         | The same                                                                |

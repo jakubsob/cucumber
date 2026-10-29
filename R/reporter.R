@@ -19,7 +19,7 @@
 #' messages of a scenario are, in order:
 #'
 #' - `testCaseStarted`, with the `id` its other messages refer to and the
-#'   `testCaseId` of its `testCase`, sent before the run starts, whose
+#'   `testCaseId` of its `testCase`, sent before any scenario runs, whose
 #'   `pickleId` is the id of its `pickle`: the scenario's name, tags and steps.
 #' - `testStepStarted` and `testStepFinished` of each hook and step, with the
 #'   `testStepResult`: its `status`, like `"PASSED"`, `duration` and the

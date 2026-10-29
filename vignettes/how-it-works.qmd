@@ -4,17 +4,18 @@ vignette: >
   %\VignetteIndexEntry{How it works}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+engine: knitr
 format:
   html:
     syntax-definitions: [gherkin.xml]
 ---
 
-`cucumber::test()` runs the `.feature` and `.feature.md` files of a directory, `tests/acceptance` by default, and its subdirectories. A run goes like this:
+`cucumber::test()` runs the `.feature` and `.feature.md` files of a directory, `{r} I(cucumber:::format_option_default("cucumber.path"))` by default, and its subdirectories. A run goes like this:
 
 1. **Load the step definitions.** The `helper-*.R` and `setup-*.R` files of the directory are run, like `testthat::test_dir()` runs them. Calls to `given()`, `when()`, `then()`, the hooks and `define_parameter_type()` in them register step definitions, hooks and parameter types for the run.
-2. **Parse the feature files.** Every feature file is parsed before anything runs. If one can't be parsed, no scenario runs, and every parse error is reported with its file, line and column.
+2. **Parse the feature files.** The feature files picked by `filter` and `features` are parsed before anything runs. If one can't be parsed, no scenario runs, and every parse error is reported with its file, line and column.
 3. **Compile the scenarios.** Each scenario, and each row of a Scenario Outline's Examples, becomes one test case, with the `Background` steps before its own steps.
-4. **Select and order them**, by `filter`, `name`, `tags` and `features`, and by `order`.
+4. **Select and order them**, by `name`, `tags` and the lines of `features`, and by `order`.
 5. **Run them.** Each step is matched to a step definition, and the step definitions are called one by one.
 6. **Report them.** Every outcome of the run is a [Cucumber Message](https://github.com/cucumber/messages), passed to the reporter: the progress in the console, or reports like the HTML report, see `vignette("reporting")`.
 

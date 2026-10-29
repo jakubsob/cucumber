@@ -12,7 +12,7 @@ Write executable specifications in a natural language that describes how your co
 }
 \section{Getting started}{
 
-Write scenarios in \code{.feature} files in \code{tests/acceptance}, see
+Write scenarios in \code{.feature} files in \code{"tests/acceptance"}, see
 \code{vignette("reference-gherkin", package = "cucumber")}. Define their steps with \code{\link[=given]{given()}},
 \code{\link[=when]{when()}} and \code{\link[=then]{then()}}, and hooks with \code{\link[=before]{before()}} and \code{\link[=after]{after()}}, in \verb{setup-*.R} files next
 to them. Run them with \code{\link[=test]{test()}}, or with \code{\link[=run]{run()}} in a testthat test file.

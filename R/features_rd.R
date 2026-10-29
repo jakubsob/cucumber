@@ -11,9 +11,10 @@
 #' add <- function(basket, n) basket + n
 #' ```
 #'
-#' It adds a section, "Behavior" by default, with each selected feature: its name, its
-#' description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
-#' their tags. Of a Scenario Outline, only the selected Examples rows are shown.
+#' It adds a section, named `r format_option_default("cucumber.rd_section")` by default,
+#' with each selected feature: its name, its description, the Rules and Backgrounds of the
+#' selected scenarios and the scenarios, without their tags. Of a Scenario Outline, only the
+#' selected Examples rows are shown.
 #'
 #' In the help page, each feature is one block of Gherkin, as it's written. On HTML pages,
 #' like the pkgdown reference page, it's shown like Markdown with Gherkin: the names of the
@@ -21,10 +22,10 @@
 #' list, tables are tables and Doc Strings are code, a Doc String of Gherkin highlighted as
 #' Gherkin. With `markdown = FALSE`, HTML pages show the block of Gherkin too.
 #'
-#' Scenarios are selected like in [test()]. By default only scenarios tagged `@rd` are
-#' selected, so that you choose the ones that make good documentation. Set the
-#' `cucumber.rd_tags` option to use another tag expression, or pass `tags = NULL` to select
-#' scenarios without a tag.
+#' Scenarios are selected like in [test()]. By default only scenarios matching
+#' `r format_option_default("cucumber.rd_tags")` are selected, so that you choose the ones
+#' that make good documentation. Set the `cucumber.rd_tags` option to use another tag
+#' expression, or pass `tags = NULL` to select scenarios without a tag.
 #'
 #' On a pkgdown site, code is highlighted by the site's theme.
 #'

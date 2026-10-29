@@ -9,6 +9,14 @@ Prints one character for each step and hook as it finishes, then the summary of
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{......F--
 
+Failures:
+
+1) Scenario: Remove an item # basket.feature:6
+    ✔ Given a basket with 2 apples
+    ✖ When I remove 3 apples
+    Error:
+      Can't remove more apples than there are.
+
 ────────────────────────────────────────────────────────────────────────
 Summary
   3 scenarios (1 failed, 2 passed)
@@ -66,7 +74,7 @@ x When I remove 1 item}
 \item And the output doesn't include "Scenario: Add an item"
 }
 }
-\subsection{Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too}{
+\subsection{Scenario: Pending, undefined and ambiguous steps are printed as characters too}{
 \itemize{
 \item Given a file named "features/basket.feature" with
 \out{<pre class="gherkin"><code><span class="kw">Feature:</span> Statuses&#10;  <span class="kw">Scenario:</span> Pending&#10;    <span class="fu">Given</span> a pending step&#10;&#10;  <span class="kw">Scenario:</span> Undefined&#10;    <span class="fu">Given</span> an undefined step&#10;&#10;  <span class="kw">Scenario:</span> Ambiguous&#10;    <span class="fu">Given</span> the ambiguous step</code></pre >}
@@ -145,7 +153,7 @@ given("the \{word\} step", function(word, context) \{\})}
     And the output includes "The basket is empty"
     And the output doesn't include "Scenario: Add an item"
 
-  Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too
+  Scenario: Pending, undefined and ambiguous steps are printed as characters too
     Given a file named "features/basket.feature" with
       """
       Feature: Statuses

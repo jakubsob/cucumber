@@ -35,10 +35,9 @@ reported_step <- function(q, pickle_step, result) {
 #' Summary Reporter for Cucumber
 #'
 #' @description
-#' Prints only the summary of the run. The other cucumber reporters print it at
-#' the end of the run too:
-#' [CucumberProgressReporter], [CucumberProgressBarReporter] and
-#' [CucumberPrettyReporter].
+#' Prints only the summary of the run. [CucumberProgressReporter],
+#' [CucumberPrettyReporter] and [CucumberDotsReporter] print it at the end of
+#' the run too, and [CucumberProgressBarReporter] prints its counts.
 #'
 #' ```
 #' Failures:

@@ -9,7 +9,7 @@ Feature: Running feature files like testthat runs test files
   output, like its tests, and their messages are shown, while the 2nd edition hides them. What the setup files and steps defer to `testthat::teardown_env()` runs
   when `test()` ends. Each feature file is the file of its scenarios' results, and a failure, a skip
   or a warning is at its line: the line of its step, or of its scenario for a hook. Outside of a testthat run, like in the console, `test()` sets
-  `NOT_CRAN` to `"true"`, like `testthat::test_local()`, so snapshots are checked. In a testthat
+  `NOT_CRAN` to `"true"` when it isn't set, like `testthat::test_local()`, so snapshots are checked. In a testthat
   run or in R CMD check, `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.
   `skip()` in a `before_all()` hook skips every scenario, like `skip()` at the top of a test file skips its tests.
   `skip()` in a setup or helper file stops the run instead, like in `testthat::test_dir()`.

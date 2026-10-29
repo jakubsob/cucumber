@@ -15,11 +15,12 @@
 #'       steps' and hooks'), `duration` in seconds and how many `attempts` it
 #'       took, more than one if it was retried. A retried scenario's row and
 #'       steps are of its last attempt.}
-#'     \item{`steps`}{A tibble with a row per step and hook that ran: the
+#'     \item{`steps`}{A tibble with a row per step and hook of each scenario: the
 #'       `scenario_id` and `scenario` it ran in, its `keyword` (`Before` or
 #'       `After` for a hook), `text` (a hook's name), `status`, `duration` in
 #'       seconds and the `error` of a step that didn't pass.}
 #'     \item{`envelopes`}{The messages, as lists.}
+#'     \item{`lines`}{The messages, as the lines of the ndjson file.}
 #'   }
 #'
 #' @examples

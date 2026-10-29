@@ -7,7 +7,7 @@
 #' progress of the run, combine it with another reporter in a
 #' [CucumberMultiReporter]. To write the report of a run after it ran, store
 #' its messages with [CucumberMessagesReporter] and pass their file to
-#' `report()`.
+#' the `$report()` method.
 #'
 #' @examples
 #' \dontrun{

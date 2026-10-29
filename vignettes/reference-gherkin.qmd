@@ -4,6 +4,7 @@ vignette: >
   %\VignetteIndexEntry{Gherkin Reference}
   %\VignetteEngine{quarto::html}
   %\VignetteEncoding{UTF-8}
+engine: knitr
 format:
   html:
     syntax-definitions: [gherkin.xml]
@@ -41,13 +42,13 @@ Feature: Guess the word
     Then the Breaker must guess a word with 5 characters
 ```
 
-Please note that some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, like `Given: x`, the feature file fails to parse.
+Please note that some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, like `Given: x`, it isn't a step: after a step the feature file fails to parse, and right under `Scenario:` the line is read as part of the description.
 
 Every feature file is parsed before anything runs. If any of them can't be parsed, no scenario runs, and every error is reported with its file, line and column:
 
 ```
 Can't parse feature files
-✖ Parse error in "features/broken.feature" (9:7): inconsistent cell count within the table
+✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table
 ```
 
 # Keywords
@@ -516,7 +517,7 @@ Tags can be placed above the following Gherkin elements:
 * `Scenario Outline`
 * `Examples`
 
-**Note:** Tags placed above `Background` or steps (`Given`, `When`, `Then`, `And`, `But`, `*`) will cause a validation error. Place tags only on the elements listed above.
+**Note:** Tags placed above `Background` or steps (`Given`, `When`, `Then`, `And`, `But`, `*`) make the feature file fail to parse. Place tags only on the elements listed above.
 
 In `Scenario Outline`, you can use tags on different sets of examples:
 
@@ -660,7 +661,7 @@ Fonctionnalité: Addition
     Alors I should have 2
 ```
 
-A file without the header is in English (`en`), or in the language of the `cucumber.language` option, like `options(cucumber.language = "fr")`. Every language from Cucumber's [gherkin-languages.json](https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json) is supported. See the [Gherkin reference](https://cucumber.io/docs/gherkin/languages/) for the keywords of each language.
+A file without the header is in the language of the `cucumber.language` option, `{r} I(cucumber:::format_option_default("cucumber.language"))` by default, like `options(cucumber.language = "fr")`. Every language from Cucumber's [gherkin-languages.json](https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json) is supported. See the [Gherkin reference](https://cucumber.io/docs/gherkin/languages/) for the keywords of each language.
 
 Step definitions don't change: steps are matched without their keyword, so `given("I have {int}", ...)` matches `Soit I have 1`.
 

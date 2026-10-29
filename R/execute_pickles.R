@@ -1,7 +1,7 @@
 #' Execute pickles
 #'
 #' @description
-#' Executes a list of pickles, populating metadata (status, error, duration).
+#' Runs each pickle as a testthat test.
 #' Each pickle runs in a testthat test_that() context.
 #'
 #' @param pickles List of pickle objects (must have matched steps)
@@ -52,7 +52,8 @@ execute_pickles <- function(
 #'
 #' Every step is reported. Steps after a step that didn't pass, and all steps
 #' after a failed or skipping before hook, are skipped. Steps without exactly one
-#' definition are always reported as undefined or ambiguous.
+#' definition are reported as undefined or ambiguous, unless a hook or step
+#' skipped the scenario.
 #'
 #' Hooks and steps are the scenario's test steps: the scenario gets the worst
 #' of their results, and each after hook gets the worst result so far. Each
@@ -60,7 +61,7 @@ execute_pickles <- function(
 #' Before hooks after one that didn't pass are skipped.
 #'
 #' With `skip_steps`, neither hooks nor step bodies run, and testthat skips the
-#' scenario with `skip_reason`. In a dry run, undefined and ambiguous steps
+#' scenario with `skip_reason`, except in a dry run. In a dry run, undefined and ambiguous steps
 #' don't fail the scenario either: they skip it.
 #'
 #' A failed scenario runs again, up to `retry` times, until it passes. Only its

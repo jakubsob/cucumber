@@ -63,12 +63,6 @@ ANONYMOUS <- .parameter(
 #'   transformer = as.double
 #' )
 #'
-#' \dontrun{
-#' #' tests/testthat/test-cucumber.R
-#' cucumber::define_parameter_type("color", "red|blue|green", as.character)
-#' cucumber::test(".", "./steps")
-#' }
-#'
 #' @eval features_rd(features = "parameter_types.feature")
 #'
 #' @md

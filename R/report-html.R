@@ -5,7 +5,7 @@
 #' (<https://github.com/cucumber/html-formatter>). To also see the progress of
 #' the run, combine it with another reporter in a [CucumberMultiReporter]. To
 #' write the report of a run after it ran, store its messages with
-#' [CucumberMessagesReporter] and pass their file to `report()`.
+#' [CucumberMessagesReporter] and pass their file to the `$report()` method.
 #'
 #' @seealso Steps and hooks attach screenshots and logs to the report, see
 #'   [attachments] and `vignette("reporting", package = "cucumber")`.

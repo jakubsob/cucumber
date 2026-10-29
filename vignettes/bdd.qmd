@@ -330,7 +330,7 @@ add_to_cart <- function(id) {
 }
 ```
 
-`devtools::document()` adds a "Specification" section to `?add_to_cart`, with the feature's name, its description and the tagged scenarios, as they're written. On the pkgdown site, steps are a list and tables are tables, unless you pass `markdown = FALSE`.
+`devtools::document()` adds a section named `{r} I(cucumber:::format_option_default("cucumber.rd_section"))` by default to `?add_to_cart`, with the feature's name, its description and the tagged scenarios, as they're written. On the pkgdown site, steps are a list and tables are tables, unless you pass `markdown = FALSE`.
 
 The help pages of {cucumber} are written this way, like [`?hook`](https://jakubsob.github.io/cucumber/reference/hook.html) or [`?test`](https://jakubsob.github.io/cucumber/reference/test.html). What we learned writing them:
 

@@ -21,11 +21,12 @@ example of an outline being one: its \code{id}, the \code{uri}, \code{feature} a
 steps' and hooks'), \code{duration} in seconds and how many \code{attempts} it
 took, more than one if it was retried. A retried scenario's row and
 steps are of its last attempt.}
-\item{\code{steps}}{A tibble with a row per step and hook that ran: the
+\item{\code{steps}}{A tibble with a row per step and hook of each scenario: the
 \code{scenario_id} and \code{scenario} it ran in, its \code{keyword} (\code{Before} or
 \code{After} for a hook), \code{text} (a hook's name), \code{status}, \code{duration} in
 seconds and the \code{error} of a step that didn't pass.}
 \item{\code{envelopes}}{The messages, as lists.}
+\item{\code{lines}}{The messages, as the lines of the ndjson file.}
 }
 }
 \description{
@@ -39,7 +40,7 @@ your own.
 \if{html}{
 \subsection{Feature: Custom report}{
 \code{read_messages()} reads the messages a \code{CucumberMessagesReporter} wrote as tibbles of the run's
-features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.
+features, scenarios and steps, with hooks among the steps. Write a report of your own from them, like a summary of a CI job.
 \subsection{Background:}{
 \itemize{
 \item Given a package
@@ -99,7 +100,7 @@ print(read_messages("messages.ndjson"))}
 }
 \if{text,latex}{\preformatted{Feature: Custom report
   `read_messages()` reads the messages a `CucumberMessagesReporter` wrote as tibbles of the run's
-  features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.
+  features, scenarios and steps, with hooks among the steps. Write a report of your own from them, like a summary of a CI job.
 
   Background:
     Given a package
