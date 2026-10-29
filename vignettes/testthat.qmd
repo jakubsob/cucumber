@@ -9,6 +9,14 @@ format:
     syntax-definitions: [gherkin.xml]
 ---
 
+```{=html}
+<!-- The tables need the width more than the page needs a table of contents. -->
+<style>
+  #main { width: 100%; max-width: none; }
+  #main > .page-header { max-width: 72ch; }
+</style>
+```
+
 cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a `test_that()` test, and step definitions use testthat's expectations. If you know testthat, most of cucumber works the way you expect. This article lists where the two are alike and where they differ.
 
 `test()` is cucumber's `testthat::test_dir()`: it runs the feature files of a directory, by default `tests/acceptance`. `run()`, called in a `tests/testthat/test-*.R` file, runs feature files as part of the package's testthat tests, e.g. with `devtools::test()` or `R CMD check`.
