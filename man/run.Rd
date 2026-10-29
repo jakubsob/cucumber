@@ -516,3 +516,6 @@ cucumber::run()
 }
 
 }
+\seealso{
+\link{snapshots} for how snapshots of steps are saved and checked.
+}

@@ -252,7 +252,12 @@ We can run those tests with:
 
 ```r
 cucumber::test()
-#> Test passed
+#>   |  F  P  U  S  OK | Feature
+#> ✔ |               1 | Bookstore
+#>
+#> Summary
+#>   1 scenario (1 passed)
+#>   4 steps (4 passed)
 ```
 
 What `cucumber::test` function does is it reads the feature files, finds corresponding actions implementations and runs them in order. To learn more how it works, refer to [How it works](https://jakubsob.github.io/cucumber/articles/how-it-works.html) vignette.
@@ -282,8 +287,12 @@ Re-running the tests will result in two scenarios passing.
 
 ```r
 cucumber::test()
-#> Test passed
-#> Test passed
+#>   |  F  P  U  S  OK | Feature
+#> ✔ |               2 | Bookstore
+#>
+#> Summary
+#>   2 scenarios (2 passed)
+#>   11 steps (11 passed)
 ```
 
 # Specifications as documentation

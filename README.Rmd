@@ -17,6 +17,16 @@ library(cucumber)
 # detects no ANSI support in a non-interactive knit.
 options(cli.unicode = FALSE)
 
+# Durations change on every run, so show fixed ones to keep README.md stable.
+for (hook in c("output", "error")) {
+  local({
+    default <- knitr::knit_hooks$get(hook)
+    knitr::knit_hooks$set(setNames(list(function(x, options) {
+      default(gsub("\\d+m\\d{2}\\.\\d{3}s", "0m00.100s", x), options)
+    }), hook))
+  })
+}
+
 # Reporter output below is produced by running shipped examples, so it can
 # never drift from the implementation.
 pass_dir <- "inst/examples/with_testthat_success"
@@ -198,7 +208,7 @@ To match `(`, `{` or `/` literally, escape them with a backslash, e.g. `"a\\/b"`
 
 A description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression instead, e.g. `"^I have (\\d+) cucumbers?$"`. Each capture group is passed to the implementation.
 
-Each step parsed from the `.feature` files must match exactly one step definition. If a step matches none, an error with a ready-to-paste snippet is thrown. If it matches more than one, an error listing every matching definition is thrown.
+Each step parsed from the `.feature` files must match exactly one step definition. A step that matches none is undefined: its scenario fails, the run goes on, and a ready-to-paste snippet is shown. A step that matches more than one is ambiguous: its scenario fails with an error listing every matching definition.
 
 ### Parameter types
 

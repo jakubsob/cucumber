@@ -330,7 +330,7 @@ cucumber::test(reporter = cucumber::CucumberUsageReporter$new())
 
 }
 \section{Super classes}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{cucumber::CucumberQueryReporter} -> \code{CucumberUsageReporter}
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberQueryReporter]{cucumber::CucumberQueryReporter}} -> \code{CucumberUsageReporter}
 }
 \section{Methods}{
 \subsection{Public methods}{

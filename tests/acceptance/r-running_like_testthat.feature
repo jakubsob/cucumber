@@ -72,6 +72,7 @@ Feature: Running feature files like testthat runs test files
       | Adding an apple |
     And there is no file "test-file-ran.txt"
 
+  @rd
   Scenario: Steps run in the directory of the feature files
     Given a file named "features/basket.txt" with
       """
@@ -258,6 +259,7 @@ Feature: Running feature files like testthat runs test files
       """
     Then the output doesn't include "Weighing the basket"
 
+  @rd
   Scenario: A step fails when a test_that() test in it fails
     Given a file named "features/setup-test.R" with
       """
@@ -362,6 +364,7 @@ Feature: Running feature files like testthat runs test files
       | scenario             | status |
       | Checking the edition | passed |
 
+  @rd
   Scenario: testthat::testing_package() is the package of the feature files
     Given a file named "features/setup-package.R" with
       """
@@ -413,6 +416,7 @@ Feature: Running feature files like testthat runs test files
       teardown
       """
 
+  @rd
   Scenario: What setup files and steps defer to testthat::teardown_env() runs when test() ends
     Given a file named "features/setup-log.R" with
       """
@@ -604,6 +608,7 @@ Feature: Running feature files like testthat runs test files
       | Adding an apple     | basket.feature           |
       | Paying for an apple | checkout/payment.feature |
 
+  @rd
   Scenario: A failure is at its line of the feature file, the line of its step or of its scenario
     Given a file named "features/setup-hooks.R" with
       """

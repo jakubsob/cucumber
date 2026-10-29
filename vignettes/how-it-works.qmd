@@ -9,16 +9,23 @@ format:
     syntax-definitions: [gherkin.xml]
 ---
 
-When `cucumber::test` is called, it scans for the `.feature` files in the `features_dir` directory.
+`cucumber::test()` runs the `.feature` and `.feature.md` files of a directory, `tests/acceptance` by default, and its subdirectories. A run goes like this:
 
-It parses the feature files and runs the step implementations one by one, according to their order in feature files.
+1. **Load the step definitions.** The `helper-*.R` and `setup-*.R` files of the directory are run, like `testthat::test_dir()` runs them. Calls to `given()`, `when()`, `then()`, the hooks and `define_parameter_type()` in them register step definitions, hooks and parameter types for the run.
+2. **Parse the feature files.** Every feature file is parsed before anything runs. If one can't be parsed, no scenario runs, and every parse error is reported with its file, line and column.
+3. **Compile the scenarios.** Each scenario, and each row of a Scenario Outline's Examples, becomes one test case, with the `Background` steps before its own steps.
+4. **Select and order them**, by `filter`, `name`, `tags` and `features`, and by `order`.
+5. **Run them.** Each step is matched to a step definition, and the step definitions are called one by one.
+6. **Report them.** Every outcome of the run is a [Cucumber Message](https://github.com/cucumber/messages), passed to the reporter: the progress in the console, or reports like the HTML report, see `vignette("reporting")`.
+
+`run()` does the same in a testthat test file, where testthat reports each scenario as a test. See `vignette("testthat")` for how cucumber and testthat compare.
 
 # Step execution order
 
 Given such a feature file:
 
 ```gherkin
-# tests/testthat/sum.feature
+# tests/acceptance/sum.feature
 Feature: Sum
   Scenario: Sum should work for 2 numbers
     Given I have 1
@@ -37,7 +44,7 @@ Feature: Sum
 And such step definitions:
 
 ```r
-# tests/testthat/steps/steps_definitions.R
+# tests/acceptance/setup-steps.R
 given("I have {int}", function(int, context) {
   print("given")
   context$numbers <- c(context$numbers, int)
@@ -57,54 +64,37 @@ then("I get {int}", function(int, context) {
 The order of calling the steps would be:
 
 ```r
-> [1] "given"
-> [1] "given"
-> [1] "when"
-> [1] "then"
-> [1] "given"
-> [1] "given"
-> [1] "given"
-> [1] "when"
-> [1] "then"
+#> [1] "given"
+#> [1] "given"
+#> [1] "when"
+#> [1] "then"
+#> [1] "given"
+#> [1] "given"
+#> [1] "given"
+#> [1] "when"
+#> [1] "then"
 ```
 
-# Translation to `testthat` code
+Hooks run around them: `before_all()` once before the first scenario, `before()` and `after()` around each scenario, `before_step()` and `after_step()` around each step, and `after_all()` once after the last scenario. See `?hook`.
 
-Cucumber translates `.feature` files to `testthat::test_that` calls.
+# Sharing state with `context`
 
-When a `Scenario` is run, the `context` environment is reset so that the state doesn't leak to the next scenario.
+Each scenario gets a new, empty `context` environment, shared by its steps and hooks. State doesn't leak from one scenario to the next.
 
-The previous feature file is basically translated to the following test code, so that testthat runs it and collects its results. Cucumber's reporters report the run.
+Code a step or a hook defers in `context`, like `withr::local_options(.local_envir = context)`, runs when the scenario ends.
 
-```r
-test_that("Scenario: Sum should work for 2 numbers", {
-  context <- new.env()
-  context$numbers <- c(context$numbers, 1)
-  context$numbers <- c(context$numbers, 2)
-  context$result <- sum(context$numbers)
-  expect_equal(context$result, 3)
-})
+# Matching steps
 
-test_that("Scenario: Sum should work for 3 numbers", {
-  context <- new.env()
-  context$numbers <- c(context$numbers, 1)
-  context$numbers <- c(context$numbers, 2)
-  context$numbers <- c(context$numbers, 3)
-  context$result <- sum(context$numbers)
-  expect_equal(context$result, 6)
-})
-```
+A step is matched to a step definition by its text, without its keyword: `Given I have 1` and `And I have 1` match the same definition.
 
-Test successes or failures are reported at the level of Scenarios.
+A step definition's description is a [Cucumber Expression](https://github.com/cucumber/cucumber-expressions), like `"I have {int}"`, or a regular expression if it starts with `^`, ends with `$` or is surrounded by `/`. The values its parameters match are passed to the step definition, before its Data Table or Doc String and `context`. See `?step` and `?define_parameter_type`.
 
-A scenario is a test case.
+Every step gets a result:
 
-# How step definitions are loaded
+- **passed**: its step definition ran without an error or a failed expectation.
+- **failed**: its step definition failed. The steps after it are **skipped**.
+- **pending**: its step definition called `pending()`.
+- **undefined**: no step definition matches it. The run goes on with the next scenario, and shows a snippet of a step definition to paste into a setup file.
+- **ambiguous**: more than one step definition matches it. The error lists them all.
 
-If you define your steps in [setup or helper](https://testthat.r-lib.org/articles/special-files.html) files you don't have to load step implementations manually. Cucumber will load them automatically when `cucumber::test` is called.
-
-If you don't want them to be loaded automatically from the default location, you can create your own command that calls `cucumber::test()` and loads the step definitions from the desired location.
-
-Steps from feature files are matched against step definitions defined with `given()`, `when()`, and `then()` functions using regular expressions.
-
-When you define a step by calling any of the step functions, you register that step, making it available for the tests.
+A scenario with a pending or undefined step fails, unless the run is given `strict = FALSE`. `cucumber::test(dry_run = TRUE)` finds every undefined and ambiguous step without running any.

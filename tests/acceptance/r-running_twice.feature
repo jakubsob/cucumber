@@ -6,6 +6,7 @@ Feature: Running tests more than once
   that testthat and `test(".")` both run, defines its step definitions, hooks and parameter types again
   rather than twice.
 
+  @rd
   Scenario: Tests can be run twice in the same session
     Given a package
     And a file named "features/calculate.feature" with
@@ -126,6 +127,7 @@ Feature: Running tests more than once
       | scenario        | status |
       | Adding an apple | passed |
 
+  @rd
   Scenario: A setup file loaded again defines its step definitions, hooks and parameter types again, not twice
     Given a package
     And a file named "features/calculate.feature" with

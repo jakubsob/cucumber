@@ -55,6 +55,7 @@ Feature: Snapshots
 
   Rule: A changed snapshot is accepted with testthat
 
+    @rd
     Scenario Outline: A changed snapshot of <feature> is accepted with snapshot_accept("<accepted>"), with <runner>
       Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
       And I run the feature files with "<runner>"
@@ -219,6 +220,7 @@ Feature: Snapshots
 
   Rule: Each feature file has a snapshot file of its own
 
+    @rd
     Scenario Outline: The snapshot of <feature> is saved in <snapshot file> by <runner>
       Given a feature file "<feature>" with a scenario "Showing the basket" that snapshots "1 apple"
       When I run the feature files with "<runner>"
@@ -346,6 +348,7 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    @rd
     Scenario Outline: A snapshot in a <hook> hook is of its scenario, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
       And a file named "tests/testthat/setup-hooks.R" with
@@ -423,6 +426,7 @@ Feature: Snapshots
 
   Rule: A snapshot is checked by the runs after the one that saved it
 
+    @rd
     Scenario Outline: A snapshot saved by <first> is checked by <second>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
       And I run the feature files with "<first>"
@@ -501,6 +505,7 @@ Feature: Snapshots
 
   Rule: A snapshot that isn't checked is kept
 
+    @rd
     Scenario Outline: A scenario that stops before its snapshot keeps it, when "<step>", with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
       And I run the feature files with "<runner>"
@@ -579,6 +584,7 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    @rd
     Scenario Outline: Snapshots of scenarios that didn't run are kept, with <runner>
       Given the steps that take snapshots
       And a file named "tests/testthat/basket.feature" with
@@ -619,6 +625,7 @@ Feature: Snapshots
 
   Rule: Snapshots of scenarios that aren't in the feature file anymore are deleted
 
+    @rd
     Scenario Outline: The snapshot of a renamed scenario is deleted, with <runner>
       Given a feature file "basket.feature" with a scenario "Showing the basket" that snapshots "1 apple"
       And I run the feature files with "<runner>"
@@ -751,6 +758,7 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    @rd
     Scenario Outline: A retried scenario's snapshots are of its last attempt, with <runner>
       Given the steps that take snapshots
       And a file named "tests/testthat/basket.feature" with
@@ -948,6 +956,7 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    @rd
     Scenario Outline: The snapshots of a deleted feature file are deleted, with <runner>
       Given I run the feature files with "<runner>"
       And the file "tests/testthat/checkout.feature" is deleted
@@ -978,6 +987,7 @@ Feature: Snapshots
         | test() |
         | run()  |
 
+    @rd
     Scenario Outline: Snapshot files are kept by a run with <selection>, with <runner>
       Given I run the feature files with "<runner>"
       When I run the feature files with "<runner>" and <selection>

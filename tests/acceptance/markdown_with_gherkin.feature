@@ -97,6 +97,7 @@ Feature: Markdown with Gherkin
       | Given these items: | passed |
       | When I add a note: | passed |
 
+  @rd
   Scenario: Tags are written in backticks
     Given a file named "features/basket.feature.md" with
       """
@@ -151,6 +152,7 @@ Feature: Markdown with Gherkin
       | Add an item    | passed |
       | Remove an item | passed |
 
+  @rd
   Scenario: A Rule and a Background are headers too
     Given a file named "features/basket.feature.md" with
       """

@@ -67,6 +67,7 @@ reference:
     contents:
       - test
       - run
+      - snapshots
   - title: Reporters
     contents:
       - CucumberReporter

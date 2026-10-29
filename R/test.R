@@ -43,6 +43,7 @@
 #'
 #' To get the results of a run, use [test()], which returns them like [testthat::test_dir()].
 #'
+#' @seealso [snapshots] for how snapshots of steps are saved and checked.
 #' @eval features_rd(features = "r-running_alongside_testthat.feature")
 #'
 #' @importFrom rlang abort
@@ -665,7 +666,10 @@ filter_features <- function(features, filter = NULL, ...) {
 #'   "fail_fast.feature",
 #'   "retry.feature",
 #'   "order.feature",
-#'   "markdown_with_gherkin.feature"
+#'   "markdown_with_gherkin.feature",
+#'   "gherkin_parse_failure.feature",
+#'   "r-running_like_testthat.feature",
+#'   "r-running_twice.feature"
 #' ))
 #'
 #' @importFrom withr defer

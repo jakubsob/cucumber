@@ -62,6 +62,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 
 - ✨ `features_rd()` puts scenarios of feature files in a function's help page.
 - 📝 New articles: Reports, `vignette("reporting")`, and cucumber and testthat, `vignette("testthat")`.
+- 📝 New help pages: `?cucumber`, linking every topic and article, and `?snapshots`. `?test` shows how feature files run like testthat test files, and what happens when they can't be parsed.
 
 ## Bug fixes
 

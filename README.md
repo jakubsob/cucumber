@@ -79,7 +79,7 @@ withr::with_dir(pass_dir, {
     Summary
       3 scenarios (3 passed)
       6 steps (6 passed)
-      0m00.042s (executing steps: 0m00.013s)
+      0m00.100s (executing steps: 0m00.100s)
     --------------------------------------------------------------------------------
 
 When a step fails, the reporter shows which step broke and why as soon
@@ -99,7 +99,7 @@ withr::with_dir(fail_dir, {
         x Then the result is 5
         Error: 
           Step "the result is 5" failed
-          i Feature: addition.feature
+          i Feature: addition.feature:7
           i Scenario: Adding integer and float
           i Step defined at: setup-steps-addition.R:5
           Expected `context$result` to equal `expected`.
@@ -113,7 +113,7 @@ withr::with_dir(fail_dir, {
         x Then the result is 5
         Error: 
           Step "the result is 5" failed
-          i Feature: addition.feature
+          i Feature: addition.feature:10
           i Scenario: Adding float and float
           i Step defined at: setup-steps-addition.R:5
           Expected `context$result` to equal `expected`.
@@ -129,7 +129,7 @@ withr::with_dir(fail_dir, {
         x Then the result is 5
         Error: 
           Step "the result is 5" failed
-          i Feature: addition.feature
+          i Feature: addition.feature:7
           i Scenario: Adding integer and float
           i Step defined at: setup-steps-addition.R:5
           Expected `context$result` to equal `expected`.
@@ -142,7 +142,7 @@ withr::with_dir(fail_dir, {
         x Then the result is 5
         Error: 
           Step "the result is 5" failed
-          i Feature: addition.feature
+          i Feature: addition.feature:10
           i Scenario: Adding float and float
           i Step defined at: setup-steps-addition.R:5
           Expected `context$result` to equal `expected`.
@@ -154,7 +154,7 @@ withr::with_dir(fail_dir, {
     Summary
       3 scenarios (2 failed, 1 passed)
       6 steps (2 failed, 4 passed)
-      0m00.139s (executing steps: 0m00.114s)
+      0m00.100s (executing steps: 0m00.100s)
     --------------------------------------------------------------------------------
 
     Error:
@@ -187,7 +187,7 @@ withr::with_dir(pass_dir, {
     Summary
       3 scenarios (3 passed)
       6 steps (6 passed)
-      0m00.033s (executing steps: 0m00.004s)
+      0m00.100s (executing steps: 0m00.100s)
     --------------------------------------------------------------------------------
 
 Put your acceptance tests in a directory separate to your unit tests:
@@ -328,9 +328,10 @@ e.g. `"^I have (\\d+) cucumbers?$"`. Each capture group is passed to the
 implementation.
 
 Each step parsed from the `.feature` files must match exactly one step
-definition. If a step matches none, an error with a ready-to-paste
-snippet is thrown. If it matches more than one, an error listing every
-matching definition is thrown.
+definition. A step that matches none is undefined: its scenario fails,
+the run goes on, and a ready-to-paste snippet is shown. A step that
+matches more than one is ambiguous: its scenario fails with an error
+listing every matching definition.
 
 ### Parameter types
 

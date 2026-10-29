@@ -374,7 +374,7 @@ cucumber::test(features = readLines("rerun.txt"))
 
 }
 \section{Super classes}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{cucumber::CucumberQueryReporter} -> \code{CucumberRerunReporter}
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberQueryReporter]{cucumber::CucumberQueryReporter}} -> \code{CucumberRerunReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

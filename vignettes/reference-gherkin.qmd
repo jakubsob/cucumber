@@ -41,7 +41,14 @@ Feature: Guess the word
     Then the Breaker must guess a word with 5 characters
 ```
 
-Please note that some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, your test(s) will be ignored.
+Please note that some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, like `Given: x`, the feature file fails to parse.
+
+Every feature file is parsed before anything runs. If any of them can't be parsed, no scenario runs, and every error is reported with its file, line and column:
+
+```
+Can't parse feature files
+✖ Parse error in "features/broken.feature" (9:7): inconsistent cell count within the table
+```
 
 # Keywords
 
@@ -68,7 +75,7 @@ There are a few secondary keywords as well:
 
 The purpose of the `Feature` keyword is to provide a high-level description of a software feature, and to group related scenarios.
 
-The first primary keyword in a Gherkin document must always be `Feature`, followed by a `:` and a short text that describes the feature.
+The first primary keyword in a Gherkin document must always be `Feature` (or `Ability`, or `Business Need`), followed by a `:` and a short text that describes the feature.
 
 You can add free-form text underneath Feature to add more description. These description lines are ignored by Cucumber at runtime.
 
@@ -84,11 +91,11 @@ The name and the optional description have no special meaning to Cucumber. Their
 
 The free format description for Feature ends when you start a line with the keyword `Background`, `Rule`, `Example` or `Scenario Outline` (or their alias keywords).
 
-You can only have a single `Feature` in a `.feature` file.
+You can only have a single `Feature` in a `.feature` file. A file without a `Feature`, or a `Feature` without scenarios, runs nothing.
 
 # Descriptions
 
-Free-form descriptions (as described above for `Feature`) can also be placed underneath `Example/Scenario`, `Background` and `Scenario Outline`.
+Free-form descriptions (as described above for `Feature`) can also be placed underneath `Rule`, `Example/Scenario`, `Background`, `Scenario Outline` and `Examples`.
 
 You can write anything you like, as long as no line starts with a keyword.
 
@@ -354,7 +361,7 @@ Scenario Outline: eating
 
 # Examples
 
-A `Scenario Outline` must contain one or more `Examples` (or `Scenarios`) section(s). Its steps are interpreted as a template which is never directly run. Instead, the `Scenario Outline` is run _once for each row_ in the `Examples` section beneath it (not counting the first header row).
+A `Scenario Outline` must contain one or more `Examples` (or `Scenarios`) section(s). `Examples` under a `Scenario` make it a `Scenario Outline` too. Its steps are interpreted as a template which is never directly run. Instead, the `Scenario Outline` is run _once for each row_ in the `Examples` section beneath it (not counting the first header row).
 
 The steps can use `<>` delimited _parameters_ that reference headers in the examples table. Cucumber will replace these parameters with values from the table _before_ it tries to match the step against a step definition.
 
@@ -388,7 +395,7 @@ Scenario: eating
 
 You can use parameters in the `Scenario Outline` name as well, to give each scenario its own name, for example `Scenario Outline: eat <eat> out of <start>`.
 
-You can also use parameters in [multiline step arguments](#step-arguments).
+You can also use parameters in [multiline step arguments](#step-arguments): they're replaced in Doc Strings and Data Tables too.
 
 # Step Arguments
 
@@ -411,7 +418,15 @@ Given a blog post named "Random" with Markdown body
 
 In your step definition, there’s no need to find this text and match it in your pattern.
 
-It will automatically be passed as the last argument in the step definition. See `?step` for details.
+It is passed to the step definition as one string, its lines joined by `"\n"`, after the step's parameters and before `context`:
+
+```r
+given("a blog post named {string} with Markdown body", function(name, body, context) {
+  ...
+})
+```
+
+To get a character vector of lines instead, set `options(cucumber.docstring_as_lines = TRUE)`, see `?opts`.
 
 Indentation of the opening `"""` is unimportant, although common practice is two spaces in from the enclosing step. The indentation inside the triple quotes, however, is significant. Each line of the Doc String will be dedented according to the opening `"""`. Indentation beyond the column of the opening `"""` will therefore be preserved.
 
@@ -426,7 +441,7 @@ Given a blog post named "Random" with Markdown body
   ```
 ````
 
-You can specify the content type of a Doc String after the opening delimiter, for example `"""markdown`. It is passed to the step definition along with the text, see `?step`.
+You can specify the content type of a Doc String after the opening delimiter, for example `"""markdown`. The step definition gets it in the `media_type` attribute of the Doc String: `attr(body, "media_type")`.
 
 # Data Tables
 
@@ -440,7 +455,24 @@ Given the following users exist:
   | Matt   | matt@cucumber.io   | @mattwynne      |
 ```
 
-Just like `Doc Strings`, `Data Tables` will be passed to the step definition as the last argument. See `?step` for details.
+Just like `Doc Strings`, `Data Tables` are passed to the step definition after the step's parameters and before `context`, as a tibble whose column names are its first row. See `?step` for details.
+
+Every row of a Data Table must have the same number of cells, or the feature file fails to parse.
+
+A step can have both a Data Table and a Doc String. The step definition gets them in the order they are written:
+
+```gherkin
+Given a request
+  | header | value |
+  | Accept | json  |
+  """
+  {"id": 1}
+  """
+```
+
+```r
+given("a request", function(headers, body, context) { ... })
+```
 
 ## Table Cell Escaping
 
@@ -628,6 +660,81 @@ Fonctionnalité: Addition
     Alors I should have 2
 ```
 
-A file without the header is in English (`en`). Every language from Cucumber's [gherkin-languages.json](https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json) is supported. See the [Gherkin reference](https://cucumber.io/docs/gherkin/languages/) for the keywords of each language.
+A file without the header is in English (`en`), or in the language of the `cucumber.language` option, like `options(cucumber.language = "fr")`. Every language from Cucumber's [gherkin-languages.json](https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json) is supported. See the [Gherkin reference](https://cucumber.io/docs/gherkin/languages/) for the keywords of each language.
 
 Step definitions don't change: steps are matched without their keyword, so `given("I have {int}", ...)` matches `Soit I have 1`.
+
+# Markdown with Gherkin
+
+Feature files can be Markdown documents: `.feature.md` files, written in [Markdown with Gherkin](https://github.com/cucumber/gherkin/blob/main/MARKDOWN_WITH_GHERKIN.md). They run like `.feature` files, and can be run together with them.
+
+Use them when a specification should read as a document: it renders on GitHub, on a pkgdown site or in any Markdown viewer, and it can have prose, lists and tables between its scenarios that aren't part of the test.
+
+A Markdown document is Gherkin with these changes:
+
+- **Headers** are the `Feature`, `Rule`, `Background`, `Scenario`, `Scenario Outline` and `Examples`, like `# Feature: Basket` or `## Scenario: Add an item`.
+- **List items** that start with a step keyword are steps, like `* Given an empty basket` or `- When I add an apple`. A list item that doesn't start with a step keyword is ignored.
+- **Code blocks** under a step are Doc Strings. Their language, like ```` ```json ````, is the Doc String's media type.
+- **Tables** indented 2 to 5 spaces are Data Tables, under a step, and Examples, under an `Examples` header. The separator row under the header, `| --- |`, isn't a row. A table that isn't indented, or is indented more, is ignored.
+- **Tags** are written in backticks, on the line above the header they tag: `` `@smoke` ``.
+- **Everything else**, like paragraphs, images and unindented tables, is ignored.
+
+Here is a document with all of them:
+
+````markdown
+# Feature: Basket
+
+A basket holds the items a customer wants to buy.
+This table is for the reader, not a step argument, because it isn't indented:
+
+| item  | price |
+| ----- | ----- |
+| apple | 1     |
+
+## Background:
+
+* Given an empty basket
+
+## Rule: Items are counted
+
+`@smoke`
+### Scenario Outline: Add <n> apples
+
+* When I add <n> apples
+* Then the basket has <n> items
+
+#### Examples:
+
+  | n |
+  | - |
+  | 1 |
+  | 2 |
+
+## Rule: Items can have a note
+
+### Scenario: Add a gift note
+
+* When I add these items:
+  | item   | price |
+  | ------ | ----: |
+  | apple  | 1     |
+  | banana | 2     |
+* And I add a note:
+  ```json
+  {"gift": true}
+  ```
+* Then the order has a note
+````
+
+Its step definitions are like those of a `.feature` file. The Doc String has its media type in the `media_type` attribute:
+
+```r
+when("I add a note:", function(note, context) {
+  attr(note, "media_type") # "json"
+  context$note <- jsonlite::fromJSON(note)
+})
+```
+
+A Markdown document can't start with `# language:`, as it would be a header. Set the language of Markdown documents with the `cucumber.language` option, like `options(cucumber.language = "fr")`.
+
+The snapshots of `basket.feature.md` are in `_snaps/basket.feature.md`, like those of `basket.feature`. So the two can't be in the same directory: the run stops with an error that names both.

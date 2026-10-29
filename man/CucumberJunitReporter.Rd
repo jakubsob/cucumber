@@ -364,7 +364,7 @@ cucumber::CucumberJunitReporter$new("cucumber-junit.xml")$report("cucumber.ndjso
 
 }
 \section{Super classes}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{cucumber::CucumberQueryReporter} -> \code{CucumberJunitReporter}
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberQueryReporter]{cucumber::CucumberQueryReporter}} -> \code{CucumberJunitReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

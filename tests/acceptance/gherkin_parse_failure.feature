@@ -6,6 +6,7 @@ Feature: Gherkin parse failure
   Background:
     Given a package
 
+  @rd
   Scenario: Every error in a feature file is reported with its line and column
     Given a file named "features/broken.feature" with
       """
@@ -146,6 +147,7 @@ Feature: Gherkin parse failure
       x Parse error in "broken.feature" (14:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'junk 11'
       """
 
+  @rd
   Scenario: No scenario runs when a feature file fails to parse, and every parse error is reported
     Given a file named "features/a.feature" with
       """
