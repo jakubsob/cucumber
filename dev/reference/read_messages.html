@@ -92,13 +92,16 @@ took, more than one if it was retried. A retried scenario's row and
 steps are of its last attempt.</p></dd>
 
 <dt><code>steps</code></dt>
-<dd><p>A tibble with a row per step and hook that ran: the
+<dd><p>A tibble with a row per step and hook of each scenario: the
 <code>scenario_id</code> and <code>scenario</code> it ran in, its <code>keyword</code> (<code>Before</code> or
 <code>After</code> for a hook), <code>text</code> (a hook's name), <code>status</code>, <code>duration</code> in
 seconds and the <code>error</code> of a step that didn't pass.</p></dd>
 
 <dt><code>envelopes</code></dt>
 <dd><p>The messages, as lists.</p></dd>
+
+<dt><code>lines</code></dt>
+<dd><p>The messages, as the lines of the ndjson file.</p></dd>
 
 
 </dl></div>
@@ -111,7 +114,7 @@ seconds and the <code>error</code> of a step that didn't pass.</p></dd>
 <div class="section">
 <h3 id="feature-custom-report">Feature: Custom report<a class="anchor" aria-label="anchor" href="#feature-custom-report"></a></h3>
 <p><code>read_messages()</code> reads the messages a <code>CucumberMessagesReporter</code> wrote as tibbles of the run's
-features, scenarios and steps. Write a report of your own from them, like a summary of a CI job.</p><div class="section">
+features, scenarios and steps, with hooks among the steps. Write a report of your own from them, like a summary of a CI job.</p><div class="section">
 <h4 id="background-">Background:<a class="anchor" aria-label="anchor" href="#background-"></a></h4><ul><li><p>Given a package</p></li>
 <li><p>And a file named "features/basket.feature" with
 </p><div class="sourceCode"><pre class="gherkin"><code><span class="kw">Feature:</span> Basket

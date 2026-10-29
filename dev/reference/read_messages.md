@@ -38,14 +38,18 @@ A `cucumber_messages` object, a list with:
 
 - `steps`:
 
-  A tibble with a row per step and hook that ran: the `scenario_id` and
-  `scenario` it ran in, its `keyword` (`Before` or `After` for a hook),
-  `text` (a hook's name), `status`, `duration` in seconds and the
-  `error` of a step that didn't pass.
+  A tibble with a row per step and hook of each scenario: the
+  `scenario_id` and `scenario` it ran in, its `keyword` (`Before` or
+  `After` for a hook), `text` (a hook's name), `status`, `duration` in
+  seconds and the `error` of a step that didn't pass.
 
 - `envelopes`:
 
   The messages, as lists.
+
+- `lines`:
+
+  The messages, as the lines of the ndjson file.
 
 ## Behavior
 
@@ -55,8 +59,9 @@ A `cucumber_messages` object, a list with:
 ### Feature: Custom report
 
 `read_messages()` reads the messages a `CucumberMessagesReporter` wrote
-as tibbles of the run's features, scenarios and steps. Write a report of
-your own from them, like a summary of a CI job.
+as tibbles of the run's features, scenarios and steps, with hooks among
+the steps. Write a report of your own from them, like a summary of a CI
+job.
 
 #### Background:
 

@@ -102,7 +102,7 @@
   #main { width: 100%; max-width: none; }
 </style>
 <p>cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a <code>test_that()</code> test, and step definitions use testthat’s expectations. If you know testthat, most of cucumber works the way you expect. This article lists where the two are alike and where they differ.</p>
-<p><code><a href="../reference/test.html">test()</a></code> is cucumber’s <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code>: it runs the feature files of a directory, by default <code>tests/acceptance</code>. <code><a href="../reference/run.html">run()</a></code>, called in a <code>tests/testthat/test-*.R</code> file, runs feature files as part of the package’s testthat tests, e.g. with <code>devtools::test()</code> or <code>R CMD check</code>.</p>
+<p><code><a href="../reference/test.html">test()</a></code> is cucumber’s <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code>: it runs the feature files of a directory, by default <code>"tests/acceptance"</code>. <code><a href="../reference/run.html">run()</a></code>, called in a <code>tests/testthat/test-*.R</code> file, runs feature files as part of the package’s testthat tests, e.g. with <code>devtools::test()</code> or <code>R CMD check</code>.</p>
 <section class="section level2"><h2 id="writing-tests">Writing tests<a class="anchor" aria-label="anchor" href="#writing-tests"></a>
 </h2>
 <table class="table caption-top">
@@ -245,7 +245,7 @@
 <td>Required <code>path</code>
 </td>
 <td>
-<code>tests/acceptance</code>, or the <code>cucumber.path</code> option</td>
+<code>"tests/acceptance"</code>, or the <code>cucumber.path</code> option</td>
 </tr>
 <tr class="even">
 <td>Package code</td>

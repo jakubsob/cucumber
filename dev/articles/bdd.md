@@ -210,7 +210,7 @@ test_that("Bookstore: Adding a book to cart", {
   # Then
   bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
 })
-#> Test passed with 1 success 🌈.
+#> Test passed with 1 success 🎊.
 ```
 
 With this implementation, we can easily extend tests with checking if we
@@ -229,7 +229,7 @@ test_that("Bookstore: Adding multiple books to cart", {
   # Then
   bookstore$cart_includes(c("The Hobbit, J.R.R. Tolkien", "The Lord of the Rings, J.R.R. Tolkien"))
 })
-#> Test passed with 1 success 🌈.
+#> Test passed with 1 success 🎊.
 ```
 
 As the system grows, it will be extended with more examples and more
@@ -383,10 +383,10 @@ add_to_cart <- function(id) {
 }
 ```
 
-`devtools::document()` adds a “Specification” section to `?add_to_cart`,
-with the feature’s name, its description and the tagged scenarios, as
-they’re written. On the pkgdown site, steps are a list and tables are
-tables, unless you pass `markdown = FALSE`.
+`devtools::document()` adds a section named `"Behavior"` by default to
+`?add_to_cart`, with the feature’s name, its description and the tagged
+scenarios, as they’re written. On the pkgdown site, steps are a list and
+tables are tables, unless you pass `markdown = FALSE`.
 
 The help pages of {cucumber} are written this way, like
 [`?hook`](https://jakubsob.github.io/cucumber/reference/hook.html) or

@@ -90,7 +90,7 @@ scenario, e.g. when a service it needs isn't available. Outside of a Cucumber ru
 <p>Call <code>skip_scenario()</code> in a step or a <code><a href="hook.html">before()</a></code> hook to skip the rest of the scenario,
 for example when a service it needs is down. The scenario is reported as skipped with its reason,
 and after hooks still run and get <code>"skipped"</code> as its status.
-In an <code><a href="hook.html">after()</a></code> hook, it skips only that hook, and the scenario is skipped unless it failed.
+In an <code><a href="hook.html">after()</a></code> hook, it skips only that hook, and the scenario is skipped unless it already failed, or is pending, undefined or ambiguous.
 In a <code><a href="hook.html">before_all()</a></code> hook, it skips every scenario of the run. Calling it in a <code><a href="hook.html">before_step()</a></code>, <code><a href="hook.html">after_step()</a></code>
 or <code><a href="hook.html">after_all()</a></code> hook is an error of the hook. <code><a href="https://testthat.r-lib.org/reference/skip.html" class="external-link">testthat::skip()</a></code> does the same.</p><div class="section">
 <h4 id="background-">Background:<a class="anchor" aria-label="anchor" href="#background-"></a></h4><ul><li><p>Given a package</p></li>

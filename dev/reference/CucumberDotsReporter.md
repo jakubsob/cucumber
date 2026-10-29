@@ -6,6 +6,14 @@ summary of
 
     ......F--
 
+    Failures:
+
+    1) Scenario: Remove an item # basket.feature:6
+        ✔ Given a basket with 2 apples
+        ✖ When I remove 3 apples
+        Error:
+          Can't remove more apples than there are.
+
     ────────────────────────────────────────────────────────────────────────
     Summary
       3 scenarios (1 failed, 2 passed)
@@ -85,7 +93,7 @@ with the scenarios that didn't pass.
 
 - And the output doesn't include "Scenario: Add an item"
 
-#### Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too
+#### Scenario: Pending, undefined and ambiguous steps are printed as characters too
 
 - Given a file named "features/basket.feature" with
 

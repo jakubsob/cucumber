@@ -6,7 +6,7 @@ of the run, combine it with another reporter in a
 [CucumberMultiReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberMultiReporter.md).
 To write the report of a run after it ran, store its messages with
 [CucumberMessagesReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberMessagesReporter.md)
-and pass their file to `report()`.
+and pass their file to the `$report()` method.
 
 ## Behavior
 

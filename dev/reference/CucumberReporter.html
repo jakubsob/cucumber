@@ -88,7 +88,7 @@ failing <code><a href="hook.html">before_all()</a></code> hook, or <code>NULL</c
 
 </dl><p>An envelope is a list with one element, named by the message's type. The
 messages of a scenario are, in order:</p><ul><li><p><code>testCaseStarted</code>, with the <code>id</code> its other messages refer to and the
-<code>testCaseId</code> of its <code>testCase</code>, sent before the run starts, whose
+<code>testCaseId</code> of its <code>testCase</code>, sent before any scenario runs, whose
 <code>pickleId</code> is the id of its <code>pickle</code>: the scenario's name, tags and steps.</p></li>
 <li><p><code>testStepStarted</code> and <code>testStepFinished</code> of each hook and step, with the
 <code>testStepResult</code>: its <code>status</code>, like <code>"PASSED"</code>, <code>duration</code> and the

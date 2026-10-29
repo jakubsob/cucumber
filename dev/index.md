@@ -38,8 +38,9 @@ The building blocks of the cucumber tests are Features and Scenarios.
 
 - Each Feature will be treated as a separate
   [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage)
-  – their results will be reported as if they were `test-*.R` files,
-  e.g. `'test-Feature: Addition.R'`.
+  – its scenarios are reported with the feature as their context and the
+  feature file as their file, e.g. context `Feature: Addition` in file
+  `addition.feature`.
 - Each Scenario is equivalent to a
   [`testthat::test_that`](https://testthat.r-lib.org/reference/test_that.html)
   or
@@ -154,7 +155,7 @@ Error:
 
 To see every step as it runs, use `CucumberPrettyReporter`.
 `CucumberDotsReporter`, `CucumberProgressBarReporter` and
-`CucumberSummaryReporter`.
+`CucumberSummaryReporter` are also available.
 
 ``` r
 

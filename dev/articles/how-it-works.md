@@ -2,7 +2,7 @@
 
 [`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
 runs the `.feature` and `.feature.md` files of a directory,
-`tests/acceptance` by default, and its subdirectories. A run goes like
+`"tests/acceptance"` by default, and its subdirectories. A run goes like
 this:
 
 1.  **Load the step definitions.** The `helper-*.R` and `setup-*.R`
@@ -16,13 +16,14 @@ this:
     [`define_parameter_type()`](https://jakubsob.github.io/cucumber/dev/reference/define_parameter_type.md)
     in them register step definitions, hooks and parameter types for the
     run.
-2.  **Parse the feature files.** Every feature file is parsed before
-    anything runs. If one can’t be parsed, no scenario runs, and every
-    parse error is reported with its file, line and column.
+2.  **Parse the feature files.** The feature files picked by `filter`
+    and `features` are parsed before anything runs. If one can’t be
+    parsed, no scenario runs, and every parse error is reported with its
+    file, line and column.
 3.  **Compile the scenarios.** Each scenario, and each row of a Scenario
     Outline’s Examples, becomes one test case, with the `Background`
     steps before its own steps.
-4.  **Select and order them**, by `filter`, `name`, `tags` and
+4.  **Select and order them**, by `name`, `tags` and the lines of
     `features`, and by `order`.
 5.  **Run them.** Each step is matched to a step definition, and the
     step definitions are called one by one.

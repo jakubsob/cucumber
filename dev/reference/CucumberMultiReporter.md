@@ -12,11 +12,11 @@ print the progress of a run and write its messages.
 
 Every reporter gets the run as Cucumber Messages.
 `CucumberMultiReporter` sends them to several reporters, to show the
-progress of a run and write its reports at once. `report()` sends a
-reporter the messages stored in an ndjson file, like the one a
-`CucumberMessagesReporter` writes, to report a run after it ran. A
-reporter that prints, like `CucumberSummaryReporter`, prints to a `file`
-instead of the console when it's given one, replaced by each run.
+progress of a run and write its reports at once. A reporter's
+`$report()` method sends it the messages stored in an ndjson file, like
+the one a `CucumberMessagesReporter` writes, to report a run after it
+ran. A reporter that prints, like `CucumberSummaryReporter`, prints to a
+`file` instead of the console when it's given one, replaced by each run.
 
 #### Background:
 

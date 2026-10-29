@@ -74,7 +74,7 @@ the progress of a run and write its messages.</p>
 <h3 id="feature-reporters">Feature: Reporters<a class="anchor" aria-label="anchor" href="#feature-reporters"></a></h3>
 <p>Every reporter gets the run as Cucumber Messages. <code>CucumberMultiReporter</code> sends them to
 several reporters, to show the progress of a run and write its reports at once.
-<code>report()</code> sends a reporter the messages stored in an ndjson file, like the one a
+A reporter's <code>$report()</code> method sends it the messages stored in an ndjson file, like the one a
 <code>CucumberMessagesReporter</code> writes, to report a run after it ran.
 A reporter that prints, like <code>CucumberSummaryReporter</code>, prints to a <code>file</code> instead of the console
 when it's given one, replaced by each run.</p><div class="section">

@@ -195,13 +195,13 @@
 <li>
 <code>Ability:</code> and <code>Business Need:</code> can be used instead of <code>Feature:</code>.</li>
 <li>An empty file, a file with only comments, and a <code>Feature:</code> without scenarios run nothing, instead of failing.</li>
-<li>A <code>Scenario:</code> without steps is reported as an empty test. Background steps don’t run for it.</li>
+<li>A <code>Scenario:</code> without steps passes. Background steps don’t run for it.</li>
 </ul></section><section class="level2"><h3 id="parse-errors">Parse errors<a class="anchor" aria-label="anchor" href="#parse-errors"></a>
 </h3>
 <p>Every feature file is parsed before anything runs. If any file can’t be parsed, no scenario runs, and every error of every file is reported, each with its line and column:</p>
 <pre><code>Can't parse feature files
-✖ Parse error in "features/broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
-✖ Parse error in "features/broken.feature" (9:7): inconsistent cell count within the table</code></pre>
+✖ Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
+✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table</code></pre>
 <p>Before, the files before the broken one ran, and the files after it were skipped.</p>
 </section><section class="level2"><h3 id="migrating-from-2-2-0">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0"></a>
 </h3>
@@ -601,7 +601,7 @@
 <span><span class="fu"><a href="../reference/define_parameter_type.html">define_parameter_type</a></span><span class="op">(</span><span class="st">"colour"</span>, <span class="st">"(?:dark )?(?:red|blue)"</span>, <span class="va">as.character</span><span class="op">)</span></span></code></pre></div>
 </section><section class="level3"><h4 id="parameter-types-cant-be-redefined">Parameter types can’t be redefined<a class="anchor" aria-label="anchor" href="#parameter-types-cant-be-redefined"></a>
 </h4>
-<p><code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> fails on a name that is already defined, like <code>int</code>. Before, the second definition silently replaced the first. Give your parameter type its own name, e.g. <code>{count}</code>. A name can’t contain <code>{</code>, <code>}</code>, <code>(</code>, <code>)</code>, <code>\</code> or <code>/</code>, and only one parameter type with the same regexp can have <code>prefer_for_regexp_match = TRUE</code>.</p>
+<p><code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> fails on a name that is already defined differently, like <code>int</code>. Defining the same parameter type again, like when a setup file is loaded twice, replaces it. Before, the second definition silently replaced the first. Give your parameter type its own name, e.g. <code>{count}</code>. A name can’t contain <code>{</code>, <code>}</code>, <code>(</code>, <code>)</code>, <code>\</code> or <code>/</code>, and only one parameter type with the same regexp can have <code>prefer_for_regexp_match = TRUE</code>.</p>
 <p><code>{byte}</code>, <code>{short}</code>, <code>{long}</code> and <code>{double}</code> are built in now, so a parameter type of your own with one of these names must be renamed. A regular expression group whose regexp is <a href="https://github.com/wrathematics/float" class="external-link">float</a>’s is ambiguous between <a href="https://github.com/wrathematics/float" class="external-link">float</a> and <code>{double}</code>.</p>
 </section></section></section><section class="section level2"><h2 id="running-tests">Running tests<a class="anchor" aria-label="anchor" href="#running-tests"></a>
 </h2>
@@ -886,10 +886,10 @@
 <p>See <code><a href="../articles/reporting.html">vignette("reporting")</a></code> for how to write the HTML report of a run, attach a screenshot of a failing shinytest2 scenario to it, and keep the report of a CI run.</p>
 </section><section class="section level2"><h2 id="features-as-documentation">Features as documentation<a class="anchor" aria-label="anchor" href="#features-as-documentation"></a>
 </h2>
-<p><code><a href="../reference/features_rd.html">features_rd()</a></code> puts scenarios of feature files in the help page of a function, in a “Behavior” section:</p>
+<p><code><a href="../reference/features_rd.html">features_rd()</a></code> puts scenarios of feature files in the help page of a function, in a section named <code>"Behavior"</code> by default:</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' @eval cucumber::features_rd(features = "basket.feature")</span></span></code></pre></div>
-<p>It selects scenarios like <code><a href="../reference/test.html">test()</a></code>, by <code>features</code> and their lines, <code>filter</code>, <code>name</code> and <code>tags</code>. By default only scenarios tagged <code>@rd</code> are selected; the <code>cucumber.rd_tags</code> option sets another tag expression, and <code>section</code> or the <code>cucumber.rd_section</code> option names the section. In the help page, each feature is one block of Gherkin, as written, with only the Rules and Backgrounds of the selected scenarios, and of a Scenario Outline only the selected Examples. On a pkgdown site, it’s shown like Markdown with Gherkin: headers for the feature and its Rules, Backgrounds, scenarios and Examples, a list of steps, tables, and Doc Strings as code, Gherkin ones highlighted. <code>markdown = FALSE</code> shows the block of Gherkin there too.</p>
+<p>It selects scenarios like <code><a href="../reference/test.html">test()</a></code>, by <code>features</code> and their lines, <code>filter</code>, <code>name</code> and <code>tags</code>. By default only scenarios matching <code>"@rd"</code> are selected; the <code>cucumber.rd_tags</code> option sets another tag expression, and <code>section</code> or the <code>cucumber.rd_section</code> option names the section. In the help page, each feature is one block of Gherkin, as written, with only the Rules and Backgrounds of the selected scenarios, and of a Scenario Outline only the selected Examples. On a pkgdown site, it’s shown like Markdown with Gherkin: headers for the feature and its Rules, Backgrounds, scenarios and Examples, a list of steps, tables, and Doc Strings as code, Gherkin ones highlighted. <code>markdown = FALSE</code> shows the block of Gherkin there too.</p>
 </section><section class="section level2"><h2 id="snippets">Snippets<a class="anchor" aria-label="anchor" href="#snippets"></a>
 </h2>
 <p>Snippets for undefined steps are generated like in Cucumber:</p>

@@ -279,7 +279,8 @@ Source: `tests/acceptance/regular_expressions.feature`
 ### Feature: Step definition arguments
 
 A step definition is a function. It gets the step's parameters, then its
-Data Table or Doc String, then `context`, in this order.
+Data Table and Doc String in the order they are written, then `context`,
+in this order.
 
 #### Background:
 

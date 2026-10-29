@@ -1,11 +1,13 @@
 # Summary Reporter for Cucumber
 
-Prints only the summary of the run. The other cucumber reporters print
-it at the end of the run too:
+Prints only the summary of the run.
 [CucumberProgressReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberProgressReporter.md),
-[CucumberProgressBarReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberProgressBarReporter.md)
+[CucumberPrettyReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberPrettyReporter.md)
 and
-[CucumberPrettyReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberPrettyReporter.md).
+[CucumberDotsReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberDotsReporter.md)
+print it at the end of the run too, and
+[CucumberProgressBarReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberProgressBarReporter.md)
+prints its counts.
 
     Failures:
 

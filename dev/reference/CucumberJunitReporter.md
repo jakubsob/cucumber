@@ -7,7 +7,7 @@ progress of the run, combine it with another reporter in a
 [CucumberMultiReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberMultiReporter.md).
 To write the report of a run after it ran, store its messages with
 [CucumberMessagesReporter](https://jakubsob.github.io/cucumber/dev/reference/CucumberMessagesReporter.md)
-and pass their file to `report()`.
+and pass their file to the `$report()` method.
 
 ## Behavior
 
@@ -22,7 +22,8 @@ the run.
 
 Each scenario is a test case, each example of an outline being one. Its
 class name is the feature's name and its name is the scenario's, after
-the rule's, followed by the name and number of the example. A scenario
+the rule's, followed by the name and number of the example, and the
+example's own name when the outline's name has placeholders. A scenario
 that passed, failed or was skipped is a passed, failed or skipped test
 case. A pending, undefined or ambiguous scenario is a failed one. Its
 steps and their results are the test case's output. A

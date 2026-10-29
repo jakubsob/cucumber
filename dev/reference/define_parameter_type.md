@@ -494,10 +494,4 @@ define_parameter_type(
   regexp = "[+-]?\\d*\\.?\\d+(?:e[+-]?\\d+)?",
   transformer = as.double
 )
-
-if (FALSE) { # \dontrun{
-#' tests/testthat/test-cucumber.R
-cucumber::define_parameter_type("color", "red|blue|green", as.character)
-cucumber::test(".", "./steps")
-} # }
 ```

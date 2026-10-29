@@ -34,7 +34,7 @@ needs is down. The scenario is reported as skipped with its reason, and
 after hooks still run and get `"skipped"` as its status. In an
 [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
 hook, it skips only that hook, and the scenario is skipped unless it
-failed. In a
+already failed, or is pending, undefined or ambiguous. In a
 [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
 hook, it skips every scenario of the run. Calling it in a
 [`before_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md),

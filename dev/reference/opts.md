@@ -11,7 +11,9 @@ The following options are available:
 
   Directory with `.feature` files that
   [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
-  runs when called without `path`.
+  runs and
+  [`features_rd()`](https://jakubsob.github.io/cucumber/dev/reference/features_rd.md)
+  reads when called without `path`.
 
   default: `"tests/acceptance"`
 

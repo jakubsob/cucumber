@@ -35,7 +35,7 @@ An envelope is a list with one element, named by the message's type. The
 messages of a scenario are, in order:
 
 - `testCaseStarted`, with the `id` its other messages refer to and the
-  `testCaseId` of its `testCase`, sent before the run starts, whose
+  `testCaseId` of its `testCase`, sent before any scenario runs, whose
   `pickleId` is the id of its `pickle`: the scenario's name, tags and
   steps.
 

@@ -98,16 +98,16 @@
 
 
 
-    <p><code><a href="../reference/test.html">cucumber::test()</a></code> runs the <code>.feature</code> and <code>.feature.md</code> files of a directory, <code>tests/acceptance</code> by default, and its subdirectories. A run goes like this:</p>
+    <p><code><a href="../reference/test.html">cucumber::test()</a></code> runs the <code>.feature</code> and <code>.feature.md</code> files of a directory, <code>"tests/acceptance"</code> by default, and its subdirectories. A run goes like this:</p>
 <ol type="1">
 <li>
 <strong>Load the step definitions.</strong> The <code>helper-*.R</code> and <code>setup-*.R</code> files of the directory are run, like <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code> runs them. Calls to <code><a href="../reference/step.html">given()</a></code>, <code><a href="../reference/step.html">when()</a></code>, <code><a href="../reference/step.html">then()</a></code>, the hooks and <code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> in them register step definitions, hooks and parameter types for the run.</li>
 <li>
-<strong>Parse the feature files.</strong> Every feature file is parsed before anything runs. If one can’t be parsed, no scenario runs, and every parse error is reported with its file, line and column.</li>
+<strong>Parse the feature files.</strong> The feature files picked by <code>filter</code> and <code>features</code> are parsed before anything runs. If one can’t be parsed, no scenario runs, and every parse error is reported with its file, line and column.</li>
 <li>
 <strong>Compile the scenarios.</strong> Each scenario, and each row of a Scenario Outline’s Examples, becomes one test case, with the <code>Background</code> steps before its own steps.</li>
 <li>
-<strong>Select and order them</strong>, by <code>filter</code>, <code>name</code>, <code>tags</code> and <code>features</code>, and by <code>order</code>.</li>
+<strong>Select and order them</strong>, by <code>name</code>, <code>tags</code> and the lines of <code>features</code>, and by <code>order</code>.</li>
 <li>
 <strong>Run them.</strong> Each step is matched to a step definition, and the step definitions are called one by one.</li>
 <li>

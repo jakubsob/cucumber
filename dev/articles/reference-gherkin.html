@@ -118,10 +118,10 @@
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> the Maker has started a game with the word <span class="st">"silky"</span></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> the Breaker joins the Maker's game</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> the Breaker must guess a word with 5 characters</span></code></pre></div>
-<p>Please note that some keywords <em>are</em> followed by a colon (<code>:</code>) and some <em>are not</em>. If you add a colon after a keyword that should not be followed by one, like <code>Given: x</code>, the feature file fails to parse.</p>
+<p>Please note that some keywords <em>are</em> followed by a colon (<code>:</code>) and some <em>are not</em>. If you add a colon after a keyword that should not be followed by one, like <code>Given: x</code>, it isn’t a step: after a step the feature file fails to parse, and right under <code>Scenario:</code> the line is read as part of the description.</p>
 <p>Every feature file is parsed before anything runs. If any of them can’t be parsed, no scenario runs, and every error is reported with its file, line and column:</p>
 <pre><code>Can't parse feature files
-✖ Parse error in "features/broken.feature" (9:7): inconsistent cell count within the table</code></pre>
+✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table</code></pre>
 <section class="section level2"><h2 id="keywords">Keywords<a class="anchor" aria-label="anchor" href="#keywords"></a>
 </h2>
 <p>Each line that isn’t a blank line has to start with a Gherkin <em>keyword</em>, followed by any text you like. The only exceptions are the free-form descriptions placed underneath <code>Example/Scenario</code>, <code>Background</code> and <code>Scenario Outline</code> lines.</p>
@@ -470,7 +470,7 @@
 <li><code>Scenario Outline</code></li>
 <li><code>Examples</code></li>
 </ul>
-<p><strong>Note:</strong> Tags placed above <code>Background</code> or steps (<code>Given</code>, <code>When</code>, <code>Then</code>, <code>And</code>, <code>But</code>, <code>*</code>) will cause a validation error. Place tags only on the elements listed above.</p>
+<p><strong>Note:</strong> Tags placed above <code>Background</code> or steps (<code>Given</code>, <code>When</code>, <code>Then</code>, <code>And</code>, <code>But</code>, <code>*</code>) make the feature file fail to parse. Place tags only on the elements listed above.</p>
 <p>In <code>Scenario Outline</code>, you can use tags on different sets of examples:</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">Scenario Outline:</span> Steps will run conditionally if tagged</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Given</span> user is logged in</span>
@@ -611,7 +611,7 @@
 <span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    Soit I have 1</span>
 <span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    Quand I add 1</span>
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    Alors I should have 2</span></code></pre></div>
-<p>A file without the header is in English (<code>en</code>), or in the language of the <code>cucumber.language</code> option, like <code>options(cucumber.language = "fr")</code>. Every language from Cucumber’s <a href="https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json" class="external-link">gherkin-languages.json</a> is supported. See the <a href="https://cucumber.io/docs/gherkin/languages/" class="external-link">Gherkin reference</a> for the keywords of each language.</p>
+<p>A file without the header is in the language of the <code>cucumber.language</code> option, <code>"en"</code> by default, like <code>options(cucumber.language = "fr")</code>. Every language from Cucumber’s <a href="https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json" class="external-link">gherkin-languages.json</a> is supported. See the <a href="https://cucumber.io/docs/gherkin/languages/" class="external-link">Gherkin reference</a> for the keywords of each language.</p>
 <p>Step definitions don’t change: steps are matched without their keyword, so <code>given("I have {int}", ...)</code> matches <code>Soit I have 1</code>.</p>
 </section><section class="section level2"><h2 id="markdown-with-gherkin">Markdown with Gherkin<a class="anchor" aria-label="anchor" href="#markdown-with-gherkin"></a>
 </h2>

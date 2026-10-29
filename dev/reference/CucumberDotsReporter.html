@@ -3,6 +3,14 @@
 CucumberSummaryReporter:
 ......F--
 
+Failures:
+
+1) Scenario: Remove an item # basket.feature:6
+    ✔ Given a basket with 2 apples
+    ✖ When I remove 3 apples
+    Error:
+      Can't remove more apples than there are.
+
 ────────────────────────────────────────────────────────────────────────
 Summary
   3 scenarios (1 failed, 2 passed)
@@ -12,6 +20,14 @@ Summary
 "><meta property="og:description" content="Prints one character for each step and hook as it finishes, then the summary of
 CucumberSummaryReporter:
 ......F--
+
+Failures:
+
+1) Scenario: Remove an item # basket.feature:6
+    ✔ Given a basket with 2 apples
+    ✖ When I remove 3 apples
+    Error:
+      Can't remove more apples than there are.
 
 ────────────────────────────────────────────────────────────────────────
 Summary
@@ -81,12 +97,20 @@ Summary
 <a href="CucumberSummaryReporter.html">CucumberSummaryReporter</a>:</p>
 <p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>......F<span class="sc">--</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>────────────────────────────────────────────────────────────────────────</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>Summary</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>  <span class="dv">3</span> <span class="fu">scenarios</span> (<span class="dv">1</span> failed, <span class="dv">2</span> passed)</span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>  <span class="dv">9</span> <span class="fu">steps</span> (<span class="dv">1</span> failed, <span class="dv">2</span> skipped, <span class="dv">6</span> passed)</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>  <span class="dv">0</span><span class="fu">m00.153s</span> (executing steps<span class="sc">:</span> <span class="dv">0</span>m00<span class="fl">.121</span>s)</span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>────────────────────────────────────────────────────────────────────────</span></code></pre><p></p></div>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>Failures<span class="sc">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="dv">1</span><span class="er">)</span> Scenario<span class="sc">:</span> Remove an item <span class="co"># basket.feature:6</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    ✔ Given a basket with <span class="dv">2</span> apples</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    ✖ When I remove <span class="dv">3</span> apples</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>    Error<span class="sc">:</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>      Can<span class="st">'t remove more apples than there are.</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="st">────────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="st">Summary</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="st">  3 scenarios (1 failed, 2 passed)</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="st">  9 steps (1 failed, 2 skipped, 6 passed)</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="st">  0m00.153s (executing steps: 0m00.121s)</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="st">────────────────────────────────────────────────────────────────────────</span></span></code></pre><p></p></div>
     </div>
 
 
@@ -136,7 +160,7 @@ x When I remove 1 item</code></pre></div></li>
 <li><p>And the output doesn't include "Scenario: Add an item"</p></li>
 </ul></div>
 <div class="section">
-<h4 id="scenario-pending-undefined-and-ambiguous-steps-and-hooks-are-printed-as-characters-too">Scenario: Pending, undefined and ambiguous steps and hooks are printed as characters too<a class="anchor" aria-label="anchor" href="#scenario-pending-undefined-and-ambiguous-steps-and-hooks-are-printed-as-characters-too"></a></h4><ul><li><p>Given a file named "features/basket.feature" with
+<h4 id="scenario-pending-undefined-and-ambiguous-steps-are-printed-as-characters-too">Scenario: Pending, undefined and ambiguous steps are printed as characters too<a class="anchor" aria-label="anchor" href="#scenario-pending-undefined-and-ambiguous-steps-are-printed-as-characters-too"></a></h4><ul><li><p>Given a file named "features/basket.feature" with
 </p><div class="sourceCode"><pre class="gherkin"><code><span class="kw">Feature:</span> Statuses
   <span class="kw">Scenario:</span> Pending
     <span class="fu">Given</span> a pending step

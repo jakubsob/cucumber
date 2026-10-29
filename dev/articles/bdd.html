@@ -261,7 +261,7 @@
 <span>  <span class="co"># Then</span></span>
 <span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">cart_includes</span><span class="op">(</span><span class="st">"The Hobbit, J.R.R. Tolkien"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Test passed with 1 success 🌈.</span></span></code></pre></div>
+<span><span class="co">#&gt; Test passed with 1 success 🎊.</span></span></code></pre></div>
 </div>
 <p>With this implementation, we can easily extend tests with checking if we can add multiple books to the cart.</p>
 <div class="cell">
@@ -277,7 +277,7 @@
 <span>  <span class="co"># Then</span></span>
 <span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">cart_includes</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The Hobbit, J.R.R. Tolkien"</span>, <span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Test passed with 1 success 🌈.</span></span></code></pre></div>
+<span><span class="co">#&gt; Test passed with 1 success 🎊.</span></span></code></pre></div>
 </div>
 <p>As the system grows, it will be extended with more examples and more actions. Actions already implemented will be reused in different scenarios.</p>
 <p>The implementation of the system will evolve, so will specifications, but this approach will ensure that test code is easy to maintain and focused on the business goal.</p>
@@ -376,7 +376,7 @@
 <span><span class="va">add_to_cart</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">storage</span> <span class="op">&lt;&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">storage</span>, <span class="va">id</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><code>devtools::document()</code> adds a “Specification” section to <code>?add_to_cart</code>, with the feature’s name, its description and the tagged scenarios, as they’re written. On the pkgdown site, steps are a list and tables are tables, unless you pass <code>markdown = FALSE</code>.</p>
+<p><code>devtools::document()</code> adds a section named <code>"Behavior"</code> by default to <code>?add_to_cart</code>, with the feature’s name, its description and the tagged scenarios, as they’re written. On the pkgdown site, steps are a list and tables are tables, unless you pass <code>markdown = FALSE</code>.</p>
 <p>The help pages of {cucumber} are written this way, like <a href="https://jakubsob.github.io/cucumber/reference/hook.html" class="external-link"><code>?hook</code></a> or <a href="https://jakubsob.github.io/cucumber/reference/test.html" class="external-link"><code>?test</code></a>. What we learned writing them:</p>
 <ul>
 <li>

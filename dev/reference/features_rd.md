@@ -9,10 +9,10 @@ the function's roxygen block:
     #' @export
     add <- function(basket, n) basket + n
 
-It adds a section, "Behavior" by default, with each selected feature:
-its name, its description, the Rules and Backgrounds of the selected
-scenarios and the scenarios, without their tags. Of a Scenario Outline,
-only the selected Examples rows are shown.
+It adds a section, named `"Behavior"` by default, with each selected
+feature: its name, its description, the Rules and Backgrounds of the
+selected scenarios and the scenarios, without their tags. Of a Scenario
+Outline, only the selected Examples rows are shown.
 
 In the help page, each feature is one block of Gherkin, as it's written.
 On HTML pages, like the pkgdown reference page, it's shown like Markdown
@@ -24,10 +24,10 @@ too.
 
 Scenarios are selected like in
 [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md).
-By default only scenarios tagged `@rd` are selected, so that you choose
-the ones that make good documentation. Set the `cucumber.rd_tags` option
-to use another tag expression, or pass `tags = NULL` to select scenarios
-without a tag.
+By default only scenarios matching `"@rd"` are selected, so that you
+choose the ones that make good documentation. Set the `cucumber.rd_tags`
+option to use another tag expression, or pass `tags = NULL` to select
+scenarios without a tag.
 
 On a pkgdown site, code is highlighted by the site's theme.
 

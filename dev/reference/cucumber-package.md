@@ -8,7 +8,7 @@ level description of how your code works.
 
 ## Getting started
 
-Write scenarios in `.feature` files in `tests/acceptance`, see
+Write scenarios in `.feature` files in `"tests/acceptance"`, see
 [`vignette("reference-gherkin", package = "cucumber")`](https://jakubsob.github.io/cucumber/dev/articles/reference-gherkin.md).
 Define their steps with
 [`given()`](https://jakubsob.github.io/cucumber/dev/reference/step.md),

@@ -5,13 +5,13 @@ for CI services like Jenkins, GitHub Actions or GitLab. To also see the
 progress of the run, combine it with another reporter in a
 CucumberMultiReporter. To write the report of a run after it ran, store
 its messages with CucumberMessagesReporter and pass their file to
-report()."><meta property="og:description" content="Writes the run as a JUnit XML report, the one of the official Cucumber
+the $report() method."><meta property="og:description" content="Writes the run as a JUnit XML report, the one of the official Cucumber
 JUnit XML formatter (https://github.com/cucumber/junit-xml-formatter),
 for CI services like Jenkins, GitHub Actions or GitLab. To also see the
 progress of the run, combine it with another reporter in a
 CucumberMultiReporter. To write the report of a run after it ran, store
 its messages with CucumberMessagesReporter and pass their file to
-report()."><meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png"><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
+the $report() method."><meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png"><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -75,7 +75,7 @@ for CI services like Jenkins, GitHub Actions or GitLab. To also see the
 progress of the run, combine it with another reporter in a
 <a href="CucumberMultiReporter.html">CucumberMultiReporter</a>. To write the report of a run after it ran, store
 its messages with <a href="CucumberMessagesReporter.html">CucumberMessagesReporter</a> and pass their file to
-<code>report()</code>.</p>
+the <code>$report()</code> method.</p>
     </div>
 
 
@@ -90,7 +90,8 @@ its messages with <a href="CucumberMessagesReporter.html">CucumberMessagesReport
 <p><code>CucumberJunitReporter</code> writes the JUnit XML report of a run when the run ends, even when it
 fails. CI services read it to show the results of the run.</p>
 <p>Each scenario is a test case, each example of an outline being one. Its class name is the feature's
-name and its name is the scenario's, after the rule's, followed by the name and number of the example.
+name and its name is the scenario's, after the rule's, followed by the name and number of the example,
+and the example's own name when the outline's name has placeholders.
 A scenario that passed, failed or was skipped is a passed, failed or skipped test case. A pending,
 undefined or ambiguous scenario is a failed one. Its steps and their results are the test case's output.
 A <code><a href="hook.html">before_all()</a></code> or <code><a href="hook.html">after_all()</a></code> hook that failed is a failed test case too, named after where it's defined.</p><div class="section">

@@ -6,18 +6,19 @@ of the help find how it behaves. Call it with @eval in the function's roxygen bl
 #' @export
 add &amp;lt;- function(basket, n) basket + n
 
-It adds a section, &quot;Behavior&quot; by default, with each selected feature: its name, its
-description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
-their tags. Of a Scenario Outline, only the selected Examples rows are shown.
+It adds a section, named &quot;Behavior&quot; by default,
+with each selected feature: its name, its description, the Rules and Backgrounds of the
+selected scenarios and the scenarios, without their tags. Of a Scenario Outline, only the
+selected Examples rows are shown.
 In the help page, each feature is one block of Gherkin, as it's written. On HTML pages,
 like the pkgdown reference page, it's shown like Markdown with Gherkin: the names of the
 feature and of its Rules, Backgrounds, scenarios and Examples are headers, steps are a
 list, tables are tables and Doc Strings are code, a Doc String of Gherkin highlighted as
 Gherkin. With markdown = FALSE, HTML pages show the block of Gherkin too.
-Scenarios are selected like in test(). By default only scenarios tagged @rd are
-selected, so that you choose the ones that make good documentation. Set the
-cucumber.rd_tags option to use another tag expression, or pass tags = NULL to select
-scenarios without a tag.
+Scenarios are selected like in test(). By default only scenarios matching
+&quot;@rd&quot; are selected, so that you choose the ones
+that make good documentation. Set the cucumber.rd_tags option to use another tag
+expression, or pass tags = NULL to select scenarios without a tag.
 On a pkgdown site, code is highlighted by the site's theme.
 It turns on markdown for the roxygen block it's in."><meta property="og:description" content="Put scenarios of your feature files in the help page of a function, so that readers
 of the help find how it behaves. Call it with @eval in the function's roxygen block:
@@ -26,18 +27,19 @@ of the help find how it behaves. Call it with @eval in the function's roxygen bl
 #' @export
 add &amp;lt;- function(basket, n) basket + n
 
-It adds a section, &quot;Behavior&quot; by default, with each selected feature: its name, its
-description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
-their tags. Of a Scenario Outline, only the selected Examples rows are shown.
+It adds a section, named &quot;Behavior&quot; by default,
+with each selected feature: its name, its description, the Rules and Backgrounds of the
+selected scenarios and the scenarios, without their tags. Of a Scenario Outline, only the
+selected Examples rows are shown.
 In the help page, each feature is one block of Gherkin, as it's written. On HTML pages,
 like the pkgdown reference page, it's shown like Markdown with Gherkin: the names of the
 feature and of its Rules, Backgrounds, scenarios and Examples are headers, steps are a
 list, tables are tables and Doc Strings are code, a Doc String of Gherkin highlighted as
 Gherkin. With markdown = FALSE, HTML pages show the block of Gherkin too.
-Scenarios are selected like in test(). By default only scenarios tagged @rd are
-selected, so that you choose the ones that make good documentation. Set the
-cucumber.rd_tags option to use another tag expression, or pass tags = NULL to select
-scenarios without a tag.
+Scenarios are selected like in test(). By default only scenarios matching
+&quot;@rd&quot; are selected, so that you choose the ones
+that make good documentation. Set the cucumber.rd_tags option to use another tag
+expression, or pass tags = NULL to select scenarios without a tag.
 On a pkgdown site, code is highlighted by the site's theme.
 It turns on markdown for the roxygen block it's in."><meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png"><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -103,18 +105,19 @@ of the help find how it behaves. Call it with <code>@eval</code> in the function
 <span><span class="co">#' @eval cucumber::features_rd(features = "basket.feature")</span></span>
 <span><span class="co">#' @export</span></span>
 <span><span class="va">add</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">basket</span>, <span class="va">n</span><span class="op">)</span> <span class="va">basket</span> <span class="op">+</span> <span class="va">n</span></span></code></pre><p></p></div>
-<p>It adds a section, "Behavior" by default, with each selected feature: its name, its
-description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
-their tags. Of a Scenario Outline, only the selected Examples rows are shown.</p>
+<p>It adds a section, named <code>"Behavior"</code> by default,
+with each selected feature: its name, its description, the Rules and Backgrounds of the
+selected scenarios and the scenarios, without their tags. Of a Scenario Outline, only the
+selected Examples rows are shown.</p>
 <p>In the help page, each feature is one block of Gherkin, as it's written. On HTML pages,
 like the pkgdown reference page, it's shown like Markdown with Gherkin: the names of the
 feature and of its Rules, Backgrounds, scenarios and Examples are headers, steps are a
 list, tables are tables and Doc Strings are code, a Doc String of Gherkin highlighted as
 Gherkin. With <code>markdown = FALSE</code>, HTML pages show the block of Gherkin too.</p>
-<p>Scenarios are selected like in <code><a href="test.html">test()</a></code>. By default only scenarios tagged <code>@rd</code> are
-selected, so that you choose the ones that make good documentation. Set the
-<code>cucumber.rd_tags</code> option to use another tag expression, or pass <code>tags = NULL</code> to select
-scenarios without a tag.</p>
+<p>Scenarios are selected like in <code><a href="test.html">test()</a></code>. By default only scenarios matching
+<code>"@rd"</code> are selected, so that you choose the ones
+that make good documentation. Set the <code>cucumber.rd_tags</code> option to use another tag
+expression, or pass <code>tags = NULL</code> to select scenarios without a tag.</p>
 <p>On a pkgdown site, code is highlighted by the site's theme.</p>
 <p>It turns on markdown for the roxygen block it's in.</p>
     </div>

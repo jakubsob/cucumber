@@ -117,6 +117,12 @@ test(
   Additional arguments passed to
   [`grepl()`](https://rdrr.io/r/base/grep.html) to control filtering.
 
+## Value
+
+The results of the run, like
+[`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html),
+invisibly.
+
 ## testthat's teardown environment
 
 Like in
@@ -166,7 +172,7 @@ use, and is an error in a parallel testthat run.
 
 `test()` runs the feature files in `tests/acceptance`, or in the
 directory set in the `cucumber.path` option. Pass `path` to run another
-directory. A mistake in an argument is an error that names the argument.
+directory. A mistake in an argument is an error that says what is wrong.
 
 #### Background:
 
@@ -399,9 +405,9 @@ Source: `tests/acceptance/r-projects_that_arent_packages.feature`
 
 ### Feature: Choosing feature files
 
-`test(path)` runs every `.feature` file in `path`, searched recursively.
-Run only some of them by listing them in `features`, or with a `filter`
-on their file names.
+`test(path)` runs every `.feature` and `.feature.md` file in `path`,
+searched recursively. Run only some of them by listing them in
+`features`, or with a `filter` on their file names.
 
 #### Background:
 
@@ -476,8 +482,9 @@ on their file names.
 
 #### Rule: `filter` runs the feature files whose name matches a regular expression
 
-The name is the file name without `.feature`. Extra arguments of
-`test()` are passed to [`grepl()`](https://rdrr.io/r/base/grep.html).
+The name is the file name without its `.feature` or `.feature.md`
+extension. Extra arguments of `test()` are passed to
+[`grepl()`](https://rdrr.io/r/base/grep.html).
 
 ##### Scenario: Only feature files whose name matches are run
 
@@ -505,7 +512,7 @@ Run only the scenarios whose tags match a tag expression, like
 with `and`, `or`, `not` and parentheses, like the official
 cucumber/tag-expressions. Tags are written with their `@`, and `and`,
 `or` and `not` are lowercase. Scenarios inherit the tags of their
-Feature, and examples inherit the tags of their Examples.
+Feature and Rule, and examples inherit the tags of their Examples.
 
 #### Background:
 
@@ -1232,9 +1239,10 @@ Source: `tests/acceptance/retry.feature`
 ### Feature: Order
 
 Scenarios run in the order they are defined: feature files in order of
-their path, and the scenarios of each file from top to bottom. With
-`order`, they run in reverse or in random order instead, which shows
-scenarios that pass only after another one left something behind.
+their path, or in the order `features` lists them, and the scenarios of
+each file from top to bottom. With `order`, they run in reverse or in
+random order instead, which shows scenarios that pass only after another
+one left something behind.
 
 #### Background:
 
@@ -1466,9 +1474,10 @@ Source: `tests/acceptance/markdown_with_gherkin.feature`
 
 ### Feature: Gherkin parse failure
 
-A feature file that isn't valid Gherkin fails with every error and its
-line:column. Every feature file is parsed before anything runs, so if
-any of them can't be parsed, no scenario runs.
+A feature file that isn't valid Gherkin fails with its errors and their
+line:column, up to 11 errors per file. Every feature file is parsed
+before anything runs, so if any of them can't be parsed, no scenario
+runs.
 
 #### Background:
 
@@ -1565,7 +1574,8 @@ edition hides them. What the setup files and steps defer to
 runs when `test()` ends. Each feature file is the file of its scenarios'
 results, and a failure, a skip or a warning is at its line: the line of
 its step, or of its scenario for a hook. Outside of a testthat run, like
-in the console, `test()` sets `NOT_CRAN` to `"true"`, like
+in the console, `test()` sets `NOT_CRAN` to `"true"` when it isn't set,
+like
 [`testthat::test_local()`](https://testthat.r-lib.org/reference/test_package.html),
 so snapshots are checked. In a testthat run or in R CMD check,
 `NOT_CRAN` is left as it is, so `skip_on_cran()` still skips on CRAN.

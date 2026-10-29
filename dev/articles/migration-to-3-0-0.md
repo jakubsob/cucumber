@@ -164,8 +164,7 @@ in Cucumber:
 - `Ability:` and `Business Need:` can be used instead of `Feature:`.
 - An empty file, a file with only comments, and a `Feature:` without
   scenarios run nothing, instead of failing.
-- A `Scenario:` without steps is reported as an empty test. Background
-  steps don’t run for it.
+- A `Scenario:` without steps passes. Background steps don’t run for it.
 
 ### Parse errors
 
@@ -174,8 +173,8 @@ parsed, no scenario runs, and every error of every file is reported,
 each with its line and column:
 
     Can't parse feature files
-    ✖ Parse error in "features/broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
-    ✖ Parse error in "features/broken.feature" (9:7): inconsistent cell count within the table
+    ✖ Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
+    ✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table
 
 Before, the files before the broken one ran, and the files after it were
 skipped.
@@ -528,11 +527,12 @@ define_parameter_type("colour", "(?:dark )?(?:red|blue)", as.character)
 #### Parameter types can’t be redefined
 
 [`define_parameter_type()`](https://jakubsob.github.io/cucumber/dev/reference/define_parameter_type.md)
-fails on a name that is already defined, like `int`. Before, the second
-definition silently replaced the first. Give your parameter type its own
-name, e.g. `{count}`. A name can’t contain `{`, `}`, `(`, `)`, `\` or
-`/`, and only one parameter type with the same regexp can have
-`prefer_for_regexp_match = TRUE`.
+fails on a name that is already defined differently, like `int`.
+Defining the same parameter type again, like when a setup file is loaded
+twice, replaces it. Before, the second definition silently replaced the
+first. Give your parameter type its own name, e.g. `{count}`. A name
+can’t contain `{`, `}`, `(`, `)`, `\` or `/`, and only one parameter
+type with the same regexp can have `prefer_for_regexp_match = TRUE`.
 
 `{byte}`, `{short}`, `{long}` and `{double}` are built in now, so a
 parameter type of your own with one of these names must be renamed. A
@@ -1088,7 +1088,7 @@ failing shinytest2 scenario to it, and keep the report of a CI run.
 
 [`features_rd()`](https://jakubsob.github.io/cucumber/dev/reference/features_rd.md)
 puts scenarios of feature files in the help page of a function, in a
-“Behavior” section:
+section named `"Behavior"` by default:
 
 ``` r
 
@@ -1098,15 +1098,16 @@ puts scenarios of feature files in the help page of a function, in a
 It selects scenarios like
 [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md),
 by `features` and their lines, `filter`, `name` and `tags`. By default
-only scenarios tagged `@rd` are selected; the `cucumber.rd_tags` option
-sets another tag expression, and `section` or the `cucumber.rd_section`
-option names the section. In the help page, each feature is one block of
-Gherkin, as written, with only the Rules and Backgrounds of the selected
-scenarios, and of a Scenario Outline only the selected Examples. On a
-pkgdown site, it’s shown like Markdown with Gherkin: headers for the
-feature and its Rules, Backgrounds, scenarios and Examples, a list of
-steps, tables, and Doc Strings as code, Gherkin ones highlighted.
-`markdown = FALSE` shows the block of Gherkin there too.
+only scenarios matching `"@rd"` are selected; the `cucumber.rd_tags`
+option sets another tag expression, and `section` or the
+`cucumber.rd_section` option names the section. In the help page, each
+feature is one block of Gherkin, as written, with only the Rules and
+Backgrounds of the selected scenarios, and of a Scenario Outline only
+the selected Examples. On a pkgdown site, it’s shown like Markdown with
+Gherkin: headers for the feature and its Rules, Backgrounds, scenarios
+and Examples, a list of steps, tables, and Doc Strings as code, Gherkin
+ones highlighted. `markdown = FALSE` shows the block of Gherkin there
+too.
 
 ## Snippets
 

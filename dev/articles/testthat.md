@@ -9,7 +9,8 @@ they differ.
 [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) is
 cucumber’s
 [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html):
-it runs the feature files of a directory, by default `tests/acceptance`.
+it runs the feature files of a directory, by default
+`"tests/acceptance"`.
 [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md),
 called in a `tests/testthat/test-*.R` file, runs feature files as part
 of the package’s testthat tests, e.g. with `devtools::test()` or
@@ -44,7 +45,7 @@ of the package’s testthat tests, e.g. with `devtools::test()` or
 
 |  | [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html) | [`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) |
 |----|----|----|
-| Default directory | Required `path` | `tests/acceptance`, or the `cucumber.path` option |
+| Default directory | Required `path` | `"tests/acceptance"`, or the `cucumber.path` option |
 | Package code | `load_package` argument | Load the package first, e.g. with [`pkgload::load_all()`](https://pkgload.r-lib.org/reference/load_all.html) |
 | Environment | `env` argument | The same |
 | testthat edition | From the package’s `DESCRIPTION` | The same |
