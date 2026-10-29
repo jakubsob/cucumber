@@ -89,16 +89,16 @@ a {
   }
 }
 
-// Navbar: quiet ground, a tinted pill marks where you are ------------------------
+// Navbar: light-green ground, an underline on the bottom edge marks where you are
 
 .navbar {
-  background: var(--bs-body-bg) !important;
+  background: var(--rl-code-bg) !important;
   border-bottom: 1px solid var(--rl-rule);
   --bs-navbar-color: var(--rl-ink);
-  --bs-navbar-hover-color: var(--rl-passed);
+  --bs-navbar-hover-color: var(--rl-ink);
   --bs-navbar-active-color: var(--rl-ink);
   --bs-navbar-brand-color: var(--rl-ink);
-  --bs-navbar-brand-hover-color: var(--rl-passed);
+  --bs-navbar-brand-hover-color: var(--rl-ink);
   --bs-nav-link-color: var(--rl-ink);
 
   .navbar-brand {
@@ -113,14 +113,48 @@ a {
 
   .nav-link {
     hyphens: manual;
+    border-radius: 0;
+    border-bottom: 3px solid transparent;
   }
 
   .nav-item .nav-link:hover {
     background: transparent;
+    border-bottom-color: var(--rl-rule);
   }
 
   .nav-item.active .nav-link {
-    background: var(--rl-code-bg);
+    background: transparent;
+    border-bottom-color: var(--rl-passed);
+  }
+
+  // Padding lives in the items, so the active underline sits on the navbar's bottom border
+  @include media-breakpoint-up(lg) {
+    padding-block: 0;
+
+    > .container,
+    .navbar-collapse,
+    .navbar-nav {
+      align-items: stretch;
+    }
+
+    .navbar-brand,
+    .nav-text {
+      align-self: center;
+    }
+
+    .nav-item,
+    .nav-item > form {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-item > .nav-link {
+      align-self: stretch;
+      display: flex;
+      align-items: center;
+      padding-block: 1rem;
+      margin-bottom: -1px;
+    }
   }
 
   // Search input
