@@ -14,7 +14,7 @@ Shows a bar of the steps and hooks run so far, redrawn in place:
 12/40 steps [==============                                         ]
 }\if{html}{\out{</div>}}
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

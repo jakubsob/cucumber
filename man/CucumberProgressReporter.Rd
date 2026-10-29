@@ -20,7 +20,7 @@ Feature: Basket
 
 To see each step, use \link{CucumberPrettyReporter}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

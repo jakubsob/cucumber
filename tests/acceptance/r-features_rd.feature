@@ -1,7 +1,7 @@
 @rd
 Feature: Scenarios as documentation
   `features_rd()` puts scenarios of feature files in the help page of a function, in a
-  "Specification" section, so readers of the help find how it behaves. Call it with `@eval`
+  "Behavior" section, so readers of the help find how it behaves. Call it with `@eval`
   in the function's roxygen block. It selects scenarios like `test()`: by `features` and their
   lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected,
   set the `cucumber.rd_tags` option to use another tag expression. Name the section with
@@ -58,7 +58,7 @@ Feature: Scenarios as documentation
       """
     Then the help page "add" includes
       """
-      Specification:
+      Behavior:
 
       Feature: Basket
         A basket holds the items a customer wants to buy.
@@ -416,7 +416,7 @@ Feature: Scenarios as documentation
       roxygen2::roxygenise()
       """
     Then the help page "add" includes "Examples of use:"
-    And the help page "add" doesn't include "Specification:"
+    And the help page "add" doesn't include "Behavior:"
 
   Scenario: The sections of every help page have another name
     Given a file named "R/add.R" with
@@ -428,10 +428,10 @@ Feature: Scenarios as documentation
       """
     When I run
       """
-      withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
+      withr::with_options(list(cucumber.rd_section = "Specification"), roxygen2::roxygenise())
       """
-    Then the help page "add" includes "Behavior:"
-    And the help page "add" doesn't include "Specification:"
+    Then the help page "add" includes "Specification:"
+    And the help page "add" doesn't include "Behavior:"
 
   Scenario: Scenarios of a Rule are under the Rule
     Only the selected Examples of a Scenario Outline are shown, and only the Rules with

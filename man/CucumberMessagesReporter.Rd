@@ -13,7 +13,7 @@ Cucumber Compatibility Kit. Locations of step definitions and hooks need
 their source references, kept when the files are sourced with
 \code{keep.source = TRUE}, as testthat does.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

@@ -13,7 +13,7 @@ pending(message = "TODO")
 Call \code{pending()} in a step or a hook that isn't implemented yet. Outside of a
 Cucumber run \code{pending()} skips the test like \code{\link[testthat:skip]{testthat::skip()}}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

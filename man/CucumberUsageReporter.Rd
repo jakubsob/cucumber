@@ -18,7 +18,7 @@ I add \{int\} apples             1.52ms    setup-steps.R:3
 I remove \{int\} apples          UNUSED    setup-steps.R:6
 }\if{html}{\out{</div>}}
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

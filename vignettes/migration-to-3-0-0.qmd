@@ -649,7 +649,7 @@ See `vignette("reporting")` for how to write the HTML report of a run, attach a 
 
 # Features as documentation
 
-`features_rd()` puts scenarios of feature files in the help page of a function, in a "Specification" section:
+`features_rd()` puts scenarios of feature files in the help page of a function, in a "Behavior" section:
 
 ```r
 #' @eval cucumber::features_rd(features = "basket.feature")

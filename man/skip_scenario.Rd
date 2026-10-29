@@ -14,7 +14,7 @@ Call \code{skip_scenario()} in a step or in a \code{\link[=before]{before()}} or
 scenario, e.g. when a service it needs isn't available. Outside of a Cucumber run
 \code{skip_scenario()} skips the test like \code{\link[testthat:skip]{testthat::skip()}}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

@@ -28,7 +28,7 @@ A function of class \code{step}, invisibly. Function should be called for side e
 \description{
 Provide a description that matches steps in feature files and the implementation function that will be run.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

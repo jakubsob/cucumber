@@ -55,7 +55,7 @@ of the help find how it behaves. Call it with \verb{@eval} in the function's rox
 add <- function(basket, n) basket + n
 }\if{html}{\out{</div>}}
 
-It adds a section, "Specification" by default, with each selected feature: its name, its
+It adds a section, "Behavior" by default, with each selected feature: its name, its
 description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
 their tags. Of a Scenario Outline, only the selected Examples rows are shown.
 
@@ -74,14 +74,14 @@ On a pkgdown site, code is highlighted by the site's theme.
 
 It turns on markdown for the roxygen block it's in.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}
 \if{html}{
 \subsection{Feature: Scenarios as documentation}{
 \code{features_rd()} puts scenarios of feature files in the help page of a function, in a
-"Specification" section, so readers of the help find how it behaves. Call it with \code{@eval}
+"Behavior" section, so readers of the help find how it behaves. Call it with \code{@eval}
 in the function's roxygen block. It selects scenarios like \code{test()}: by \code{features} and their
 lines, \code{filter}, \code{name} and \code{tags}. By default only scenarios tagged \code{@rd} are selected,
 set the \code{cucumber.rd_tags} option to use another tag expression. Name the section with
@@ -109,7 +109,7 @@ add <- function(basket, n) basket + n}
 \item When I run
 \preformatted{roxygen2::roxygenise()}
 \item Then the help page "add" includes
-\preformatted{Specification:
+\preformatted{Behavior:
 
 Feature: Basket
   A basket holds the items a customer wants to buy.
@@ -363,7 +363,7 @@ add <- function(basket, n) basket + n}
 \item When I run
 \preformatted{roxygen2::roxygenise()}
 \item Then the help page "add" includes "Examples of use:"
-\item And the help page "add" doesn't include "Specification:"
+\item And the help page "add" doesn't include "Behavior:"
 }
 }
 \subsection{Scenario: The sections of every help page have another name}{
@@ -374,9 +374,9 @@ add <- function(basket, n) basket + n}
 #' @export
 add <- function(basket, n) basket + n}
 \item When I run
-\preformatted{withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())}
-\item Then the help page "add" includes "Behavior:"
-\item And the help page "add" doesn't include "Specification:"
+\preformatted{withr::with_options(list(cucumber.rd_section = "Specification"), roxygen2::roxygenise())}
+\item Then the help page "add" includes "Specification:"
+\item And the help page "add" doesn't include "Behavior:"
 }
 }
 \subsection{Scenario: Scenarios of a Rule are under the Rule}{
@@ -628,7 +628,7 @@ i Select scenarios with `features`, `filter` or `name`.}
 }    
 \if{text,latex}{\preformatted{Feature: Scenarios as documentation
   `features_rd()` puts scenarios of feature files in the help page of a function, in a
-  "Specification" section, so readers of the help find how it behaves. Call it with `@eval`
+  "Behavior" section, so readers of the help find how it behaves. Call it with `@eval`
   in the function's roxygen block. It selects scenarios like `test()`: by `features` and their
   lines, `filter`, `name` and `tags`. By default only scenarios tagged `@rd` are selected,
   set the `cucumber.rd_tags` option to use another tag expression. Name the section with
@@ -685,7 +685,7 @@ i Select scenarios with `features`, `filter` or `name`.}
       """
     Then the help page "add" includes
       """
-      Specification:
+      Behavior:
 
       Feature: Basket
         A basket holds the items a customer wants to buy.
@@ -1043,7 +1043,7 @@ i Select scenarios with `features`, `filter` or `name`.}
       roxygen2::roxygenise()
       """
     Then the help page "add" includes "Examples of use:"
-    And the help page "add" doesn't include "Specification:"
+    And the help page "add" doesn't include "Behavior:"
 
   Scenario: The sections of every help page have another name
     Given a file named "R/add.R" with
@@ -1055,10 +1055,10 @@ i Select scenarios with `features`, `filter` or `name`.}
       """
     When I run
       """
-      withr::with_options(list(cucumber.rd_section = "Behavior"), roxygen2::roxygenise())
+      withr::with_options(list(cucumber.rd_section = "Specification"), roxygen2::roxygenise())
       """
-    Then the help page "add" includes "Behavior:"
-    And the help page "add" doesn't include "Specification:"
+    Then the help page "add" includes "Specification:"
+    And the help page "add" doesn't include "Behavior:"
 
   Scenario: Scenarios of a Rule are under the Rule
     Only the selected Examples of a Scenario Outline are shown, and only the Rules with

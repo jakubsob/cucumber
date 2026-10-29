@@ -7,7 +7,7 @@
 Passes every event to each of its reporters. Use it, for example, to print
 the progress of a run and write its messages.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

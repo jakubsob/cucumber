@@ -266,7 +266,7 @@ and put them in its help page with `features_rd()`:
 add <- function(basket, n) basket + n
 ```
 
-`devtools::document()` adds a Specification section to `?add` with the
+`devtools::document()` adds a Behavior section to `?add` with the
 feature’s description and the tagged scenarios:
 
     Add items to a basket
@@ -279,7 +279,7 @@ feature’s description and the tagged scenarios:
 
          add(basket, n)
          
-    Specification:
+    Behavior:
 
          Feature: Basket
            A basket holds the items a customer wants to buy.

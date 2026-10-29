@@ -10,7 +10,7 @@ the run, combine it with another reporter in a \link{CucumberMultiReporter}. To
 write the report of a run after it ran, store its messages with
 \link{CucumberMessagesReporter} and pass their file to \code{report()}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

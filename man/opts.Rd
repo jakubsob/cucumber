@@ -47,12 +47,12 @@ default: \code{"@rd"}
 
 Name of the section \code{\link[=features_rd]{features_rd()}} puts scenarios in.
 
-default: \code{"Specification"}
+default: \code{"Behavior"}
 }
 
 See \code{\link[base:options]{base::options()}} and \code{\link[base:options]{base::getOption()}} on how to work with options.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

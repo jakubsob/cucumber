@@ -32,7 +32,7 @@ seconds and the \code{error} of a step that didn't pass.}
 Reads the messages a \link{CucumberMessagesReporter} wrote, to write a report of
 your own.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

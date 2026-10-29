@@ -29,7 +29,7 @@ The scenarios that failed, are ambiguous or undefined are listed under
 Failures, those that are pending and the failed attempts of retried
 scenarios under Warnings.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

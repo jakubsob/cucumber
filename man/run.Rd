@@ -86,7 +86,7 @@ didn't run.
 
 To get the results of a run, use \code{\link[=test]{test()}}, which returns them like \code{\link[testthat:test_dir]{testthat::test_dir()}}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

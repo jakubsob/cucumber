@@ -14,7 +14,7 @@ undefined in several scenarios gets one snippet.
 \})
 }\if{html}{\out{</div>}}
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

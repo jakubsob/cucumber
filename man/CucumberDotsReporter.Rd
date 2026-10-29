@@ -17,7 +17,7 @@ Summary
 ────────────────────────────────────────────────────────────────────────
 }\if{html}{\out{</div>}}
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

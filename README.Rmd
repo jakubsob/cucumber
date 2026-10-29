@@ -171,7 +171,7 @@ and put them in its help page with `features_rd()`:
 cat("```r", rd_roxygen, "```", sep = "\n")
 ```
 
-`devtools::document()` adds a Specification section to `?add` with the feature's description and the tagged scenarios:
+`devtools::document()` adds a Behavior section to `?add` with the feature's description and the tagged scenarios:
 
 ```{r rd-help, echo = FALSE}
 withr::with_tempdir({
@@ -181,7 +181,7 @@ withr::with_tempdir({
   rd_file <- tempfile(fileext = ".Rd")
   writeLines(format(rd[["add.Rd"]]), rd_file)
   help <- capture.output(tools::Rd2txt(rd_file, options = list(underline_titles = FALSE)))
-  #section <- paste0(getOption("cucumber.rd_section", "Specification"), ":")
+  #section <- paste0(getOption("cucumber.rd_section"), ":")
   #cat(help[which(help == section):length(help)], sep = "\n")
   cat(help, sep = "\n")
 })

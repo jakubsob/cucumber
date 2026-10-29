@@ -13,7 +13,7 @@ Review and accept changed snapshots with \code{\link[testthat:snapshot_accept]{t
 \code{\link[testthat:snapshot_accept]{testthat::snapshot_accept()}}, given the snapshot file's name and the directory of the
 feature files, like \code{snapshot_accept("checkout-basket.feature", "tests/acceptance")}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

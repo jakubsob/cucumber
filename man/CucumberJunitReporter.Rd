@@ -12,7 +12,7 @@ progress of the run, combine it with another reporter in a
 its messages with \link{CucumberMessagesReporter} and pass their file to
 \code{report()}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

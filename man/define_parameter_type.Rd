@@ -36,7 +36,7 @@ Built-in parameter types are \code{{int}}, \code{{float}}, \code{{word}}, \code{
 like \code{{int}} but gives a double, as a long can be too big for an R integer.
 Define your own before the steps that use it are run, e.g. in a \verb{setup-*.R} file.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

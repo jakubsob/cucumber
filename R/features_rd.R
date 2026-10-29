@@ -11,7 +11,7 @@
 #' add <- function(basket, n) basket + n
 #' ```
 #'
-#' It adds a section, "Specification" by default, with each selected feature: its name, its
+#' It adds a section, "Behavior" by default, with each selected feature: its name, its
 #' description, the Rules and Backgrounds of the selected scenarios and the scenarios, without
 #' their tags. Of a Scenario Outline, only the selected Examples rows are shown.
 #'

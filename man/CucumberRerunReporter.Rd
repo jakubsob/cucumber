@@ -11,7 +11,7 @@ scenarios that didn't pass, like \code{basket.feature:3:12}. Pass them to the
 see the progress of the run, combine it with another reporter in a
 \link{CucumberMultiReporter}.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

@@ -34,7 +34,7 @@ messages of a scenario are, in order:
 Combine reporters with \link{CucumberMultiReporter}.
 }
 
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

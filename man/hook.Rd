@@ -47,7 +47,7 @@ each scenario, \code{before_step()} and \code{after_step()} each step, \code{bef
 the whole run. A \code{before()} or \code{after()} hook can skip the scenario with \code{\link[=skip_scenario]{skip_scenario()}}.
 Hooks don't run in a dry run.
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

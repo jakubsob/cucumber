@@ -8,7 +8,7 @@ OPTION_DEFAULTS <- list(
   cucumber.reporter_max_docstring_lines = Inf,
   cucumber.reporter_max_table_lines = Inf,
   cucumber.rd_tags = "@rd",
-  cucumber.rd_section = "Specification"
+  cucumber.rd_section = "Behavior"
 )
 
 .onLoad <- function(libname, pkgname) {

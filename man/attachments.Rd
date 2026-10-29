@@ -20,7 +20,7 @@ like \code{context$link("https://example.com/basket", "https://example.com/check
 or \code{context$link(urls)}.
 }
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

@@ -15,7 +15,7 @@ Prints each feature, scenario and step as it runs, then the summary of
     [x] Then the result should be 120 on the screen
 }\if{html}{\out{</div>}}
 }
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}

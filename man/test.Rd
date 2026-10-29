@@ -106,7 +106,7 @@ Those tests won't be run when calling \code{\link[=test]{test()}}. To run those 
 }
 }
 
-\section{Specification}{
+\section{Behavior}{
 
 \if{html}{\out{
 <pre hidden></pre >}}
