@@ -68,6 +68,14 @@
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/jakubsob/cucumber/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-lightswitch" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Light switch"><span class="fa fa-sun"></span></button>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-lightswitch">
+<li><button class="dropdown-item" data-bs-theme-value="light"><span class="fa fa-sun"></span> Light</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="dark"><span class="fa fa-moon"></span> Dark</button></li>
+    <li><button class="dropdown-item" data-bs-theme-value="auto"><span class="fa fa-adjust"></span> Auto</button></li>
+  </ul>
+</li>
       </ul>
 </div>
 
@@ -90,7 +98,11 @@
 
 
 
-    <p>cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a <code>test_that()</code> test, and step definitions use testthat’s expectations. If you know testthat, most of cucumber works the way you expect. This article lists where the two are alike and where they differ.</p>
+    <!-- The tables need the width more than the page needs a table of contents. --><style>
+  #main { width: 100%; max-width: none; }
+  #main > .page-header { max-width: 72ch; }
+</style>
+<p>cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a <code>test_that()</code> test, and step definitions use testthat’s expectations. If you know testthat, most of cucumber works the way you expect. This article lists where the two are alike and where they differ.</p>
 <p><code><a href="../reference/test.html">test()</a></code> is cucumber’s <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code>: it runs the feature files of a directory, by default <code>tests/acceptance</code>. <code><a href="../reference/run.html">run()</a></code>, called in a <code>tests/testthat/test-*.R</code> file, runs feature files as part of the package’s testthat tests, e.g. with <code>devtools::test()</code> or <code>R CMD check</code>.</p>
 <section class="section level2"><h2 id="writing-tests">Writing tests<a class="anchor" aria-label="anchor" href="#writing-tests"></a>
 </h2>
