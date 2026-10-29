@@ -74,8 +74,14 @@ main {
     padding-top: 1.25rem;
   }
 
-  p, li, dd, blockquote {
-    max-width: 72ch;
+  // Text keeps the width of the col-md-9 main column, also on pages that widen main
+  @each $breakpoint, $container in map-remove($container-max-widths, "sm") {
+    @include media-breakpoint-up($breakpoint) {
+      .page-header, p, ul, ol, dl, blockquote {
+        // pkgdown caps main at 50rem
+        max-width: calc(min(#{$container} * 0.75, 50rem) - #{$grid-gutter-width});
+      }
+    }
   }
 }
 
