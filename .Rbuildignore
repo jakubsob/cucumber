@@ -19,3 +19,4 @@
 ^CRAN-SUBMISSION$
 ^revdep$
 ^README\.Rmd$
+^\.gitattributes$

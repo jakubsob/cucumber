@@ -1,0 +1,2 @@
+# Official Gherkin test data with CRLF line endings, kept byte for byte
+*.crlf.feature -text
