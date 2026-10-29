@@ -101,75 +101,93 @@ feature_rd <- function(document, pickles, source, file, markdown) {
   if (length(pickles) == 0) {
     return(NULL)
   }
-  feature <- document$feature
-  flavour <- gherkin_flavour(file)
   # The scenarios and the outline rows that are selected
   selected <- unlist(map(pickles, \(pickle) pickle$message$astNodeIds))
-  tokens <- gherkin_tokens(document, source)
-  # A child of the feature or of a rule ends before the first line of the next one
-  children <- c(feature$children, unlist(map(feature$children, \(child) child$rule$children), recursive = FALSE))
-  starts <- c(unlist(map(children, \(child) {
-    node <- child$background %||% child$scenario %||% child$rule
-    first_line(node)
-  })), length(source) + 1)
-  # The lines of a node, from its keyword to the next child, without its tags
-  # and, of a Scenario Outline, without the Examples' tags and unselected rows
-  node_lines <- function(node, level) {
-    drop <- unlist(map(node$examples, \(examples) {
-      c(map_int(examples$tags, \(tag) tag$location$line), unselected_rows(examples, selected))
-    }))
-    from <- node$location$line
-    to <- min(starts[starts > from]) - 1
-    lines <- setdiff(from:to, drop)
-    # Without the blank lines and comments before the next child
-    while (length(lines) > 0 && grepl(flavour$block_end, source[[lines[[length(lines)]]]])) {
-      lines <- lines[-length(lines)]
-    }
-    lines
-  }
-  # A list of the parts of the children, made by `part` of a node and its
-  # level: their Background and selected scenarios, and the Rules with selected
-  # scenarios
-  children_parts <- function(children, part, level = 1) {
-    parts <- unlist(map(children, \(child) {
-      if (!is.null(child$scenario) && child$scenario$id %in% selected) {
-        list(part(child$scenario, level))
-      } else if (!is.null(child$rule)) {
-        rule_parts <- children_parts(child$rule$children, part, level + 1)
-        if (length(rule_parts) > 0) c(list(part(child$rule, level)), rule_parts)
-      }
-    }), recursive = FALSE)
-    if (length(parts) == 0) {
-      return(NULL)
-    }
-    background <- Find(\(child) !is.null(child$background), children)$background
-    c(if (!is.null(background)) list(part(background, level)), parts)
-  }
-  parts <- function(part) c(list(part(feature, 0)), children_parts(feature$children, part))
-  # Line 0 is the blank line between parts
-  lines <- unlist(map(parts(node_lines), \(part) c(0L, part)))[-1]
+  feature <- document$feature
+  feature$children <- prune_children(feature$children, selected)
+  flavour <- gherkin_flavour(file)
+  lines <- source_lines(document$feature, nodes(feature), source, flavour, selected)
   code <- flavour$block_code(c("", source)[lines + 1], feature$location$column)
   html <- if (markdown) {
-    html <- nest_subsections(parts(\(node, level) node_rd(node, level, selected)))
+    html <- node_rd(feature)
     # An empty block to start the HTML block of gherkin_rd()
     c("<pre hidden></pre >}}", "\\if{html}{", html, paste0("}", padding(html)))
   } else {
-    pre <- gherkin_pre(code, lines, tokens)
+    pre <- gherkin_pre(code, lines, gherkin_tokens(document, source))
     paste0(pre, "}}", padding(pre))
   }
   c(gherkin_rd(code, html), paste0("Source: `", file, "`"), "")
 }
 
-#' Rd of a node with its steps and selected Examples, like Markdown with
-#' Gherkin of `pretty()` of the Gherkin utilities: a subsection, a list of
-#' steps, tables, and Doc Strings as code
-#' @param level 0 for the Feature, 1 for its Rules and children, 2 for the
-#'   children of a Rule
-#' @param selected The ids of the selected Examples rows
-#' @return Lines of Rd, of a subsection left open, with its `level`
+#' The children that document the selection: the selected scenarios with
+#' their selected Examples rows, the Rules with some, and the Background
+#' beside them
+#' @param selected The ids of the selected scenarios and Examples rows
+#' @return The children, empty if none is selected
+#' @importFrom purrr compact
 #' @keywords internal
 #' @noRd
-node_rd <- function(node, level, selected) {
+prune_children <- function(children, selected) {
+  kept <- compact(map(children, \(child) {
+    if (!is.null(child$scenario) && child$scenario$id %in% selected) {
+      child$scenario$examples <- compact(map(child$scenario$examples, \(examples) {
+        examples$tableBody <- Filter(\(row) row$id %in% selected, examples$tableBody)
+        if (length(examples$tableBody) > 0) examples
+      }))
+      child
+    } else if (!is.null(child$rule)) {
+      child$rule$children <- prune_children(child$rule$children, selected)
+      if (length(child$rule$children) > 0) child
+    }
+  }))
+  if (length(kept) == 0) {
+    return(list())
+  }
+  c(Filter(\(child) !is.null(child$background), children), kept)
+}
+
+#' A node and the nodes of its children, as they're written
+#' @keywords internal
+#' @noRd
+nodes <- function(node) {
+  c(list(node), unlist(map(node$children, \(child) nodes(child_node(child))), recursive = FALSE))
+}
+
+child_node <- function(child) child$background %||% child$scenario %||% child$rule
+
+#' The lines of the source of the nodes, each from its keyword to the next
+#' child, without tags and unselected Examples rows, and a 0 for the blank
+#' line between them
+#' @param feature The feature of the document, with all its children
+#' @param nodes The nodes to show
+#' @keywords internal
+#' @noRd
+source_lines <- function(feature, nodes, source, flavour, selected) {
+  all <- nodes(feature)
+  starts <- c(map_int(all[-1], first_line), length(source) + 1)
+  drop <- unlist(map(all, \(node) {
+    map(node$examples, \(examples) {
+      c(map_int(examples$tags, \(tag) tag$location$line), unselected_rows(examples, selected))
+    })
+  }))
+  lines <- map(nodes, \(node) {
+    from <- node$location$line
+    lines <- setdiff(from:(min(starts[starts > from]) - 1), drop)
+    # Without the blank lines and comments before the next child
+    while (length(lines) > 0 && grepl(flavour$block_end, source[[lines[[length(lines)]]]])) {
+      lines <- lines[-length(lines)]
+    }
+    lines
+  })
+  unlist(map(lines, \(x) c(0L, x)))[-1]
+}
+
+#' Rd of a node, like Markdown with Gherkin of `pretty()` of the Gherkin
+#' utilities: a subsection with its description, a list of steps, tables,
+#' Doc Strings as code, and the subsections of its Examples and children
+#' @keywords internal
+#' @noRd
+node_rd <- function(node) {
   name <- if (nzchar(node$name)) paste0(": ", rd_text(node$name)) else ":"
   description <- if (nzchar(node$description %||% "")) rd_text(trimws(strsplit(node$description, "\n")[[1]]))
   steps <- unlist(map(node$steps, \(step) {
@@ -179,34 +197,15 @@ node_rd <- function(node, level, selected) {
       if (!is.null(step$docString)) doc_string_rd(step$docString)
     )
   }))
-  examples <- unlist(map(node$examples, \(examples) {
-    rows <- Filter(\(row) row$id %in% selected, examples$tableBody)
-    if (length(rows) > 0) {
-      c(node_rd(examples, level + 1, selected), table_rd(c(list(examples$tableHeader), rows)), "}")
-    }
-  }))
-  structure(c(
+  c(
     paste0("\\subsection{", node$keyword, name, "}{"),
     description,
     if (length(steps) > 0) c("\\itemize{", steps, "}"),
-    examples
-  ), level = level)
-}
-
-#' Rd of subsections left open, each closed before the next one of its level
-#' or a lower one
-#' @param parts Lines of Rd, with their `level`
-#' @keywords internal
-#' @noRd
-nest_subsections <- function(parts) {
-  open <- integer()
-  rd <- character()
-  for (part in parts) {
-    level <- attr(part, "level")
-    rd <- c(rd, rep("}", sum(open >= level)), part)
-    open <- c(open[open < level], level)
-  }
-  c(rd, rep("}", length(open)))
+    if (!is.null(node$tableHeader)) table_rd(c(list(node$tableHeader), node$tableBody)),
+    unlist(map(node$examples, node_rd)),
+    unlist(map(node$children, \(child) node_rd(child_node(child)))),
+    "}"
+  )
 }
 
 #' Rd of the rows of a table, the first one its header. A cell is on one
@@ -262,21 +261,6 @@ rd_escape <- function(x) gsub("([{}%])", "\\\\\\1", gsub("\\", "\\\\", x, fixed 
 #' @noRd
 padding <- function(x) strrep(" ", sum(nchar(x, "bytes") - nchar(x)))
 
-#' HTML of lines of Gherkin, highlighted, as a pkgdown code block: on one
-#' line, as pkgdown splits a section into paragraphs at blank lines, even in
-#' \out, and with `</pre >`, not ending the HTML block of `gherkin_rd()`
-#' @param lines Their numbers in the document of `tokens`
-#' @param tokens Of `gherkin_tokens()`
-#' @keywords internal
-#' @noRd
-gherkin_pre <- function(code, lines, tokens) {
-  paste0(
-    "<pre class=\"gherkin\"><code>",
-    rd_escape(paste(gherkin_html(code, lines, tokens), collapse = "&#10;")),
-    "</code></pre >"
-  )
-}
-
 #' Rd of a feature: the lines of Gherkin as they're written, and for HTML
 #' its Rd
 #' @param code The lines
@@ -315,71 +299,4 @@ unselected_rows <- function(examples, selected) {
   }
   last <- if (length(rows) > 0) rows[[length(rows)]] else examples$tableHeader
   seq(first_line(examples), last$location$line %||% examples$location$line)
-}
-
-#' The lines of a document's tokens that pandoc's highlighting classes are for
-#' @param source The lines of the feature file
-#' @return A list of `keywords`, the keyword of a line and its classes by the
-#'   line, and the lines of `comments` and of Doc `strings`
-#' @keywords internal
-#' @noRd
-gherkin_tokens <- function(document, source) {
-  keywords <- list()
-  strings <- integer()
-  walk <- function(node) {
-    if (!is.list(node)) {
-      return()
-    }
-    if (!is.null(node$keyword) && !is.null(node$location)) {
-      # Only steps have a keywordType, and their keyword ends with its space
-      keywords[[as.character(node$location$line)]] <<- if (is.null(node$keywordType)) {
-        c(paste0(node$keyword, ":"), "kw")
-      } else {
-        c(trimws(node$keyword, "right"), "fu")
-      }
-    }
-    doc <- node$docString
-    if (!is.null(doc)) {
-      from <- doc$location$line
-      to <- min(which(trimws(source) == doc$delimiter & seq_along(source) > from))
-      strings <<- c(strings, from:to)
-    }
-    for (child in node) walk(child)
-  }
-  walk(document$feature)
-  list(keywords = keywords, strings = strings, comments = map_int(document$comments, \(comment) comment$location$line))
-}
-
-#' HTML of lines of a feature file, with the classes pandoc gives tokens, for
-#' pkgdown's theme to highlight
-#' @param text The lines
-#' @param lines Their numbers in the feature file
-#' @param tokens Of `gherkin_tokens()`
-#' @keywords internal
-#' @noRd
-gherkin_html <- function(text, lines, tokens) {
-  escape <- \(x) gsub(">", "&gt;", gsub("<", "&lt;", gsub("&", "&amp;", x, fixed = TRUE), fixed = TRUE), fixed = TRUE)
-  span <- \(class, x) paste0("<span class=\"", class, "\">", x, "</span>")
-  inline <- function(x) {
-    x <- gsub("(\"[^\"]*\")", span("st", "\\1"), escape(x))
-    x <- gsub("(&lt;[^&[:space:]]+&gt;)", span("va", "\\1"), x)
-    gsub("(^|\\s)\\|(?=\\s|$)", paste0("\\1", span("op", "|")), x, perl = TRUE)
-  }
-  map_chr(seq_along(text), \(i) {
-    if (lines[[i]] %in% tokens$comments) {
-      return(span("co", escape(text[[i]])))
-    }
-    if (lines[[i]] %in% tokens$strings) {
-      return(span("st", escape(text[[i]])))
-    }
-    keyword <- tokens$keywords[[as.character(lines[[i]])]]
-    if (is.null(keyword)) {
-      return(inline(text[[i]]))
-    }
-    # After the indent, or in Markdown after `## ` or `* `
-    at <- regexpr(keyword[[1]], text[[i]], fixed = TRUE)
-    before <- substring(text[[i]], 1, at - 1)
-    rest <- substring(text[[i]], at + nchar(keyword[[1]]))
-    paste0(escape(before), span(keyword[[2]], escape(keyword[[1]])), inline(rest))
-  })
 }
