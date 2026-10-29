@@ -31,7 +31,7 @@ template:
 navbar:
   structure:
     left: [reference, gherkin-reference, articles, news]
-    right: [search, github]
+    right: [search, github, lightswitch]
   components:
     gherkin-reference:
       text: Gherkin Reference
