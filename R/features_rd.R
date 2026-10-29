@@ -31,21 +31,20 @@
 #' It turns on markdown for the roxygen block it's in.
 #'
 #' @param path Path to the directory containing the `.feature` files. Its subdirectories are
-#'   searched too. Defaults to the `cucumber.path` option, or `"tests/acceptance"` if it's not set.
+#'   searched too. Defaults to the `cucumber.path` option, see [opts].
 #'   Relative paths are relative to the working directory, the package's root when you
 #'   run `devtools::document()`.
 #' @param filter If not NULL, only features with file names matching this regular expression
 #'   are documented. Matching is performed on the file name after it's stripped of ".feature" or ".feature.md".
 #' @param tags If not NULL, select scenarios by tag expression string, see [test()].
-#'   Defaults to the `cucumber.rd_tags` option, or `"@rd"` if it's not set.
+#'   Defaults to the `cucumber.rd_tags` option, see [opts].
 #' @param name If not NULL, only scenarios with names matching any of these regular expressions
 #'   are documented.
 #' @param features If not NULL, only these feature files are documented. Relative paths are
 #'   relative to `path`. A directory selects the feature files in it and its subdirectories.
 #'   Add `:line` to select only the scenario at that line, e.g.
 #'   `"addition.feature:12"`. The line of an example row selects only that example.
-#' @param section Name of the section. Defaults to the `cucumber.rd_section` option, or
-#'   `"Specification"` if it's not set.
+#' @param section Name of the section. Defaults to the `cucumber.rd_section` option, see [opts].
 #' @param markdown If TRUE, HTML pages show each feature like Markdown with Gherkin. If
 #'   FALSE, they show it as one block of Gherkin, as it's written, like the help page.
 #' @param ... Additional arguments passed to `grepl()`.
@@ -56,12 +55,12 @@
 #' @export
 #' @md
 features_rd <- function(
-  path = getOption("cucumber.path", "tests/acceptance"),
+  path = getOption("cucumber.path"),
   filter = NULL,
-  tags = getOption("cucumber.rd_tags", "@rd"),
+  tags = getOption("cucumber.rd_tags"),
   name = NULL,
   features = NULL,
-  section = getOption("cucumber.rd_section", "Specification"),
+  section = getOption("cucumber.rd_section"),
   markdown = TRUE,
   ...
 ) {

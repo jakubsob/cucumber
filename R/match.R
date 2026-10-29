@@ -206,7 +206,7 @@ check_arity <- function(formals, types, argument_names) {
 #' @noRd
 docstring_argument <- function(lines) {
   new_docstring(
-    if (getOption("cucumber.docstring_as_lines", FALSE)) c(lines) else paste(lines, collapse = "\n"),
+    if (getOption("cucumber.docstring_as_lines")) c(lines) else paste(lines, collapse = "\n"),
     attr(lines, "media_type")
   )
 }

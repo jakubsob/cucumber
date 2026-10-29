@@ -50,23 +50,15 @@ CucumberPrettyReporter <- R6::R6Class(
     #' Initialize the reporter
     #' @param show_praise Deprecated, has no effect: the reporter shows no praise.
     #' @param reporter_max_docstring_lines Max docstring lines to print for a step before
-    #'   truncating. Defaults to the `cucumber.reporter_max_docstring_lines` option, or
-    #'   `Inf` (print in full) if unset.
+    #'   truncating. Defaults to the `cucumber.reporter_max_docstring_lines` option, see [opts].
     #' @param reporter_max_table_lines Max data table rows to print for a step before
-    #'   truncating. Defaults to the `cucumber.reporter_max_table_lines` option, or `Inf`
-    #'   (print in full) if unset.
+    #'   truncating. Defaults to the `cucumber.reporter_max_table_lines` option, see [opts].
     #' @param file Path of a file to print to instead of the console, replaced
     #'   by each run, or `NULL`
     initialize = function(
       show_praise = NULL,
-      reporter_max_docstring_lines = getOption(
-        "cucumber.reporter_max_docstring_lines",
-        Inf
-      ),
-      reporter_max_table_lines = getOption(
-        "cucumber.reporter_max_table_lines",
-        Inf
-      ),
+      reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines"),
+      reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines"),
       file = NULL
     ) {
       if (!is.null(show_praise)) rlang::warn("`show_praise` is deprecated and has no effect.")

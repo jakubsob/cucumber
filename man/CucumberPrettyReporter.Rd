@@ -610,8 +610,8 @@ Initialize the reporter
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CucumberPrettyReporter$new(
   show_praise = NULL,
-  reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines", Inf),
-  reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines", Inf),
+  reporter_max_docstring_lines = getOption("cucumber.reporter_max_docstring_lines"),
+  reporter_max_table_lines = getOption("cucumber.reporter_max_table_lines"),
   file = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -622,12 +622,10 @@ Initialize the reporter
 \item{\code{show_praise}}{Deprecated, has no effect: the reporter shows no praise.}
 
 \item{\code{reporter_max_docstring_lines}}{Max docstring lines to print for a step before
-truncating. Defaults to the \code{cucumber.reporter_max_docstring_lines} option, or
-\code{Inf} (print in full) if unset.}
+truncating. Defaults to the \code{cucumber.reporter_max_docstring_lines} option, see \link{opts}.}
 
 \item{\code{reporter_max_table_lines}}{Max data table rows to print for a step before
-truncating. Defaults to the \code{cucumber.reporter_max_table_lines} option, or \code{Inf}
-(print in full) if unset.}
+truncating. Defaults to the \code{cucumber.reporter_max_table_lines} option, see \link{opts}.}
 
 \item{\code{file}}{Path of a file to print to instead of the console, replaced
 by each run, or \code{NULL}}

@@ -614,7 +614,7 @@ filter_features <- function(features, filter = NULL, ...) {
 #' @param reporter A [CucumberReporter], or `NULL` to report nothing. Defaults to
 #'   [CucumberProgressReporter].
 #' @param path Path to the directory containing the `.feature` files. Its subdirectories are
-#'   searched too. Defaults to the `cucumber.path` option, or `"tests/acceptance"` if it's not set.
+#'   searched too. Defaults to the `cucumber.path` option, see [opts].
 #' @param filter If not NULL, run only the feature files whose name matches this regular expression.
 #' @param tags If not NULL, run only the scenarios that match this tag expression, e.g. `"@smoke and not @slow"`.
 #' @param name If not NULL, run only the scenarios whose name matches any of these regular expressions.
@@ -679,7 +679,7 @@ filter_features <- function(features, filter = NULL, ...) {
 #' @export
 #' @md
 test <- function(
-  path = getOption("cucumber.path", "tests/acceptance"),
+  path = getOption("cucumber.path"),
   filter = NULL,
   tags = NULL,
   reporter = CucumberProgressReporter$new(),

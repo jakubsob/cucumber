@@ -5,19 +5,19 @@
 \title{Scenarios as documentation}
 \usage{
 features_rd(
-  path = getOption("cucumber.path", "tests/acceptance"),
+  path = getOption("cucumber.path"),
   filter = NULL,
-  tags = getOption("cucumber.rd_tags", "@rd"),
+  tags = getOption("cucumber.rd_tags"),
   name = NULL,
   features = NULL,
-  section = getOption("cucumber.rd_section", "Specification"),
+  section = getOption("cucumber.rd_section"),
   markdown = TRUE,
   ...
 )
 }
 \arguments{
 \item{path}{Path to the directory containing the \code{.feature} files. Its subdirectories are
-searched too. Defaults to the \code{cucumber.path} option, or \code{"tests/acceptance"} if it's not set.
+searched too. Defaults to the \code{cucumber.path} option, see \link{opts}.
 Relative paths are relative to the working directory, the package's root when you
 run \code{devtools::document()}.}
 
@@ -25,7 +25,7 @@ run \code{devtools::document()}.}
 are documented. Matching is performed on the file name after it's stripped of ".feature" or ".feature.md".}
 
 \item{tags}{If not NULL, select scenarios by tag expression string, see \code{\link[=test]{test()}}.
-Defaults to the \code{cucumber.rd_tags} option, or \code{"@rd"} if it's not set.}
+Defaults to the \code{cucumber.rd_tags} option, see \link{opts}.}
 
 \item{name}{If not NULL, only scenarios with names matching any of these regular expressions
 are documented.}
@@ -35,8 +35,7 @@ relative to \code{path}. A directory selects the feature files in it and its sub
 Add \verb{:line} to select only the scenario at that line, e.g.
 \code{"addition.feature:12"}. The line of an example row selects only that example.}
 
-\item{section}{Name of the section. Defaults to the \code{cucumber.rd_section} option, or
-\code{"Specification"} if it's not set.}
+\item{section}{Name of the section. Defaults to the \code{cucumber.rd_section} option, see \link{opts}.}
 
 \item{markdown}{If TRUE, HTML pages show each feature like Markdown with Gherkin. If
 FALSE, they show it as one block of Gherkin, as it's written, like the help page.}

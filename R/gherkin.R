@@ -58,7 +58,7 @@ parse_gherkin <- function(lines, uri = NULL, flavour = gherkin_flavour(uri)) {
 #' @keywords internal
 #' @noRd
 default_language <- function() {
-  language <- getOption("cucumber.language", "en")
+  language <- getOption("cucumber.language")
   if (!rlang::is_string(language)) {
     abort_user("The `cucumber.language` option must be a language code, like \"fr\".")
   }

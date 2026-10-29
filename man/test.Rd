@@ -5,7 +5,7 @@
 \title{Run Cucumber tests}
 \usage{
 test(
-  path = getOption("cucumber.path", "tests/acceptance"),
+  path = getOption("cucumber.path"),
   filter = NULL,
   tags = NULL,
   reporter = CucumberProgressReporter$new(),
@@ -25,7 +25,7 @@ test(
 }
 \arguments{
 \item{path}{Path to the directory containing the \code{.feature} files. Its subdirectories are
-searched too. Defaults to the \code{cucumber.path} option, or \code{"tests/acceptance"} if it's not set.}
+searched too. Defaults to the \code{cucumber.path} option, see \link{opts}.}
 
 \item{filter}{If not NULL, run only the feature files whose name matches this regular expression.}
 
