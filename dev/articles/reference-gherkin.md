@@ -1,0 +1,923 @@
+# Gherkin Reference
+
+This reference describes how to write Gherkin.
+
+This is a modified copy of the official [Gherkin
+reference](https://cucumber.io/docs/gherkin/reference/) from Cucumber
+project, adjusted to specific features of the
+[cucumber](https://github.com/jakubsob/cucumber) package.
+
+------------------------------------------------------------------------
+
+Gherkin uses a set of special [keywords](#keywords) to give structure
+and meaning to executable specifications.
+
+Most lines in a Gherkin document start with one of the
+[keywords](#keywords).
+
+Comments are only permitted at the start of a new line, anywhere in the
+feature file. They begin with zero or more spaces, followed by a hash
+sign (`#`) and some text.
+
+Block comments are currently not supported by Gherkin.
+
+Indentation doesn’t change the meaning of a line, the keyword it starts
+with does. You can indent with spaces or tabs, the recommended
+indentation level is two spaces.
+
+Here is an example:
+
+``` gherkin
+Feature: Guess the word
+  # The first example has two steps
+  Scenario: Maker starts a game
+    When the Maker starts a game
+    Then the Maker waits for a Breaker to join
+
+  # The second example has three steps
+  Scenario: Breaker joins a game
+    Given the Maker has started a game with the word "silky"
+    When the Breaker joins the Maker's game
+    Then the Breaker must guess a word with 5 characters
+```
+
+Please note that some keywords *are* followed by a colon (`:`) and some
+*are not*. If you add a colon after a keyword that should not be
+followed by one, like `Given: x`, the feature file fails to parse.
+
+Every feature file is parsed before anything runs. If any of them can’t
+be parsed, no scenario runs, and every error is reported with its file,
+line and column:
+
+    Can't parse feature files
+    ✖ Parse error in "features/broken.feature" (9:7): inconsistent cell count within the table
+
+## Keywords
+
+Each line that isn’t a blank line has to start with a Gherkin *keyword*,
+followed by any text you like. The only exceptions are the free-form
+descriptions placed underneath `Example/Scenario`, `Background` and
+`Scenario Outline` lines.
+
+The primary keywords are:
+
+- [`Feature`](#feature)
+- [`Rule`](#rule)
+- [`Example`](#example) (or `Scenario`)
+- [`Given`](#given), [`When`](#when), [`Then`](#then), [`And`,
+  `But`](#and-but) for [steps](#steps) (or `*`)
+- [`Background`](#background)
+- [`Scenario Outline`](#scenario-outline) (or `Scenario Template`)
+- [`Examples`](#examples) (or `Scenarios`)
+
+There are a few secondary keywords as well:
+
+- `"""` ([Doc Strings](#doc-strings))
+- `|` ([Data Tables](#data-tables))
+- `@` ([Tags](#tags))
+- `#` (Comments)
+
+## Feature
+
+The purpose of the `Feature` keyword is to provide a high-level
+description of a software feature, and to group related scenarios.
+
+The first primary keyword in a Gherkin document must always be `Feature`
+(or `Ability`, or `Business Need`), followed by a `:` and a short text
+that describes the feature.
+
+You can add free-form text underneath Feature to add more description.
+These description lines are ignored by Cucumber at runtime.
+
+``` gherkin
+Feature: Guess the word
+  The word guess game is a turn-based game for two players.
+  The Maker makes a word for the Breaker to guess. The game  is over when the Breaker guesses the Maker's word.
+
+  Example: Maker starts a game
+```
+
+The name and the optional description have no special meaning to
+Cucumber. Their purpose is to provide a place for you to document
+important aspects of the feature, such as a brief explanation and a list
+of business rules (general acceptance criteria).
+
+The free format description for Feature ends when you start a line with
+the keyword `Background`, `Rule`, `Example` or `Scenario Outline` (or
+their alias keywords).
+
+You can only have a single `Feature` in a `.feature` file. A file
+without a `Feature`, or a `Feature` without scenarios, runs nothing.
+
+## Descriptions
+
+Free-form descriptions (as described above for `Feature`) can also be
+placed underneath `Rule`, `Example/Scenario`, `Background`,
+`Scenario Outline` and `Examples`.
+
+You can write anything you like, as long as no line starts with a
+keyword.
+
+## Example
+
+This is a *concrete example* that *illustrates* a business rule. It
+consists of a list of [steps](#steps).
+
+The keyword `Scenario` is a synonym of the keyword `Example`.
+
+You can have as many steps as you like, but we recommend 3-5 steps per
+example. Having too many steps will cause the example to lose its
+expressive power as a specification and documentation.
+
+In addition to being a specification and documentation, an example is
+also a *test*. As a whole, your examples are an *executable
+specification* of the system.
+
+Examples follow this same pattern:
+
+- Describe an initial context (`Given` steps)
+- Describe an event (`When` steps)
+- Describe an expected outcome (`Then` steps)
+
+## Rule
+
+The `Rule` keyword groups together several scenarios that belong to one
+*business rule*. A `Rule` should contain one or more scenarios that
+illustrate the particular rule.
+
+``` gherkin
+Feature: Highlander
+
+  Rule: There can be only One
+
+    Example: Only One -- More than one alive
+      Given there are 3 ninjas
+      And there are more than one ninja alive
+      When 2 ninjas meet, they will fight
+      Then one ninja dies (but not me)
+      And there is one ninja less alive
+
+    Example: Only One -- One alive
+      Given there is only 1 ninja alive
+      Then they will live forever ;-)
+
+  Rule: There can be Two (in some cases)
+
+    Example: Two -- Dead and Reborn as Phoenix
+      ...
+```
+
+A `Rule` can have its own `Background`. It runs after the `Feature`’s
+`Background`, only for the scenarios of that `Rule`.
+
+## Steps
+
+Each step starts with `Given`, `When`, `Then`, `And`, or `But`.
+
+Cucumber executes each step in a scenario one at a time, in the sequence
+you’ve written them in. When Cucumber tries to execute a step, it looks
+for a matching step definition to execute.
+
+Keywords are not taken into account when looking for a step definition.
+This means you cannot have a `Given`, `When`, `Then`, `And` or `But`
+step with the same text as another step.
+
+Cucumber considers the following steps duplicates:
+
+``` gherkin
+Given there is money in my account
+Then there is money in my account
+```
+
+This might seem like a limitation, but it forces you to come up with a
+less ambiguous, more clear domain language:
+
+``` gherkin
+Given my account has a balance of £430
+Then my account should have a balance of £430
+```
+
+### Given
+
+`Given` steps are used to describe the initial context of the system -
+the *scene* of the scenario. It is typically something that happened in
+the *past*.
+
+When Cucumber executes a `Given` step, it will configure the system to
+be in a well-defined state, such as creating and configuring objects or
+adding data to a test database.
+
+The purpose of `Given` steps is to **put the system in a known state**
+before the user (or external system) starts interacting with the system
+(in the `When` steps). Avoid talking about user interaction in
+`Given`’s. If you were creating use cases, `Given`’s would be your
+preconditions.
+
+It’s okay to have several `Given` steps (use `And` or `But` for number 2
+and upwards to make it more readable).
+
+Examples:
+
+- Mickey and Minnie have started a game
+- I am logged in
+- Joe has a balance of £42
+
+### When
+
+`When` steps are used to describe an event, or an *action*. This can be
+a person interacting with the system, or it can be an event triggered by
+another system.
+
+Examples:
+
+- Guess a word
+- Invite a friend
+- Withdraw money
+
+Imagine it’s 1922
+
+Most software does something people could do manually (just not as
+efficiently).
+
+Try hard to come up with examples that don’t make any assumptions about
+technology or user interface. Imagine it’s 1922, when there were no
+computers.
+
+Implementation details should be hidden in the step definitions (see
+[`?step`](https://jakubsob.github.io/cucumber/dev/reference/step.md)).
+
+### Then
+
+`Then` steps are used to describe an *expected* outcome, or result.
+
+The step definition of a `Then` step should use an *assertion* to
+compare the *actual* outcome (what the system actually does) to the
+*expected* outcome (what the step says the system is supposed to do).
+
+An outcome *should* be on an **observable** output. That is, something
+that comes *out* of the system (report, user interface, message), and
+not a behavior deeply buried inside the system (like a record in a
+database).
+
+Examples:
+
+- See that the guessed word was wrong
+- Receive an invitation
+- Card should be swallowed
+
+While it might be tempting to implement `Then` steps to look in the
+database - resist that temptation!
+
+You should only verify an outcome that is observable for the user (or
+external system), and changes to a database are usually not.
+
+### And, But
+
+If you have successive `Given`’s or `Then`’s, you *could* write:
+
+``` gherkin
+Example: Multiple Givens
+  Given one thing
+  Given another thing
+  Given yet another thing
+  When I open my eyes
+  Then I should see something
+  Then I shouldn't see something else
+```
+
+Or, you could make the example more fluidly structured by replacing the
+successive `Given`’s or `Then`’s with `And`’s and `But`’s:
+
+``` gherkin
+Example: Multiple Givens
+  Given one thing
+  And another thing
+  And yet another thing
+  When I open my eyes
+  Then I should see something
+  But I shouldn't see something else
+```
+
+### \*
+
+Gherkin also supports using an asterisk (`*`) in place of any of the
+normal step keywords. This can be helpful when you have some steps that
+are effectively a *list of things*, so you can express it more like
+bullet points where otherwise the natural language of `And` etc might
+not read so elegantly.
+
+For example:
+
+``` gherkin
+Scenario: All done
+  Given I am out shopping
+  And I have eggs
+  And I have milk
+  And I have butter
+  When I check my list
+  Then I don't need anything
+```
+
+Could be expressed as:
+
+``` gherkin
+Scenario: All done
+  Given I am out shopping
+  * I have eggs
+  * I have milk
+  * I have butter
+  When I check my list
+  Then I don't need anything
+```
+
+## Background
+
+Occasionally you’ll find yourself repeating the same `Given` steps in
+all of the scenarios in a `Feature`.
+
+Since it is repeated in every scenario, this is an indication that those
+steps are not *essential* to describe the scenarios; they are
+*incidental details*. You can literally move such `Given` steps to the
+background, by grouping them under a `Background` section.
+
+A `Background` allows you to add some context to the scenarios that
+follow it. It can contain one or more `Given` steps, which are run
+before *each* scenario, but after any
+[`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+hooks (see
+[`?hook`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)).
+
+A `Background` is placed before the first `Scenario`/`Example`, at the
+same level of indentation.
+
+For example:
+
+``` gherkin
+Feature: Multiple site support
+  Only blog owners can post to a blog, except administrators,  who can post to all blogs.
+
+  Background:
+    Given a global administrator named "Greg"
+    And a blog named "Greg's anti-tax rants"
+    And a customer named "Dr. Bill"
+    And a blog named "Expensive Therapy" owned by "Dr. Bill"
+
+  Scenario: Dr. Bill posts to his own blog
+    Given I am logged in as Dr. Bill
+    When I try to post to "Expensive Therapy"
+    Then I should see "Your article was published."
+
+  Scenario: Dr. Bill tries to post to somebody else's blog, and fails
+    Given I am logged in as Dr. Bill
+    When I try to post to "Greg's anti-tax rants"
+    Then I should see "Hey! That's not your blog!"
+
+  Scenario: Greg posts to a client's blog
+    Given I am logged in as Greg
+    When I try to post to "Expensive Therapy"
+    Then I should see "Your article was published."
+```
+
+You can only have one set of `Background` steps per `Feature` or `Rule`.
+If you need different `Background` steps for different scenarios,
+consider breaking up your set of scenarios into more `Rule`s or
+`Feature`s.
+
+For a less explicit alternative to `Background`, check out
+[`?hook`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+
+### Tips for using Background
+
+- Don’t use `Background` to set up **complicated states**, unless that
+  state is actually something the client needs to know.
+  - For example, if the user and site names don’t matter to the client,
+    use a higher-level step such as
+    `Given I am logged in as a site owner`.
+- Keep your `Background` section **short**.
+  - The client needs to actually remember this stuff when reading the
+    scenarios. If the `Background` is more than 4 lines long, consider
+    moving some of the irrelevant details into higher-level steps.
+- Make your `Background` section **vivid**.
+  - Use colourful names, and try to tell a story. The human brain keeps
+    track of stories much better than it keeps track of names like
+    `"User A"`, `"User B"`, `"Site 1"`, and so on.
+- Keep your scenarios **short**, and don’t have too many.
+  - If the `Background` section has scrolled off the screen, the reader
+    no longer has a full overview of what’s happening. Think about using
+    higher-level steps, or splitting the `*.feature` file.
+
+## Scenario Outline
+
+The `Scenario Outline` keyword can be used to run the same `Scenario`
+multiple times, with different combinations of values.
+
+The keyword `Scenario Template` is a synonym of the keyword
+`Scenario Outline`.
+
+Copying and pasting scenarios to use different values quickly becomes
+tedious and repetitive:
+
+``` gherkin
+Scenario: eat 5 out of 12
+  Given there are 12 cucumbers
+  When I eat 5 cucumbers
+  Then I should have 7 cucumbers
+Scenario: eat 5 out of 20
+  Given there are 20 cucumbers
+  When I eat 5 cucumbers
+  Then I should have 15 cucumbers
+```
+
+We can collapse these two similar scenarios into a `Scenario Outline`.
+
+Scenario outlines allow us to more concisely express these scenarios
+through the use of a template with `< >`-delimited parameters:
+
+``` gherkin
+Scenario Outline: eating
+  Given there are <start> cucumbers
+  When I eat <eat> cucumbers
+  Then I should have <left> cucumbers
+
+  Examples:
+    | start | eat | left |
+    |    12 |   5 |    7 |
+    |    20 |   5 |   15 |
+```
+
+## Examples
+
+A `Scenario Outline` must contain one or more `Examples` (or
+`Scenarios`) section(s). `Examples` under a `Scenario` make it a
+`Scenario Outline` too. Its steps are interpreted as a template which is
+never directly run. Instead, the `Scenario Outline` is run *once for
+each row* in the `Examples` section beneath it (not counting the first
+header row).
+
+The steps can use `<>` delimited *parameters* that reference headers in
+the examples table. Cucumber will replace these parameters with values
+from the table *before* it tries to match the step against a step
+definition.
+
+If our step definitions use `{string}` parameters, we must use quotes
+around the values in the table for them to match correctly.
+
+``` gherkin
+Scenario Outline: eating
+  Given there are <start> cucumbers
+  When I eat <eat> cucumbers
+  Then I should have <left> cucumbers
+
+  Examples:
+    | start    | eat    | left      |
+    | 'twelve' | 'five' | 'seven'   |
+    | 'twenty' | 'five' | 'fifteen' |
+```
+
+This Scenario Outline results in two Scenarios being run, both named
+`eating`. Scenarios that share a name are numbered in test results:
+`eating (1)`, `eating (2)`.
+
+``` gherkin
+Scenario: eating
+  Given there are 'twelve' cucumbers
+  When I eat 'five' cucumbers
+  Then I should have 'seven' cucumbers
+
+Scenario: eating
+  Given there are 'twenty' cucumbers
+  When I eat 'five' cucumbers
+  Then I should have 'fifteen' cucumbers
+```
+
+You can use parameters in the `Scenario Outline` name as well, to give
+each scenario its own name, for example
+`Scenario Outline: eat <eat> out of <start>`.
+
+You can also use parameters in [multiline step
+arguments](#step-arguments): they’re replaced in Doc Strings and Data
+Tables too.
+
+## Step Arguments
+
+In some cases you might want to pass more data to a step than fits on a
+single line. For this purpose Gherkin has `Doc Strings` and
+`Data Tables`.
+
+## Doc Strings
+
+`Doc Strings` are handy for passing a larger piece of text to a step
+definition.
+
+The text should be offset by delimiters consisting of three double-quote
+marks on lines of their own:
+
+``` gherkin
+Given a blog post named "Random" with Markdown body
+  """
+  Some Title, Eh?
+  ===============
+  Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,  consectetur adipiscing elit.
+  """
+```
+
+In your step definition, there’s no need to find this text and match it
+in your pattern.
+
+It is passed to the step definition as one string, its lines joined by
+`"\n"`, after the step’s parameters and before `context`:
+
+``` r
+
+given("a blog post named {string} with Markdown body", function(name, body, context) {
+  ...
+})
+```
+
+To get a character vector of lines instead, set
+`options(cucumber.docstring_as_lines = TRUE)`, see
+[`?opts`](https://jakubsob.github.io/cucumber/dev/reference/opts.md).
+
+Indentation of the opening `"""` is unimportant, although common
+practice is two spaces in from the enclosing step. The indentation
+inside the triple quotes, however, is significant. Each line of the Doc
+String will be dedented according to the opening `"""`. Indentation
+beyond the column of the opening `"""` will therefore be preserved.
+
+Doc strings also support using three backticks as the delimiter:
+
+```` gherkin
+Given a blog post named "Random" with Markdown body
+  ```
+  Some Title, Eh?
+  ===============
+  Here is the first paragraph of my blog post.
+  ```
+````
+
+You can specify the content type of a Doc String after the opening
+delimiter, for example `"""markdown`. The step definition gets it in the
+`media_type` attribute of the Doc String: `attr(body, "media_type")`.
+
+## Data Tables
+
+`Data Tables` are handy for passing a list of values to a step
+definition:
+
+``` gherkin
+Given the following users exist:
+  | name   | email              | twitter         |
+  | Aslak  | aslak@cucumber.io  | @aslak_hellesoy |
+  | Julien | julien@cucumber.io | @jbpros         |
+  | Matt   | matt@cucumber.io   | @mattwynne      |
+```
+
+Just like `Doc Strings`, `Data Tables` are passed to the step definition
+after the step’s parameters and before `context`, as a tibble whose
+column names are its first row. See
+[`?step`](https://jakubsob.github.io/cucumber/dev/reference/step.md) for
+details.
+
+Every row of a Data Table must have the same number of cells, or the
+feature file fails to parse.
+
+A step can have both a Data Table and a Doc String. The step definition
+gets them in the order they are written:
+
+``` gherkin
+Given a request
+  | header | value |
+  | Accept | json  |
+  """
+  {"id": 1}
+  """
+```
+
+``` r
+
+given("a request", function(headers, body, context) { ... })
+```
+
+### Table Cell Escaping
+
+If you want to use a newline character in a table cell, you can write
+this as `\n`. If you need a `|` as part of the cell, you can escape it
+as `\|`. And finally, if you need a `\`, you can escape that with `\\`.
+
+## Tags
+
+Tags are a great way to organise your features and scenarios.
+
+They can be used for two purposes:
+
+- Running a subset of scenarios
+- Restricting hooks to a subset of scenarios
+
+Consider the following example:
+
+``` gherkin
+@billing
+Feature: Verify billing
+
+  @important
+  Scenario: Missing product description
+    Given hello
+
+  Scenario: Several products
+    Given hello
+```
+
+A feature or scenario can have as many tags as you like. Separate them
+with spaces:
+
+``` gherkin
+@billing @bicker @annoy
+Feature: Verify billing
+```
+
+Tags can be placed above the following Gherkin elements:
+
+- `Feature`
+- `Rule`
+- `Scenario`
+- `Scenario Outline`
+- `Examples`
+
+**Note:** Tags placed above `Background` or steps (`Given`, `When`,
+`Then`, `And`, `But`, `*`) will cause a validation error. Place tags
+only on the elements listed above.
+
+In `Scenario Outline`, you can use tags on different sets of examples:
+
+``` gherkin
+Scenario Outline: Steps will run conditionally if tagged
+  Given user is logged in
+  When user clicks <link>
+  Then user will be logged out
+
+  @mobile
+  Examples:
+    | link                  |
+    | logout link on mobile |
+
+  @desktop
+  Examples:
+    | link                   |
+    | logout link on desktop |
+```
+
+Tags placed in invalid locations will result in an error. For example,
+this is **invalid** and will throw an error:
+
+``` gherkin
+Feature: Invalid tag usage
+  @invalid-here
+  Background:
+    Given setup step
+
+  Scenario: Test
+    @also-invalid
+    Given a step
+```
+
+**Note:** It is not possible to place tags above `Background` or steps
+(`Given`, `When`, `Then`, `And` and `But`).
+
+### Tag inheritance
+
+Tags are inherited by child elements. Tags placed above a `Feature` will
+be inherited by `Rule`, `Scenario`, `Scenario Outline`, or `Examples`.
+Tags placed above a `Rule` will be inherited by its scenarios.
+Similarly, tags placed above a `Scenario Outline` will be inherited by
+`Examples`.
+
+### Running a subset of scenarios
+
+You can use the `tags` parameter in
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
+or
+[`cucumber::run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md)
+to only run scenarios with particular tags.
+
+Using tag expressions:
+
+``` r
+
+# Run only scenarios tagged with @smoke
+cucumber::test("tests/acceptance", tags = "@smoke")
+
+# Run scenarios tagged with both @smoke and @fast
+cucumber::test("tests/acceptance", tags = "@smoke and @fast")
+
+# Run scenarios tagged with @wip but not @slow
+cucumber::test("tests/acceptance", tags = "@wip and not @slow")
+
+# Run scenarios tagged with either @gui or @database
+cucumber::test("tests/acceptance", tags = "@gui or @database")
+```
+
+### Tag expressions
+
+A tag expression is an infix boolean expression. Below are some
+examples:
+
+| Expression | Description |
+|----|----|
+| `@fast` | Scenarios tagged with @fast |
+| `@wip and not @slow` | Scenarios tagged with @wip that aren’t also tagged with @slow |
+| `@smoke and @fast` | Scenarios tagged with both @smoke and @fast |
+| `@gui or @database` | Scenarios tagged with either @gui or @database |
+
+For more advanced tag expressions you can use parentheses for clarity,
+or to change operator precedence:
+
+``` r
+
+cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
+```
+
+#### Tag expression operators
+
+Tag expressions support the following operators:
+
+- `and` - logical AND (both conditions must be true)
+- `or` - logical OR (at least one condition must be true)
+- `not` - logical NOT (negates the condition)
+- `( )` - parentheses for grouping and controlling precedence
+
+**Operator precedence:** `not` has the highest precedence, followed by
+`and`, then `or`. Use parentheses to change the order of evaluation.
+
+The operators are lowercase: `AND` is read as a tag, so
+`@smoke AND @fast` is a syntax error.
+
+#### Tag names
+
+In a tag expression, a tag is everything up to whitespace or a
+parenthesis. To use a parenthesis, whitespace or a backslash in a tag,
+escape it with a backslash. In an R string the backslash itself is
+escaped: `tags = "@wip\\(x\\)"`.
+
+Tag names are case-sensitive: `@Smoke` and `@smoke` are different tags.
+
+### Using tags for documentation
+
+Your imagination is the only limitation when it comes to using tags for
+documentation.
+
+#### Link to other documents
+
+Tags can refer to IDs in external systems such as requirement management
+tools, issue trackers or test management tools:
+
+``` gherkin
+@BJ-x98.77 @BJ-z12.33
+Feature: Convert transaction
+```
+
+You can use custom reporting to turn these tags into links pointing to
+documents in your external tool.
+
+#### Development process
+
+Another creative way to use tags is to keep track of where in the
+development process a certain feature is:
+
+``` gherkin
+@qa_ready
+Feature: Index projects
+```
+
+#### Other common uses
+
+- `@smoke` - Quick smoke tests that run on every commit
+- `@wip` - Work in progress, scenarios that are being developed
+- `@slow` - Long-running tests that might be skipped in development
+- `@manual` - Tests that require manual verification
+- `@bug` - Tests that reproduce a reported bug
+- `@regression` - Regression tests for fixed bugs
+
+## Spoken Languages
+
+The language you choose for Gherkin should be the same language your
+users and domain experts use when they talk about the domain.
+
+To write a feature file in another language, put a `# language:` header
+on the first line, followed by the language code:
+
+``` gherkin
+# language: fr
+Fonctionnalité: Addition
+  Scénario: Adding one
+    Soit I have 1
+    Quand I add 1
+    Alors I should have 2
+```
+
+A file without the header is in English (`en`), or in the language of
+the `cucumber.language` option, like
+`options(cucumber.language = "fr")`. Every language from Cucumber’s
+[gherkin-languages.json](https://github.com/cucumber/gherkin/blob/main/gherkin-languages.json)
+is supported. See the [Gherkin
+reference](https://cucumber.io/docs/gherkin/languages/) for the keywords
+of each language.
+
+Step definitions don’t change: steps are matched without their keyword,
+so `given("I have {int}", ...)` matches `Soit I have 1`.
+
+## Markdown with Gherkin
+
+Feature files can be Markdown documents: `.feature.md` files, written in
+[Markdown with
+Gherkin](https://github.com/cucumber/gherkin/blob/main/MARKDOWN_WITH_GHERKIN.md).
+They run like `.feature` files, and can be run together with them.
+
+Use them when a specification should read as a document: it renders on
+GitHub, on a pkgdown site or in any Markdown viewer, and it can have
+prose, lists and tables between its scenarios that aren’t part of the
+test.
+
+A Markdown document is Gherkin with these changes:
+
+- **Headers** are the `Feature`, `Rule`, `Background`, `Scenario`,
+  `Scenario Outline` and `Examples`, like `# Feature: Basket` or
+  `## Scenario: Add an item`.
+- **List items** that start with a step keyword are steps, like
+  `* Given an empty basket` or `- When I add an apple`. A list item that
+  doesn’t start with a step keyword is ignored.
+- **Code blocks** under a step are Doc Strings. Their language, like
+  ```` ```json ````, is the Doc String’s media type.
+- **Tables** indented 2 to 5 spaces are Data Tables, under a step, and
+  Examples, under an `Examples` header. The separator row under the
+  header, `| --- |`, isn’t a row. A table that isn’t indented, or is
+  indented more, is ignored.
+- **Tags** are written in backticks, on the line above the header they
+  tag: `` `@smoke` ``.
+- **Everything else**, like paragraphs, images and unindented tables, is
+  ignored.
+
+Here is a document with all of them:
+
+```` markdown
+# Feature: Basket
+
+A basket holds the items a customer wants to buy.
+This table is for the reader, not a step argument, because it isn't indented:
+
+| item  | price |
+| ----- | ----- |
+| apple | 1     |
+
+## Background:
+
+* Given an empty basket
+
+## Rule: Items are counted
+
+`@smoke`
+### Scenario Outline: Add <n> apples
+
+* When I add <n> apples
+* Then the basket has <n> items
+
+#### Examples:
+
+  | n |
+  | - |
+  | 1 |
+  | 2 |
+
+## Rule: Items can have a note
+
+### Scenario: Add a gift note
+
+* When I add these items:
+  | item   | price |
+  | ------ | ----: |
+  | apple  | 1     |
+  | banana | 2     |
+* And I add a note:
+  ```json
+  {"gift": true}
+  ```
+* Then the order has a note
+````
+
+Its step definitions are like those of a `.feature` file. The Doc String
+has its media type in the `media_type` attribute:
+
+``` r
+
+when("I add a note:", function(note, context) {
+  attr(note, "media_type") # "json"
+  context$note <- jsonlite::fromJSON(note)
+})
+```
+
+A Markdown document can’t start with `# language:`, as it would be a
+header. Set the language of Markdown documents with the
+`cucumber.language` option, like `options(cucumber.language = "fr")`.
+
+The snapshots of `basket.feature.md` are in `_snaps/basket.feature.md`,
+like those of `basket.feature`. So the two can’t be in the same
+directory: the run stops with an error that names both.
