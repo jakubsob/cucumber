@@ -43,7 +43,20 @@ acceptance_example <- function(feature, scenario, pretty = FALSE) {
   if (pretty) code <- with_pretty_reporter(code)
   # The code, as R so pkgdown links its functions to their docs, then its output
   tabs[["Console"]] <- c(code_block(code, "r"), "", code_block(run_example(files, code), "console-output"))
-  ids <- paste0(gsub("[^a-z0-9]+", "-", tolower(scenario)), "-", seq_along(tabs))
+  knitr::asis_output(ide_tabs(tabs, scenario))
+}
+
+# Examples of ways to do the same thing, each a tab of the examples' own tabs. `scenarios`
+# are the scenarios' names, named by the tabs' labels
+acceptance_examples <- function(feature, scenarios, pretty = FALSE) {
+  tabs <- lapply(scenarios, \(scenario) acceptance_example(feature, scenario, pretty))
+  knitr::asis_output(ide_tabs(tabs, paste(scenarios, collapse = " ")))
+}
+
+# Lines of each tab, named by their labels, as tabs. Their ids start with `id`, so it's
+# unique to the tabs in the article
+ide_tabs <- function(tabs, id) {
+  ids <- paste0(gsub("[^a-z0-9]+", "-", tolower(id)), "-", seq_along(tabs))
   active <- c(" active", rep("", length(tabs) - 1))
   buttons <- sprintf(
     '<li class="nav-item" role="presentation"><button class="nav-link%s" data-bs-toggle="tab" data-bs-target="#%s" type="button" role="tab">%s</button></li>',
@@ -52,12 +65,12 @@ acceptance_example <- function(feature, scenario, pretty = FALSE) {
   panes <- unlist(Map(\(id, active, lines) {
     c(sprintf('::: {#%s .tab-pane%s role="tabpanel"}', id, sub(" ", " .", active)), "", lines, "", ":::")
   }, ids, active, tabs))
-  knitr::asis_output(paste(c(
+  paste(c(
     "::: {.ide-tabs}",
     "```{=html}", '<ul class="nav nav-tabs" role="tablist">', buttons, "</ul>", "```", "",
     "::: {.tab-content}", panes, ":::",
     ":::"
-  ), collapse = "\n"))
+  ), collapse = "\n")
 }
 
 # The steps of a scenario, after those of the Backgrounds of its Feature and Rule
@@ -403,18 +416,13 @@ A `Scenario Outline` must contain one or more `Examples` (or `Scenarios`) sectio
 
 The steps can use `<>` delimited _parameters_ that reference headers in the examples table. Cucumber will replace these parameters with values from the table _before_ it tries to match the step against a step definition.
 
-If our step definitions use `{string}` parameters, we must use quotes around the values in the table for them to match correctly.
+If our step definitions use `{string}` parameters, the substituted text must be quoted: either put quotes around the placeholder in the step (`"<start>"`) or around the values in the table.
 
-```gherkin
-Scenario Outline: eating
-  Given there are <start> cucumbers
-  When I eat <eat> cucumbers
-  Then I should have <left> cucumbers
-
-  Examples:
-    | start    | eat    | left      |
-    | 'twelve' | 'five' | 'seven'   |
-    | 'twenty' | 'five' | 'fifteen' |
+```{r, echo = FALSE}
+acceptance_examples("scenario_outlines.feature", c(
+  "Quotes in the step" = "A {string} placeholder can be quoted in the step",
+  "Quotes in the table" = "A {string} placeholder can be quoted in the Examples table"
+), pretty = TRUE)
 ```
 
 This Scenario Outline results in two Scenarios being run, both named `eating`. Scenarios that share a name are numbered in test results: `eating (1)`, `eating (2)`.

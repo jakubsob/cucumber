@@ -271,8 +271,8 @@ main ol > li::marker {
   }
 
   .tab-pane {
-    // Panes that aren't code, like the results, get the editor's padding
-    &:not(:has(> div.sourceCode)) {
+    // Panes that aren't code or tabs, like the results, get the editor's padding
+    &:not(:has(> div.sourceCode, > .ide-tabs)) {
       padding: 1rem 1.125rem;
 
       > :last-child {
@@ -282,9 +282,20 @@ main ol > li::marker {
   }
 
   div.sourceCode,
-  html:root & pre {
+  html:root & pre,
+  .tab-pane > .ide-tabs {
     margin: 0;
     border: 0;
+  }
+
+  // Tabs inside a tab fill it and hide with it: pkgdown hides inactive panes with
+  // visibility, which the active pane inside would undo
+  .tab-content:has(> .tab-pane > .ide-tabs) {
+    padding: 0;
+  }
+
+  .tab-pane:not(.active) .tab-pane {
+    visibility: hidden;
   }
 
   // The output of the code above it, in the Console tab

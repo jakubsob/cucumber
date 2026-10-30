@@ -120,6 +120,78 @@ Feature: Scenario Outlines
     And it ran "Scenario: Greeting Alice"
     And it ran "Scenario: Greeting Bob"
 
+  Scenario: A {string} placeholder can be quoted in the step
+    Given a file named "features/eating.feature" with
+      """
+      Feature: Eating
+        Scenario Outline: eating
+          Given there are "<start>" cucumbers
+          When I eat "<eat>" cucumbers
+          Then I should have "<left>" cucumbers
+
+          Examples:
+            | start  | eat  | left    |
+            | twelve | five | seven   |
+            | twenty | five | fifteen |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      numbers <- c(five = 5, seven = 7, twelve = 12, fifteen = 15, twenty = 20)
+      given("there are {string} cucumbers", function(start, context) {
+        context$cucumbers <- numbers[[start]]
+      })
+      when("I eat {string} cucumbers", function(eat, context) {
+        context$cucumbers <- context$cucumbers - numbers[[eat]]
+      })
+      then("I should have {string} cucumbers", function(left, context) {
+        expect_equal(context$cucumbers, numbers[[left]])
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario | status |
+      | eating   | passed |
+      | eating   | passed |
+
+  Scenario: A {string} placeholder can be quoted in the Examples table
+    Given a file named "features/eating.feature" with
+      """
+      Feature: Eating
+        Scenario Outline: eating
+          Given there are <start> cucumbers
+          When I eat <eat> cucumbers
+          Then I should have <left> cucumbers
+
+          Examples:
+            | start    | eat    | left      |
+            | 'twelve' | 'five' | 'seven'   |
+            | 'twenty' | 'five' | 'fifteen' |
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      numbers <- c(five = 5, seven = 7, twelve = 12, fifteen = 15, twenty = 20)
+      given("there are {string} cucumbers", function(start, context) {
+        context$cucumbers <- numbers[[start]]
+      })
+      when("I eat {string} cucumbers", function(eat, context) {
+        context$cucumbers <- context$cucumbers - numbers[[eat]]
+      })
+      then("I should have {string} cucumbers", function(left, context) {
+        expect_equal(context$cucumbers, numbers[[left]])
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the scenarios have these results:
+      | scenario | status |
+      | eating   | passed |
+      | eating   | passed |
+
   Scenario: Scenarios that share a name are numbered
     Given a file named "features/eating.feature" with
       """
