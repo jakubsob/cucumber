@@ -36,14 +36,14 @@ template:
 
 navbar:
   structure:
-    left: [reference, gherkin-reference, articles, news]
+    left: [get-started, guides, reference, gherkin-reference, migrate, news]
     right: [search, github, lightswitch]
   components:
-    gherkin-reference:
-      text: Gherkin Reference
-      href: articles/reference-gherkin.html
-    articles:
-      text: Articles
+    get-started:
+      text: Get started
+      href: articles/get-started.html
+    guides:
+      text: Guides
       menu:
         - text: Behavior-Driven Development
           href: articles/bdd.html
@@ -53,48 +53,64 @@ navbar:
           href: articles/testthat.html
         - text: Reports
           href: articles/reporting.html
-        - text: -------
-        - text: Migration guides
-        - text: 3.0.0
+    gherkin-reference:
+      text: Gherkin
+      href: articles/reference-gherkin.html
+    reference:
+      text: Functions
+      href: reference/index.html
+    migrate:
+      text: Upgrade
+      menu:
+        - text: To 3.0.0
           href: articles/migration-to-3-0-0.html
-        - text: 2.0.0
+        - text: To 2.0.0
           href: articles/migration-to-2-0-0.html
 
 reference:
-  - title: Add implementation
+  - title: Write steps and hooks
+    desc: Connect the text of a scenario to R code.
     contents:
-      - hook
       - step
+      - hook
+      - define_parameter_type
       - pending
       - skip_scenario
       - attachments
-      - define_parameter_type
-  - title: Run tests
+  - title: Run features
+    desc: Run feature files on their own, or inside testthat.
     contents:
       - test
       - run
       - snapshots
-  - title: Reporters
+  - title: Console reporters
+    desc: Show the progress of a run in the console.
     contents:
-      - CucumberReporter
       - CucumberProgressReporter
       - CucumberProgressBarReporter
       - CucumberDotsReporter
       - CucumberSummaryReporter
       - CucumberPrettyReporter
-      - CucumberMessagesReporter
+  - title: Report files
+    desc: Write a report of a run to a file.
+    contents:
       - CucumberHtmlReporter
       - CucumberJunitReporter
+      - CucumberMessagesReporter
+  - title: Find what to fix
+    desc: Reports that list what is left to do.
+    contents:
       - CucumberRerunReporter
       - CucumberSnippetsReporter
       - CucumberUsageReporter
-      - CucumberMultiReporter
-  - title: Documentation
+  - title: Combine and extend reporters
+    desc: Use several reporters in one run, or write your own.
     contents:
-      - features_rd
-  - title: Options
+      - CucumberMultiReporter
+      - CucumberReporter
+      - read_messages
+  - title: Configure and document
+    desc: Options of a run, and scenarios in help pages.
     contents:
       - opts
-  - title: Custom reports
-    contents:
-      - read_messages
+      - features_rd

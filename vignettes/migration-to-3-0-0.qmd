@@ -19,7 +19,130 @@ source("acceptance-examples.R")
 
 Cucumber 3.0.0 brings the package closer to  the official Cucumber implementations: feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin) and step descriptions are [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions).
 
-Each section below describes what's new. Where a change can break a project written for 2.2.0, a *Migrating from 2.2.0* subsection shows what to change. The [last section](#summary-of-breaking-changes) lists every breaking change, grouped by where you need to make it: feature files, step definitions, parameter types, hooks, reporters and test runs.
+The [checklist](#migration-checklist) below finds and fixes everything that can break a project written for 2.2.0. The sections after it explain what's new and why each change was made. Where a change can break a project, a *Migrating* subsection shows what to change.
+
+# Migration checklist {#migration-checklist}
+
+Work through the steps in order. Run the searches from the project root. Each item links to its explanation.
+
+## 1. Find what fails
+
+1. Upgrade cucumber to 3.0.0 and testthat to 3.3.2 or later.
+2. Run a dry run. It parses every feature file and matches every step to a step definition, without running any step or hook:
+
+   ```r
+   cucumber::test(dry_run = TRUE)
+   ```
+
+   It reports every parse error with its file, line and column, every undefined step, every ambiguous step and every undefined parameter type. Fix them with the items below, and repeat until it reports none.
+
+## 2. Rewrite what can be changed mechanically
+
+These changes are safe without running the tests. The searches look in `tests`; use the directory of your feature files and step definitions.
+
+**Feature files.** Every parse error of the dry run is one of: text between steps that isn't a step, table or Doc String, a misplaced or second `Background:`, an unclosed Doc String, a tag with nothing after it, two Doc Strings after one step, a tag with whitespace, an unknown `# language:`, a step keyword without a space after it, a lowercase keyword, and table rows with different numbers of cells. See [Feature files that were accepted and now fail](#feature-files-that-were-accepted-and-now-fail), [Steps with different text](#steps-with-different-text) and [Step arguments with different values](#step-arguments-with-different-values).
+
+**Step definitions.** See [Migrating step descriptions](#migrating-step-descriptions).
+
+- Regular expression characters in a step description are now matched literally. Replace them with Cucumber Expressions, like `apples?` with `apple(s)`:
+
+  ```sh
+  grep -rnE '(given|when|then)\("[^"]*[?*+|[]' tests
+  ```
+
+- Escape a literal `(`, `{` or `/` in a description with `\\(`, `\\{` or `\\/`.
+- Remove the `^` and `$` of a description that uses a parameter like `{int}`, or write the whole description as a regular expression:
+
+  ```sh
+  grep -rnE '(given|when|then)\("\^.*\{' tests
+  ```
+
+- Remove one of two step definitions that match the same step, like the `{int}` and `{float}` variants. Keep the `{float}` one.
+
+**Parameter types.** See [Migrating parameter types](#migrating-parameter-types).
+
+- Replace four backslashes with two in `define_parameter_type()` regexps, like `"\\\\d+"` with `"\\d+"`:
+
+  ```sh
+  grep -rnF '\\\\' tests
+  ```
+
+- Rename a parameter type that redefines another one, like `int`, or is now built in: `byte`, `short`, `long` and `double`:
+
+  ```sh
+  grep -rnE 'define_parameter_type\("(int|float|word|string|byte|short|long|double)"' tests
+  ```
+
+- Define every parameter type a description uses, or remove its braces.
+
+**Hooks.** See [Migrating hooks](#migrating-hooks).
+
+- Replace the `scenario_name` argument with `scenario` and use `scenario$name`:
+
+  ```sh
+  grep -rn 'scenario_name' tests
+  ```
+
+**Test runs.** See [Migrating test runs](#migrating-test-runs).
+
+- Write every tag expression, in `test()`, `run()` and hooks, with `@` before tags and `and`, `or` and `not` in lowercase: `"smoke AND NOT slow"` becomes `"@smoke and not @slow"`. Combine a vector of tag expressions with `and`, and a vector of `filter` regular expressions with `|`:
+
+  ```sh
+  grep -rnE '(tags|filter) *= *' tests
+  ```
+
+- Remove the `cucumber.indent` option. It's ignored:
+
+  ```sh
+  grep -rn 'cucumber.indent' .
+  ```
+
+- Replace testthat reporters passed to `test()` or `run()` with cucumber's: `testthat::JunitReporter` with `CucumberJunitReporter`, and others with `CucumberSummaryReporter$new()`, or `NULL` for no output:
+
+  ```sh
+  grep -rnE 'reporter *=|JunitReporter' tests
+  ```
+
+- To see each step as it runs, as before, pass `CucumberPrettyReporter$new()`. Use it also where `CucumberProgressReporter$new()` gets `reporter_max_docstring_lines` or `reporter_max_table_lines`, and remove `show_praise`.
+- `run()` in a testthat file now reports nothing of its own. To print the run with cucumber's reporter too, as before, pass `reporter = CucumberProgressReporter$new()`.
+- Move the snapshots of `_snaps/__cucumber__.md`, or of the snapshot file of the test file that calls `run()`, to the snapshot file of each feature, like `_snaps/basket.feature.md`, or let the run save them again. See [Snapshot files](#snapshot-files).
+
+**Custom reporters.** Replace `start_feature()`, `end_feature()`, `start_step()` and `end_step()` with `add_message()`, reading the run from its Cucumber Messages. Replace testthat's `start_reporter()` with `start_run()`, `end_reporter()` with `end_run(error)`, `start_test()` and `end_test()` with the `testCaseStarted` and `testCaseFinished` messages, and warnings from `add_result()` with `add_warning()`. To extend the reporter that prints each step, inherit from `CucumberPrettyReporter`, not `CucumberProgressReporter`. See [Migrating custom reporters](#migrating-custom-reporters).
+
+```sh
+grep -rnE 'start_feature|end_feature|start_step|end_step|start_reporter|end_reporter|start_test|end_test|add_result' R tests
+```
+
+## 3. Decide
+
+These need a choice that depends on your project.
+
+- **Pending and undefined steps fail their scenario.** Implement them, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).
+- **A Doc String is one string, not a character vector of lines.** Where a step splits or indexes its `doc_string`, use `strsplit(doc_string, "\n")[[1]]`, or set the `cucumber.docstring_as_lines` option. See [Step arguments](#step-arguments):
+
+  ```sh
+  grep -rn 'doc_string' tests
+  ```
+
+- **Capture groups in a parameter type's regexp** make its transformer get one argument per group. Make them non-capturing, `(?:...)`, to keep the whole match, or give the transformer an argument per group. See [Capture groups](#capture-groups).
+- **`.feature` files in subdirectories of the test directory now run.** Move the ones that shouldn't run, like test fixtures, out of it. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
+- **Steps that relied on `{int}` matching `+5`, `{float}` needing a decimal point, or `{word}` matching only letters, digits and `_`.** See [Built-in parameter types](#built-in-parameter-types).
+
+## 4. Run the tests and review the differences
+
+Run `cucumber::test()`. Failures that remain come from changes that only show in a run:
+
+- A failed expectation in a step, like `expect_equal()`, now fails the run. Before, its scenario was reported as skipped. See [Failed expectations fail the run](#failed-expectations-fail-the-run).
+- Steps that were silently dropped before now run, like a step indented deeper than the step above it. See [Steps that were dropped and now run](#steps-that-were-dropped-and-now-run).
+- Doc Strings keep their comment and empty lines, escapes like `\n` in table cells are unescaped, and outline placeholders are replaced in step arguments. See [Step arguments with different values](#step-arguments-with-different-values).
+- Tags can contain `#` and `:`, and a description containing `Feature:` is no longer a second Feature. See [Tags and descriptions](#tags-and-descriptions).
+- Scenario names of outlines have no `(Example n)` suffix, and repeated names are numbered. Update the names you use in `filter`, `name` or when comparing test results. See [Scenario names](#scenario-names):
+
+  ```sh
+  grep -rn '(Example' tests
+  ```
+
+- `test()` keeps the step definitions registered before it, and `run()` clears its own when it returns. See [`test()` and `run()`](#test-and-run).
 
 # Feature files
 
@@ -131,7 +254,7 @@ acceptance_example(
 
 Before, the files before the broken one ran, and the files after it were skipped.
 
-## Migrating from 2.2.0
+## Migrating feature files
 
 Feature files that ran before can now fail to parse, and some steps get different text or arguments. Run `cucumber::test()` and fix the parse errors, then check the differences below.
 
@@ -231,7 +354,7 @@ Invalid Cucumber Expressions are an error that points at the problem: an empty o
 
 A step that matches more than one step definition fails with an error listing every matching definition and where it's defined.
 
-## Migrating from 2.2.0
+## Migrating step descriptions
 
 ### Text is matched literally
 
@@ -337,7 +460,7 @@ define_parameter_type("point", "(\\d+),(\\d+)", function(x, y) c(as.integer(x), 
 given("the point {point}", function(point, context) { ... })
 ```
 
-## Migrating from 2.2.0
+## Migrating parameter types
 
 ### Built-in parameter types
 
@@ -449,7 +572,7 @@ Each feature file has a snapshot file of its own in `_snaps`, named after the fe
 - Skip the scenarios that take snapshots in a `before_all()` or `before()` hook, not with `skip()` before `run()` in its test file, as testthat deletes the snapshot files that a run of every test file didn't use.
 - cucumber needs testthat 3.3.2 or later.
 
-## Migrating from 2.2.0
+## Migrating test runs
 
 ### Feature files in subdirectories run
 
@@ -537,7 +660,7 @@ after_step(function(context, step) {
 })
 ```
 
-## Migrating from 2.2.0
+## Migrating hooks
 
 A hook's second argument is the scenario instead of its name. Replace `scenario_name` with `scenario$name`:
 
@@ -589,7 +712,7 @@ cucumber::test(reporter = CucumberMultiReporter$new(list(
 CucumberHtmlReporter$new("report.html")$report("cucumber.ndjson")
 ```
 
-## Migrating from 2.2.0
+## Migrating custom reporters
 
 This matters only for custom reporters. `start_feature()`, `end_feature()`, `start_step()` and `end_step()` are removed: read the run from the messages in `add_message()` instead. A step's result is in its `testStepFinished` message, whose `testStepId` is the id of a test step of the scenario's `testCase`. That test step's `pickleStepId` is the id of a step of the scenario's `pickle`, with the step's text.
 
@@ -650,54 +773,3 @@ Snippets for undefined steps are generated like in Cucumber:
 - A step starting with `And`, `But` or `*` gets `given()`, `when()` or `then()` from its type, `given()` when it's unknown.
 - A step that starts with `^` or ends with `$` gets a regular expression of its text, like `when("^I pay 5\\$$", ...)`.
 - Arguments are valid R names: `iso_date` for a parameter type `{iso-date}`.
-
-# Summary of breaking changes
-
-Everything you may need to change when upgrading from 2.2.0, grouped by where the change goes.
-
-## In feature files
-
-- Fix lines that are now parse errors: text between steps that isn't a step, table or Doc String, a misplaced or second `Background:`, unclosed Doc Strings, tags with nothing after them, two Doc Strings after one step, tags with spaces, unknown `# language:`, steps without a space after the keyword, and lowercase keywords. See [Feature files that were accepted and now fail](#feature-files-that-were-accepted-and-now-fail) and [Steps with different text](#steps-with-different-text).
-- Give every row of a Data Table the same number of cells. See [Step arguments with different values](#step-arguments-with-different-values).
-- Check steps that were silently dropped before and now run, like steps indented deeper than the step above. See [Steps that were dropped and now run](#steps-that-were-dropped-and-now-run).
-- Check tags with `#` or `:` in them, and descriptions containing `Feature:`. See [Tags and descriptions](#tags-and-descriptions).
-
-## In step definitions
-
-- Replace regular expression characters in step descriptions, like `apples?`, with Cucumber Expressions, like `apple(s)`. See [Text is matched literally](#text-is-matched-literally).
-- Escape literal `(`, `{` and `/` with `\\(`, `\\{` and `\\/`, e.g. `"I visit \\/about"`.
-- Remove `^` and `$` from descriptions that use parameters like `{int}`, or rewrite them as regular expressions. See [Descriptions with `^` or `$`](#descriptions-with-or).
-- Define every parameter type used in a description, or remove its braces. See [Undefined parameter types](#undefined-parameter-types).
-- Remove step definitions that match the same step, like `{int}` and `{float}` variants. See [Ambiguous steps](#ambiguous-steps).
-- Check steps that rely on `{int}` matching `+5`, `{float}` matching only decimals, or `{word}` matching only letters, digits and `_`. See [Built-in parameter types](#built-in-parameter-types).
-- Update steps whose Data Table or Doc String values changed: Doc Strings keep comment and empty lines, escapes like `\n` in table cells are unescaped, and outline placeholders are replaced in arguments. See [Step arguments with different values](#step-arguments-with-different-values).
-
-## In parameter types
-
-- Replace four backslashes with two in `define_parameter_type()` regexps, e.g. `"\\\\d+"` with `"\\d+"`. See [Regexps are used as is](#regexps-are-used-as-is).
-- Replace capture groups `(...)` with non-capturing groups `(?:...)`, or give the transformer one argument per group. See [Capture groups](#capture-groups).
-- Rename parameter types that redefine another one, like `int`, or that are now built in: `byte`, `short`, `long` and `double`. See [Parameter types can't be redefined](#parameter-types-cant-be-redefined).
-
-## In hooks
-
-- Replace `scenario_name` with `scenario$name` in `before()` and `after()` hooks. See [Hooks](#hooks).
-
-## In custom reporters
-
-- Replace `start_feature()`, `end_feature()`, `start_step()` and `end_step()` with `add_message()`, reading the run from its Cucumber Messages. See [Reporters](#reporters).
-- Inherit from `CucumberPrettyReporter` instead of `CucumberProgressReporter` to extend the reporter that prints each step. See [Reporters](#reporters).
-- Replace testthat's reporter methods with cucumber's events: `start_reporter()` with `start_run()`, `end_reporter()` with `end_run(error)`, `start_test()` and `end_test()` with the `testCaseStarted` and `testCaseFinished` messages in `add_message()`, and warnings from `add_result()` with `add_warning()`. See [Reporters](#reporters).
-
-## In test runs
-
-- Replace testthat reporters passed to `test()` or `run()` with cucumber's, like `CucumberSummaryReporter$new()`, or with `NULL` for no output. See [Reporters](#reporters).
-- Replace `testthat::JunitReporter` with `CucumberJunitReporter`: `test(reporter = CucumberJunitReporter$new("cucumber-junit.xml"))`.
-- Pass `reporter = CucumberPrettyReporter$new()` to `test()` or `run()` to see each step as it runs, as before. Replace `CucumberProgressReporter$new()` with `CucumberPrettyReporter$new()` where it's given `reporter_max_docstring_lines` or `reporter_max_table_lines`. `show_praise` is deprecated, as it never had an effect. See [Reporters](#reporters).
-- Pass `reporter = CucumberProgressReporter$new()` to `run()` to print the run with cucumber's reporter, besides testthat's, as before. See [Reporters](#reporters).
-- Move snapshots from `_snaps/__cucumber__.md`, or from the snapshot file of the testthat file that calls `run()`, to the snapshot file of each feature, like `_snaps/basket.feature.md`. See [Snapshot files](#snapshot-files).
-- Move `.feature` files that shouldn't run, like test fixtures, out of subdirectories of the test directory. See [Feature files in subdirectories run](#feature-files-in-subdirectories-run).
-- Implement pending and undefined steps, or run with `strict = FALSE` to skip their scenarios. See [Pending and undefined steps fail](#pending-and-undefined-steps-fail).
-- Write tags in `tags` arguments with their `@`, and `and`, `or` and `not` in lowercase, in `test()`, `run()` and hooks. Combine several tag expressions with `and`, and several `filter` regular expressions with `|`. See [Tag expressions](#tag-expressions).
-- Upgrade testthat to 3.3.2 or later.
-- Fix failing expectations that were reported as skipped before. See [Failed expectations fail the run](#failed-expectations-fail-the-run).
-- Update scenario names used in `filter`, `name` or when comparing test results: outline scenarios no longer get an `(Example n)` suffix, and repeated names are numbered. See [Scenario names](#scenario-names).

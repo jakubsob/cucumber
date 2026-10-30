@@ -1,0 +1,132 @@
+---
+title: "Get started"
+vignette: >
+  %\VignetteIndexEntry{Get started}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+engine: knitr
+format:
+  html:
+    syntax-definitions: [gherkin.xml]
+---
+
+```{r, include = FALSE}
+library(cucumber)
+library(testthat)
+
+source("acceptance-examples.R")
+
+# The example's files, run the way a reader would run them
+example_dir <- "../inst/examples/with_testthat_success"
+example_files <- function(...) {
+  paths <- c(...)
+  setNames(lapply(file.path(example_dir, paths), readLines), paths)
+}
+example_run <- function(code, files) {
+  knitr::asis_output(paste(code_block(run_example(files, code), "console-output"), collapse = "\n"))
+}
+```
+
+In a few minutes you'll have a feature file written in plain language, steps in R that check it, and a run that tells you which scenarios pass. New to the idea behind it? Read `vignette("bdd")` first, or come back to it later.
+
+# Install
+
+```r
+install.packages("cucumber")
+```
+
+cucumber runs on testthat, so you need it too: `install.packages("testthat")`.
+
+# Write a feature
+
+A feature file describes behavior in [Gherkin](https://cucumber.io/docs/gherkin/reference/), one example per scenario. Each step is a line that starts with `Given`, `When` or `Then`. Save this as `tests/acceptance/addition.feature`:
+
+```{embed, file = "../inst/examples/with_testthat_success/tests/acceptance/addition.feature"}
+```
+
+Nothing in it says how to add numbers. That's the point: the feature reads the same to someone who doesn't write R.
+
+# Write the steps
+
+A step definition connects a step's text to R code. Save this as `tests/acceptance/setup-steps-addition.R`:
+
+```{embed, file = "../inst/examples/with_testthat_success/tests/acceptance/setup-steps-addition.R"}
+```
+
+- `"I add {float} and {float}"` matches the text of a step. Each placeholder takes a number out of the text and passes it to the function, as `x` and `y`.
+- `context` is an environment the steps of one scenario share. The `when` step stores the result in it and the `then` step reads it.
+- `expect_equal()` is the testthat expectation you already know.
+
+# Run it
+
+`cucumber::test()` runs the feature files of `tests/acceptance`:
+
+```{r, echo = FALSE}
+example_run(
+  'cucumber::test(filter = "addition")',
+  example_files("tests/acceptance/addition.feature", "tests/acceptance/setup-steps-addition.R")
+)
+```
+
+One line per feature, with its scenarios counted by status. All three scenarios passed.
+
+# See a failure
+
+Change the expected result in a `Then` step, say to `5`, and run again. The reporter shows the step that failed, in which scenario, where its definition is, and how the values differ:
+
+```{r, echo = FALSE}
+example_failure <- example_files(
+  "tests/acceptance/addition.feature",
+  "tests/acceptance/setup-steps-addition.R"
+)
+example_failure[[1]] <- sub("Then the result is 2$", "Then the result is 5", example_failure[[1]])
+example_run('cucumber::test(filter = "addition")', example_failure)
+```
+
+# See every step
+
+`CucumberPrettyReporter` prints each step as it runs, in color in a terminal:
+
+```{r, echo = FALSE}
+example_run(
+  'cucumber::test(filter = "addition", reporter = CucumberPrettyReporter$new())',
+  example_files("tests/acceptance/addition.feature", "tests/acceptance/setup-steps-addition.R")
+)
+```
+
+`CucumberDotsReporter`, `CucumberProgressBarReporter` and `CucumberSummaryReporter` are the other console reporters. See the [reference](../reference/index.html#reporters).
+
+# Where the files go
+
+Keep acceptance tests apart from your unit tests:
+
+```text
+tests/
+├── acceptance/
+│   ├── setup-steps_1.R
+│   ├── setup-steps_2.R
+│   ├── feature_1.feature
+│   └── feature_2.feature
+└── testthat/
+    └── test-unit_test_1.R
+```
+
+or alongside them, and run the features from a testthat file with `cucumber::run()`:
+
+```text
+tests/
+└── testthat/
+    ├── test-cucumber.R
+    ├── test-unit_test_1.R
+    ├── setup-steps_1.R
+    └── feature_1.feature
+```
+
+`vignette("testthat")` explains how the two ways differ.
+
+# Next
+
+- `vignette("how-it-works")`: how steps are matched, parameter types, hooks and state.
+- `vignette("reference-gherkin")`: every Gherkin keyword, with examples.
+- `vignette("reporting")`: HTML and JUnit reports, with screenshots and logs.
+- The [examples](https://github.com/jakubsob/cucumber/tree/main/inst/examples) directory has runnable projects.

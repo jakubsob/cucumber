@@ -54,6 +54,34 @@ A step is matched to a step definition by its text, without its keyword: `Given 
 
 A step definition's description is a [Cucumber Expression](https://github.com/cucumber/cucumber-expressions), like `"I have {int}"`, or a regular expression if it starts with `^`, ends with `$` or is surrounded by `/`. The values its parameters match are passed to the step definition, before its Data Table or Doc String and `context`. See `?step` and `?define_parameter_type`.
 
+## Cucumber Expressions
+
+Text in a description is matched literally, except for:
+
+- `{int}` and other [parameter types](#parameter-types), whose values are passed to the step definition,
+- `(s)`, optional text: `"I have {int} cucumber(s)"` matches both `I have 1 cucumber` and `I have 2 cucumbers`,
+- `a/b`, alternative words: `"I press the Enter/Return key"` matches either word.
+
+To match `(`, `{` or `/` literally, escape them with a backslash, like `"a\\/b"`. An invalid expression, like `"I visit /about"`, is an error.
+
+A description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression instead, like `"^I have (\\d+) cucumbers?$"`. Each capture group is passed to the step definition.
+
+## Parameter types
+
+The values of a step's parameters are found with regular expressions and cast by a transformer function. These parameter types are available by default:
+
+| Parameter type | Matches | Converted with |
+|---|---|---|
+| `{int}` | Integers, like `71` or `-19` | `as.integer()` |
+| `{float}` | Floats, like `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12` | `as.double()` |
+| `{word}` | Words without whitespace, like `banana` or `foo-bar`, but not `banana split` | Passed as is |
+| `{string}` | Single-quoted or double-quoted strings, like `"banana split"` or `'banana split'`, but not `banana split`. Only the text between the quotes is extracted, with escaped quotes unescaped | Passed as is |
+| `{}` | Anything | Passed as is |
+
+Define your own with `define_parameter_type()`.
+
+## Results
+
 Every step gets a result:
 
 - [passed]{.status .passed}: its step definition ran without an error or a failed expectation.
