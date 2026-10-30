@@ -119,7 +119,6 @@ a {
 
   .nav-link {
     hyphens: manual;
-    border-radius: 0;
     border-bottom: 3px solid transparent;
   }
 
@@ -201,7 +200,6 @@ a {
       vertical-align: 0.1em;
       background: var(--rl-brand);
       border: 1px solid var(--rl-passed);
-      border-radius: 2px;
     }
   }
 }
@@ -224,7 +222,6 @@ main ul:not([class]) {
       height: 0.45em;
       background: var(--rl-brand);
       border: 1px solid var(--rl-passed);
-      border-radius: 2px;
     }
   }
 
@@ -239,13 +236,89 @@ main ol > li::marker {
   font-weight: 700;
 }
 
+// Tabs: an outlined editor, each tab a file ---------------------------------
+
+.ide-tabs {
+  background: var(--rl-code-bg);
+  border: 1px solid var(--rl-rule);
+  margin-bottom: 1rem;
+
+  .nav-tabs {
+    background: var(--bs-body-bg);
+    border-bottom: 1px solid var(--rl-rule);
+  }
+
+  .nav-tabs .nav-item .nav-link {
+    margin: 0 0 -1px;
+    padding: 0.4rem 0.9rem;
+    border: 0;
+    border-right: 1px solid var(--rl-rule);
+    border-top: 2px solid transparent;
+    font-family: var(--bs-font-monospace);
+    font-size: 0.8rem;
+    color: var(--rl-muted);
+  }
+
+  .nav-tabs .nav-item .nav-link:hover {
+    color: var(--rl-ink);
+  }
+
+  .nav-tabs .nav-item .nav-link.active {
+    background: var(--rl-code-bg);
+    border-top-color: var(--rl-passed);
+    border-bottom: 1px solid var(--rl-code-bg);
+    color: var(--rl-ink);
+  }
+
+  .tab-pane {
+    // Panes that aren't code, like the results, get the editor's padding
+    &:not(:has(> div.sourceCode)) {
+      padding: 1rem 1.125rem;
+
+      > :last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  div.sourceCode,
+  html:root & pre {
+    margin: 0;
+    border: 0;
+  }
+
+  // The output of the code above it, in the Console tab
+  html:root & pre.console-output {
+    border-top: 1px solid var(--rl-rule);
+  }
+
+  // Tables sit on the editor's background, like the code
+  table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: transparent;
+    --bs-table-accent-bg: transparent;
+    --bs-table-color: var(--rl-ink);
+    --bs-table-border-color: var(--rl-rule);
+    background: transparent;
+  }
+
+  th,
+  td {
+    background: transparent;
+  }
+}
+
+// pkgdown's lifecycle badges have their own radius
+.lifecycle {
+  border-radius: 0;
+}
+
 // Code ----------------------------------------------------------------------
 
 html:root code {
   color: var(--rl-ink);
   background: var(--rl-code-bg);
   border: 1px solid var(--rl-rule);
-  border-radius: 4px;
   padding: 0.05em 0.3em;
   font-size: 0.875em;
 }
@@ -253,7 +326,6 @@ html:root code {
 html:root pre {
   background: var(--rl-code-bg);
   border: 1px solid var(--rl-rule);
-  border-radius: 6px;
   padding: 1rem 1.125rem;
 
   code {

@@ -13,6 +13,12 @@ template:
     secondary: "#4a5d4e"
     link-color: "#1C2541"
     font-size-base: "1.0625rem"
+    border-radius: 0
+    border-radius-sm: 0
+    border-radius-lg: 0
+    border-radius-xl: 0
+    border-radius-xxl: 0
+    border-radius-pill: 0
     base_font: {google: {family: "Atkinson Hyperlegible Next", wght: [400, 700]}}
     heading_font: {google: {family: "Atkinson Hyperlegible Next", wght: [400, 700]}}
     code_font: {google: {family: "Atkinson Hyperlegible Mono", wght: [400, 700]}}
