@@ -59,6 +59,7 @@ cucumber now follows the Cucumber specification more closely: feature files are 
 - ✨ `features_rd()` puts scenarios of feature files in a function's help page.
 - 📝 New articles: Get started, Reports, cucumber and testthat, and Compatibility with Cucumber. Examples in the articles come from the acceptance tests.
 - 📝 New help pages `?cucumber` and `?snapshots`.
+- 📝 "How it works" has a stepper that plays a scenario run: which step definitions and hooks run in which order, with the context and the messages.
 
 ## Bug fixes
 
