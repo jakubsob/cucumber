@@ -36,7 +36,7 @@ template:
 
 navbar:
   structure:
-    left: [get-started, guides, reference, gherkin-reference, migrate, news]
+    left: [get-started, guides, how-it-works, reference, migrate, news]
     right: [search, github, lightswitch]
   components:
     get-started:
@@ -47,18 +47,24 @@ navbar:
       menu:
         - text: Behavior-Driven Development
           href: articles/bdd.html
-        - text: How it works
-          href: articles/how-it-works.html
         - text: cucumber and testthat
           href: articles/testthat.html
         - text: Reports
           href: articles/reporting.html
-    gherkin-reference:
-      text: Gherkin
-      href: articles/reference-gherkin.html
+    how-it-works:
+      text: How it works
+      menu:
+        - text: Running features
+          href: articles/how-it-works.html
+        - text: Compatibility with Cucumber
+          href: articles/compatibility.html
     reference:
-      text: Functions
-      href: reference/index.html
+      text: Reference
+      menu:
+        - text: Functions
+          href: reference/index.html
+        - text: Gherkin
+          href: articles/reference-gherkin.html
     migrate:
       text: Upgrade
       menu:

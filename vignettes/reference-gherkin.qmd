@@ -17,8 +17,6 @@ library(testthat)
 source("acceptance-examples.R")
 ```
 
-This reference describes how to write Gherkin.
-
 This is a modified copy of the official [Gherkin reference](https://cucumber.io/docs/gherkin/reference/) from Cucumber project, adjusted to specific features of the `{cucumber}` package.
 
 ---
@@ -37,7 +35,7 @@ Indentation doesn't change the meaning of a line, the keyword it starts with doe
 acceptance_example("gherkin.feature", "Indentation doesn't matter")
 ```
 
-Please note that some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, like `Given: x`, it isn't a step: after a step the feature file fails to parse, and right under `Scenario:` the line is read as part of the description.
+Some keywords _are_ followed by a colon (`:`) and some _are not_. If you add a colon after a keyword that should not be followed by one, like `Given: x`, it isn't a step: after a step the feature file fails to parse, and right under `Scenario:` the line is read as part of the description.
 
 Every feature file is parsed before anything runs. If any of them can't be parsed, no scenario runs, and every error is reported with its file, line and column:
 
@@ -131,7 +129,7 @@ acceptance_example(
 
 Each step starts with `Given`, `When`, `Then`, `And`, or `But`.
 
-Cucumber executes each step in a scenario one at a time, in the sequence you’ve written them in. When Cucumber tries to execute a step, it looks for a matching step definition to execute.
+Cucumber executes each step in a scenario one at a time, in the sequence you've written them in. When Cucumber tries to execute a step, it looks for a matching step definition to execute.
 
 Keywords are not taken into account when looking for a step definition. This means you cannot have a `Given`, `When`, `Then`, `And` or `But` step with the same text as another step.
 
@@ -174,8 +172,6 @@ Examples:
 * Guess a word
 * Invite a friend
 * Withdraw money
-
-Imagine it's 1922
 
 Most software does something people could do manually (just not as efficiently).
 
@@ -277,13 +273,13 @@ For a less explicit alternative to `Background`, check out `?hook`
 
 ## Tips for using Background
 
-*   Don't use `Background` to set up **complicated states**, unless that state is actually something the client needs to know.
+*   Don't use `Background` to set up complicated states, unless that state is actually something the client needs to know.
     *   For example, if the user and site names don't matter to the client, use a higher-level step such as `Given I am logged in as a site owner`.
-*   Keep your `Background` section **short**.
+*   Keep your `Background` section short.
     *   The client needs to actually remember this stuff when reading the scenarios. If the `Background` is more than 4 lines long, consider moving some of the irrelevant details into higher-level steps.
-*   Make your `Background` section **vivid**.
+*   Make your `Background` section vivid.
     *   Use colourful names, and try to tell a story. The human brain keeps track of stories much better than it keeps track of names like `"User A"`, `"User B"`, `"Site 1"`, and so on.
-*   Keep your scenarios **short**, and don't have too many.
+*   Keep your scenarios short, and don't have too many.
     *   If the `Background` section has scrolled off the screen, the reader no longer has a full overview of what's happening. Think about using higher-level steps, or splitting the `*.feature` file.
 
 # Scenario Outline
@@ -343,7 +339,7 @@ acceptance_example("doc_string.feature", "A Doc String can be between \"\"\" del
 
 Doc strings also support using three backticks as the delimiter, like in the examples below.
 
-In your step definition, there’s no need to find this text and match it in your pattern.
+In your step definition, there's no need to find this text and match it in your pattern.
 
 It is passed to the step definition as one string, its lines joined by `"\n"`, after the step's parameters and before `context`:
 
@@ -393,12 +389,10 @@ acceptance_example("data_tables.feature", "Data Table cells unescape \\n, \\| an
 
 # Tags
 
-Tags are a great way to organise your features and scenarios.
+Tags organise features and scenarios. Use them to:
 
-They can be used for two purposes:
-
-* Running a subset of scenarios
-* Restricting hooks to a subset of scenarios
+* run a subset of scenarios,
+* restrict hooks to a subset of scenarios.
 
 A feature or scenario can have as many tags as you like. Separate them with spaces, like `@smoke @fast`.
 
@@ -410,15 +404,13 @@ Tags can be placed above the following Gherkin elements:
 * `Scenario Outline`
 * `Examples`
 
-**Note:** Tags placed above `Background` or steps (`Given`, `When`, `Then`, `And`, `But`, `*`) make the feature file fail to parse. Place tags only on the elements listed above.
-
 In `Scenario Outline`, you can use tags on different sets of examples:
 
 ```{r, echo = FALSE}
 acceptance_example("target_specific_scenarios_by_tag.feature", "An Examples' tags apply to its examples", pretty = TRUE)
 ```
 
-Tags placed in invalid locations will result in an error. For example, this is **invalid** and will throw an error:
+Tags above a `Background` or a step make the feature file fail to parse:
 
 ```gherkin
 Feature: Invalid tag usage
@@ -473,33 +465,13 @@ acceptance_example(
 
 ## Tag expressions
 
-A tag expression is an infix boolean expression. Below are some examples:
-
-| Expression | Description |
-|------------|-------------|
-| `@fast` | Scenarios tagged with @fast |
-| `@wip and not @slow` | Scenarios tagged with @wip that aren't also tagged with @slow |
-| `@smoke and @fast` | Scenarios tagged with both @smoke and @fast |
-| `@gui or @database` | Scenarios tagged with either @gui or @database |
-
-For more advanced tag expressions you can use parentheses for clarity, or to change operator precedence:
+A tag expression is an infix boolean expression with the lowercase operators `and`, `or` and `not`, and parentheses for grouping. `not` binds tighter than `and`, and `and` tighter than `or`:
 
 ```r
 cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
 ```
 
-### Tag expression operators
-
-Tag expressions support the following operators:
-
-* `and` - logical AND (both conditions must be true)
-* `or` - logical OR (at least one condition must be true)
-* `not` - logical NOT (negates the condition)
-* `( )` - parentheses for grouping and controlling precedence
-
-**Operator precedence:** `not` has the highest precedence, followed by `and`, then `or`. Use parentheses to change the order of evaluation.
-
-The operators are lowercase: `AND` is read as a tag, so `@smoke AND @fast` is a syntax error.
+`AND` is read as a tag, so `@smoke AND @fast` is a syntax error.
 
 ### Tag names
 
@@ -509,36 +481,14 @@ Tag names are case-sensitive: `@Smoke` and `@smoke` are different tags.
 
 ## Using tags for documentation
 
-Your imagination is the only limitation when it comes to using tags for documentation.
-
-### Link to other documents
-
-Tags can refer to IDs in external systems such as requirement management tools, issue trackers or test management tools:
+Tags can refer to IDs in external systems such as issue trackers, or mark where a feature is in the development process:
 
 ```gherkin
-@BJ-x98.77 @BJ-z12.33
+@BJ-x98.77 @qa_ready
 Feature: Convert transaction
 ```
 
-You can use custom reporting to turn these tags into links pointing to documents in your external tool.
-
-### Development process
-
-Another creative way to use tags is to keep track of where in the development process a certain feature is:
-
-```gherkin
-@qa_ready
-Feature: Index projects
-```
-
-### Other common uses
-
-* `@smoke` - Quick smoke tests that run on every commit
-* `@wip` - Work in progress, scenarios that are being developed
-* `@slow` - Long-running tests that might be skipped in development
-* `@manual` - Tests that require manual verification
-* `@bug` - Tests that reproduce a reported bug
-* `@regression` - Regression tests for fixed bugs
+Custom reporting can turn these tags into links.
 
 # Spoken Languages
 
@@ -562,12 +512,12 @@ Use them when a specification should read as a document: it renders on GitHub, o
 
 A Markdown document is Gherkin with these changes:
 
-- **Headers** are the `Feature`, `Rule`, `Background`, `Scenario`, `Scenario Outline` and `Examples`, like `# Feature: Basket` or `## Scenario: Add an item`.
-- **List items** that start with a step keyword are steps, like `* Given an empty basket` or `- When I add an apple`. A list item that doesn't start with a step keyword is ignored.
-- **Code blocks** under a step are Doc Strings. Their language, like ```` ```json ````, is the Doc String's media type.
-- **Tables** indented 2 to 5 spaces are Data Tables, under a step, and Examples, under an `Examples` header. The separator row under the header, `| --- |`, isn't a row. A table that isn't indented, or is indented more, is ignored.
-- **Tags** are written in backticks, on the line above the header they tag: `` `@smoke` ``.
-- **Everything else**, like paragraphs, images and unindented tables, is ignored.
+- Headers are the `Feature`, `Rule`, `Background`, `Scenario`, `Scenario Outline` and `Examples`, like `# Feature: Basket` or `## Scenario: Add an item`.
+- List items that start with a step keyword are steps, like `* Given an empty basket` or `- When I add an apple`. A list item that doesn't start with a step keyword is ignored.
+- Code blocks under a step are Doc Strings. Their language, like ```` ```json ````, is the Doc String's media type.
+- Tables indented 2 to 5 spaces are Data Tables, under a step, and Examples, under an `Examples` header. The separator row under the header, `| --- |`, isn't a row. A table that isn't indented, or is indented more, is ignored.
+- Tags are written in backticks, on the line above the header they tag: `` `@smoke` ``.
+- Everything else, like paragraphs, images and unindented tables, is ignored.
 
 A Markdown document runs like a feature file:
 
@@ -582,18 +532,6 @@ acceptance_example(
   "markdown_with_gherkin.feature",
   "A code block is a Doc String and an indented table is a Data Table"
 )
-```
-
-Tags are written in backticks:
-
-```{r, echo = FALSE}
-acceptance_example("markdown_with_gherkin.feature", "Tags are written in backticks", pretty = TRUE)
-```
-
-A `Rule` and a `Background` are headers too:
-
-```{r, echo = FALSE}
-acceptance_example("markdown_with_gherkin.feature", "A Rule and a Background are headers too", pretty = TRUE)
 ```
 
 A Markdown document can't start with `# language:`, as it would be a header. Set the language of Markdown documents with the `cucumber.language` option, like `options(cucumber.language = "fr")`.

@@ -1,6 +1,6 @@
 # cucumber 3.0.0
 
-cucumber now follows more closely the Cucumber specification: feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin) and step descriptions are [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions). Some feature files and step definitions that worked in 2.x need changes. The [migration guide](https://jakubsob.github.io/cucumber/articles/migration-to-3-0-0.html) describes every change in detail, with examples.
+cucumber now follows the Cucumber specification more closely: feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin) and step descriptions are [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions). Some feature files and step definitions that worked in 2.x need changes, see the [migration guide](https://jakubsob.github.io/cucumber/articles/migration-to-3-0-0.html). It also lists how close cucumber is to the official implementations, in `vignette("compatibility")`.
 
 ## Gherkin
 
@@ -16,24 +16,23 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ⚠️ Text in step descriptions is matched literally, not as a regular expression. A description that starts with `^`, ends with `$` or is surrounded by `/` is a regular expression.
 - ⚠️ A step that matches more than one step definition fails as ambiguous. Previously the first one was used.
 - ⚠️ Invalid Cucumber Expressions are an error that points at the problem. A step definition that uses an undefined parameter type defines no step.
+- ⚠️ Snippets for undefined steps are generated like in Cucumber, with every matching parameter type, custom parameter types and `data_table` and `doc_string` arguments.
 - ✨ The rest of the Cucumber Expressions syntax: optional text `cucumber(s)`, alternatives `Enter/Return` and the anonymous parameter `{}`.
 - ✨ Code a step defers in its `context`, like `withr::local_options(.local_envir = context)`, runs when the scenario ends.
-- ✨ A step's error shows its backtrace and names the feature file and line, like `Feature: basket.feature:3`.
-- ⚠️ Snippets for undefined steps are generated like in Cucumber, with every matching parameter type, custom parameter types and `data_table` and `doc_string` arguments.
+- ✨ A step's error shows its backtrace and names the feature file and line, like `Feature: basket.feature:3`. A step definition with the wrong number of arguments, or without `context` as its last argument, gets an error that shows the function to use.
 
 ## Parameter types
 
 - ⚠️ `{int}`, `{float}` and `{word}` match the same values as in Cucumber Expressions. `{byte}`, `{short}`, `{long}` and `{double}` are built in.
 - ⚠️ A parameter type's `regexp` is used as is: replace `"\\\\d+"` with `"\\d+"`. Its capture groups are passed to the transformer as separate arguments.
 - ⚠️ `define_parameter_type()` fails on a name that is already defined, an invalid name or an invalid regexp.
-- ✨ `{string}` matches escaped quotes. `define_parameter_type()` accepts several regexps, `use_for_snippets` and `prefer_for_regexp_match`, and its `transformer` is optional.
+- ✨ `{string}` matches escaped quotes. `define_parameter_type()` accepts several regexps, `use_for_snippets` and `prefer_for_regexp_match`, and its `transformer` is optional. An error of a transformer names the parameter type.
 
 ## Running tests
 
 - ⚠️ `test()` and `run()` find feature files in subdirectories of `path` too.
 - ⚠️ Every step gets a result: passed, failed, pending, undefined, ambiguous or skipped. Pending, undefined and ambiguous steps fail their scenario and don't stop the run. Run with `strict = FALSE` to skip scenarios with pending or undefined steps instead.
-- ⚠️ Tag expressions are parsed like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions): tags need their `@`, operators are lowercase, and `tags` must be one expression.
-- ⚠️ `filter` must be one regular expression.
+- ⚠️ Tag expressions are parsed like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions): tags need their `@`, operators are lowercase, and `tags` must be one expression. `filter` must be one regular expression.
 - ⚠️ Each feature file has a snapshot file of its own, like `_snaps/checkout-basket.feature.md`, whether run by `test()` or `run()`.
 - ⚠️ cucumber needs testthat 3.3.2 or later.
 - ✨ New `test()` and `run()` arguments: `dry_run`, `name`, `features` (with lines, like `"addition.feature:12"`), `fail_fast`, `retry` and `order`.
@@ -46,41 +45,27 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ Any number of `before()` and `after()` hooks, with `tags` and `name` arguments.
 - ✨ `before_step()`, `after_step()`, `before_all()` and `after_all()` hooks.
 - ✨ `skip_scenario()` skips a scenario from a `before()` hook or a step. `skip()` in a `before_all()` hook skips the whole run, and in an `after()` hook skips that hook.
-- ✨ `context` and `scenario` print readably.
 
 ## Reporters
 
 - ⚠️ Cucumber reporters are no longer testthat reporters, and testthat reporters can't be passed to `test()` or `run()`. A `CucumberReporter` gets the run as [Cucumber Messages](https://github.com/cucumber/messages) in `add_message()`. Its `start_feature()`, `end_feature()`, `start_step()` and `end_step()` methods are removed.
-- ⚠️ The reporter that prints each step is renamed `CucumberPrettyReporter`. `CucumberProgressReporter`, the default, prints one line per feature. `show_praise` is deprecated.
+- ⚠️ The reporter that prints each step is renamed `CucumberPrettyReporter`, and prints a step's warnings under the step. `CucumberProgressReporter`, the default, prints one line per feature. `show_praise` is deprecated.
 - ⚠️ `run()` in a testthat run reports nothing of its own by default: testthat's reporter reports each scenario as a test, at its line of the feature file.
-- ✨ New reporters, like Cucumber's formatters: `CucumberDotsReporter`, `CucumberProgressBarReporter`, `CucumberSummaryReporter`, `CucumberMessagesReporter`, `CucumberHtmlReporter`, `CucumberJunitReporter`, `CucumberRerunReporter`, `CucumberUsageReporter`, `CucumberSnippetsReporter` and `CucumberMultiReporter`.
-- ✨ Reporters print or write to a file, and `report(file)` reports a run from its stored Cucumber Messages.
-- ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles.
-- ✨ Steps and hooks attach data to the report with `context$attach()`, `context$log()` and `context$link()`.
+- ✨ New reporters, like Cucumber's formatters: `CucumberDotsReporter`, `CucumberProgressBarReporter`, `CucumberSummaryReporter`, `CucumberMessagesReporter`, `CucumberHtmlReporter`, `CucumberJunitReporter`, `CucumberRerunReporter`, `CucumberUsageReporter`, `CucumberSnippetsReporter` and `CucumberMultiReporter`. They print or write to a file, and `report(file)` reports a run from its stored Cucumber Messages.
+- ✨ `read_messages()` reads the Cucumber Messages of a run as tibbles. Steps and hooks attach data to the report with `context$attach()`, `context$log()` and `context$link()`.
 
 ## Documentation
 
 - ✨ `features_rd()` puts scenarios of feature files in a function's help page.
-- 📝 The migration guide and "How it works" show examples from the acceptance tests, as editor tabs with the files and the output of the run, like the Gherkin reference.
-- 📝 New article: Get started, `vignette("get-started")`, from installing to a first run. The home page is shorter and puts the installation first; step matching syntax and parameter types moved to "How it works". The site's navigation is regrouped and the function reference groups reporters by what they do.
-- 📝 `?hook` and "cucumber and testthat" show how to share a connection or an app driver between scenarios: the `context` of a `before_all()` hook isn't theirs, so keep it in an environment of a `setup-*.R` file.
-- 📝 "cucumber and testthat" starts with when to use which and how they complement each other.
-- 📝 New articles: Reports, `vignette("reporting")`, and cucumber and testthat, `vignette("testthat")`.
-- 📝 New help pages: `?cucumber`, linking every topic and article, and `?snapshots`. `?test` shows how feature files run like testthat test files, and what happens when they can't be parsed.
+- 📝 New articles: Get started, Reports, cucumber and testthat, and Compatibility with Cucumber. Examples in the articles come from the acceptance tests.
+- 📝 New help pages `?cucumber` and `?snapshots`.
 
 ## Bug fixes
 
-- 🐛 A failed expectation in a step fails the test run. Previously the scenario was reported as skipped.
-- 🐛 A step or a hook fails when a `test_that()` test in it fails.
-- 🐛 A scenario whose steps pass without an expectation is reported as passed, not skipped as an empty test.
+- 🐛 A failed expectation in a step, or a failed `test_that()` test in it, fails the test run. Previously the scenario was reported as skipped. A scenario whose steps pass without an expectation is reported as passed, not skipped as an empty test.
 - 🐛 testthat's reporters show a step's error as `Error: Step "<text>" failed` instead of its classes.
-- 🐛 A step definition with the wrong number of arguments, or without `context` as its last argument, gets an error that shows the function to use.
-- 🐛 An error of a parameter type's transformer names the parameter type.
-- 🐛 A step's warnings are printed under the step, not above it.
-- 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, and errors on an unknown argument.
-- 🐛 `test()`, `run()` and `features_rd()` check their arguments before anything runs, with an error that names the argument.
-- 🐛 `test()` attaches cucumber, so setup files define steps without `cucumber::`.
-- 🐛 `test()` keeps the step definitions, hooks and parameter types registered before it.
+- 🐛 `test()` attaches cucumber, so setup files define steps without `cucumber::`, and keeps the step definitions, hooks and parameter types registered before it.
+- 🐛 `test()` passes its `...` to `grepl()` when matching `filter`, and `test()` and `run()` check their arguments before anything runs, with an error that names the argument.
 - 🐛 A `test_that()` test after `run()` in a test file is reported in the test file's context.
 
 # cucumber 2.2.0
