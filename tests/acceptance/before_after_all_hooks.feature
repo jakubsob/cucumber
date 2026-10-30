@@ -2,6 +2,8 @@ Feature: Before all and after all hooks
   `before_all()` and `after_all()` run code once, before the first scenario and after the last one,
   like starting and stopping a server. They take no arguments, or a `context` to attach data to the report,
   which isn't shared with the scenarios.
+  To share a connection or an app driver between scenarios, keep it in an environment of a `setup-*.R` file
+  and hand it to each scenario in a `before()` hook.
   A failing `before_all()` hook stops the run before any scenario, after the other `before_all()` hooks ran.
   `after_all()` hooks run even when the run failed, and a failing one fails the run.
 
@@ -92,6 +94,34 @@ Feature: Before all and after all hooks
       """
     Then the steps have these results:
       | step                  | status |
+      | Given an empty basket | passed |
+
+  Scenario: State shared by the scenarios of a run is kept in an environment of the setup file
+    Given a file named "features/basket.feature" with
+      """
+      Feature: Basket
+        Scenario: Add an item
+          Given an empty basket
+
+        Scenario: Remove an item
+          Given an empty basket
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      shared <- new.env()
+      before_all(function() shared$server <- "started")
+      before(function(context, scenario) context$server <- shared$server)
+      given("an empty basket", function(context) {
+        expect_equal(context$server, "started")
+      })
+      """
+    When I run
+      """
+      test("features")
+      """
+    Then the steps have these results:
+      | step                  | status |
+      | Given an empty basket | passed |
       | Given an empty basket | passed |
 
   Rule: A failing before all or after all hook fails the run

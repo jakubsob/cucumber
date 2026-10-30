@@ -33,7 +33,8 @@ and in \code{after()} hooks its \code{status} and \code{error}.
 the step's \code{keyword}, \code{text}, \code{line}, and its \code{data_table} and \code{doc_string} if it has
 them, as its step definition gets them, and in \code{after_step()} hooks its \code{status} and \code{error}.
 \item \code{before_all()} and \code{after_all()} hooks get no arguments, or a \code{context} to
-attach data to the report, see \link{attachments}. It isn't shared with scenarios.
+attach data to the report, see \link{attachments}. It isn't shared with scenarios: to share
+a connection or an app driver, keep it in an environment of a \verb{setup-*.R} file.
 }}
 
 \item{tags}{A tag expression, e.g. \code{"@db and not @slow"}.
@@ -616,6 +617,8 @@ Source: \code{tests/acceptance/before_after_step_hooks.feature}
 \code{before_all()} and \code{after_all()} run code once, before the first scenario and after the last one,
 like starting and stopping a server. They take no arguments, or a \code{context} to attach data to the report,
 which isn't shared with the scenarios.
+To share a connection or an app driver between scenarios, keep it in an environment of a \code{setup-*.R} file
+and hand it to each scenario in a \code{before()} hook.
 A failing \code{before_all()} hook stops the run before any scenario, after the other \code{before_all()} hooks ran.
 \code{after_all()} hooks run even when the run failed, and a failing one fails the run.
 \subsection{Background:}{
@@ -650,6 +653,8 @@ stop the server}
   `before_all()` and `after_all()` run code once, before the first scenario and after the last one,
   like starting and stopping a server. They take no arguments, or a `context` to attach data to the report,
   which isn't shared with the scenarios.
+  To share a connection or an app driver between scenarios, keep it in an environment of a `setup-*.R` file
+  and hand it to each scenario in a `before()` hook.
   A failing `before_all()` hook stops the run before any scenario, after the other `before_all()` hooks ran.
   `after_all()` hooks run even when the run failed, and a failing one fails the run.
 

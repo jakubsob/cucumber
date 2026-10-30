@@ -82,7 +82,8 @@ skip_scenario <- function(message = "Skipped") {
 #'     the step's `keyword`, `text`, `line`, and its `data_table` and `doc_string` if it has
 #'     them, as its step definition gets them, and in `after_step()` hooks its `status` and `error`.
 #'   - `before_all()` and `after_all()` hooks get no arguments, or a `context` to
-#'     attach data to the report, see [attachments]. It isn't shared with scenarios.
+#'     attach data to the report, see [attachments]. It isn't shared with scenarios: to share
+#'     a connection or an app driver, keep it in an environment of a `setup-*.R` file.
 #'
 #' @param tags A tag expression, e.g. `"@db and not @slow"`.
 #'   The hook runs only for scenarios that match it. If `NULL`, it runs for every scenario.

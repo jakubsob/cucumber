@@ -64,7 +64,7 @@ If you're starting a feature, write its scenarios first, then the code and its u
 | Code shared by the tests of a file | Code at the top of the file, or a helper function    | `Background:` steps, run before each scenario of the feature or rule                                                                    |
 | The same test with other values    | A loop over `test_that()`, or a package like patrick | `Scenario Outline:` with `Examples:`                                                                                                    |
 | State within a test                | Local variables                                      | The `context` environment, passed to every step and hook of the scenario                                                                |
-| State between tests                | Not shared, unless kept outside the test             | Not shared: each scenario gets a new `context`                                                                                          |
+| State between tests                | Not shared, unless kept outside the test             | Not shared: each scenario gets a new `context`. Keep what the run shares, like a connection, in an environment of a `setup-*.R` file and set it up in `before_all()` |
 | Checking values                    | `expect_*()`                                         | `expect_*()` in step definitions                                                                                                        |
 :::
 

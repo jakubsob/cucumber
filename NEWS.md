@@ -63,6 +63,7 @@ cucumber now follows more closely the Cucumber specification: feature files are 
 - ✨ `features_rd()` puts scenarios of feature files in a function's help page.
 - 📝 The migration guide and "How it works" show examples from the acceptance tests, as editor tabs with the files and the output of the run, like the Gherkin reference.
 - 📝 New article: Get started, `vignette("get-started")`, from installing to a first run. The home page is shorter and puts the installation first; step matching syntax and parameter types moved to "How it works". The site's navigation is regrouped and the function reference groups reporters by what they do.
+- 📝 `?hook` and "cucumber and testthat" show how to share a connection or an app driver between scenarios: the `context` of a `before_all()` hook isn't theirs, so keep it in an environment of a `setup-*.R` file.
 - 📝 "cucumber and testthat" starts with when to use which and how they complement each other.
 - 📝 New articles: Reports, `vignette("reporting")`, and cucumber and testthat, `vignette("testthat")`.
 - 📝 New help pages: `?cucumber`, linking every topic and article, and `?snapshots`. `?test` shows how feature files run like testthat test files, and what happens when they can't be parsed.
