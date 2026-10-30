@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>What’s new in 3.0.0 and how to migrate • cucumber</title>
+<title>Migration to cucumber 3.0.0 • cucumber</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -19,7 +19,7 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="migration-to-3-0-0_files/libs/quarto-html/popper.min.js"></script><script src="migration-to-3-0-0_files/libs/quarto-html/tippy.umd.min.js"></script><link href="migration-to-3-0-0_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="migration-to-3-0-0_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="What’s new in 3.0.0 and how to migrate">
+<!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Migration to cucumber 3.0.0">
 <meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -46,19 +46,34 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/reference-gherkin.html">Gherkin Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
-    <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
     <li><a class="dropdown-item" href="../articles/testthat.html">cucumber and testthat</a></li>
     <li><a class="dropdown-item" href="../articles/reporting.html">Reports</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">3.0.0</a></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-it-works" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">How it works</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-it-works">
+<li><a class="dropdown-item" href="../articles/how-it-works.html">Running features</a></li>
+    <li><a class="dropdown-item" href="../articles/compatibility.html">Compatibility with Cucumber</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-gherkin.html">Gherkin</a></li>
+  </ul>
+</li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-upgrade" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Upgrade</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-upgrade">
+<li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">To 3.0.0</a></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">To 2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -84,7 +99,7 @@
 </nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>What’s new in 3.0.0 and how to migrate</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Migration to cucumber 3.0.0</h1>
 
 
 
@@ -99,111 +114,120 @@
 
 
     <p>Cucumber 3.0.0 brings the package closer to the official Cucumber implementations: feature files are parsed by a port of the <a href="https://github.com/cucumber/gherkin" class="external-link">official Gherkin parser</a> and step descriptions are <a href="https://github.com/cucumber/cucumber-expressions" class="external-link">Cucumber Expressions</a>.</p>
-<p>Each section below describes what’s new. Where a change can break a project written for 2.2.0, a <em>Migrating from 2.2.0</em> subsection shows what to change. The <a href="#summary-of-breaking-changes">last section</a> lists every breaking change, grouped by where you need to make it: feature files, step definitions, parameter types, hooks, reporters and test runs.</p>
-<section class="section level2"><h2 id="feature-files">Feature files<a class="anchor" aria-label="anchor" href="#feature-files"></a>
+<p>cucumber is tested against the test suites of the official Cucumber projects, see <code><a href="../articles/compatibility.html">vignette("compatibility")</a></code>.</p>
+<p>The <a href="#migration-checklist">checklist</a> below finds and fixes everything that can break a project written for 2.2.0. The sections after it explain each change and why it was made. Where a change can break a project, a <em>Migrating</em> subsection shows what to change.</p>
+<section class="section level2"><h2 id="migration-checklist">Migration checklist<a class="anchor" aria-label="anchor" href="#migration-checklist"></a>
+</h2>
+<p>Work through the steps in order. Run the searches from the project root. Each item links to its explanation.</p>
+<section class="level2"><h3 id="find-what-fails">1. Find what fails<a class="anchor" aria-label="anchor" href="#find-what-fails"></a>
+</h3>
+<ol type="1">
+<li><p>Upgrade cucumber to 3.0.0 and testthat to 3.3.2 or later.</p></li>
+<li>
+<p>Run a dry run. It parses every feature file and matches every step to a step definition, without running any step or hook:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>It reports every parse error with its file, line and column, every undefined step, every ambiguous step and every undefined parameter type. Fix them with the items below, and repeat until it reports none.</p>
+</li>
+</ol></section><section class="level2"><h3 id="rewrite-what-can-be-changed-mechanically">2. Rewrite what can be changed mechanically<a class="anchor" aria-label="anchor" href="#rewrite-what-can-be-changed-mechanically"></a>
+</h3>
+<p>These changes are safe without running the tests. The searches look in <code>tests</code>; use the directory of your feature files and step definitions.</p>
+<p><strong>Feature files.</strong> The dry run reports every parse error. See <a href="#feature-files-that-were-accepted-and-now-fail">Feature files that were accepted and now fail</a>, <a href="#steps-with-different-text">Steps with different text</a> and <a href="#step-arguments-with-different-values">Step arguments with different values</a>.</p>
+<p><strong>Step definitions.</strong> See <a href="#migrating-step-descriptions">Migrating step descriptions</a>.</p>
+<ul>
+<li>
+<p>Regular expression characters in a step description are now matched literally. Replace them with Cucumber Expressions, like <code>apples?</code> with <code>apple(s)</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnE</span> <span class="st">'(given|when|then)\("[^"]*[?*+|[]'</span> tests</span></code></pre></div>
+</li>
+<li><p>Escape a literal <code>(</code>, <code>{</code> or <code>/</code> in a description with <code>\\(</code>, <code>\\{</code> or <code>\\/</code>.</p></li>
+<li>
+<p>Remove the <code>^</code> and <code>$</code> of a description that uses a parameter like <code>{int}</code>, or write the whole description as a regular expression:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnE</span> <span class="st">'(given|when|then)\("\^.*\{'</span> tests</span></code></pre></div>
+</li>
+<li><p>Remove one of two step definitions that match the same step, like the <code>{int}</code> and <a href="https://github.com/wrathematics/float" class="external-link">float</a> variants. Keep the <a href="https://github.com/wrathematics/float" class="external-link">float</a> one.</p></li>
+</ul>
+<p><strong>Parameter types.</strong> See <a href="#migrating-parameter-types">Migrating parameter types</a>.</p>
+<ul>
+<li>
+<p>Replace four backslashes with two in <code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> regexps, like <code>"\\\\d+"</code> with <code>"\\d+"</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnF</span> <span class="st">'\\\\'</span> tests</span></code></pre></div>
+</li>
+<li>
+<p>Rename a parameter type that redefines another one, like <code>int</code>, or is now built in: <code>byte</code>, <code>short</code>, <code>long</code> and <code>double</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnE</span> <span class="st">'define_parameter_type\("(int|float|word|string|byte|short|long|double)"'</span> tests</span></code></pre></div>
+</li>
+<li><p>Define every parameter type a description uses, or remove its braces.</p></li>
+</ul>
+<p><strong>Hooks.</strong> See <a href="#migrating-hooks">Migrating hooks</a>.</p>
+<ul>
+<li>
+<p>Replace the <code>scenario_name</code> argument with <code>scenario</code> and use <code>scenario$name</code>:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rn</span> <span class="st">'scenario_name'</span> tests</span></code></pre></div>
+</li>
+</ul>
+<p><strong>Test runs.</strong> See <a href="#migrating-test-runs">Migrating test runs</a>.</p>
+<ul>
+<li>
+<p>Write every tag expression, in <code><a href="../reference/test.html">test()</a></code>, <code><a href="../reference/run.html">run()</a></code> and hooks, with <code>@</code> before tags and <code>and</code>, <code>or</code> and <code>not</code> in lowercase: <code>"smoke AND NOT slow"</code> becomes <code>"@smoke and not @slow"</code>. Combine a vector of tag expressions with <code>and</code>, and a vector of <code>filter</code> regular expressions with <code>|</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnE</span> <span class="st">'(tags|filter) *= *'</span> tests</span></code></pre></div>
+</li>
+<li>
+<p>Remove the <code>cucumber.indent</code> option. It’s ignored:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rn</span> <span class="st">'cucumber.indent'</span> .</span></code></pre></div>
+</li>
+<li>
+<p>Replace testthat reporters passed to <code><a href="../reference/test.html">test()</a></code> or <code><a href="../reference/run.html">run()</a></code> with cucumber’s: <code><a href="https://testthat.r-lib.org/reference/JunitReporter.html" class="external-link">testthat::JunitReporter</a></code> with <code>CucumberJunitReporter</code>, and others with <code>CucumberSummaryReporter$new()</code>, or <code>NULL</code> for no output:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnE</span> <span class="st">'reporter *=|JunitReporter'</span> tests</span></code></pre></div>
+</li>
+<li><p>To see each step as it runs, as before, pass <code>CucumberPrettyReporter$new()</code>. Use it also where <code>CucumberProgressReporter$new()</code> gets <code>reporter_max_docstring_lines</code> or <code>reporter_max_table_lines</code>, and remove <code>show_praise</code>.</p></li>
+<li><p><code><a href="../reference/run.html">run()</a></code> in a testthat file now reports nothing of its own. To print the run with cucumber’s reporter too, as before, pass <code>reporter = CucumberProgressReporter$new()</code>.</p></li>
+<li><p>Move the snapshots of <code>_snaps/__cucumber__.md</code>, or of the snapshot file of the test file that calls <code><a href="../reference/run.html">run()</a></code>, to the snapshot file of each feature, like <code>_snaps/basket.feature.md</code>, or let the run save them again. See <a href="#snapshot-files">Snapshot files</a>.</p></li>
+</ul>
+<p><strong>Custom reporters.</strong> See <a href="#migrating-custom-reporters">Migrating custom reporters</a>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rnE</span> <span class="st">'start_feature|end_feature|start_step|end_step|start_reporter|end_reporter|start_test|end_test|add_result'</span> R tests</span></code></pre></div>
+</section><section class="level2"><h3 id="decide">3. Decide<a class="anchor" aria-label="anchor" href="#decide"></a>
+</h3>
+<p>These need a choice that depends on your project.</p>
+<ul>
+<li><p><strong>Pending and undefined steps fail their scenario.</strong> Implement them, or run with <code>strict = FALSE</code> to skip their scenarios. See <a href="#pending-and-undefined-steps-fail">Pending and undefined steps fail</a>.</p></li>
+<li>
+<p><strong>A Doc String is one string, not a character vector of lines.</strong> Where a step splits or indexes its <code>doc_string</code>, use <code>strsplit(doc_string, "\n")[[1]]</code>, or set the <code>cucumber.docstring_as_lines</code> option to <code>TRUE</code>. See <a href="#feature-files">Feature files</a>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rn</span> <span class="st">'doc_string'</span> tests</span></code></pre></div>
+</li>
+<li><p><strong>Capture groups in a parameter type’s regexp</strong> make its transformer get one argument per group. Make them non-capturing, <code>(?:...)</code>, to keep the whole match, or give the transformer an argument per group. See <a href="#capture-groups">Capture groups</a>.</p></li>
+<li><p><strong><code>.feature</code> files in subdirectories of the test directory now run.</strong> Move the ones that shouldn’t run, like test fixtures, out of it. See <a href="#feature-files-in-subdirectories-run">Feature files in subdirectories run</a>.</p></li>
+<li><p><strong>Steps that relied on <code>{int}</code> matching <code>+5</code>, <a href="https://github.com/wrathematics/float" class="external-link">float</a> needing a decimal point, or <code>{word}</code> matching only letters, digits and <code>_</code>.</strong> See <a href="#built-in-parameter-types">Built-in parameter types</a>.</p></li>
+</ul></section><section class="level2"><h3 id="run-the-tests-and-review-the-differences">4. Run the tests and review the differences<a class="anchor" aria-label="anchor" href="#run-the-tests-and-review-the-differences"></a>
+</h3>
+<p>Run <code><a href="../reference/test.html">cucumber::test()</a></code>. Failures that remain come from changes that only show in a run:</p>
+<ul>
+<li><p>A failed expectation in a step, like <code>expect_equal()</code>, now fails the run. Before, its scenario was reported as skipped. See <a href="#failed-expectations-fail-the-run">Failed expectations fail the run</a>.</p></li>
+<li><p>Steps that were silently dropped before now run, like a step indented deeper than the step above it. See <a href="#steps-that-were-dropped-and-now-run">Steps that were dropped and now run</a>.</p></li>
+<li><p>Doc Strings keep their comment and empty lines, escapes like <code>\n</code> in table cells are unescaped, and outline placeholders are replaced in step arguments. See <a href="#step-arguments-with-different-values">Step arguments with different values</a>.</p></li>
+<li><p>Tags can contain <code>#</code> and <code>:</code>, and a description containing <code>Feature:</code> is no longer a second Feature. See <a href="#tags-and-descriptions">Tags and descriptions</a>.</p></li>
+<li>
+<p>Scenario names of outlines have no <code>(Example n)</code> suffix, and repeated names are numbered. Update the names you use in <code>filter</code>, <code>name</code> or when comparing test results. See <a href="#scenario-names">Scenario names</a>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="at">-rn</span> <span class="st">'(Example'</span> tests</span></code></pre></div>
+</li>
+<li><p><code><a href="../reference/test.html">test()</a></code> keeps the step definitions registered before it, and <code><a href="../reference/run.html">run()</a></code> clears its own when it returns. See <a href="#test-and-run"><code>test()</code> and <code>run()</code></a>.</p></li>
+</ul></section></section><section class="section level2"><h2 id="feature-files">Feature files<a class="anchor" aria-label="anchor" href="#feature-files"></a>
 </h2>
 <p>Feature files are parsed by a port of the official Gherkin parser. For the official Gherkin test data, the package gives the same scenarios, steps, arguments and errors as the official parser.</p>
 <p>A line’s meaning comes from the keyword it starts with, not from its indentation. Tabs, 4 spaces, no indentation and mixed indentation are all valid:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Basket</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Scenario:</span> Add an item</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Given</span> an empty basket</span></code></pre></div>
-<section class="level2"><h3 id="rules">Rules<a class="anchor" aria-label="anchor" href="#rules"></a>
-</h3>
-<p>A <code>Rule</code> groups scenarios that illustrate one business rule. It can have its own <code>Background</code>, which runs after the <code>Feature</code>’s one, and passes its tags to its scenarios:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Basket</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Rule:</span> An empty basket costs nothing</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">Background:</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">Given</span> an empty basket</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">Scenario:</span> Checking out</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">When</span> I check out</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">Then</span> I pay 0</span></code></pre></div>
-</section><section class="level2"><h3 id="languages">Languages<a class="anchor" aria-label="anchor" href="#languages"></a>
-</h3>
-<p>Feature files can be written in any of the 80 languages of the official Gherkin parser, by starting them with a <code># language:</code> line. Step definitions don’t change:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># language: fr</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Fonctionnalité: Panier</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  Scénario: Ajouter un article</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    Soit un panier vide</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    Quand j'ajoute une pomme</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    Alors le panier contient 1 article</span></code></pre></div>
-<p>The <code>cucumber.language</code> option sets the language of feature files without a <code># language:</code> line:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>cucumber.language <span class="op">=</span> <span class="st">"fr"</span><span class="op">)</span></span></code></pre></div>
-</section><section class="level2"><h3 id="markdown-with-gherkin">Markdown with Gherkin<a class="anchor" aria-label="anchor" href="#markdown-with-gherkin"></a>
-</h3>
-<p><code>.feature.md</code> files run like feature files. Their headers are the Feature, Rule, Background, Scenario and Examples, their list items that start with a step keyword are steps, their code blocks are Doc Strings, and their tables indented 2 to 5 spaces are Data Tables and Examples. Tags are written in backticks. The rest of the Markdown is ignored, like in Cucumber:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Feature: Basket</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scenario: Add an item</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Given an empty basket</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>When I add an apple</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Then the basket contains 1 item</span></code></pre></div>
-</section><section class="level2"><h3 id="scenario-outlines">Scenario Outlines<a class="anchor" aria-label="anchor" href="#scenario-outlines"></a>
-</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Basket</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Scenario:</span> Add an item</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Given</span> an empty basket</span></code></pre></div>
+<p>The parser also adds the following, all described in <code><a href="../articles/reference-gherkin.html">vignette("reference-gherkin")</a></code>:</p>
 <ul>
 <li>
-<p>Placeholders are replaced in Doc Strings and Data Tables, not only in the step text. With <code>| x |</code> / <code>| 1 |</code> as Examples, the Doc String below is <code>v=1</code> and the table is <code>| 1 |</code> / <code>| 1 |</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario Outline:</span> S</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> t</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>      <span class="st">"""</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">      v=&lt;x&gt;</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">      """</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">And</span> u</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="va">&lt;x&gt;</span> <span class="op">|</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> <span class="va">&lt;x&gt;</span> <span class="op">|</span></span></code></pre></div>
-</li>
+<code>Rule</code> with its own <code>Background</code>, 80 spoken languages with <code># language:</code> and the <code>cucumber.language</code> option, and <code>.feature.md</code> files (Markdown with Gherkin).</li>
+<li>Scenario Outline placeholders are replaced in names, Doc Strings and Data Tables. Examples can have a name and a description, and <code>Examples:</code> under a <code>Scenario:</code> makes it an outline.</li>
+<li>A step can have both a Data Table and a Doc String. A Doc String is one string with its lines joined by <code>"\n"</code>, and its media type is in the <code>media_type</code> attribute. The <code>cucumber.docstring_as_lines</code> option brings back the character vector of lines.</li>
 <li>
-<p>Examples can have a description:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">Examples:</span> Some</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>      A description.</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> x <span class="op">|</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> 1 <span class="op">|</span></span></code></pre></div>
-</li>
-<li><p><code>Examples:</code> under a <code>Scenario:</code> makes it an outline, like <code>Scenario Outline:</code> does.</p></li>
-</ul></section><section class="level2"><h3 id="step-arguments">Step arguments<a class="anchor" aria-label="anchor" href="#step-arguments"></a>
-</h3>
-<ul>
-<li>
-<p>A step can have both a Data Table and a Doc String. The step gets them in the order they are written:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> a request</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> header <span class="op">|</span> value <span class="op">|</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>      <span class="op">|</span> Accept <span class="op">|</span> json  <span class="op">|</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">"""</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">      {"id": 1}</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">      """</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"a request"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">headers</span>, <span class="va">body</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
-</li>
-<li>
-<p>A step gets a Doc String as one string, with its lines joined by <code>"\n"</code>, instead of a character vector of lines. Its media type, written after <code>"""</code> like <code>"""json</code>, is in the <code>media_type</code> attribute:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"a request"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">body</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">body</span>, <span class="st">"media_type"</span><span class="op">)</span> <span class="co"># "json"</span></span>
-<span>  <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">body</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>To keep getting a character vector of lines, set the <code>cucumber.docstring_as_lines</code> option, e.g. in a <code>setup-*.R</code> file next to your feature files:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>cucumber.docstring_as_lines <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-</li>
-</ul></section><section class="level2"><h3 id="other-additions">Other additions<a class="anchor" aria-label="anchor" href="#other-additions"></a>
-</h3>
-<ul>
-<li>
-<code>Ability:</code> and <code>Business Need:</code> can be used instead of <code>Feature:</code>.</li>
-<li>An empty file, a file with only comments, and a <code>Feature:</code> without scenarios run nothing, instead of failing.</li>
-<li>A <code>Scenario:</code> without steps passes. Background steps don’t run for it.</li>
-</ul></section><section class="level2"><h3 id="parse-errors">Parse errors<a class="anchor" aria-label="anchor" href="#parse-errors"></a>
-</h3>
-<p>Every feature file is parsed before anything runs. If any file can’t be parsed, no scenario runs, and every error of every file is reported, each with its line and column:</p>
-<pre><code>Can't parse feature files
-✖ Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
-✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table</code></pre>
-<p>Before, the files before the broken one ran, and the files after it were skipped.</p>
-</section><section class="level2"><h3 id="migrating-from-2-2-0">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0"></a>
+<code>Ability:</code> and <code>Business Need:</code> work as <code>Feature:</code>. An empty file, a file with only comments and a <code>Feature:</code> without scenarios run nothing instead of failing. A <code>Scenario:</code> without steps passes.</li>
+<li>Every feature file is parsed before anything runs. If any can’t be parsed, no scenario runs and every error is reported with its file, line and column. Before, the files before the broken one ran and the rest were skipped.</li>
+</ul>
+<section class="level2"><h3 id="migrating-feature-files">Migrating feature files<a class="anchor" aria-label="anchor" href="#migrating-feature-files"></a>
 </h3>
 <p>Feature files that ran before can now fail to parse, and some steps get different text or arguments. Run <code><a href="../reference/test.html">cucumber::test()</a></code> and fix the parse errors, then check the differences below.</p>
 <p>The <code>cucumber.indent</code> option is removed: it’s ignored if set.</p>
@@ -224,8 +248,8 @@
 <ul>
 <li>
 <p>A step indented deeper than the step above it. Before, <code>Then b</code> was dropped without a warning:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> a</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">Then</span> b</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> a</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>      <span class="fu">Then</span> b</span></code></pre></div>
 </li>
 <li><p>A step with a Doc String with a media type, or with both a Data Table and a Doc String. Before, the step got no argument.</p></li>
 <li><p>Examples with a description, and <code>Examples:</code> under a <code>Scenario:</code>. Before, <code>&lt;x&gt;</code> wasn’t replaced.</p></li>
@@ -405,7 +429,7 @@
 </ul></section></section></section><section class="section level2"><h2 id="step-descriptions">Step descriptions<a class="anchor" aria-label="anchor" href="#step-descriptions"></a>
 </h2>
 <p>Step descriptions support the full <a href="https://github.com/cucumber/cucumber-expressions" class="external-link">Cucumber Expressions</a> syntax:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Optional text: matches "1 cucumber" and "2 cucumbers"</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I have {int} cucumber(s)"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span>
 <span></span>
@@ -418,30 +442,30 @@
 <span><span class="co"># Anonymous parameter: matches anything and passes it as text</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I am {}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">who</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>A description that starts with <code>^</code>, ends with <code>$</code> or is surrounded by <code>/</code> is a regular expression, as in cucumber-jvm. Each capture group’s text is passed to the step, <code>NA</code> if the group didn’t match. A group whose regexp is a parameter type’s regexp, like <code>(\d+)</code> for <code>{int}</code>, is transformed by that parameter type:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># n is an integer</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"^I have (\\d+) cucumbers$"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p>Invalid Cucumber Expressions are an error that points at the problem: an empty optional <code>()</code>, an optional inside an optional, a parameter inside an optional, an alternation inside an optional, an empty alternative (<code>/about</code>, <code>a//b</code>, <code>{int}/{int}</code>), an alternative made of optionals only, a missing <code>)</code> or <code>}</code>, an illegal character in a parameter name, and escaping a character that can’t be escaped. When the message suggests an escape, it also shows how to write it in an R string.</p>
 <p>A step that matches more than one step definition fails with an error listing every matching definition and where it’s defined.</p>
-<section class="level2"><h3 id="migrating-from-2-2-0-1">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0-1"></a>
+<section class="level2"><h3 id="migrating-step-descriptions">Migrating step descriptions<a class="anchor" aria-label="anchor" href="#migrating-step-descriptions"></a>
 </h3>
 <section class="level3"><h4 id="text-is-matched-literally">Text is matched literally<a class="anchor" aria-label="anchor" href="#text-is-matched-literally"></a>
 </h4>
 <p>Text in step descriptions was treated as a regular expression, so characters like <code>.</code>, <code>?</code>, <code>*</code>, <code>|</code> or <code>[</code> could change what a step matched. Now it’s matched literally. Use Cucumber Expressions instead:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before: matched "I have 3 apples" and "I have 3 apple"</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I have {int} apples?"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Now</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I have {int} apple(s)"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <p><code>(</code>, <code>{</code> and <code>/</code> have a meaning in Cucumber Expressions. To match them literally, escape them with <code>\\(</code>, <code>\\{</code> or <code>\\/</code>:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I visit \\/about"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </section><section class="level3"><h4 id="descriptions-with-or">Descriptions with <code>^</code> or <code>$</code>
 <a class="anchor" aria-label="anchor" href="#descriptions-with-or"></a>
 </h4>
 <p>Before, a description starting with <code>^</code> or ending with <code>$</code> was a Cucumber Expression. Now it’s a regular expression, so its parameters like <code>{int}</code> don’t work. Remove the anchors, or write it as a regular expression:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"^I have {int} cucumbers$"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span>
 <span></span>
@@ -454,7 +478,7 @@
 </h4>
 <p>Before, when a step matched more than one step definition, the first registered one was used without a warning, unless the definitions were identical. Now the step fails. Remove the duplicates.</p>
 <p>A common case is defining a step for both <code>{int}</code> and <a href="https://github.com/wrathematics/float" class="external-link">float</a>. <a href="https://github.com/wrathematics/float" class="external-link">float</a> now matches integers too, so keep only the <a href="https://github.com/wrathematics/float" class="external-link">float</a> one:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I pay {int} dollars"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">amount</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I pay {float} dollars"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">amount</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span>
@@ -468,7 +492,7 @@
 <a class="anchor" aria-label="anchor" href="#cleanup-with-context"></a>
 </h3>
 <p>Code a step or a hook defers in its <code>context</code> runs when the scenario ends, after its <code><a href="../reference/hook.html">after()</a></code> hooks, like code deferred in a testthat test. Without <code>context</code>, it’s undone when the step ends:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"the shop is closed"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_options.html" class="external-link">local_options</a></span><span class="op">(</span>shop.open <span class="op">=</span> <span class="cn">FALSE</span>, .local_envir <span class="op">=</span> <span class="va">context</span><span class="op">)</span></span>
 <span>  <span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/local_mocked_bindings.html" class="external-link">local_mocked_bindings</a></span><span class="op">(</span>now <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2026-01-01 22:00"</span><span class="op">)</span>, .env <span class="op">=</span> <span class="va">context</span><span class="op">)</span></span>
@@ -538,11 +562,11 @@
 <p><code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> fails on an empty name, as <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code> is the anonymous parameter type, and on an invalid regexp, with an error that names the parameter type and says why, like <code>The regexp /(green/ of parameter type {colour} is invalid.</code> Before, an invalid regexp failed the steps that used it, with an error of <code>stri_detect_regex()</code>.</p>
 <p>An error of a transformer fails the step with <code>Parameter type {colour} failed to transform "blue".</code>, caused by the transformer’s error, and its backtrace is the calls of the transformer.</p>
 <p>If a parameter type’s <code>regexp</code> has capture groups, its transformer gets the text of each group as a separate argument, like in Cucumber:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/define_parameter_type.html">define_parameter_type</a></span><span class="op">(</span><span class="st">"point"</span>, <span class="st">"(\\d+),(\\d+)"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"the point {point}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">point</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<section class="level2"><h3 id="migrating-from-2-2-0-2">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0-2"></a>
+<section class="level2"><h3 id="migrating-parameter-types">Migrating parameter types<a class="anchor" aria-label="anchor" href="#migrating-parameter-types"></a>
 </h3>
 <section class="level3"><h4 id="built-in-parameter-types">Built-in parameter types<a class="anchor" aria-label="anchor" href="#built-in-parameter-types"></a>
 </h4>
@@ -584,7 +608,7 @@
 </section><section class="level3"><h4 id="regexps-are-used-as-is">Regexps are used as is<a class="anchor" aria-label="anchor" href="#regexps-are-used-as-is"></a>
 </h4>
 <p>Before, a parameter type’s <code>regexp</code> was a replacement string, so special characters needed four backslashes:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu"><a href="../reference/define_parameter_type.html">define_parameter_type</a></span><span class="op">(</span><span class="st">"sci_number"</span>, <span class="st">"[+-]?\\\\d*\\\\.?\\\\d+"</span>, <span class="va">as.double</span><span class="op">)</span></span>
 <span></span>
@@ -593,7 +617,7 @@
 </section><section class="level3"><h4 id="capture-groups">Capture groups<a class="anchor" aria-label="anchor" href="#capture-groups"></a>
 </h4>
 <p>Before, a transformer got the whole match, and capture groups made later parameters of the step get wrong values. To keep passing the whole match, use non-capturing groups, <code>(?:...)</code>:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu"><a href="../reference/define_parameter_type.html">define_parameter_type</a></span><span class="op">(</span><span class="st">"colour"</span>, <span class="st">"(dark )?(red|blue)"</span>, <span class="va">as.character</span><span class="op">)</span></span>
 <span></span>
@@ -609,7 +633,7 @@
 <p>Undefined and ambiguous steps don’t stop the run. They fail their scenario, and the other scenarios and feature files still run, so every missing step’s snippet is shown.</p>
 <p><code><a href="../reference/test.html">test()</a></code> and <code><a href="../reference/run.html">run()</a></code> search <code>path</code> recursively for feature files, symbolic links included.</p>
 <p><code><a href="../reference/test.html">test()</a></code> and <code><a href="../reference/run.html">run()</a></code> get new arguments:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Match every step to a step definition, without running steps or hooks</span></span>
 <span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span>dry_run <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -635,7 +659,7 @@
 <li>A random order shows its seed, and <code>order = "random:&lt;seed&gt;"</code> runs the scenarios in that order again.</li>
 </ul>
 <p><code><a href="../reference/test.html">test()</a></code> called without <code>path</code> runs the feature files of the directory in the <code>cucumber.path</code> option, <code>"tests/acceptance"</code> by default:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>cucumber.path <span class="op">=</span> <span class="st">"features"</span><span class="op">)</span></span></code></pre></div>
 <section class="level2"><h3 id="test-and-run">
 <code>test()</code> and <code>run()</code>
@@ -643,40 +667,27 @@
 </h3>
 <ul>
 <li>
-<code><a href="../reference/test.html">test()</a></code> runs feature files like <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code> runs test files: in <code>path</code>, after the <code>helper-*.R</code> and <code>setup-*.R</code> files and before the <code>teardown-*.R</code> files. What they, steps and hooks defer to <code><a href="https://testthat.r-lib.org/reference/teardown_env.html" class="external-link">testthat::teardown_env()</a></code> runs when <code><a href="../reference/test.html">test()</a></code> ends. Each feature file is the <code>file</code> of its scenarios’ results. Before, <code><a href="../reference/test.html">test()</a></code> wrote a <code>test-__cucumber__.R</code> file into <code>path</code>, which failed in a read-only directory.</li>
+<code><a href="../reference/test.html">test()</a></code> runs feature files like <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code> runs test files: in <code>path</code>, after the <code>helper-*.R</code> and <code>setup-*.R</code> files and before the <code>teardown-*.R</code> files. Each feature file is the <code>file</code> of its scenarios’ results. Before, <code><a href="../reference/test.html">test()</a></code> wrote a <code>test-__cucumber__.R</code> file into <code>path</code>, which failed in a read-only directory.</li>
 <li>
-<code><a href="../reference/test.html">test()</a></code> attaches cucumber, like it attaches testthat, so setup files define steps without <code>cucumber::</code>, also when it’s called as <code><a href="../reference/test.html">cucumber::test()</a></code> from a package without <code><a href="https://github.com/jakubsob/cucumber" class="external-link">library(cucumber)</a></code>. Before, they failed with <code>could not find function "given"</code>.</li>
+<code><a href="../reference/test.html">test()</a></code> attaches cucumber, so setup files define steps without <code>cucumber::</code>. Before, they failed with <code>could not find function "given"</code>.</li>
 <li>
-<code><a href="../reference/test.html">test()</a></code> checks snapshots when the <code>NOT_CRAN</code> environment variable isn’t set, like <code><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">testthat::test_local()</a></code>. In a testthat run and in R CMD check, <code>NOT_CRAN</code> is left as it is, so <code>skip_on_cran()</code> still skips on CRAN.</li>
-<li>In <code><a href="../reference/test.html">test()</a></code>, <code><a href="https://testthat.r-lib.org/reference/is_testing.html" class="external-link">testthat::testing_package()</a></code> is the package of <code>path</code>, so <code>testthat::local_mocked_bindings(.env = context)</code> mocks the package’s functions without <code>.package</code>, and steps see its internal functions, like in a testthat test.</li>
+<code><a href="../reference/test.html">test()</a></code> checks snapshots when <code>NOT_CRAN</code> isn’t set, like <code><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">testthat::test_local()</a></code>. <code><a href="https://testthat.r-lib.org/reference/is_testing.html" class="external-link">testthat::testing_package()</a></code> is the package of <code>path</code>, so <code>local_mocked_bindings(.env = context)</code> mocks its functions without <code>.package</code>.</li>
 <li>
-<code><a href="../reference/test.html">test()</a></code> keeps the step definitions, hooks and parameter types registered before it, like by the setup files of a testthat run that calls it. Before, it cleared them.</li>
+<code><a href="../reference/test.html">test()</a></code> keeps the step definitions, hooks and parameter types registered before it. Before, it cleared them.</li>
 <li>
-<code><a href="../reference/test.html">test()</a></code> fails with the error that stopped the run, like a feature file that can’t be parsed, under <code>Test failures.</code>, so it’s shown even with <code>reporter = NULL</code>.</li>
+<code><a href="../reference/test.html">test()</a></code> fails with the error that stopped the run, like an unparsable feature file, under <code>Test failures.</code>, even with <code>reporter = NULL</code>.</li>
 <li>
-<code><a href="../reference/run.html">run()</a></code> runs outside of a testthat run, like in the console: it attaches testthat, reports with <code>CucumberProgressReporter</code>, fails with <code>Test failures.</code> if a scenario failed, and clears its step definitions and hooks when it returns. Before, it failed with “<code>teardown_env()</code> has not been initialized”.</li>
+<code><a href="../reference/run.html">run()</a></code> works outside of a testthat run: it attaches testthat, reports with <code>CucumberProgressReporter</code>, fails with <code>Test failures.</code> if a scenario failed, and clears its step definitions and hooks when it returns. Before, it failed with “<code>teardown_env()</code> has not been initialized”.</li>
 <li>
-<code><a href="../reference/test.html">test()</a></code>, <code><a href="../reference/run.html">run()</a></code> and <code><a href="../reference/features_rd.html">features_rd()</a></code> check their arguments before anything runs, even with <code>stop_on_failure = FALSE</code>. A mistake is an error that names the argument, like <code>`dry_run` must be `TRUE` or `FALSE`.</code> or <code>`path` must be a directory.</code> Before, they failed inside cucumber, like with <code>invalid argument type</code> or <code>cannot change working directory</code>.</li>
+<code><a href="../reference/test.html">test()</a></code>, <code><a href="../reference/run.html">run()</a></code> and <code><a href="../reference/features_rd.html">features_rd()</a></code> check their arguments before anything runs and name the wrong one, like <code>`dry_run` must be `TRUE` or `FALSE`.</code>
+</li>
 <li>
-<code><a href="../reference/test.html">test()</a></code> passes its <code>...</code> to <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl()</a></code> when matching <code>filter</code>, as documented, e.g. <code>test(filter = "ADDITION", ignore.case = TRUE)</code>. Before, they were ignored. An argument of neither <code><a href="../reference/test.html">test()</a></code> nor <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl()</a></code>, like a misspelled <code>fail_fst = TRUE</code>, is an error.</li>
-<li>A <code>test_that()</code> test after <code><a href="../reference/run.html">run()</a></code> in a test file is reported in the test file’s context. Before, testthat reported it in the context of the last feature <code><a href="../reference/run.html">run()</a></code> ran.</li>
+<code><a href="../reference/test.html">test()</a></code> passes its <code>...</code> to <code><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl()</a></code> when matching <code>filter</code>, e.g. <code>test(filter = "ADDITION", ignore.case = TRUE)</code>. An argument of neither, like a misspelled <code>fail_fst = TRUE</code>, is an error.</li>
+<li>A <code>test_that()</code> test after <code><a href="../reference/run.html">run()</a></code> in a test file is reported in the test file’s context.</li>
 </ul></section><section class="level2"><h3 id="snapshots">Snapshots<a class="anchor" aria-label="anchor" href="#snapshots"></a>
 </h3>
-<p>Each feature file has a snapshot file of its own in <code>_snaps</code>, named after the feature file’s path with its directories joined by <code>-</code>, like testthat’s flat <code>_snaps</code>: the snapshots of <code>basket.feature</code> are in <code>_snaps/basket.feature.md</code>, those of <code>checkout/basket.feature</code> in <code>_snaps/checkout-basket.feature.md</code>. They’re the same whether the feature files are run by <code><a href="../reference/test.html">test()</a></code> or by <code><a href="../reference/run.html">run()</a></code>, so either checks the snapshots of the other.</p>
-<ul>
-<li>
-<code>expect_snapshot()</code> works in steps and in <code><a href="../reference/hook.html">before()</a></code>, <code><a href="../reference/hook.html">after()</a></code>, <code><a href="../reference/hook.html">before_step()</a></code> and <code><a href="../reference/hook.html">after_step()</a></code> hooks. A snapshot in a <code><a href="../reference/hook.html">before_all()</a></code> or <code><a href="../reference/hook.html">after_all()</a></code> hook is an error, as a snapshot is of a scenario.</li>
-<li>A snapshot is named after its scenario, numbered like <code>Showing the basket (2)</code> when scenarios share a name. A retried scenario’s snapshots are those of its last attempt, and they’re kept in the order of the scenarios in the feature file, whatever the <code>order</code>.</li>
-<li>Snapshots of scenarios that didn’t run, like with <code>filter</code>, <code>name</code> or <code>tags</code>, are kept, and so are those of a scenario that stopped before them, and those of a scenario on CRAN. Scenarios that didn’t run keep their changed snapshots in the <code>.new.md</code> file too, so the changes found by two <code><a href="../reference/run.html">run()</a></code> calls of a feature are all reviewed with <code><a href="https://testthat.r-lib.org/reference/snapshot_accept.html" class="external-link">testthat::snapshot_review()</a></code>.</li>
-<li>Snapshots of scenarios that were renamed or removed are deleted, like those of a removed testthat test. A run of every scenario deletes the snapshot files of feature files that don’t exist anymore, and <code>expect_snapshot_file()</code> files that weren’t taken: announce them with <code><a href="https://testthat.r-lib.org/reference/expect_snapshot_file.html" class="external-link">testthat::announce_snapshot_file()</a></code> to keep them. A run of some of the scenarios, a dry run, a run stopped by <code>fail_fast</code>, a run whose scenarios a <code><a href="../reference/hook.html">before_all()</a></code> hook skipped, a run that stops before it starts, and a run on CI delete no snapshot file.</li>
-<li>A variant’s snapshot is in the variant’s directory, like <code>_snaps/linux/checkout-basket.feature.md</code>, and <code>expect_snapshot_file()</code> files in a directory named after the snapshot file, like <code>_snaps/checkout-basket.feature/plot.png</code>.</li>
-<li>Accept and review changed snapshots with the snapshot file’s name: <code>snapshot_accept("checkout-basket.feature", path)</code>, a variant’s with its directory, <code>snapshot_accept("linux/checkout-basket.feature", path)</code>, and <code>expect_snapshot_file()</code> files with a <code>/</code>, <code>snapshot_accept("checkout-basket.feature/", path)</code>. The message of a changed snapshot names it, also for a variant.</li>
-<li>Two feature files that would share a snapshot file, like <code>basket.feature</code> and <code>basket.feature.md</code>, stop the run with an error that names both.</li>
-<li>
-<code><a href="../reference/run.html">run()</a></code> or <code>test(".")</code> in a parallel testthat run, <code>Config/testthat/parallel: true</code>, is an error, as testthat would delete the snapshot files of the feature files.</li>
-<li>Skip the scenarios that take snapshots in a <code><a href="../reference/hook.html">before_all()</a></code> or <code><a href="../reference/hook.html">before()</a></code> hook, not with <code>skip()</code> before <code><a href="../reference/run.html">run()</a></code> in its test file, as testthat deletes the snapshot files that a run of every test file didn’t use.</li>
-<li>cucumber needs testthat 3.3.2 or later.</li>
-</ul></section><section class="level2"><h3 id="migrating-from-2-2-0-3">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0-3"></a>
+<p>Each feature file has a snapshot file of its own in <code>_snaps</code>, like <code>_snaps/basket.feature.md</code> or, for <code>checkout/basket.feature</code>, <code>_snaps/checkout-basket.feature.md</code>. <code><a href="../reference/test.html">test()</a></code> and <code><a href="../reference/run.html">run()</a></code> use the same files. <code>expect_snapshot()</code> works in steps and in scenario and step hooks. A snapshot is named after its scenario. Snapshots of scenarios that didn’t run are kept, and those of renamed or removed scenarios are deleted. <code><a href="../articles/testthat.html">vignette("testthat")</a></code> has the details. cucumber needs testthat 3.3.2 or later.</p>
+</section><section class="level2"><h3 id="migrating-test-runs">Migrating test runs<a class="anchor" aria-label="anchor" href="#migrating-test-runs"></a>
 </h3>
 <section class="level3"><h4 id="feature-files-in-subdirectories-run">Feature files in subdirectories run<a class="anchor" aria-label="anchor" href="#feature-files-in-subdirectories-run"></a>
 </h4>
@@ -684,13 +695,13 @@
 </section><section class="level3"><h4 id="pending-and-undefined-steps-fail">Pending and undefined steps fail<a class="anchor" aria-label="anchor" href="#pending-and-undefined-steps-fail"></a>
 </h4>
 <p>Before, <code><a href="../reference/pending.html">pending()</a></code> skipped the scenario, and an undefined step stopped the run. Now both fail the scenario. To skip these scenarios instead, run with <code>strict = FALSE</code>:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="st">"tests/acceptance"</span>, strict <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>A run without any step definitions reports its steps as undefined, instead of failing with “No step definitions found”.</p>
 </section><section class="level3"><h4 id="tag-expressions">Tag expressions<a class="anchor" aria-label="anchor" href="#tag-expressions"></a>
 </h4>
 <p>Tag expressions are parsed like the official <a href="https://github.com/cucumber/tag-expressions" class="external-link">cucumber/tag-expressions</a>. Write tags with their <code>@</code>, and <code>and</code>, <code>or</code> and <code>not</code> in lowercase:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span>tags <span class="op">=</span> <span class="st">"smoke AND NOT slow"</span><span class="op">)</span></span>
 <span></span>
@@ -698,7 +709,7 @@
 <span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span>tags <span class="op">=</span> <span class="st">"@smoke and not @slow"</span><span class="op">)</span></span></code></pre></div>
 <p>A tag is everything up to whitespace or a parenthesis, so tags with <code>:</code>, <code>/</code> or <code>#</code> work. Escape a parenthesis in a tag with a backslash: <code>tags = "@wip\\(x\\)"</code>.</p>
 <p><code>tags</code> must be one tag expression, and <code>filter</code> one regular expression. Before, only the first of several was used. Combine them:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span>tags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"@smoke"</span>, <span class="st">"not @slow"</span><span class="op">)</span>, filter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"basket"</span>, <span class="st">"checkout"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -735,7 +746,7 @@
 <li>A failing hook’s error says which hook failed, like <code>Hook `before()` failed</code>, or its name, the scenario’s feature and name, and where the hook is defined. <code><a href="../reference/hook.html">after()</a></code> hooks get it as <code>scenario$error</code>, with the hook’s own error as its <code>parent</code>.</li>
 <li>A printed <code>scenario</code> shows its name and where it is, like <code>&lt;scenario&gt; "Add an item" (basket.feature:2)</code>. A printed <code>context</code> lists what steps and hooks put in it, one line each, and its methods. Like a tibble, it shows the first 10 items; <code>print(context, n = 20)</code> shows more.</li>
 </ul>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/hook.html">before</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">context</span>, <span class="va">scenario</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">context</span><span class="op">$</span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu">dbConnect</span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu">SQLite</span><span class="op">(</span><span class="op">)</span>, <span class="st">":memory:"</span><span class="op">)</span></span>
 <span><span class="op">}</span>, tags <span class="op">=</span> <span class="st">"@db"</span>, name <span class="op">=</span> <span class="st">"Connect to the database"</span><span class="op">)</span></span>
@@ -751,10 +762,10 @@
 <span><span class="fu"><a href="../reference/hook.html">after_step</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">context</span>, <span class="va">step</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="va">step</span><span class="op">$</span><span class="va">text</span>, <span class="st">": "</span>, <span class="va">step</span><span class="op">$</span><span class="va">status</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<section class="level2"><h3 id="migrating-from-2-2-0-4">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0-4"></a>
+<section class="level2"><h3 id="migrating-hooks">Migrating hooks<a class="anchor" aria-label="anchor" href="#migrating-hooks"></a>
 </h3>
 <p>A hook’s second argument is the scenario instead of its name. Replace <code>scenario_name</code> with <code>scenario$name</code>:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="fu"><a href="../reference/hook.html">after</a></span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">context</span>, <span class="va">scenario_name</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="st">"Finished "</span>, <span class="va">scenario_name</span><span class="op">)</span></span>
@@ -844,16 +855,16 @@
 </tbody>
 </table>
 <p>The reporters that print, print to a file instead when given one, e.g. <code>CucumberSummaryReporter$new(file = "summary.txt")</code>. The reporters that write a file create its directory. <code>report(file)</code> of every reporter reports a run after it ran, from the messages a <code>CucumberMessagesReporter</code> stored:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span>reporter <span class="op">=</span> <span class="va"><a href="../reference/CucumberMultiReporter.html">CucumberMultiReporter</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="va"><a href="../reference/CucumberProgressReporter.html">CucumberProgressReporter</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va"><a href="../reference/CucumberMessagesReporter.html">CucumberMessagesReporter</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="st">"cucumber.ndjson"</span><span class="op">)</span></span>
 <span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va"><a href="../reference/CucumberHtmlReporter.html">CucumberHtmlReporter</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="st">"report.html"</span><span class="op">)</span><span class="op">$</span><span class="fu">report</span><span class="op">(</span><span class="st">"cucumber.ndjson"</span><span class="op">)</span></span></code></pre></div>
-<section class="level2"><h3 id="migrating-from-2-2-0-5">Migrating from 2.2.0<a class="anchor" aria-label="anchor" href="#migrating-from-2-2-0-5"></a>
+<section class="level2"><h3 id="migrating-custom-reporters">Migrating custom reporters<a class="anchor" aria-label="anchor" href="#migrating-custom-reporters"></a>
 </h3>
 <p>This matters only for custom reporters. <code>start_feature()</code>, <code>end_feature()</code>, <code>start_step()</code> and <code>end_step()</code> are removed: read the run from the messages in <code>add_message()</code> instead. A step’s result is in its <code>testStepFinished</code> message, whose <code>testStepId</code> is the id of a test step of the scenario’s <code>testCase</code>. That test step’s <code>pickleStepId</code> is the id of a step of the scenario’s <code>pickle</code>, with the step’s text.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Before</span></span>
 <span><span class="va">StatusReporter</span> <span class="op">&lt;-</span> <span class="fu">R6</span><span class="fu">::</span><span class="kw"><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6Class</a></span><span class="op">(</span></span>
 <span>  <span class="st">"StatusReporter"</span>,</span>
@@ -887,74 +898,13 @@
 </section><section class="section level2"><h2 id="features-as-documentation">Features as documentation<a class="anchor" aria-label="anchor" href="#features-as-documentation"></a>
 </h2>
 <p><code><a href="../reference/features_rd.html">features_rd()</a></code> puts scenarios of feature files in the help page of a function, in a section named <code>"Behavior"</code> by default:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' @eval cucumber::features_rd(features = "basket.feature")</span></span></code></pre></div>
-<p>It selects scenarios like <code><a href="../reference/test.html">test()</a></code>, by <code>features</code> and their lines, <code>filter</code>, <code>name</code> and <code>tags</code>. By default only scenarios matching <code>"@rd"</code> are selected; the <code>cucumber.rd_tags</code> option sets another tag expression, and <code>section</code> or the <code>cucumber.rd_section</code> option names the section. In the help page, each feature is one block of Gherkin, as written, with only the Rules and Backgrounds of the selected scenarios, and of a Scenario Outline only the selected Examples. On a pkgdown site, it’s shown like Markdown with Gherkin: headers for the feature and its Rules, Backgrounds, scenarios and Examples, a list of steps, tables, and Doc Strings as code, Gherkin ones highlighted. <code>markdown = FALSE</code> shows the block of Gherkin there too.</p>
+<p>It selects scenarios like <code><a href="../reference/test.html">test()</a></code>, by <code>features</code>, <code>filter</code>, <code>name</code> and <code>tags</code>. By default only scenarios tagged <code>"@rd"</code> are selected. The <code>cucumber.rd_tags</code> option sets another tag expression, and <code>section</code> or the <code>cucumber.rd_section</code> option names the section. Each feature is shown as one block of Gherkin, with only the Rules, Backgrounds and Examples of the selected scenarios. On a pkgdown site it’s shown like Markdown with Gherkin, and <code>markdown = FALSE</code> keeps the block of Gherkin. See <code><a href="../articles/bdd.html">vignette("bdd")</a></code>.</p>
 </section><section class="section level2"><h2 id="snippets">Snippets<a class="anchor" aria-label="anchor" href="#snippets"></a>
 </h2>
-<p>Snippets for undefined steps are generated like in Cucumber:</p>
-<ul>
-<li>Parameters are in the order they appear in the step.</li>
-<li>A value matched by several parameter types gives one suggestion per type, e.g. <code>{int}</code> and a commented-out <a href="https://github.com/wrathematics/float" class="external-link">float</a> for <code>5</code>.</li>
-<li>Custom parameter types are used.</li>
-<li>Repeated parameter names are <code>string</code>, <code>string2</code>.</li>
-<li>A step with a data table or doc string gets a <code>data_table</code> or <code>doc_string</code> argument.</li>
-<li>
-<code>(</code>, <code>{</code> and <code>/</code> in the step’s text are escaped, so the snippet matches the step it was generated for.</li>
-<li>A step starting with <code>And</code>, <code>But</code> or <code>*</code> gets <code><a href="../reference/step.html">given()</a></code>, <code><a href="../reference/step.html">when()</a></code> or <code><a href="../reference/step.html">then()</a></code> from its type, <code><a href="../reference/step.html">given()</a></code> when it’s unknown.</li>
-<li>A step that starts with <code>^</code> or ends with <code>$</code> gets a regular expression of its text, like <code>when("^I pay 5\\$$", ...)</code>.</li>
-<li>Arguments are valid R names: <code>iso_date</code> for a parameter type <code>{iso-date}</code>.</li>
-</ul></section><section class="section level2"><h2 id="summary-of-breaking-changes">Summary of breaking changes<a class="anchor" aria-label="anchor" href="#summary-of-breaking-changes"></a>
-</h2>
-<p>Everything you may need to change when upgrading from 2.2.0, grouped by where the change goes.</p>
-<section class="level2"><h3 id="in-feature-files">In feature files<a class="anchor" aria-label="anchor" href="#in-feature-files"></a>
-</h3>
-<ul>
-<li>Fix lines that are now parse errors: text between steps that isn’t a step, table or Doc String, a misplaced or second <code>Background:</code>, unclosed Doc Strings, tags with nothing after them, two Doc Strings after one step, tags with spaces, unknown <code># language:</code>, steps without a space after the keyword, and lowercase keywords. See <a href="#feature-files-that-were-accepted-and-now-fail">Feature files that were accepted and now fail</a> and <a href="#steps-with-different-text">Steps with different text</a>.</li>
-<li>Give every row of a Data Table the same number of cells. See <a href="#step-arguments-with-different-values">Step arguments with different values</a>.</li>
-<li>Check steps that were silently dropped before and now run, like steps indented deeper than the step above. See <a href="#steps-that-were-dropped-and-now-run">Steps that were dropped and now run</a>.</li>
-<li>Check tags with <code>#</code> or <code>:</code> in them, and descriptions containing <code>Feature:</code>. See <a href="#tags-and-descriptions">Tags and descriptions</a>.</li>
-</ul></section><section class="level2"><h3 id="in-step-definitions">In step definitions<a class="anchor" aria-label="anchor" href="#in-step-definitions"></a>
-</h3>
-<ul>
-<li>Replace regular expression characters in step descriptions, like <code>apples?</code>, with Cucumber Expressions, like <code>apple(s)</code>. See <a href="#text-is-matched-literally">Text is matched literally</a>.</li>
-<li>Escape literal <code>(</code>, <code>{</code> and <code>/</code> with <code>\\(</code>, <code>\\{</code> and <code>\\/</code>, e.g. <code>"I visit \\/about"</code>.</li>
-<li>Remove <code>^</code> and <code>$</code> from descriptions that use parameters like <code>{int}</code>, or rewrite them as regular expressions. See <a href="#descriptions-with-or">Descriptions with <code>^</code> or <code>$</code></a>.</li>
-<li>Define every parameter type used in a description, or remove its braces. See <a href="#undefined-parameter-types">Undefined parameter types</a>.</li>
-<li>Remove step definitions that match the same step, like <code>{int}</code> and <a href="https://github.com/wrathematics/float" class="external-link">float</a> variants. See <a href="#ambiguous-steps">Ambiguous steps</a>.</li>
-<li>Check steps that rely on <code>{int}</code> matching <code>+5</code>, <a href="https://github.com/wrathematics/float" class="external-link">float</a> matching only decimals, or <code>{word}</code> matching only letters, digits and <code>_</code>. See <a href="#built-in-parameter-types">Built-in parameter types</a>.</li>
-<li>Update steps whose Data Table or Doc String values changed: Doc Strings keep comment and empty lines, escapes like <code>\n</code> in table cells are unescaped, and outline placeholders are replaced in arguments. See <a href="#step-arguments-with-different-values">Step arguments with different values</a>.</li>
-</ul></section><section class="level2"><h3 id="in-parameter-types">In parameter types<a class="anchor" aria-label="anchor" href="#in-parameter-types"></a>
-</h3>
-<ul>
-<li>Replace four backslashes with two in <code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> regexps, e.g. <code>"\\\\d+"</code> with <code>"\\d+"</code>. See <a href="#regexps-are-used-as-is">Regexps are used as is</a>.</li>
-<li>Replace capture groups <code>(...)</code> with non-capturing groups <code>(?:...)</code>, or give the transformer one argument per group. See <a href="#capture-groups">Capture groups</a>.</li>
-<li>Rename parameter types that redefine another one, like <code>int</code>, or that are now built in: <code>byte</code>, <code>short</code>, <code>long</code> and <code>double</code>. See <a href="#parameter-types-cant-be-redefined">Parameter types can’t be redefined</a>.</li>
-</ul></section><section class="level2"><h3 id="in-hooks">In hooks<a class="anchor" aria-label="anchor" href="#in-hooks"></a>
-</h3>
-<ul>
-<li>Replace <code>scenario_name</code> with <code>scenario$name</code> in <code><a href="../reference/hook.html">before()</a></code> and <code><a href="../reference/hook.html">after()</a></code> hooks. See <a href="#hooks">Hooks</a>.</li>
-</ul></section><section class="level2"><h3 id="in-custom-reporters">In custom reporters<a class="anchor" aria-label="anchor" href="#in-custom-reporters"></a>
-</h3>
-<ul>
-<li>Replace <code>start_feature()</code>, <code>end_feature()</code>, <code>start_step()</code> and <code>end_step()</code> with <code>add_message()</code>, reading the run from its Cucumber Messages. See <a href="#reporters">Reporters</a>.</li>
-<li>Inherit from <code>CucumberPrettyReporter</code> instead of <code>CucumberProgressReporter</code> to extend the reporter that prints each step. See <a href="#reporters">Reporters</a>.</li>
-<li>Replace testthat’s reporter methods with cucumber’s events: <code>start_reporter()</code> with <code>start_run()</code>, <code>end_reporter()</code> with <code>end_run(error)</code>, <code>start_test()</code> and <code>end_test()</code> with the <code>testCaseStarted</code> and <code>testCaseFinished</code> messages in <code>add_message()</code>, and warnings from <code>add_result()</code> with <code>add_warning()</code>. See <a href="#reporters">Reporters</a>.</li>
-</ul></section><section class="level2"><h3 id="in-test-runs">In test runs<a class="anchor" aria-label="anchor" href="#in-test-runs"></a>
-</h3>
-<ul>
-<li>Replace testthat reporters passed to <code><a href="../reference/test.html">test()</a></code> or <code><a href="../reference/run.html">run()</a></code> with cucumber’s, like <code>CucumberSummaryReporter$new()</code>, or with <code>NULL</code> for no output. See <a href="#reporters">Reporters</a>.</li>
-<li>Replace <code><a href="https://testthat.r-lib.org/reference/JunitReporter.html" class="external-link">testthat::JunitReporter</a></code> with <code>CucumberJunitReporter</code>: <code>test(reporter = CucumberJunitReporter$new("cucumber-junit.xml"))</code>.</li>
-<li>Pass <code>reporter = CucumberPrettyReporter$new()</code> to <code><a href="../reference/test.html">test()</a></code> or <code><a href="../reference/run.html">run()</a></code> to see each step as it runs, as before. Replace <code>CucumberProgressReporter$new()</code> with <code>CucumberPrettyReporter$new()</code> where it’s given <code>reporter_max_docstring_lines</code> or <code>reporter_max_table_lines</code>. <code>show_praise</code> is deprecated, as it never had an effect. See <a href="#reporters">Reporters</a>.</li>
-<li>Pass <code>reporter = CucumberProgressReporter$new()</code> to <code><a href="../reference/run.html">run()</a></code> to print the run with cucumber’s reporter, besides testthat’s, as before. See <a href="#reporters">Reporters</a>.</li>
-<li>Move snapshots from <code>_snaps/__cucumber__.md</code>, or from the snapshot file of the testthat file that calls <code><a href="../reference/run.html">run()</a></code>, to the snapshot file of each feature, like <code>_snaps/basket.feature.md</code>. See <a href="#snapshot-files">Snapshot files</a>.</li>
-<li>Move <code>.feature</code> files that shouldn’t run, like test fixtures, out of subdirectories of the test directory. See <a href="#feature-files-in-subdirectories-run">Feature files in subdirectories run</a>.</li>
-<li>Implement pending and undefined steps, or run with <code>strict = FALSE</code> to skip their scenarios. See <a href="#pending-and-undefined-steps-fail">Pending and undefined steps fail</a>.</li>
-<li>Write tags in <code>tags</code> arguments with their <code>@</code>, and <code>and</code>, <code>or</code> and <code>not</code> in lowercase, in <code><a href="../reference/test.html">test()</a></code>, <code><a href="../reference/run.html">run()</a></code> and hooks. Combine several tag expressions with <code>and</code>, and several <code>filter</code> regular expressions with <code>|</code>. See <a href="#tag-expressions">Tag expressions</a>.</li>
-<li>Upgrade testthat to 3.3.2 or later.</li>
-<li>Fix failing expectations that were reported as skipped before. See <a href="#failed-expectations-fail-the-run">Failed expectations fail the run</a>.</li>
-<li>Update scenario names used in <code>filter</code>, <code>name</code> or when comparing test results: outline scenarios no longer get an <code>(Example n)</code> suffix, and repeated names are numbered. See <a href="#scenario-names">Scenario names</a>.</li>
-</ul></section></section><script id="quarto-html-after-body" type="application/javascript">
+<p>Snippets for undefined steps are generated like in Cucumber. A value matched by several parameter types gives one suggestion per type, like <code>{int}</code> and a commented-out <a href="https://github.com/wrathematics/float" class="external-link">float</a> for <code>5</code>. Custom parameter types are used, <code>(</code>, <code>{</code> and <code>/</code> are escaped, and a step with a Data Table or Doc String gets a <code>data_table</code> or <code>doc_string</code> argument. A step starting with <code>And</code>, <code>But</code> or <code>*</code> gets <code><a href="../reference/step.html">given()</a></code>, <code><a href="../reference/step.html">when()</a></code> or <code><a href="../reference/step.html">then()</a></code> from its type. A step that starts with <code>^</code> or ends with <code>$</code> gets a regular expression, like <code>when("^I pay 5\\$$", ...)</code>.</p>
+</section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);

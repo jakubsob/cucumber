@@ -19,7 +19,7 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="how-it-works_files/libs/quarto-html/popper.min.js"></script><script src="how-it-works_files/libs/quarto-html/tippy.umd.min.js"></script><link href="how-it-works_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="how-it-works_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="How it works">
+<!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="How it works">
 <meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -46,19 +46,34 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/reference-gherkin.html">Gherkin Reference</a></li>
-<li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
-    <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
     <li><a class="dropdown-item" href="../articles/testthat.html">cucumber and testthat</a></li>
     <li><a class="dropdown-item" href="../articles/reporting.html">Reports</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">3.0.0</a></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
+  </ul>
+</li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-it-works" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">How it works</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-it-works">
+<li><a class="dropdown-item" href="../articles/how-it-works.html">Running features</a></li>
+    <li><a class="dropdown-item" href="../articles/compatibility.html">Compatibility with Cucumber</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-gherkin.html">Gherkin</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-upgrade" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Upgrade</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-upgrade">
+<li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">To 3.0.0</a></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">To 2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -99,6 +114,7 @@
 
 
     <p><code><a href="../reference/test.html">cucumber::test()</a></code> runs the <code>.feature</code> and <code>.feature.md</code> files of a directory, <code>"tests/acceptance"</code> by default, and its subdirectories. A run goes like this:</p>
+<div class="steps">
 <ol type="1">
 <li>
 <strong>Load the step definitions.</strong> The <code>helper-*.R</code> and <code>setup-*.R</code> files of the directory are run, like <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code> runs them. Calls to <code><a href="../reference/step.html">given()</a></code>, <code><a href="../reference/step.html">when()</a></code>, <code><a href="../reference/step.html">then()</a></code>, the hooks and <code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code> in them register step definitions, hooks and parameter types for the run.</li>
@@ -113,53 +129,112 @@
 <li>
 <strong>Report them.</strong> Every outcome of the run is a <a href="https://github.com/cucumber/messages" class="external-link">Cucumber Message</a>, passed to the reporter: the progress in the console, or reports like the HTML report, see <code><a href="../articles/reporting.html">vignette("reporting")</a></code>.</li>
 </ol>
+</div>
 <p><code><a href="../reference/run.html">run()</a></code> does the same in a testthat test file, where testthat reports each scenario as a test. See <code><a href="../articles/testthat.html">vignette("testthat")</a></code> for how cucumber and testthat compare.</p>
-<section class="section level2"><h2 id="step-execution-order">Step execution order<a class="anchor" aria-label="anchor" href="#step-execution-order"></a>
+<section class="section level2"><h2 id="a-run-step-by-step">A run, step by step<a class="anchor" aria-label="anchor" href="#a-run-step-by-step"></a>
 </h2>
-<p>Given such a feature file:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/sum.feature</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Sum</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Sum should work for 2 numbers</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I have 1</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">And</span> I have 2</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add them</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I get 3</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Sum should work for 3 numbers</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I have 1</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">And</span> I have 2</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">But</span> I have 3</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add them</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I get 6</span></code></pre></div>
-<p>And such step definitions:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># tests/acceptance/setup-steps.R</span></span>
-<span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I have {int}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">int</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"given"</span><span class="op">)</span></span>
-<span>  <span class="va">context</span><span class="op">$</span><span class="va">numbers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">context</span><span class="op">$</span><span class="va">numbers</span>, <span class="va">int</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/step.html">when</a></span><span class="op">(</span><span class="st">"I add them"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"when"</span><span class="op">)</span></span>
-<span>  <span class="va">context</span><span class="op">$</span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">context</span><span class="op">$</span><span class="va">numbers</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/step.html">then</a></span><span class="op">(</span><span class="st">"I get {int}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">int</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="st">"then"</span><span class="op">)</span></span>
-<span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="va">context</span><span class="op">$</span><span class="va">result</span>, <span class="va">int</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>The order of calling the steps would be:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#&gt; [1] "given"</span></span>
-<span><span class="co">#&gt; [1] "given"</span></span>
-<span><span class="co">#&gt; [1] "when"</span></span>
-<span><span class="co">#&gt; [1] "then"</span></span>
-<span><span class="co">#&gt; [1] "given"</span></span>
-<span><span class="co">#&gt; [1] "given"</span></span>
-<span><span class="co">#&gt; [1] "given"</span></span>
-<span><span class="co">#&gt; [1] "when"</span></span>
-<span><span class="co">#&gt; [1] "then"</span></span></code></pre></div>
-<p>Hooks run around them: <code><a href="../reference/hook.html">before_all()</a></code> once before the first scenario, <code><a href="../reference/hook.html">before()</a></code> and <code><a href="../reference/hook.html">after()</a></code> around each scenario, <code><a href="../reference/hook.html">before_step()</a></code> and <code><a href="../reference/hook.html">after_step()</a></code> around each step, and <code><a href="../reference/hook.html">after_all()</a></code> once after the last scenario. See <code><a href="../reference/hook.html">?hook</a></code>.</p>
+<p>Step through a scenario, or a scenario outline with a background, to see which code runs when, or press Play. The highlighted lines of the setup file and the feature file are the ones in play.</p>
+<div class="ide-tabs">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#run-scenario" type="button" role="tab">Scenario</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#run-outline" type="button" role="tab">Scenario Outline with Background</button></li>
+</ul>
+<div class="tab-content">
+<div id="run-scenario" class="tab-pane active" role="tabpanel">
+<div class="stepper" role="group" aria-label="Scenario, step by step">
+<script type="application/json">
+{
+ "feature": ["Feature: Basket", "  Scenario: Add two items", "    Given an empty basket", "    When I add 2 items", "    Then the basket has 2 items"],
+ "code": [  "before_all(function() message(\"run starts\"))",
+  "",
+  "before(function(context) context$start <- Sys.time())",
+  "after(function(context) message(\"took \", format(Sys.time() - context$start)))",
+  "",
+  "given(\"an empty basket\", function(context) {",
+  "  context$basket <- character()",
+  "})",
+  "",
+  "when(\"I add {int} items\", function(context, n) {",
+  "  context$basket <- rep(\"cucumber\", n)",
+  "})",
+  "",
+  "then(\"the basket has {int} items\", function(context, n) {",
+  "  expect_length(context$basket, n)",
+  "})",
+  "",
+  "after_all(function() message(\"run ends\"))"
+ ],
+ "frames": [
+  {"t": "Load the step definitions", "c": "The setup file is run. Nothing executes yet: each call only <em>registers</em> a hook or a step definition.", "k": [1, 3, 4, 6, 10, 14, 18], "x": "(no context yet)"},
+  {"t": "Parse the feature file", "c": "The feature file is parsed into a Gherkin document. A syntax error here stops the run before any scenario runs.", "f": [1, 2, 3, 4, 5], "m": ["source, gherkinDocument"]},
+  {"t": "Compile the scenario", "c": "The scenario becomes a test case, with one pickle step for each of its steps.", "f": [3, 4, 5], "m": ["pickle: Add two items", "testRunStarted"]},
+  {"t": "before_all()", "c": "Runs once, before the first scenario.", "k": [1], "m": ["testRunHookStarted, testRunHookFinished"]},
+  {"t": "before()", "c": "Runs before each scenario. The scenario gets a new, empty <code>context</code> for its hooks and steps to share.", "k": [3], "x": "start = 12:00:00", "m": ["testCaseStarted"]},
+  {"t": "Match: Given an empty basket", "c": "The step's text, without its keyword, is matched against every registered description. One matches. <code>before_step()</code> hooks would run here.", "f": [3], "k": [6], "m": ["testStepStarted"]},
+  {"t": "Run: Given an empty basket", "c": "The step definition is called with <code>context</code>. It returns without an error, so the step passes.", "f": [3], "k": [7], "x": "start = 12:00:00\nbasket = character(0)", "m": ["testStepFinished: passed"], "p": 3},
+  {"t": "Match: When I add 2 items", "c": "<code>{int}</code> matches <code>2</code> and casts it with <code>as.integer()</code>. The value is passed after <code>context</code>.", "f": [4], "k": [10], "m": ["testStepStarted"]},
+  {"t": "Run: When I add 2 items", "c": "Called with <code>n = 2L</code>. It changes the state that the steps share.", "f": [4], "k": [11], "x": "start = 12:00:00\nbasket = c(\"cucumber\", \"cucumber\")", "m": ["testStepFinished: passed"], "p": 4},
+  {"t": "Match: Then the basket has 2 items", "c": "The same matching again. A step only runs when the steps before it passed.", "f": [5], "k": [14], "m": ["testStepStarted"]},
+  {"t": "Run: Then the basket has 2 items", "c": "The step reads what the steps before it left in <code>context</code>. The expectation holds, so the step passes. A failing one would fail the step and skip the steps after it.", "f": [5], "k": [15], "m": ["testStepFinished: passed"], "p": 5},
+  {"t": "after()", "c": "Runs after the scenario, also when a step failed. Then its <code>context</code> is discarded.", "k": [4], "x": "(discarded)", "m": ["testCaseFinished"]},
+  {"t": "after_all()", "c": "Runs once, after the last scenario.", "k": [18], "m": ["testRunHookStarted, testRunHookFinished", "testRunFinished"]},
+  {"t": "Report", "c": "Every message was passed to the reporter as it happened: the progress in the console, or a report written when the run ends.", "m": ["each message goes to the reporter"]}
+ ]
+}
+</script>
+</div>
+</div>
+<div id="run-outline" class="tab-pane" role="tabpanel">
+<div class="stepper" role="group" aria-label="Scenario Outline with Background, step by step">
+<script type="application/json">
+{
+ "featureFile": "features/calculator.feature",
+ "codeFile": "features/setup-calculator.R",
+ "feature": ["Feature: Calculator", "  Background:", "    Given a calculator", "  Scenario Outline: Add numbers", "    When I add <a> and <b>", "    Then the result is <sum>", "    Examples:", "      | a | b | sum |", "      | 1 | 2 | 3   |", "      | 4 | 5 | 9   |"],
+ "code": [  "before_all(function() message(\"run starts\"))",
+  "",
+  "before(function(context) context$start <- Sys.time())",
+  "after(function(context) message(\"took \", format(Sys.time() - context$start)))",
+  "",
+  "given(\"a calculator\", function(context) {",
+  "  context$result <- 0",
+  "})",
+  "",
+  "when(\"I add {int} and {int}\", function(context, a, b) {",
+  "  context$result <- a + b",
+  "})",
+  "",
+  "then(\"the result is {int}\", function(context, sum) {",
+  "  expect_equal(context$result, sum)",
+  "})",
+  "",
+  "after_all(function() message(\"run ends\"))"
+ ],
+ "frames": [
+  {"t": "Load the step definitions", "c": "The setup file is run. Nothing executes yet: each call only <em>registers</em> a hook or a step definition.", "k": [1, 3, 4, 6, 10, 14, 18], "x": "(no context yet)"},
+  {"t": "Parse the feature file", "c": "The feature file is parsed into a Gherkin document.", "f": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "m": ["source, gherkinDocument"]},
+  {"t": "Compile the scenarios", "c": "Each row of the Examples becomes its own test case, so this outline gives two. In each, <code>&lt;a&gt;</code>, <code>&lt;b&gt;</code> and <code>&lt;sum&gt;</code> are replaced by the row's values, and the <code>Background</code> step comes before the scenario's own steps.", "f": [3, 5, 6, 9, 10], "m": ["pickle: Add numbers (1, 2, 3)", "pickle: Add numbers (4, 5, 9)", "testRunStarted"]},
+  {"t": "before_all()", "c": "Runs once, before the first test case, not before each row.", "k": [1], "m": ["testRunHookStarted, testRunHookFinished"]},
+  {"t": "Row 1: before()", "c": "Runs before each test case, so once for every row. The highlighted steps and row are that test case. The test case gets a new, empty <code>context</code>.", "f": [3, 5, 6, 9], "k": [3], "m": ["testCaseStarted"], "x": "start = 12:00:00", "r": 1},
+  {"t": "Row 1: Given a calculator", "c": "The <code>Background</code> step runs first. Its step definition is called with <code>context</code> and returns without an error, so it passes.", "f": [3], "k": [6, 7], "m": ["testStepStarted", "testStepFinished: passed"], "x": "start = 12:00:00\nresult = 0", "p": 3},
+  {"t": "Row 1: When I add 1 and 2", "c": "The text is matched after the placeholders became the row's values. Each <code>{int}</code> is cast with <code>as.integer()</code>, and the values are passed after <code>context</code>, in order: <code>a = 1L</code>, <code>b = 2L</code>.", "f": [5, 9], "k": [10, 11], "m": ["testStepStarted", "testStepFinished: passed"], "x": "start = 12:00:00\nresult = 3", "p": 5},
+  {"t": "Row 1: Then the result is 3", "c": "<code>sum = 3L</code> comes from the same row. The expectation compares it with the <code>result</code> the previous step left in <code>context</code>, and holds.", "f": [6, 9], "k": [14, 15], "m": ["testStepStarted", "testStepFinished: passed"], "p": 6},
+  {"t": "Row 1: after()", "c": "Runs after the test case. Its <code>context</code> is discarded.", "f": [3, 5, 6, 9], "k": [4], "m": ["testCaseFinished"], "x": "(discarded)"},
+  {"t": "Row 2: before()", "c": "Runs before each test case, so once for every row. The highlighted steps and row are that test case. The test case gets a new, empty <code>context</code>. Nothing is left from the first row.", "f": [3, 5, 6, 10], "k": [3], "m": ["testCaseStarted"], "x": "start = 12:00:01", "r": 1},
+  {"t": "Row 2: Given a calculator", "c": "The <code>Background</code> step runs first. Its step definition is called with <code>context</code> and returns without an error, so it passes.", "f": [3], "k": [6, 7], "m": ["testStepStarted", "testStepFinished: passed"], "x": "start = 12:00:01\nresult = 0", "p": 3},
+  {"t": "Row 2: When I add 4 and 5", "c": "The text is matched after the placeholders became the row's values. Each <code>{int}</code> is cast with <code>as.integer()</code>, and the values are passed after <code>context</code>, in order: <code>a = 4L</code>, <code>b = 5L</code>.", "f": [5, 10], "k": [10, 11], "m": ["testStepStarted", "testStepFinished: passed"], "x": "start = 12:00:01\nresult = 9", "p": 5},
+  {"t": "Row 2: Then the result is 9", "c": "<code>sum = 9L</code> comes from the same row. The expectation compares it with the <code>result</code> the previous step left in <code>context</code>, and holds.", "f": [6, 10], "k": [14, 15], "m": ["testStepStarted", "testStepFinished: passed"], "p": 6},
+  {"t": "Row 2: after()", "c": "Runs after the test case. Its <code>context</code> is discarded.", "f": [3, 5, 6, 10], "k": [4], "m": ["testCaseFinished"], "x": "(discarded)"},
+  {"t": "after_all()", "c": "Runs once, after the last test case.", "k": [18], "m": ["testRunHookStarted, testRunHookFinished", "testRunFinished"]},
+  {"t": "Report", "c": "Every message was passed to the reporter as it happened: the progress in the console, or a report written when the run ends.", "m": ["each message goes to the reporter"]}
+ ]
+}
+</script>
+</div>
+</div>
+</div>
+</div>
+<p>Hooks run around the steps: <code><a href="../reference/hook.html">before_all()</a></code> once before the first scenario, <code><a href="../reference/hook.html">before()</a></code> and <code><a href="../reference/hook.html">after()</a></code> around each scenario, <code><a href="../reference/hook.html">before_step()</a></code> and <code><a href="../reference/hook.html">after_step()</a></code> around each step, and <code><a href="../reference/hook.html">after_all()</a></code> once after the last scenario. See <code><a href="../reference/hook.html">?hook</a></code>.</p>
 </section><section class="section level2"><h2 id="sharing-state-with-context">Sharing state with <code>context</code>
 <a class="anchor" aria-label="anchor" href="#sharing-state-with-context"></a>
 </h2>
@@ -169,21 +244,82 @@
 </h2>
 <p>A step is matched to a step definition by its text, without its keyword: <code>Given I have 1</code> and <code>And I have 1</code> match the same definition.</p>
 <p>A step definition’s description is a <a href="https://github.com/cucumber/cucumber-expressions" class="external-link">Cucumber Expression</a>, like <code>"I have {int}"</code>, or a regular expression if it starts with <code>^</code>, ends with <code>$</code> or is surrounded by <code>/</code>. The values its parameters match are passed to the step definition, before its Data Table or Doc String and <code>context</code>. See <code><a href="../reference/step.html">?step</a></code> and <code><a href="../reference/define_parameter_type.html">?define_parameter_type</a></code>.</p>
+<section class="level2"><h3 id="cucumber-expressions">Cucumber Expressions<a class="anchor" aria-label="anchor" href="#cucumber-expressions"></a>
+</h3>
+<p>Text in a description is matched literally, except for:</p>
+<ul>
+<li>
+<code>{int}</code> and other <a href="#parameter-types">parameter types</a>, whose values are passed to the step definition,</li>
+<li>
+<code>(s)</code>, optional text: <code>"I have {int} cucumber(s)"</code> matches both <code>I have 1 cucumber</code> and <code>I have 2 cucumbers</code>,</li>
+<li>
+<code>a/b</code>, alternative words: <code>"I press the Enter/Return key"</code> matches either word.</li>
+</ul>
+<p>To match <code>(</code>, <code>{</code> or <code>/</code> literally, escape them with a backslash, like <code>"a\\/b"</code>. An invalid expression, like <code>"I visit /about"</code>, is an error.</p>
+<p>A description that starts with <code>^</code>, ends with <code>$</code> or is surrounded by <code>/</code> is a regular expression instead, like <code>"^I have (\\d+) cucumbers?$"</code>. Each capture group is passed to the step definition.</p>
+</section><section class="level2"><h3 id="parameter-types">Parameter types<a class="anchor" aria-label="anchor" href="#parameter-types"></a>
+</h3>
+<p>The values of a step’s parameters are found with regular expressions and cast by a transformer function. These parameter types are available by default:</p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead><tr class="header">
+<th>Parameter type</th>
+<th>Matches</th>
+<th>Converted with</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>{int}</code></td>
+<td>Integers, like <code>71</code> or <code>-19</code>
+</td>
+<td><code><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer()</a></code></td>
+</tr>
+<tr class="even">
+<td><a href="https://github.com/wrathematics/float" class="external-link">float</a></td>
+<td>Floats, like <code>3.6</code>, <code>.8</code>, <code>-9.2</code> or <code>1.5E3</code>, and integers like <code>12</code>
+</td>
+<td><code><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double()</a></code></td>
+</tr>
+<tr class="odd">
+<td><code>{word}</code></td>
+<td>Words without whitespace, like <code>banana</code> or <code>foo-bar</code>, but not <code>banana split</code>
+</td>
+<td>Passed as is</td>
+</tr>
+<tr class="even">
+<td><code>{string}</code></td>
+<td>Single-quoted or double-quoted strings, like <code>"banana split"</code> or <code>'banana split'</code>, but not <code>banana split</code>. Only the text between the quotes is extracted, with escaped quotes unescaped</td>
+<td>Passed as is</td>
+</tr>
+<tr class="odd">
+<td><code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code></td>
+<td>Anything</td>
+<td>Passed as is</td>
+</tr>
+</tbody>
+</table>
+<p>Define your own with <code><a href="../reference/define_parameter_type.html">define_parameter_type()</a></code>.</p>
+</section><section class="level2"><h3 id="results">Results<a class="anchor" aria-label="anchor" href="#results"></a>
+</h3>
 <p>Every step gets a result:</p>
 <ul>
 <li>
-<strong>passed</strong>: its step definition ran without an error or a failed expectation.</li>
+<span class="status passed">passed</span>: its step definition ran without an error or a failed expectation.</li>
 <li>
-<strong>failed</strong>: its step definition failed. The steps after it are <strong>skipped</strong>.</li>
+<span class="status failed">failed</span>: its step definition failed. The steps after it are <span class="status skipped">skipped</span>.</li>
 <li>
-<strong>pending</strong>: its step definition called <code><a href="../reference/pending.html">pending()</a></code>.</li>
+<span class="status pending">pending</span>: its step definition called <code><a href="../reference/pending.html">pending()</a></code>.</li>
 <li>
-<strong>undefined</strong>: no step definition matches it. The run goes on with the next scenario, and shows a snippet of a step definition to paste into a setup file.</li>
+<span class="status undefined">undefined</span>: no step definition matches it. The run goes on with the next scenario, and shows a snippet of a step definition to paste into a setup file.</li>
 <li>
-<strong>ambiguous</strong>: more than one step definition matches it. The error lists them all.</li>
+<span class="status ambiguous">ambiguous</span>: more than one step definition matches it. The error lists them all.</li>
 </ul>
 <p>A scenario with a pending or undefined step fails, unless the run is given <code>strict = FALSE</code>. <code>cucumber::test(dry_run = TRUE)</code> finds every undefined and ambiguous step without running any.</p>
-</section><script id="quarto-html-after-body" type="application/javascript">
+</section></section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -266,7 +402,8 @@
       }
     }
   });
-  </script></main>
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

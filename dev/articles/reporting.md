@@ -176,12 +176,14 @@ cucumber::test(
 )
 ```
 
-shinytest2 skips its apps on CRAN, and it takes any run for a CRAN run
-unless the `NOT_CRAN` environment variable is `"true"`.
-`devtools::test()` sets it, and
-[`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
-sets it too when it isn’t set, outside of a testthat run and R CMD
-check.
+> **shinytest2 and CRAN**
+>
+> shinytest2 skips its apps on CRAN, and it takes any run for a CRAN run
+> unless the `NOT_CRAN` environment variable is `"true"`.
+> `devtools::test()` sets it, and
+> [`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
+> sets it too when it isn’t set, outside of a testthat run and R CMD
+> check.
 
 The report shows the failed step with its error, the screenshot of the
 app with the error it shows, and the app’s logs, with the R error and

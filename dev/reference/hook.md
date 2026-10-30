@@ -43,7 +43,8 @@ after_all(hook, name = NULL)
   - `before_all()` and `after_all()` hooks get no arguments, or a
     `context` to attach data to the report, see
     [attachments](https://jakubsob.github.io/cucumber/dev/reference/attachments.md).
-    It isn't shared with scenarios.
+    It isn't shared with scenarios: to share a connection or an app
+    driver, keep it in an environment of a `setup-*.R` file.
 
 - tags:
 
@@ -439,10 +440,12 @@ Source: `tests/acceptance/before_after_step_hooks.feature`
 `before_all()` and `after_all()` run code once, before the first
 scenario and after the last one, like starting and stopping a server.
 They take no arguments, or a `context` to attach data to the report,
-which isn't shared with the scenarios. A failing `before_all()` hook
-stops the run before any scenario, after the other `before_all()` hooks
-ran. `after_all()` hooks run even when the run failed, and a failing one
-fails the run.
+which isn't shared with the scenarios. To share a connection or an app
+driver between scenarios, keep it in an environment of a `setup-*.R`
+file and hand it to each scenario in a `before()` hook. A failing
+`before_all()` hook stops the run before any scenario, after the other
+`before_all()` hooks ran. `after_all()` hooks run even when the run
+failed, and a failing one fails the run.
 
 #### Background:
 

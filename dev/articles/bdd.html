@@ -19,7 +19,7 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="bdd_files/libs/quarto-html/popper.min.js"></script><script src="bdd_files/libs/quarto-html/tippy.umd.min.js"></script><link href="bdd_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="bdd_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Behavior-Driven Development">
+<!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Behavior-Driven Development">
 <meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -46,19 +46,34 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/reference-gherkin.html">Gherkin Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
-    <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
     <li><a class="dropdown-item" href="../articles/testthat.html">cucumber and testthat</a></li>
     <li><a class="dropdown-item" href="../articles/reporting.html">Reports</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">3.0.0</a></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-it-works" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">How it works</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-it-works">
+<li><a class="dropdown-item" href="../articles/how-it-works.html">Running features</a></li>
+    <li><a class="dropdown-item" href="../articles/compatibility.html">Compatibility with Cucumber</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-gherkin.html">Gherkin</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-upgrade" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Upgrade</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-upgrade">
+<li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">To 3.0.0</a></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">To 2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -144,18 +159,11 @@
 <p>The implementation can be changed at any moment, and executing the specification should tell us if the system allows the user to achieve their goal.</p>
 </section><section class="section level3"><h3 id="implementing-executable-specifications">Implementing executable specifications<a class="anchor" aria-label="anchor" href="#implementing-executable-specifications"></a>
 </h3>
-<p>Specifications implemented with Behavior-Driven Development are:</p>
-<ul>
-<li>instantly readable,</li>
-<li>focused on the business goal,</li>
-<li>hiding the implementation details,</li>
-<li>encouraging reuse of test code.</li>
-</ul>
-<p>Behavior-Driven Development is not about tools. It’s a way of building software. We can implement specifications in any way we want, however, there are tools that can help us. {cucumber} is one of them.</p>
+<p>Executable specifications are readable, state the business goal, hide implementation details and let test code be reused.</p>
+<p>BDD is not about tools, but tools help. {cucumber} is one of them.</p>
 </section><section class="section level2"><h2 id="bdd-with-base-r">BDD with base R<a class="anchor" aria-label="anchor" href="#bdd-with-base-r"></a>
 </h2>
-<p>We can practice BDD using base R. Having a set of examples of how the system should work, we need to establish a way of translating examples to code.</p>
-<p>We need to represent the business language with code – a set of actions that user of the system can take. We can do it with functions. Those functions will create the interface of the system. Their names can follow closely the natural language description of the action. They will abstract and hide the implementation details of the system. They will allow reuse of the test code.</p>
+<p>We can practice BDD with base R. Given examples of how the system should work, we translate them to code: one function per action a user can take. Function names follow the natural-language description of the action, and the functions hide the implementation and make the test code reusable.</p>
 <p>The specification of the bookstore could look like this:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
@@ -174,27 +182,8 @@
 <span><span class="co">#&gt; Error:</span></span>
 <span><span class="co">#&gt; ! Test failed with 1 failure and 0 successes.</span></span></code></pre></div>
 </div>
-<p>This test fails as the code doesn’t exist yet. We can pause in this step and try out a few versions of the specifications and go with one that expresses the business goal the best.</p>
-<p>Once we have an outline of actions, we can implement them. We can use R6 objects to bind the functions together.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># tests/acceptance/setup-bookstore.R</span></span>
-<span><span class="va">Bookstore</span> <span class="op">&lt;-</span> <span class="fu">R6</span><span class="fu">::</span><span class="kw"><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6Class</a></span><span class="op">(</span></span>
-<span>  public <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    select <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">title</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    add_to_cart <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>    <span class="op">}</span>,</span>
-<span>    cart_includes <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">title</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>    <span class="op">}</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<p>When we have a skeleton of the implementation, we can start filling it with the actual code.</p>
-<p>For example, our implementation of the bookstore might be a package with:</p>
+<p>The test fails because the code doesn’t exist yet. This is a good moment to try a few versions of the specification and keep the one that expresses the business goal best.</p>
+<p>Behind those actions can be any implementation. For example, a package with:</p>
 <ul>
 <li>
 <code>select_book</code>: function that returns a tibble with book details,</li>
@@ -203,9 +192,9 @@
 <li>
 <code>get_cart</code>: function that returns a list with details of books in the cart.</li>
 </ul>
-<p>An implementation that satisfies the specification could be as simple as:</p>
+<p>A minimal implementation:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">storage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">books</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>id <span class="op">=</span> <span class="fl">1</span>, title <span class="op">=</span> <span class="st">"The Hobbit, J.R.R. Tolkien"</span><span class="op">)</span>,</span>
@@ -227,9 +216,9 @@
 <span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/keep.html" class="external-link">keep</a></span><span class="op">(</span>\<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span><span class="op">$</span><span class="va">id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">storage</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
-<p>Having this implementation, we can plug it into the test code:</p>
+<p>We plug it in with R6 objects, which bind the actions together:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># tests/acceptance/setup-bookstore.R</span></span>
 <span><span class="va">Bookstore</span> <span class="op">&lt;-</span> <span class="fu">R6</span><span class="fu">::</span><span class="kw"><a href="https://r6.r-lib.org/reference/R6Class.html" class="external-link">R6Class</a></span><span class="op">(</span></span>
 <span>  private <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -248,9 +237,9 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>Now, the tests pass.</p>
+<p>Now the same test passes:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># tests/acceptance/test-bookstore.R</span></span>
 <span><span class="fu">test_that</span><span class="op">(</span><span class="st">"Bookstore: Adding a book to cart"</span>, <span class="op">{</span></span>
 <span>  <span class="co"># Given</span></span>
@@ -261,41 +250,24 @@
 <span>  <span class="co"># Then</span></span>
 <span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">cart_includes</span><span class="op">(</span><span class="st">"The Hobbit, J.R.R. Tolkien"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Test passed with 1 success 🎊.</span></span></code></pre></div>
+<span><span class="co">#&gt; Test passed with 1 success 😸.</span></span></code></pre></div>
 </div>
-<p>With this implementation, we can easily extend tests with checking if we can add multiple books to the cart.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"Bookstore: Adding multiple books to cart"</span>, <span class="op">{</span></span>
-<span>  <span class="co"># Given</span></span>
-<span>  <span class="va">bookstore</span> <span class="op">&lt;-</span> <span class="va">Bookstore</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="co"># When</span></span>
-<span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">select</span><span class="op">(</span><span class="st">"The Hobbit, J.R.R. Tolkien"</span><span class="op">)</span></span>
-<span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">add_to_cart</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">select</span><span class="op">(</span><span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span><span class="op">)</span></span>
-<span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">add_to_cart</span><span class="op">(</span><span class="op">)</span></span>
-<span>  <span class="co"># Then</span></span>
-<span>  <span class="va">bookstore</span><span class="op">$</span><span class="fu">cart_includes</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"The Hobbit, J.R.R. Tolkien"</span>, <span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Test passed with 1 success 🎊.</span></span></code></pre></div>
-</div>
-<p>As the system grows, it will be extended with more examples and more actions. Actions already implemented will be reused in different scenarios.</p>
-<p>The implementation of the system will evolve, so will specifications, but this approach will ensure that test code is easy to maintain and focused on the business goal.</p>
+<p>As the system grows, we add examples and actions, and reuse the actions already implemented. The implementation will change, but the specifications stay focused on the business goal.</p>
 </section><section class="section level2"><h2 id="bdd-with-cucumber">BDD with {cucumber}<a class="anchor" aria-label="anchor" href="#bdd-with-cucumber"></a>
 </h2>
-<p>The steps of BDD with {cucumber} are the same as with base R. The difference in how we express specifications and their implementation.</p>
-<p>The readability of specifications is given by them being expressed in <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin</a> language. Specifications are no longer expressed in code, but as text. It adds another level of separation between the specification and the implementation.</p>
+<p>The steps of BDD with {cucumber} are the same as with base R. The difference is in how we express specifications and their implementation.</p>
+<p>Specifications are written as text in <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin</a>, not in code. That separates the specification from the implementation.</p>
 <p>We start by writing a feature file:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/bookstore.feature</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Bookstore</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding a book to cart</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/bookstore.feature</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Bookstore</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding a book to cart</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span></code></pre></div>
 <p>We implement actions with <code>given</code>, <code>when</code>, and <code>then</code> functions:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># tests/acceptance/setup-steps.R</span></span>
 <span><span class="fu"><a href="../reference/step.html">given</a></span><span class="op">(</span><span class="st">"I am in the bookstore"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
@@ -312,9 +284,8 @@
 <span>  <span class="fu">expect_in</span><span class="op">(</span><span class="va">title</span>, <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="fu">get_cart</span><span class="op">(</span><span class="op">)</span>, <span class="st">"title"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>This test does exactly the same as the test with base R.</p>
 <p>We can run those tests with:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   |  F  P  U  S  OK | Feature</span></span>
 <span><span class="co">#&gt; ✔ |               1 | Bookstore</span></span>
@@ -322,26 +293,26 @@
 <span><span class="co">#&gt; Summary</span></span>
 <span><span class="co">#&gt;   1 scenario (1 passed)</span></span>
 <span><span class="co">#&gt;   4 steps (4 passed)</span></span></code></pre></div>
-<p>What <code><a href="../reference/test.html">cucumber::test</a></code> function does is it reads the feature files, finds corresponding actions implementations and runs them in order. To learn more how it works, refer to <a href="https://jakubsob.github.io/cucumber/articles/how-it-works.html" class="external-link">How it works</a> vignette.</p>
+<p><code><a href="../reference/test.html">cucumber::test()</a></code> reads the feature files, finds the step definitions and runs them in order. See <code><a href="../articles/how-it-works.html">vignette("how-it-works")</a></code>.</p>
 <p>Similar to what we did with base R, we can extend the feature file with a scenario that checks if we can add multiple books to the cart:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/bookstore.feature</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Bookstore</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding a book to cart</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding multiple books to cart</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span> in the cart</span></code></pre></div>
-<p>Re-running the tests will result in two scenarios passing.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/bookstore.feature</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Bookstore</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding a book to cart</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding multiple books to cart</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Lord of the Rings, J.R.R. Tolkien"</span> in the cart</span></code></pre></div>
+<p>Both scenarios pass:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="../reference/test.html">test</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   |  F  P  U  S  OK | Feature</span></span>
 <span><span class="co">#&gt; ✔ |               2 | Bookstore</span></span>
@@ -353,21 +324,21 @@
 </h2>
 <p>Specifications describe how the system behaves, in a language its users read. That’s what documentation should say too, so let the specifications be the documentation of your package. Readers get examples that are true, because they run.</p>
 <p>Describe the feature in the feature file, and tag the scenarios that illustrate it with <code>@rd</code>:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/bookstore.feature</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Bookstore</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  A customer selects books and adds them to the cart to buy them.</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@rd</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding a book to cart</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding multiple books to cart</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode gherkin"><code class="sourceCode gherkin"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tests/acceptance/bookstore.feature</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">Feature:</span> Bookstore</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  A customer selects books and adds them to the cart to buy them.</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">@rd</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding a book to cart</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Given</span> I am in the bookstore</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I select <span class="st">"The Hobbit, J.R.R. Tolkien"</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">When</span> I add selected book to the cart</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Then</span> I should see <span class="st">"The Hobbit, J.R.R. Tolkien"</span> in the cart</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">Scenario:</span> Adding multiple books to cart</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div>
 <p>Then put them in the help page of the function they document with <code><a href="../reference/features_rd.html">features_rd()</a></code>:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' Add the selected book to the cart</span></span>
 <span><span class="co">#'</span></span>
 <span><span class="co">#' @param id ID of the book, from `select_book()`.</span></span>
@@ -379,30 +350,17 @@
 <p><code>devtools::document()</code> adds a section named <code>"Behavior"</code> by default to <code>?add_to_cart</code>, with the feature’s name, its description and the tagged scenarios, as they’re written. On the pkgdown site, steps are a list and tables are tables, unless you pass <code>markdown = FALSE</code>.</p>
 <p>The help pages of {cucumber} are written this way, like <a href="https://jakubsob.github.io/cucumber/reference/hook.html" class="external-link"><code>?hook</code></a> or <a href="https://jakubsob.github.io/cucumber/reference/test.html" class="external-link"><code>?test</code></a>. What we learned writing them:</p>
 <ul>
-<li>
-<strong>Explain the behavior in the feature’s description, not in roxygen.</strong> It’s what readers see first, above the scenarios. Keep roxygen for what feature files can’t say: the title, a sentence of what the function is for, a line for each argument, and examples.</li>
-<li>
-<strong>Tag the scenarios that illustrate a rule.</strong> Leave the edge cases untagged: they test the system, but readers don’t need them to understand it. One or two scenarios per rule is enough.</li>
-<li>
-<strong>Tag a <code>Rule</code> or a <code>Feature</code> when all of it illustrates the function.</strong> Its scenarios inherit the tag, like they do when you run them by tag.</li>
-<li>
-<strong>Document a function with several features.</strong> <code>features_rd(features = c("hooks.feature", "tagged_hooks.feature"))</code> puts each of them in the section, one after the other.</li>
-<li>
-<strong>Write steps that show the outcome.</strong> Be specific, but omit unnecessary details.</li>
+<li>Explain the behavior in the feature’s description, not in roxygen. It’s what readers see first, above the scenarios. Keep roxygen for what feature files can’t say: the title, a sentence of what the function is for, a line for each argument, and examples.</li>
+<li>Tag the scenarios that illustrate a rule. Leave the edge cases untagged: they test the system, but readers don’t need them to understand it. One or two scenarios per rule is enough.</li>
+<li>Tag a <code>Rule</code> or a <code>Feature</code> when all of it illustrates the function. Its scenarios inherit the tag, like they do when you run them by tag.</li>
+<li>To document a function with several features, pass them all: <code>features_rd(features = c("hooks.feature", "tagged_hooks.feature"))</code> puts each in the section, one after the other.</li>
+<li>Write steps that show the outcome. Be specific, but omit unnecessary details.</li>
 </ul>
 <p>Choose other scenarios with the <code>tags</code>, <code>name</code> and <code>features</code> arguments of <code><a href="../reference/features_rd.html">features_rd()</a></code>, like you choose the scenarios to run with <code><a href="../reference/test.html">test()</a></code>.</p>
-</section><section class="section level2"><h2 id="why-should-you-choose-cucumber">Why should you choose {cucumber}?<a class="anchor" aria-label="anchor" href="#why-should-you-choose-cucumber"></a>
+</section><section class="section level2"><h2 id="learning-bdd">Learning BDD<a class="anchor" aria-label="anchor" href="#learning-bdd"></a>
 </h2>
 <ul>
-<li>It allows you to start practicing BDD without having to figure out how to glue actions implementations on your own.</li>
-<li>It allows you to express high-level tests in a natural language.</li>
-<li>It helps you keep the separation between the specification and the implementation.</li>
-<li>It helps you extend and reuse test code.</li>
-<li>It lets the specifications document your package.</li>
-</ul></section><section class="section level2"><h2 id="learning-bdd">Learning BDD<a class="anchor" aria-label="anchor" href="#learning-bdd"></a>
-</h2>
-<ul>
-<li>ATDD by Example: A Practical Guide to Acceptance Test-Driven Development: A Practical Guide to Acceptance Test-Driven Development.</li>
+<li>Gojko Adzic, <em>Specification by Example</em>, and Markus Gärtner, <em>ATDD by Example: A Practical Guide to Acceptance Test-Driven Development</em>.</li>
 <li><a href="https://www.youtube.com/watch?v=gXh0iUt4TXA&amp;list=PLwLLcwQlnXByKR1Fo7UnE6gQAbx-JfYJZ" class="external-link">Continuous Delivery Youtube Channel</a></li>
 <li><a href="https://cucumber.io/docs/guides/" class="external-link">Cucumber</a></li>
 </ul></section><script id="quarto-html-after-body" type="application/javascript">

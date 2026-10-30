@@ -66,29 +66,18 @@ their goal.
 
 ### Implementing executable specifications
 
-Specifications implemented with Behavior-Driven Development are:
+Executable specifications are readable, state the business goal, hide
+implementation details and let test code be reused.
 
-- instantly readable,
-- focused on the business goal,
-- hiding the implementation details,
-- encouraging reuse of test code.
-
-Behavior-Driven Development is not about tools. It’s a way of building
-software. We can implement specifications in any way we want, however,
-there are tools that can help us. {cucumber} is one of them.
+BDD is not about tools, but tools help. {cucumber} is one of them.
 
 ## BDD with base R
 
-We can practice BDD using base R. Having a set of examples of how the
-system should work, we need to establish a way of translating examples
-to code.
-
-We need to represent the business language with code – a set of actions
-that user of the system can take. We can do it with functions. Those
-functions will create the interface of the system. Their names can
-follow closely the natural language description of the action. They will
-abstract and hide the implementation details of the system. They will
-allow reuse of the test code.
+We can practice BDD with base R. Given examples of how the system should
+work, we translate them to code: one function per action a user can
+take. Function names follow the natural-language description of the
+action, and the functions hide the implementation and make the test code
+reusable.
 
 The specification of the bookstore could look like this:
 
@@ -110,35 +99,11 @@ test_that("Bookstore: Adding a book to cart", {
 #> ! Test failed with 1 failure and 0 successes.
 ```
 
-This test fails as the code doesn’t exist yet. We can pause in this step
-and try out a few versions of the specifications and go with one that
-expresses the business goal the best.
+The test fails because the code doesn’t exist yet. This is a good moment
+to try a few versions of the specification and keep the one that
+expresses the business goal best.
 
-Once we have an outline of actions, we can implement them. We can use R6
-objects to bind the functions together.
-
-``` r
-
-# tests/acceptance/setup-bookstore.R
-Bookstore <- R6::R6Class(
-  public = list(
-    select = function(title) {
-
-    },
-    add_to_cart = function() {
-
-    },
-    cart_includes = function(title) {
-
-    }
-  )
-)
-```
-
-When we have a skeleton of the implementation, we can start filling it
-with the actual code.
-
-For example, our implementation of the bookstore might be a package
+Behind those actions can be any implementation. For example, a package
 with:
 
 - `select_book`: function that returns a tibble with book details,
@@ -146,8 +111,7 @@ with:
 - `get_cart`: function that returns a list with details of books in the
   cart.
 
-An implementation that satisfies the specification could be as simple
-as:
+A minimal implementation:
 
 ``` r
 
@@ -173,7 +137,7 @@ get_cart <- function() {
 }
 ```
 
-Having this implementation, we can plug it into the test code:
+We plug it in with R6 objects, which bind the actions together:
 
 ``` r
 
@@ -196,7 +160,7 @@ Bookstore <- R6::R6Class(
 )
 ```
 
-Now, the tests pass.
+Now the same test passes:
 
 ``` r
 
@@ -210,46 +174,21 @@ test_that("Bookstore: Adding a book to cart", {
   # Then
   bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
 })
-#> Test passed with 1 success 🎊.
+#> Test passed with 1 success 😸.
 ```
 
-With this implementation, we can easily extend tests with checking if we
-can add multiple books to the cart.
-
-``` r
-
-test_that("Bookstore: Adding multiple books to cart", {
-  # Given
-  bookstore <- Bookstore$new()
-  # When
-  bookstore$select("The Hobbit, J.R.R. Tolkien")
-  bookstore$add_to_cart()
-  bookstore$select("The Lord of the Rings, J.R.R. Tolkien")
-  bookstore$add_to_cart()
-  # Then
-  bookstore$cart_includes(c("The Hobbit, J.R.R. Tolkien", "The Lord of the Rings, J.R.R. Tolkien"))
-})
-#> Test passed with 1 success 🎊.
-```
-
-As the system grows, it will be extended with more examples and more
-actions. Actions already implemented will be reused in different
-scenarios.
-
-The implementation of the system will evolve, so will specifications,
-but this approach will ensure that test code is easy to maintain and
-focused on the business goal.
+As the system grows, we add examples and actions, and reuse the actions
+already implemented. The implementation will change, but the
+specifications stay focused on the business goal.
 
 ## BDD with {cucumber}
 
 The steps of BDD with {cucumber} are the same as with base R. The
-difference in how we express specifications and their implementation.
+difference is in how we express specifications and their implementation.
 
-The readability of specifications is given by them being expressed in
-[Gherkin](https://cucumber.io/docs/gherkin/reference/) language.
-Specifications are no longer expressed in code, but as text. It adds
-another level of separation between the specification and the
-implementation.
+Specifications are written as text in
+[Gherkin](https://cucumber.io/docs/gherkin/reference/), not in code.
+That separates the specification from the implementation.
 
 We start by writing a feature file:
 
@@ -284,8 +223,6 @@ then("I should see {string} in the cart", function(title, context) {
 })
 ```
 
-This test does exactly the same as the test with base R.
-
 We can run those tests with:
 
 ``` r
@@ -299,13 +236,10 @@ cucumber::test()
 #>   4 steps (4 passed)
 ```
 
-What
-[`cucumber::test`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
-function does is it reads the feature files, finds corresponding actions
-implementations and runs them in order. To learn more how it works,
-refer to [How it
-works](https://jakubsob.github.io/cucumber/articles/how-it-works.html)
-vignette.
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
+reads the feature files, finds the step definitions and runs them in
+order. See
+[`vignette("how-it-works")`](https://jakubsob.github.io/cucumber/dev/articles/how-it-works.md).
 
 Similar to what we did with base R, we can extend the feature file with
 a scenario that checks if we can add multiple books to the cart:
@@ -329,7 +263,7 @@ Feature: Bookstore
     Then I should see "The Lord of the Rings, J.R.R. Tolkien" in the cart
 ```
 
-Re-running the tests will result in two scenarios passing.
+Both scenarios pass:
 
 ``` r
 
@@ -393,21 +327,20 @@ The help pages of {cucumber} are written this way, like
 [`?test`](https://jakubsob.github.io/cucumber/reference/test.html). What
 we learned writing them:
 
-- **Explain the behavior in the feature’s description, not in roxygen.**
+- Explain the behavior in the feature’s description, not in roxygen.
   It’s what readers see first, above the scenarios. Keep roxygen for
   what feature files can’t say: the title, a sentence of what the
   function is for, a line for each argument, and examples.
-- **Tag the scenarios that illustrate a rule.** Leave the edge cases
+- Tag the scenarios that illustrate a rule. Leave the edge cases
   untagged: they test the system, but readers don’t need them to
   understand it. One or two scenarios per rule is enough.
-- **Tag a `Rule` or a `Feature` when all of it illustrates the
-  function.** Its scenarios inherit the tag, like they do when you run
-  them by tag.
-- **Document a function with several features.**
+- Tag a `Rule` or a `Feature` when all of it illustrates the function.
+  Its scenarios inherit the tag, like they do when you run them by tag.
+- To document a function with several features, pass them all:
   `features_rd(features = c("hooks.feature", "tagged_hooks.feature"))`
-  puts each of them in the section, one after the other.
-- **Write steps that show the outcome.** Be specific, but omit
-  unnecessary details.
+  puts each in the section, one after the other.
+- Write steps that show the outcome. Be specific, but omit unnecessary
+  details.
 
 Choose other scenarios with the `tags`, `name` and `features` arguments
 of
@@ -415,20 +348,10 @@ of
 like you choose the scenarios to run with
 [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md).
 
-## Why should you choose {cucumber}?
-
-- It allows you to start practicing BDD without having to figure out how
-  to glue actions implementations on your own.
-- It allows you to express high-level tests in a natural language.
-- It helps you keep the separation between the specification and the
-  implementation.
-- It helps you extend and reuse test code.
-- It lets the specifications document your package.
-
 ## Learning BDD
 
-- ATDD by Example: A Practical Guide to Acceptance Test-Driven
-  Development: A Practical Guide to Acceptance Test-Driven Development.
+- Gojko Adzic, *Specification by Example*, and Markus Gärtner, *ATDD by
+  Example: A Practical Guide to Acceptance Test-Driven Development*.
 - [Continuous Delivery Youtube
   Channel](https://www.youtube.com/watch?v=gXh0iUt4TXA&list=PLwLLcwQlnXByKR1Fo7UnE6gQAbx-JfYJZ)
 - [Cucumber](https://cucumber.io/docs/guides/)

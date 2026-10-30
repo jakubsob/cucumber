@@ -3,38 +3,112 @@
 cucumber runs on testthat. A feature file is run like a testthat test
 file, each scenario is a `test_that()` test, and step definitions use
 testthat’s expectations. If you know testthat, most of cucumber works
-the way you expect. This article lists where the two are alike and where
-they differ.
+the way you expect. This article starts with when to use which, then
+lists where the two are alike and where they differ.
+
+## When to use which
+
+The two answer different questions. testthat tests ask *does this code
+do what I wrote it to do?* A cucumber scenario asks *does the system
+behave the way someone needs it to?*
+
+|  | testthat | cucumber |
+|----|----|----|
+| Describes | How a function or an object behaves | What a user or another system gets from the whole |
+| Written in | R, by developers | Gherkin, readable by anyone |
+| Reads as | Code: the test says how it checks | A specification: the scenario says what, the steps say how |
+| Good for | Edge cases, many small inputs, internals, fast feedback while you write code | Agreed examples of behavior, user workflows, business requirements you want to keep readable and true |
+| Less suited to | Behavior agreed with people who don’t read R | Exhaustive checks of every input of a function |
+| Failure tells you | Which expectation, in which file and line | Which step of which scenario, in terms of the behavior |
+
+Use testthat to test the code you write: functions, edge cases, error
+messages. Use cucumber to pin down behavior you agreed on with someone,
+like a user, a product owner or a colleague who doesn’t write R, in
+examples all of you can read. Many Shiny apps, APIs, data pipelines and
+packages with a user-facing workflow need both.
+
+### Behavior tests of a whole system with testthat alone
+
+You can test the behavior of a whole system with testthat alone: a
+`test_that()` can start an app, call an API or run a pipeline and check
+the result. cucumber doesn’t make that possible. It gives you an
+opinionated structure for such tests:
+
+- A specification in a fixed format. Scenarios are `Given`, `When` and
+  `Then` steps in `.feature` files, parsed as
+  [Gherkin](https://cucumber.io/docs/gherkin/reference/), so everyone on
+  the team writes them the same way.
+- Reuse through steps. A step definition, like
+  `when("I add {int} to the basket", ...)`, is written once and matched
+  by any scenario that uses the sentence. Scenarios are built from
+  steps, so a new scenario is often only new text, no new code.
+- State in `context` and hooks. The steps of a scenario share a
+  `context` environment that is new for each scenario, so state doesn’t
+  leak between them.
+  [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+  and
+  [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+  hooks, also for a single step, a run or tagged scenarios, set up and
+  clean up what a scenario needs, like an app, a database or a temporary
+  directory.
+
+Without them you write that structure yourself in helper functions and
+[`withr::defer()`](https://withr.r-lib.org/reference/defer.html) calls.
+See
+[`vignette("how-it-works")`](https://jakubsob.github.io/cucumber/dev/articles/how-it-works.md)
+for how steps are matched and how `context` and hooks work.
+
+### How they complement each other
+
+- Scenarios on top, unit tests below. A scenario states the behavior
+  with a few examples, and its step definitions call functions that
+  testthat tests cover in depth. A failing scenario tells you what broke
+  for the user, a failing unit test tells you where.
+- One run.
+  [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) in
+  a `tests/testthat/test-*.R` file runs feature files with the package’s
+  other tests, with `devtools::test()` or `R CMD check`. Or keep them
+  apart in `tests/acceptance` and run them with
+  [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md).
+  [`vignette("get-started")`](https://jakubsob.github.io/cucumber/dev/articles/get-started.md)
+  shows both layouts.
+- The same tools. Step definitions use `expect_*()`, snapshots and
+  `local_mocked_bindings()`, and `helper-*.R`, `setup-*.R` and
+  `teardown-*.R` files work as they do in testthat.
+- Specifications as documentation. Scenarios can go into the help page
+  of the function they describe with
+  [`features_rd()`](https://jakubsob.github.io/cucumber/dev/reference/features_rd.md),
+  where they stay true because they run.
+
+If you’re starting a feature, write its scenarios first, then the code
+and its unit tests. If you’re adding cucumber to a package, keep your
+tests and add scenarios for the behavior you most want to spell out.
 
 [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) is
 cucumber’s
 [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html):
 it runs the feature files of a directory, by default
 `"tests/acceptance"`.
-[`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md),
-called in a `tests/testthat/test-*.R` file, runs feature files as part
-of the package’s testthat tests, e.g. with `devtools::test()` or
-`R CMD check`.
 
 ## Writing tests
 
-|  | `testthat` | `cucumber` |
+|  | testthat | cucumber |
 |----|----|----|
 | A test | `test_that("adds one", { ... })` | A `Scenario:` in a `.feature` file, whose steps are matched to step definitions, like `given("I have {int}", function(n, context) ...)` |
 | Grouping tests | A `test-*.R` file, `describe()` | A `Feature:` in a `.feature` file, `Rule:` |
 | Code shared by the tests of a file | Code at the top of the file, or a helper function | `Background:` steps, run before each scenario of the feature or rule |
 | The same test with other values | A loop over `test_that()`, or a package like patrick | `Scenario Outline:` with `Examples:` |
 | State within a test | Local variables | The `context` environment, passed to every step and hook of the scenario |
-| State between tests | Not shared, unless kept outside the test | Not shared: each scenario gets a new `context` |
+| State between tests | Not shared, unless kept outside the test | Not shared: each scenario gets a new `context`. Keep what the run shares, like a connection, in an environment of a `setup-*.R` file and set it up in [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) |
 | Checking values | `expect_*()` | `expect_*()` in step definitions |
 
 ## Files
 
-|  | [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html) | [`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) |
+|  | testthat | cucumber |
 |----|----|----|
 | Tests | `test-*.R` files | `.feature` and `.feature.md` files, also in subdirectories |
-| `helper-*.R` | Run before the tests, unless `load_helpers = FALSE` | The same. Define steps and hooks in `setup-*.R` files instead: `devtools::load_all()` runs helper files too, which defines every step twice, making it ambiguous |
-| `setup-*.R` | Run before the tests | The same. The usual place for step definitions, hooks and parameter types. Loaded again, like by testthat and by `test(".")`, a setup file defines them again rather than twice |
+| `helper-*.R` | Run before the tests, unless `load_helpers = FALSE` | The same, but define steps and hooks in `setup-*.R`: `devtools::load_all()` also runs helper files, which would define every step twice |
+| `setup-*.R` | Run before the tests | The same. The place for step definitions, hooks and parameter types. Loading a setup file again redefines them instead of duplicating them |
 | `teardown-*.R` | Run after the tests | The same |
 | `teardown_env()` in a setup file | Defers code until the run ends | The same, also in steps and hooks. When [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) is called in a testthat file, it’s the end of [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) |
 | `test-*.R` files | Run | Not run, so they can test the code the steps use, with [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html) |
@@ -43,7 +117,7 @@ of the package’s testthat tests, e.g. with `devtools::test()` or
 
 ## Running
 
-|  | [`testthat::test_dir()`](https://testthat.r-lib.org/reference/test_dir.html) | [`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) |
+|  | testthat | cucumber |
 |----|----|----|
 | Default directory | Required `path` | `"tests/acceptance"`, or the `cucumber.path` option |
 | Package code | `load_package` argument | Load the package first, e.g. with [`pkgload::load_all()`](https://pkgload.r-lib.org/reference/load_all.html) |
@@ -54,13 +128,9 @@ of the package’s testthat tests, e.g. with `devtools::test()` or
 | `NOT_CRAN` | Set to `"true"` by `test_local()` and `devtools::test()` | Set to `"true"` when it isn’t set, outside of a testthat run, so snapshots are checked. In a testthat run or R CMD check, left as it is |
 | `stop_on_failure`, `stop_on_warning` | Error after the run with failures, or with warnings | The same |
 | Returned value | `testthat_results`, a row per test | `testthat_results`, a row per scenario, with the feature as its context and the feature file as its file |
-| Running in parallel | `Config/testthat/parallel: true` | Not supported: scenarios run one after another. [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md), and `test(".")` in a file of `tests/testthat`, in a parallel testthat run are an error, as testthat would delete the snapshot files of the feature files |
+| Running in parallel | `Config/testthat/parallel: true` | Not supported: scenarios run one after another. [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) in a parallel testthat run is an error, as testthat would delete the feature files’ snapshot files |
 
-With [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md)
-in a testthat file, testthat runs the feature files: everything in the
-testthat column applies, as for any test file.
-
-## Choosing and ordering tests
+## Choosing tests
 
 |  | testthat | cucumber |
 |----|----|----|
@@ -77,7 +147,7 @@ testthat column applies, as for any test file.
 
 |  | testthat | cucumber |
 |----|----|----|
-| A failed expectation | Fails the test, and the test goes on: later expectations still run | Fails the step and the scenario. The rest of the step and the steps after it don’t run, and are reported as skipped. Their snapshots aren’t checked, and are kept |
+| A failed expectation | Fails the test, and the test goes on: later expectations still run | Fails the step and the scenario. The rest of the step and the steps after it don’t run and are reported as skipped |
 | An error | Fails the test | Fails the step and the scenario, and the steps after it are skipped |
 | `skip()` | Skips the test | Skips the scenario. [`skip_scenario()`](https://jakubsob.github.io/cucumber/dev/reference/skip_scenario.md) does the same |
 | A test without expectations | Skipped, “empty test” | Passed, if its steps passed |
@@ -90,7 +160,7 @@ testthat column applies, as for any test file.
 
 |  | testthat | cucumber |
 |----|----|----|
-| Before and after each test | Code in the test, [`withr::defer()`](https://withr.r-lib.org/reference/defer.html) | [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) and [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hooks, which get the scenario’s `context` and details, like its name and tags. [`withr::defer()`](https://withr.r-lib.org/reference/defer.html) in a step runs when the step ends, and `withr::defer(envir = context)` when the scenario ends: use `context` with `local_*()` functions, like `local_mocked_bindings(.env = context)` |
+| Before and after each test | Code in the test, [`withr::defer()`](https://withr.r-lib.org/reference/defer.html) | [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) and [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hooks, which get the scenario’s `context`, name and tags. [`withr::defer()`](https://withr.r-lib.org/reference/defer.html) in a step runs when the step ends. To run it when the scenario ends, pass `context`: `withr::defer(envir = context)`, `local_mocked_bindings(.env = context)` |
 | Before and after each step | — | [`before_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) and [`after_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hooks |
 | Once for the whole run | `setup-*.R` and `teardown-*.R` files | The same, or [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) and [`after_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hooks. With [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md), they run once for each [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) call. `skip()` in a [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hook skips every scenario, like `skip()` at the top of a test file |
 | Only for some tests | Code in those tests | Hooks with `tags`, like `before(fn, tags = "@database")` |
@@ -99,13 +169,13 @@ testthat column applies, as for any test file.
 
 |  | testthat | cucumber |
 |----|----|----|
-| `expect_snapshot()` | Works in a test | Works in a step and in a [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md), [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md), [`before_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) or [`after_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hook, with `error`, `transform` and `expect_snapshot_value()`, not in a [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) or [`after_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hook. Two feature files can’t share a snapshot file, like `basket.feature` and `basket.feature.md`: the run stops with an error |
-| Snapshot file | `_snaps/<file>.md`, one per test file: `_snaps/basket.md` for `test-basket.R` | `_snaps/<feature file>.md`, one per feature file, its directories joined by `-`: `_snaps/checkout-basket.feature.md` for `checkout/basket.feature`, and `_snaps/basket.feature.md` for `basket.feature.md` |
-| Snapshot name | The test’s name | The scenario’s name, like `Scenario: Showing the basket`, numbered when scenarios of the feature file share a name, like `Scenario: Showing the basket (2)`, whichever scenarios run. A scenario of the same name added above them renumbers them: give scenarios that take snapshots names of their own |
-| Variants and file snapshots | `_snaps/<variant>/<file>.md`, and `expect_snapshot_file()` files in `_snaps/<file>/` | `_snaps/<variant>/<feature file>.md`, like `_snaps/linux/checkout-basket.feature.md`, and `expect_snapshot_file()` files in `_snaps/<feature file>/`, like `_snaps/checkout-basket.feature/plot.png`. A changed snapshot names what to accept, like `snapshot_accept("linux/checkout-basket.feature", "tests/acceptance")` for a variant, which testthat’s message leaves out |
-| [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) and [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) | — | Both save to the same snapshot files, so either checks the snapshots of the other |
-| A test that errors or is skipped | Keeps its snapshots | The same, for a scenario, and for one whose expectation failed. Scenarios that didn’t run keep theirs too. Skip scenarios in a [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) or [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hook, not with `skip()` before [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) in its test file: testthat deletes the snapshot files of feature files that a run of every test file didn’t run |
-| Unused snapshot files | Deleted at the end of a run of every test file, except on CI | The same, by [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) and [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md): the snapshot files of deleted feature files, the snapshots of renamed or deleted scenarios, and `expect_snapshot_file()` files that weren’t taken, unless announced with `announce_snapshot_file()`. Also outside of `tests/testthat`, with `run("../acceptance")`. `test(".")` in a testthat file of `tests/testthat` tells testthat which snapshot files its feature files use, so testthat keeps them. A run of some of the scenarios, with `filter`, `name`, `tags`, `features`, `dry_run` or `fail_fast` after a failure, deletes no snapshot file |
+| `expect_snapshot()` | Works in a test | Works in a step and in [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md), [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md), [`before_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) and [`after_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hooks, not in [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) or [`after_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) |
+| Snapshot file | `_snaps/<file>.md`, one per test file | `_snaps/<feature file>.md`, one per feature file, its directories joined by `-`: `_snaps/checkout-basket.feature.md` for `checkout/basket.feature`. `basket.feature` and `basket.feature.md` can’t coexist |
+| Snapshot name | The test’s name | The scenario’s name, numbered when scenarios share a name: `Showing the basket (2)`. Adding a same-named scenario above renumbers the rest, so give scenarios that take snapshots their own names |
+| Variants and file snapshots | `_snaps/<variant>/<file>.md`, and `expect_snapshot_file()` files in `_snaps/<file>/` | The same with the feature file’s name, like `_snaps/linux/checkout-basket.feature.md`. Accept with `snapshot_accept("linux/checkout-basket.feature", "tests/acceptance")` |
+| [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md) and [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) | — | Both use the same snapshot files, so either checks the snapshots of the other |
+| A test that errors or is skipped | Keeps its snapshots | The same, and so do scenarios that didn’t run. Skip scenarios in a [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) or [`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md) hook, not with `skip()` before [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md): testthat would delete their snapshot files |
+| Unused snapshot files | Deleted at the end of a run of every test file, except on CI | The same, for removed feature files, renamed or removed scenarios, and `expect_snapshot_file()` files not announced with `announce_snapshot_file()`. A partial run, a dry run or `fail_fast` deletes nothing |
 
 ## Reporting
 

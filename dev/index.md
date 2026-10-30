@@ -1,12 +1,35 @@
 # cucumber
 
-An implementation of the [Cucumber](https://cucumber.io/) testing
-framework in R.
+Write specifications in plain-language
+[Gherkin](https://cucumber.io/docs/gherkin/reference/), run them from R
+as testthat tests, and read the results in the console or in Cucumber’s
+own HTML report. An R implementation of the
+[Cucumber](https://cucumber.io/) testing framework.
 
-## Introduction
+## Installation
 
-The package parses
-[Gherkin](https://cucumber.io/docs/gherkin/reference/) documents
+``` r
+
+install.packages("cucumber")
+```
+
+## Where to start
+
+- **New to cucumber?** [Get
+  started](https://jakubsob.github.io/cucumber/articles/get-started.html):
+  write and run your first feature.
+- **New to BDD?** Read [Behavior-Driven
+  Development](https://jakubsob.github.io/cucumber/articles/bdd.html).
+- **Know testthat?** See [cucumber and
+  testthat](https://jakubsob.github.io/cucumber/articles/testthat.html).
+- **Looking something up?** Open the [function
+  reference](https://jakubsob.github.io/cucumber/reference/) or the
+  [Gherkin
+  reference](https://jakubsob.github.io/cucumber/articles/reference-gherkin.html).
+
+## Run your first feature
+
+A feature file describes behavior in Gherkin
 
 ``` gherkin
 Feature: Addition
@@ -21,7 +44,7 @@ Feature: Addition
     Then the result is 2.2
 ```
 
-and uses step definitions to run the tests
+and step definitions run each step in R
 
 ``` r
 
@@ -34,24 +57,10 @@ then("the result is {float}", function(expected, context) {
 })
 ```
 
-The building blocks of the cucumber tests are Features and Scenarios.
-
-- Each Feature will be treated as a separate
-  [context](https://testthat.r-lib.org/reference/context.html?q=context#ref-usage)
-  – its scenarios are reported with the feature as their context and the
-  feature file as their file, e.g. context `Feature: Addition` in file
-  `addition.feature`.
-- Each Scenario is equivalent to a
-  [`testthat::test_that`](https://testthat.r-lib.org/reference/test_that.html)
-  or
-  [`testthat::it`](https://testthat.r-lib.org/reference/describe.html)
-  case. You get feedback on each Scenario separately. Only if all steps
-  in a scenario are successful, the scenario is considered successful.
-
-Run the tests with
-[`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md).
-By default it uses the `CucumberProgressReporter`, which prints a line
-for each feature with its scenarios counted by status:
+Each Feature is a testthat context and each Scenario a
+[`testthat::test_that()`](https://testthat.r-lib.org/reference/test_that.html)
+case, so you get feedback on each Scenario separately. Run them with
+[`cucumber::test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md):
 
 ``` r
 
@@ -72,152 +81,11 @@ Summary
 --------------------------------------------------------------------------------
 ```
 
-When a step fails, the reporter shows which step broke and why as soon
-as its scenario finishes, and again in the summary at the end:
-
-``` r
-
-withr::with_dir(fail_dir, {
-  cucumber::test(filter = "addition")
-})
-```
-
-``` R
-  |  F  P  U  S  OK | Feature
-
-Feature: Addition
-  Scenario: Adding integer and float
-    v When I add 1 and 1.1
-    x Then the result is 5
-    Error: 
-      Step "the result is 5" failed
-      i Feature: addition.feature:7
-      i Scenario: Adding integer and float
-      i Step defined at: setup-steps-addition.R:5
-      Expected `context$result` to equal `expected`.
-      Differences:
-        `actual`: 2.1
-      `expected`: 5.0
-
-Feature: Addition
-  Scenario: Adding float and float
-    v When I add 1.1 and 1.1
-    x Then the result is 5
-    Error: 
-      Step "the result is 5" failed
-      i Feature: addition.feature:10
-      i Scenario: Adding float and float
-      i Step defined at: setup-steps-addition.R:5
-      Expected `context$result` to equal `expected`.
-      Differences:
-        `actual`: 2.2
-      `expected`: 5.0
-x |  2            1 | Addition
-
-Failures:
-
-1) Scenario: Adding integer and float # addition.feature:5
-    v When I add 1 and 1.1
-    x Then the result is 5
-    Error: 
-      Step "the result is 5" failed
-      i Feature: addition.feature:7
-      i Scenario: Adding integer and float
-      i Step defined at: setup-steps-addition.R:5
-      Expected `context$result` to equal `expected`.
-      Differences:
-        `actual`: 2.1
-      `expected`: 5.0
-
-2) Scenario: Adding float and float # addition.feature:8
-    v When I add 1.1 and 1.1
-    x Then the result is 5
-    Error: 
-      Step "the result is 5" failed
-      i Feature: addition.feature:10
-      i Scenario: Adding float and float
-      i Step defined at: setup-steps-addition.R:5
-      Expected `context$result` to equal `expected`.
-      Differences:
-        `actual`: 2.2
-      `expected`: 5.0
-
---------------------------------------------------------------------------------
-Summary
-  3 scenarios (2 failed, 1 passed)
-  6 steps (2 failed, 4 passed)
-  0m00.100s (executing steps: 0m00.100s)
---------------------------------------------------------------------------------
-
-Error:
-! Test failures.
-```
-
-To see every step as it runs, use `CucumberPrettyReporter`.
-`CucumberDotsReporter`, `CucumberProgressBarReporter` and
-`CucumberSummaryReporter` are also available.
-
-``` r
-
-withr::with_dir(pass_dir, {
-  cucumber::test(filter = "addition", reporter = cucumber::CucumberPrettyReporter$new())
-})
-```
-
-``` R
-Feature: Addition
-  Scenario: Adding 2 integers
-    v When I add 1 and 1
-    v Then the result is 2
-  Scenario: Adding integer and float
-    v When I add 1 and 1.1
-    v Then the result is 2.1
-  Scenario: Adding float and float
-    v When I add 1.1 and 1.1
-    v Then the result is 2.2
-
-
---------------------------------------------------------------------------------
-Summary
-  3 scenarios (3 passed)
-  6 steps (6 passed)
-  0m00.100s (executing steps: 0m00.100s)
---------------------------------------------------------------------------------
-```
-
-Put your acceptance tests in a directory separate to your unit tests:
-
-``` text
-tests/
-├── acceptance/
-│   ├── setup-steps_1.R
-│   ├── setup-steps_2.R
-│   ├── feature_1.feature
-│   ├── feature_2.feature
-├── testthat/
-│   ├── test-unit_test_1.R
-│   ├── test-unit_test_2.R
-```
-
-or alongside your unit tests:
-
-``` text
-tests/
-├── testthat/
-│   ├── test-cucumber.R
-│   ├── test-unit_test_1.R
-│   ├── test-unit_test_2.R
-│   ├── setup-steps_1.R
-│   ├── setup-steps_2.R
-│   ├── feature_1.feature
-│   ├── feature_2.feature
-```
-
-## Examples
-
-See the [examples
-directory](https://github.com/jakubsob/cucumber/tree/main/inst/examples)
-to help you get started.
+When a step fails, the reporter shows which step broke and why, and
+where its definition is. [Get
+started](https://jakubsob.github.io/cucumber/articles/get-started.html)
+walks through a failure, the other console reporters and where to put
+the files.
 
 ## Reports
 
@@ -295,67 +163,6 @@ The help pages of this package are written this way, see
 [`?test`](https://jakubsob.github.io/cucumber/reference/test.html): the
 scenarios that test cucumber explain it, and stay true because they run.
 
-## How it works
-
-The `.feature` files are parsed and matched against step definitions.
-
-Step functions are defined using:
-
-- `description`: a [cucumber
-  expression](https://github.com/cucumber/cucumber-expressions).
-- and an implementation function. It must have the parameters that will
-  be matched in the description and a `context` parameter - an
-  environment for managing state between steps.
-
-Text in a description is matched literally, except for:
-
-- `{int}` and other [parameter types](#parameter-types), whose values
-  are passed to the implementation,
-- `(s)` – optional text: `"I have {int} cucumber(s)"` matches both
-  `I have 1 cucumber` and `I have 2 cucumbers`,
-- `a/b` – alternative words: `"I press the Enter/Return key"` matches
-  either word.
-
-To match `(`, `{` or `/` literally, escape them with a backslash,
-e.g. `"a\\/b"`. An invalid expression, like `"I visit /about"`, is an
-error.
-
-A description that starts with `^`, ends with `$` or is surrounded by
-`/` is a regular expression instead,
-e.g. `"^I have (\\d+) cucumbers?$"`. Each capture group is passed to the
-implementation.
-
-Each step parsed from the `.feature` files must match exactly one step
-definition. A step that matches none is undefined: its scenario fails,
-the run goes on, and a ready-to-paste snippet is shown. A step that
-matches more than one is ambiguous: its scenario fails with an error
-listing every matching definition.
-
-### Parameter types
-
-Step implementations receive data from the `.feature` files as
-parameters. The values are detected via regular expressions and cast
-with a transformer function.
-
-The following parameter types are available by default:
-
-| Parameter Type | Description |
-|----|----|
-| `{int}` | Matches integers, for example `71` or `-19`. Converts value with `as.integer`. |
-| [float](https://github.com/wrathematics/float) | Matches floats, for example `3.6`, `.8`, `-9.2` or `1.5E3`, and integers like `12`. Converts value with `as.double`. |
-| `{word}` | Matches words without whitespace, for example banana or foo-bar (but not banana split). |
-| `{string}` | Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted, with escaped quotes unescaped. |
-| [`{}`](https://rdrr.io/r/base/Paren.html) | Matches anything. Passes the matched text as is. |
-
-See
-[`cucumber::define_parameter_type()`](https://jakubsob.github.io/cucumber/dev/reference/define_parameter_type.md)
-how to define your own parameter types.
-
-## Installation
-
-To install the stable version from CRAN:
-
-``` r
-
-install.packages("cucumber")
-```
+How steps are matched, and the parameter types you can use, are in [How
+it
+works](https://jakubsob.github.io/cucumber/articles/how-it-works.html).

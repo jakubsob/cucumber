@@ -17,7 +17,7 @@
 <link href="deps/Atkinson_Hyperlegible_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Behavior-Driven Development in R">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><script src="extra.js"></script><meta property="og:title" content="Behavior-Driven Development in R">
 <meta name="description" content="Write executable specifications in a natural language that describes how your code should behave. Write specifications in feature files using Gherkin language and execute them using functions implemented in R. Use them as an extension to your testthat tests to provide a high level description of how your code works.">
 <meta property="og:description" content="Write executable specifications in a natural language that describes how your code should behave. Write specifications in feature files using Gherkin language and execute them using functions implemented in R. Use them as an extension to your testthat tests to provide a high level description of how your code works.">
 <meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png">
@@ -46,19 +46,34 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="articles/reference-gherkin.html">Gherkin Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/get-started.html">Get started</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="articles/bdd.html">Behavior-Driven Development</a></li>
-    <li><a class="dropdown-item" href="articles/how-it-works.html">How it works</a></li>
     <li><a class="dropdown-item" href="articles/testthat.html">cucumber and testthat</a></li>
     <li><a class="dropdown-item" href="articles/reporting.html">Reports</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
-    <li><a class="dropdown-item" href="articles/migration-to-3-0-0.html">3.0.0</a></li>
-    <li><a class="dropdown-item" href="articles/migration-to-2-0-0.html">2.0.0</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-it-works" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">How it works</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-it-works">
+<li><a class="dropdown-item" href="articles/how-it-works.html">Running features</a></li>
+    <li><a class="dropdown-item" href="articles/compatibility.html">Compatibility with Cucumber</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="reference/index.html">Functions</a></li>
+    <li><a class="dropdown-item" href="articles/reference-gherkin.html">Gherkin</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-upgrade" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Upgrade</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-upgrade">
+<li><a class="dropdown-item" href="articles/migration-to-3-0-0.html">To 3.0.0</a></li>
+    <li><a class="dropdown-item" href="articles/migration-to-2-0-0.html">To 2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -90,11 +105,31 @@
 </div>
 <!-- badges: start -->
 
-<p>An implementation of the <a href="https://cucumber.io/" class="external-link">Cucumber</a> testing framework in R.</p>
+<p>Write specifications in plain-language <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin</a>, run them from R as testthat tests, and read the results in the console or in Cucumber’s own HTML report. An R implementation of the <a href="https://cucumber.io/" class="external-link">Cucumber</a> testing framework.</p>
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>The package parses <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin</a> documents</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cucumber"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="where-to-start">Where to start<a class="anchor" aria-label="anchor" href="#where-to-start"></a>
+</h2>
+<ul>
+<li>
+<strong>New to cucumber?</strong> <a href="https://jakubsob.github.io/cucumber/articles/get-started.html" class="external-link">Get started</a>: write and run your first feature.</li>
+<li>
+<strong>New to BDD?</strong> Read <a href="https://jakubsob.github.io/cucumber/articles/bdd.html" class="external-link">Behavior-Driven Development</a>.</li>
+<li>
+<strong>Know testthat?</strong> See <a href="https://jakubsob.github.io/cucumber/articles/testthat.html" class="external-link">cucumber and testthat</a>.</li>
+<li>
+<strong>Looking something up?</strong> Open the <a href="https://jakubsob.github.io/cucumber/reference/" class="external-link">function reference</a> or the <a href="https://jakubsob.github.io/cucumber/articles/reference-gherkin.html" class="external-link">Gherkin reference</a>.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="run-your-first-feature">Run your first feature<a class="anchor" aria-label="anchor" href="#run-your-first-feature"></a>
+</h2>
+<p>A feature file describes behavior in Gherkin</p>
 <pre class="gherkin"><code>Feature: Addition
   Scenario: Adding 2 integers
     When I add 1 and 1
@@ -105,8 +140,8 @@
   Scenario: Adding float and float
     When I add 1.1 and 1.1
     Then the result is 2.2</code></pre>
-<p>and uses step definitions to run the tests</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>and step definitions run each step in R</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/step.html">when</a></span><span class="op">(</span><span class="st">"I add {float} and {float}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">context</span><span class="op">$</span><span class="va">result</span> <span class="op">&lt;-</span> <span class="va">x</span> <span class="op">+</span> <span class="va">y</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
@@ -114,146 +149,21 @@
 <span><span class="fu"><a href="reference/step.html">then</a></span><span class="op">(</span><span class="st">"the result is {float}"</span>, <span class="kw">function</span><span class="op">(</span><span class="va">expected</span>, <span class="va">context</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">expect_equal</span><span class="op">(</span><span class="va">context</span><span class="op">$</span><span class="va">result</span>, <span class="va">expected</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<p>The building blocks of the cucumber tests are Features and Scenarios.</p>
-<ul>
-<li>Each Feature will be treated as a separate <a href="https://testthat.r-lib.org/reference/context.html?q=context#ref-usage" class="external-link">context</a> – its scenarios are reported with the feature as their context and the feature file as their file, e.g. context <code>Feature: Addition</code> in file <code>addition.feature</code>.</li>
-<li>Each Scenario is equivalent to a <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">testthat::test_that</a></code> or <code><a href="https://testthat.r-lib.org/reference/describe.html" class="external-link">testthat::it</a></code> case. You get feedback on each Scenario separately. Only if all steps in a scenario are successful, the scenario is considered successful.</li>
-</ul>
-<p>Run the tests with <code><a href="reference/test.html">cucumber::test()</a></code>. By default it uses the <code>CucumberProgressReporter</code>, which prints a line for each feature with its scenarios counted by status:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>Each Feature is a testthat context and each Scenario a <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">testthat::test_that()</a></code> case, so you get feedback on each Scenario separately. Run them with <code><a href="reference/test.html">cucumber::test()</a></code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">pass_dir</span>, <span class="op">{</span></span>
 <span>  <span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"addition"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>  <span class="sc">|</span>  F  P  U  S  OK <span class="sc">|</span> Feature</span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>v <span class="sc">|</span>               <span class="dv">3</span> <span class="sc">|</span> Addition</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>Summary</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="dv">3</span> <span class="fu">scenarios</span> (<span class="dv">3</span> passed)</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="dv">6</span> <span class="fu">steps</span> (<span class="dv">6</span> passed)</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="dv">0</span><span class="fu">m00.100s</span> (executing steps<span class="sc">:</span> <span class="dv">0</span>m00<span class="fl">.100</span>s)</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span></code></pre></div>
-<p>When a step fails, the reporter shows which step broke and why as soon as its scenario finishes, and again in the summary at the end:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">fail_dir</span>, <span class="op">{</span></span>
-<span>  <span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"addition"</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>  <span class="sc">|</span>  F  P  U  S  OK <span class="sc">|</span> Feature</span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>Feature<span class="sc">:</span> Addition</span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  Scenario<span class="sc">:</span> Adding integer and float</span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    v When I add <span class="dv">1</span> and <span class="fl">1.1</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    x Then the result is <span class="dv">5</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    Error<span class="sc">:</span> </span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>      Step <span class="st">"the result is 5"</span> failed</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>      i Feature<span class="sc">:</span> addition.feature<span class="sc">:</span><span class="dv">7</span></span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>      i Scenario<span class="sc">:</span> Adding integer and float</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>      i Step defined at<span class="sc">:</span> setup<span class="sc">-</span>steps<span class="sc">-</span>addition.R<span class="sc">:</span><span class="dv">5</span></span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>      Expected <span class="st">`</span><span class="at">context$result</span><span class="st">`</span> to equal <span class="st">`</span><span class="at">expected</span><span class="st">`</span>.</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>      Differences<span class="sc">:</span></span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>        <span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="fl">2.1</span></span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>      <span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="fl">5.0</span></span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
-<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>Feature<span class="sc">:</span> Addition</span>
-<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  Scenario<span class="sc">:</span> Adding float and float</span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>    v When I add <span class="fl">1.1</span> and <span class="fl">1.1</span></span>
-<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>    x Then the result is <span class="dv">5</span></span>
-<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>    Error<span class="sc">:</span> </span>
-<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>      Step <span class="st">"the result is 5"</span> failed</span>
-<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>      i Feature<span class="sc">:</span> addition.feature<span class="sc">:</span><span class="dv">10</span></span>
-<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>      i Scenario<span class="sc">:</span> Adding float and float</span>
-<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>      i Step defined at<span class="sc">:</span> setup<span class="sc">-</span>steps<span class="sc">-</span>addition.R<span class="sc">:</span><span class="dv">5</span></span>
-<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>      Expected <span class="st">`</span><span class="at">context$result</span><span class="st">`</span> to equal <span class="st">`</span><span class="at">expected</span><span class="st">`</span>.</span>
-<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>      Differences<span class="sc">:</span></span>
-<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>        <span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="fl">2.2</span></span>
-<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>      <span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="fl">5.0</span></span>
-<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a>x <span class="sc">|</span>  <span class="dv">2</span>            <span class="dv">1</span> <span class="sc">|</span> Addition</span>
-<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a></span>
-<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>Failures<span class="sc">:</span></span>
-<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a></span>
-<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="dv">1</span><span class="er">)</span> Scenario<span class="sc">:</span> Adding integer and float <span class="co"># addition.feature:5</span></span>
-<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>    v When I add <span class="dv">1</span> and <span class="fl">1.1</span></span>
-<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>    x Then the result is <span class="dv">5</span></span>
-<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>    Error<span class="sc">:</span> </span>
-<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a>      Step <span class="st">"the result is 5"</span> failed</span>
-<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a>      i Feature<span class="sc">:</span> addition.feature<span class="sc">:</span><span class="dv">7</span></span>
-<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a>      i Scenario<span class="sc">:</span> Adding integer and float</span>
-<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a>      i Step defined at<span class="sc">:</span> setup<span class="sc">-</span>steps<span class="sc">-</span>addition.R<span class="sc">:</span><span class="dv">5</span></span>
-<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a>      Expected <span class="st">`</span><span class="at">context$result</span><span class="st">`</span> to equal <span class="st">`</span><span class="at">expected</span><span class="st">`</span>.</span>
-<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a>      Differences<span class="sc">:</span></span>
-<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a>        <span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="fl">2.1</span></span>
-<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a>      <span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="fl">5.0</span></span>
-<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a></span>
-<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a><span class="dv">2</span><span class="er">)</span> Scenario<span class="sc">:</span> Adding float and float <span class="co"># addition.feature:8</span></span>
-<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a>    v When I add <span class="fl">1.1</span> and <span class="fl">1.1</span></span>
-<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a>    x Then the result is <span class="dv">5</span></span>
-<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a>    Error<span class="sc">:</span> </span>
-<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a>      Step <span class="st">"the result is 5"</span> failed</span>
-<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a>      i Feature<span class="sc">:</span> addition.feature<span class="sc">:</span><span class="dv">10</span></span>
-<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a>      i Scenario<span class="sc">:</span> Adding float and float</span>
-<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a>      i Step defined at<span class="sc">:</span> setup<span class="sc">-</span>steps<span class="sc">-</span>addition.R<span class="sc">:</span><span class="dv">5</span></span>
-<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a>      Expected <span class="st">`</span><span class="at">context$result</span><span class="st">`</span> to equal <span class="st">`</span><span class="at">expected</span><span class="st">`</span>.</span>
-<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a>      Differences<span class="sc">:</span></span>
-<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a>        <span class="st">`</span><span class="at">actual</span><span class="st">`</span><span class="sc">:</span> <span class="fl">2.2</span></span>
-<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a>      <span class="st">`</span><span class="at">expected</span><span class="st">`</span><span class="sc">:</span> <span class="fl">5.0</span></span>
-<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a></span>
-<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
-<span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a>Summary</span>
-<span id="cb6-62"><a href="#cb6-62" tabindex="-1"></a>  <span class="dv">3</span> <span class="fu">scenarios</span> (<span class="dv">2</span> failed, <span class="dv">1</span> passed)</span>
-<span id="cb6-63"><a href="#cb6-63" tabindex="-1"></a>  <span class="dv">6</span> <span class="fu">steps</span> (<span class="dv">2</span> failed, <span class="dv">4</span> passed)</span>
-<span id="cb6-64"><a href="#cb6-64" tabindex="-1"></a>  <span class="dv">0</span><span class="fu">m00.100s</span> (executing steps<span class="sc">:</span> <span class="dv">0</span>m00<span class="fl">.100</span>s)</span>
-<span id="cb6-65"><a href="#cb6-65" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
-<span id="cb6-66"><a href="#cb6-66" tabindex="-1"></a></span>
-<span id="cb6-67"><a href="#cb6-67" tabindex="-1"></a>Error<span class="sc">:</span></span>
-<span id="cb6-68"><a href="#cb6-68" tabindex="-1"></a><span class="sc">!</span> Test failures.</span></code></pre></div>
-<p>To see every step as it runs, use <code>CucumberPrettyReporter</code>. <code>CucumberDotsReporter</code>, <code>CucumberProgressBarReporter</code> and <code>CucumberSummaryReporter</code> are also available.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_dir.html" class="external-link">with_dir</a></span><span class="op">(</span><span class="va">pass_dir</span>, <span class="op">{</span></span>
-<span>  <span class="fu">cucumber</span><span class="fu">::</span><span class="fu"><a href="reference/test.html">test</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"addition"</span>, reporter <span class="op">=</span> <span class="fu">cucumber</span><span class="fu">::</span><span class="va"><a href="reference/CucumberPrettyReporter.html">CucumberPrettyReporter</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>Feature<span class="sc">:</span> Addition</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  Scenario<span class="sc">:</span> Adding <span class="dv">2</span> integers</span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>    v When I add <span class="dv">1</span> and <span class="dv">1</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    v Then the result is <span class="dv">2</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  Scenario<span class="sc">:</span> Adding integer and float</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>    v When I add <span class="dv">1</span> and <span class="fl">1.1</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    v Then the result is <span class="fl">2.1</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  Scenario<span class="sc">:</span> Adding float and float</span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    v When I add <span class="fl">1.1</span> and <span class="fl">1.1</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    v Then the result is <span class="fl">2.2</span></span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>Summary</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>  <span class="dv">3</span> <span class="fu">scenarios</span> (<span class="dv">3</span> passed)</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>  <span class="dv">6</span> <span class="fu">steps</span> (<span class="dv">6</span> passed)</span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>  <span class="dv">0</span><span class="fu">m00.100s</span> (executing steps<span class="sc">:</span> <span class="dv">0</span>m00<span class="fl">.100</span>s)</span>
-<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span></code></pre></div>
-<p>Put your acceptance tests in a directory separate to your unit tests:</p>
-<pre class="text"><code>tests/
-├── acceptance/
-│   ├── setup-steps_1.R
-│   ├── setup-steps_2.R
-│   ├── feature_1.feature
-│   ├── feature_2.feature
-├── testthat/
-│   ├── test-unit_test_1.R
-│   ├── test-unit_test_2.R</code></pre>
-<p>or alongside your unit tests:</p>
-<pre class="text"><code>tests/
-├── testthat/
-│   ├── test-cucumber.R
-│   ├── test-unit_test_1.R
-│   ├── test-unit_test_2.R
-│   ├── setup-steps_1.R
-│   ├── setup-steps_2.R
-│   ├── feature_1.feature
-│   ├── feature_2.feature</code></pre>
-</div>
-<div class="section level2">
-<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
-</h2>
-<p>See the <a href="https://github.com/jakubsob/cucumber/tree/main/inst/examples" class="external-link">examples directory</a> to help you get started.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>  <span class="sc">|</span>  F  P  U  S  OK <span class="sc">|</span> Feature</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>v <span class="sc">|</span>               <span class="dv">3</span> <span class="sc">|</span> Addition</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>Summary</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="dv">3</span> <span class="fu">scenarios</span> (<span class="dv">3</span> passed)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="dv">6</span> <span class="fu">steps</span> (<span class="dv">6</span> passed)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="dv">0</span><span class="fu">m00.100s</span> (executing steps<span class="sc">:</span> <span class="dv">0</span>m00<span class="fl">.100</span>s)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="sc">--------------------------------------------------------------------------------</span></span></code></pre></div>
+<p>When a step fails, the reporter shows which step broke and why, and where its definition is. <a href="https://jakubsob.github.io/cucumber/articles/get-started.html" class="external-link">Get started</a> walks through a failure, the other console reporters and where to put the files.</p>
 </div>
 <div class="section level2">
 <h2 id="reports">Reports<a class="anchor" aria-label="anchor" href="#reports"></a>
@@ -278,103 +188,35 @@
     When I remove 1 item
     Then the basket is empty</code></pre>
 <p>and put them in its help page with <code><a href="reference/features_rd.html">features_rd()</a></code>:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#' Add items to a basket</span></span>
 <span><span class="co">#' @eval cucumber::features_rd(features = "basket.feature")</span></span>
 <span><span class="co">#' @export</span></span>
 <span><span class="va">add</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">basket</span>, <span class="va">n</span><span class="op">)</span> <span class="va">basket</span> <span class="op">+</span> <span class="va">n</span></span></code></pre></div>
 <p><code>devtools::document()</code> adds a Behavior section to <code>?add</code> with the feature’s description and the tagged scenarios:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>Add items to a basket</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>Description<span class="sc">:</span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>     Add items to a basket</span>
-<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>Usage<span class="sc">:</span></span>
-<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>     <span class="fu">add</span>(basket, n)</span>
-<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>     </span>
-<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>Behavior<span class="sc">:</span></span>
-<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a></span>
-<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>     Feature<span class="sc">:</span> Basket</span>
-<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>       A basket holds the items a customer wants to buy.</span>
-<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>     </span>
-<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>       Scenario<span class="sc">:</span> Add an item</span>
-<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>         Given an empty basket</span>
-<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>         When I add <span class="dv">1</span> item</span>
-<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>         Then the basket has <span class="dv">1</span> item</span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>     </span>
-<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>     Source<span class="sc">:</span> <span class="st">'tests/acceptance/basket.feature'</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>Add items to a basket</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>Description<span class="sc">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>     Add items to a basket</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>Usage<span class="sc">:</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>     <span class="fu">add</span>(basket, n)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>     </span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>Behavior<span class="sc">:</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>     Feature<span class="sc">:</span> Basket</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>       A basket holds the items a customer wants to buy.</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>     </span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>       Scenario<span class="sc">:</span> Add an item</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>         Given an empty basket</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>         When I add <span class="dv">1</span> item</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>         Then the basket has <span class="dv">1</span> item</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>     </span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>     Source<span class="sc">:</span> <span class="st">'tests/acceptance/basket.feature'</span></span></code></pre></div>
 <p>The help pages of this package are written this way, see <a href="https://jakubsob.github.io/cucumber/reference/hook.html" class="external-link"><code>?hook</code></a> or <a href="https://jakubsob.github.io/cucumber/reference/test.html" class="external-link"><code>?test</code></a>: the scenarios that test cucumber explain it, and stay true because they run.</p>
-</div>
-<div class="section level2">
-<h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
-</h2>
-<p>The <code>.feature</code> files are parsed and matched against step definitions.</p>
-<p>Step functions are defined using:</p>
-<ul>
-<li>
-<code>description</code>: a <a href="https://github.com/cucumber/cucumber-expressions" class="external-link">cucumber expression</a>.</li>
-<li>and an implementation function. It must have the parameters that will be matched in the description and a <code>context</code> parameter - an environment for managing state between steps.</li>
-</ul>
-<p>Text in a description is matched literally, except for:</p>
-<ul>
-<li>
-<code>{int}</code> and other <a href="#parameter-types">parameter types</a>, whose values are passed to the implementation,</li>
-<li>
-<code>(s)</code> – optional text: <code>"I have {int} cucumber(s)"</code> matches both <code>I have 1 cucumber</code> and <code>I have 2 cucumbers</code>,</li>
-<li>
-<code>a/b</code> – alternative words: <code>"I press the Enter/Return key"</code> matches either word.</li>
-</ul>
-<p>To match <code>(</code>, <code>{</code> or <code>/</code> literally, escape them with a backslash, e.g. <code>"a\\/b"</code>. An invalid expression, like <code>"I visit /about"</code>, is an error.</p>
-<p>A description that starts with <code>^</code>, ends with <code>$</code> or is surrounded by <code>/</code> is a regular expression instead, e.g. <code>"^I have (\\d+) cucumbers?$"</code>. Each capture group is passed to the implementation.</p>
-<p>Each step parsed from the <code>.feature</code> files must match exactly one step definition. A step that matches none is undefined: its scenario fails, the run goes on, and a ready-to-paste snippet is shown. A step that matches more than one is ambiguous: its scenario fails with an error listing every matching definition.</p>
-<div class="section level3">
-<h3 id="parameter-types">Parameter types<a class="anchor" aria-label="anchor" href="#parameter-types"></a>
-</h3>
-<p>Step implementations receive data from the <code>.feature</code> files as parameters. The values are detected via regular expressions and cast with a transformer function.</p>
-<p>The following parameter types are available by default:</p>
-<table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
-<thead><tr>
-<th>Parameter Type</th>
-<th>Description</th>
-</tr></thead>
-<tbody>
-<tr>
-<td><code>{int}</code></td>
-<td>Matches integers, for example <code>71</code> or <code>-19</code>. Converts value with <code>as.integer</code>.</td>
-</tr>
-<tr>
-<td><a href="https://github.com/wrathematics/float" class="external-link">float</a></td>
-<td>Matches floats, for example <code>3.6</code>, <code>.8</code>, <code>-9.2</code> or <code>1.5E3</code>, and integers like <code>12</code>. Converts value with <code>as.double</code>.</td>
-</tr>
-<tr>
-<td><code>{word}</code></td>
-<td>Matches words without whitespace, for example banana or foo-bar (but not banana split).</td>
-</tr>
-<tr>
-<td><code>{string}</code></td>
-<td>Matches single-quoted or double-quoted strings, for example “banana split” or ‘banana split’ (but not banana split). Only the text between the quotes will be extracted, with escaped quotes unescaped.</td>
-</tr>
-<tr>
-<td><code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{}</a></code></td>
-<td>Matches anything. Passes the matched text as is.</td>
-</tr>
-</tbody>
-</table>
-<p>See <code><a href="reference/define_parameter_type.html">cucumber::define_parameter_type()</a></code> how to define your own parameter types.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<p>To install the stable version from CRAN:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"cucumber"</span><span class="op">)</span></span></code></pre></div>
+<p>How steps are matched, and the parameter types you can use, are in <a href="https://jakubsob.github.io/cucumber/articles/how-it-works.html" class="external-link">How it works</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">

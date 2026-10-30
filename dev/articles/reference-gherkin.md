@@ -1,7 +1,5 @@
 # Gherkin Reference
 
-This reference describes how to write Gherkin.
-
 This is a modified copy of the official [Gherkin
 reference](https://cucumber.io/docs/gherkin/reference/) from Cucumber
 project, adjusted to specific features of the
@@ -25,34 +23,95 @@ Indentation doesn’t change the meaning of a line, the keyword it starts
 with does. You can indent with spaces or tabs, the recommended
 indentation level is two spaces.
 
-Here is an example:
+- features/indent.feature
+- features/setup-steps.R
+- Console
 
 ``` gherkin
-Feature: Guess the word
-  # The first example has two steps
-  Scenario: Maker starts a game
-    When the Maker starts a game
-    Then the Maker waits for a Breaker to join
-
-  # The second example has three steps
-  Scenario: Breaker joins a game
-    Given the Maker has started a game with the word "silky"
-    When the Breaker joins the Maker's game
-    Then the Breaker must guess a word with 5 characters
+Feature: Indentation
+Scenario: Flat
+Given I have 1
+Then I should have 1
+    Scenario: Tabs and a step deeper than the previous one
+    Given I have 1
+        Then I should have 1
 ```
 
-Please note that some keywords *are* followed by a colon (`:`) and some
-*are not*. If you add a colon after a keyword that should not be
-followed by one, like `Given: x`, it isn’t a step: after a step the
-feature file fails to parse, and right under `Scenario:` the line is
-read as part of the description.
+``` r
+
+given("I have {int}", function(n, context) {
+  context$n <- n
+})
+then("I should have {int}", function(n, context) {
+  expect_equal(context$n, n)
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               2 | Indentation
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.058s (executing steps: 0m00.007s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
+Some keywords *are* followed by a colon (`:`) and some *are not*. If you
+add a colon after a keyword that should not be followed by one, like
+`Given: x`, it isn’t a step: after a step the feature file fails to
+parse, and right under `Scenario:` the line is read as part of the
+description.
 
 Every feature file is parsed before anything runs. If any of them can’t
 be parsed, no scenario runs, and every error is reported with its file,
 line and column:
 
+- features/broken.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Broken
+  Scenario: Junk between steps
+    Given a step
+    this line is not a step
+    Then a step
+  Scenario: A ragged table
+    Given a step
+      | a | b |
+      | c |
+```
+
+``` r
+
+given("a step", function(context) {})
+```
+
+``` r
+
+test("features", stop_on_failure = FALSE)
+```
+
+``` console-output
+  Error:
     Can't parse feature files
+    ✖ Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
     ✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  0 scenarios
+  0 steps
+────────────────────────────────────────────────────────────────────────────────
+```
 
 ## Keywords
 
@@ -91,14 +150,6 @@ that describes the feature.
 You can add free-form text underneath Feature to add more description.
 These description lines are ignored by Cucumber at runtime.
 
-``` gherkin
-Feature: Guess the word
-  The word guess game is a turn-based game for two players.
-  The Maker makes a word for the Breaker to guess. The game  is over when the Breaker guesses the Maker's word.
-
-  Example: Maker starts a game
-```
-
 The name and the optional description have no special meaning to
 Cucumber. Their purpose is to provide a place for you to document
 important aspects of the feature, such as a brief explanation and a list
@@ -110,6 +161,34 @@ their alias keywords).
 
 You can only have a single `Feature` in a `.feature` file. A file
 without a `Feature`, or a `Feature` without scenarios, runs nothing.
+
+- features/empty.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Not written yet
+  Scenarios will come later.
+```
+
+``` r
+
+given("a step", function(context) {})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  0 scenarios
+  0 steps
+  0m00.001s (executing steps: 0m00.000s)
+────────────────────────────────────────────────────────────────────────────────
+```
 
 ## Descriptions
 
@@ -147,30 +226,140 @@ The `Rule` keyword groups together several scenarios that belong to one
 *business rule*. A `Rule` should contain one or more scenarios that
 illustrate the particular rule.
 
+- features/rule.feature
+- features/setup-steps.R
+- Console
+
 ``` gherkin
-Feature: Highlander
+Feature: Basket
+  Rule: Items can be added
+    Scenario: Add one item
+      Given the basket has 0 items
+      When I add 1 item
+      Then the basket should have 1 items
 
-  Rule: There can be only One
+  Rule: Items can be removed
+    Example: Remove one item
+      Given the basket has 2 items
+      When I remove 1 item
+      Then the basket should have 1 items
+```
 
-    Example: Only One -- More than one alive
-      Given there are 3 ninjas
-      And there are more than one ninja alive
-      When 2 ninjas meet, they will fight
-      Then one ninja dies (but not me)
-      And there is one ninja less alive
+``` r
 
-    Example: Only One -- One alive
-      Given there is only 1 ninja alive
-      Then they will live forever ;-)
+given("the basket has {int} items", function(n, context) {
+  context$items <- n
+})
+when("I add {int} item", function(n, context) {
+  context$items <- context$items + n
+})
+when("I remove {int} item", function(n, context) {
+  context$items <- context$items - n
+})
+then("the basket should have {int} items", function(n, context) {
+  expect_equal(context$items, n)
+})
+```
 
-  Rule: There can be Two (in some cases)
+``` r
 
-    Example: Two -- Dead and Reborn as Phoenix
-      ...
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               2 | Basket
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  6 steps (6 passed)
+  0m00.036s (executing steps: 0m00.009s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 A `Rule` can have its own `Background`. It runs after the `Feature`’s
 `Background`, only for the scenarios of that `Rule`.
+
+- features/rule.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Basket
+  Background:
+    Given the basket has 0 items
+
+  Scenario: Outside any rule
+    Then the basket should have 0 items
+
+  Rule: A full basket
+    Background:
+      When I add 5 item
+
+    Scenario: Full basket
+      Then the basket should have 5 items
+
+    Scenario Outline: Removing from a full basket
+      When I remove <n> item
+      Then the basket should have <left> items
+
+      Examples:
+        | n | left |
+        | 1 | 4    |
+        | 2 | 3    |
+```
+
+``` r
+
+given("the basket has {int} items", function(n, context) {
+  context$items <- n
+})
+when("I add {int} item", function(n, context) {
+  context$items <- context$items + n
+})
+when("I remove {int} item", function(n, context) {
+  context$items <- context$items - n
+})
+then("the basket should have {int} items", function(n, context) {
+  expect_equal(context$items, n)
+})
+```
+
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Basket
+  Scenario: Outside any rule
+    ✔ Given the basket has 0 items
+    ✔ Then the basket should have 0 items
+  Rule: A full basket
+  Scenario: Full basket
+    ✔ Given the basket has 0 items
+    ✔ When I add 5 item
+    ✔ Then the basket should have 5 items
+  Scenario Outline: Removing from a full basket
+    ✔ Given the basket has 0 items
+    ✔ When I add 5 item
+    ✔ When I remove 1 item
+    ✔ Then the basket should have 4 items
+  Scenario Outline: Removing from a full basket
+    ✔ Given the basket has 0 items
+    ✔ When I add 5 item
+    ✔ When I remove 2 item
+    ✔ Then the basket should have 3 items
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  4 scenarios (4 passed)
+  13 steps (13 passed)
+  0m00.068s (executing steps: 0m00.012s)
+────────────────────────────────────────────────────────────────────────────────
+```
 
 ## Steps
 
@@ -235,8 +424,6 @@ Examples:
 - Guess a word
 - Invite a friend
 - Withdraw money
-
-Imagine it’s 1922
 
 Most software does something people could do manually (just not as
 efficiently).
@@ -354,30 +541,53 @@ same level of indentation.
 
 For example:
 
+- features/background.feature
+- features/setup-steps.R
+- Console
+
 ``` gherkin
-Feature: Multiple site support
-  Only blog owners can post to a blog, except administrators,  who can post to all blogs.
-
+Feature: Background example
   Background:
-    Given a global administrator named "Greg"
-    And a blog named "Greg's anti-tax rants"
-    And a customer named "Dr. Bill"
-    And a blog named "Expensive Therapy" owned by "Dr. Bill"
+    Given the value is 10
 
-  Scenario: Dr. Bill posts to his own blog
-    Given I am logged in as Dr. Bill
-    When I try to post to "Expensive Therapy"
-    Then I should see "Your article was published."
+  Scenario: First scenario
+    Then I get 10
 
-  Scenario: Dr. Bill tries to post to somebody else's blog, and fails
-    Given I am logged in as Dr. Bill
-    When I try to post to "Greg's anti-tax rants"
-    Then I should see "Hey! That's not your blog!"
+  Scenario: Second scenario
+    Then I get 10
+```
 
-  Scenario: Greg posts to a client's blog
-    Given I am logged in as Greg
-    When I try to post to "Expensive Therapy"
-    Then I should see "Your article was published."
+``` r
+
+given("the value is {int}", function(n, context) {
+  context$value <- n
+})
+then("I get {int}", function(n, context) {
+  expect_equal(context$value, n)
+})
+```
+
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Background example
+  Scenario: First scenario
+    ✔ Given the value is 10
+    ✔ Then I get 10
+  Scenario: Second scenario
+    ✔ Given the value is 10
+    ✔ Then I get 10
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.025s (executing steps: 0m00.004s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 You can only have one set of `Background` steps per `Feature` or `Rule`.
@@ -390,20 +600,20 @@ For a less explicit alternative to `Background`, check out
 
 ### Tips for using Background
 
-- Don’t use `Background` to set up **complicated states**, unless that
-  state is actually something the client needs to know.
+- Don’t use `Background` to set up complicated states, unless that state
+  is actually something the client needs to know.
   - For example, if the user and site names don’t matter to the client,
     use a higher-level step such as
     `Given I am logged in as a site owner`.
-- Keep your `Background` section **short**.
+- Keep your `Background` section short.
   - The client needs to actually remember this stuff when reading the
     scenarios. If the `Background` is more than 4 lines long, consider
     moving some of the irrelevant details into higher-level steps.
-- Make your `Background` section **vivid**.
+- Make your `Background` section vivid.
   - Use colourful names, and try to tell a story. The human brain keeps
     track of stories much better than it keeps track of names like
     `"User A"`, `"User B"`, `"Site 1"`, and so on.
-- Keep your scenarios **short**, and don’t have too many.
+- Keep your scenarios short, and don’t have too many.
   - If the `Background` section has scrolled off the screen, the reader
     no longer has a full overview of what’s happening. Think about using
     higher-level steps, or splitting the `*.feature` file.
@@ -417,34 +627,67 @@ The keyword `Scenario Template` is a synonym of the keyword
 `Scenario Outline`.
 
 Copying and pasting scenarios to use different values quickly becomes
-tedious and repetitive:
+tedious and repetitive. A `Scenario Outline` is a template with
+`< >`-delimited parameters, run once for each row of its `Examples`:
+
+- features/addition.feature
+- features/setup-steps.R
+- Console
 
 ``` gherkin
-Scenario: eat 5 out of 12
-  Given there are 12 cucumbers
-  When I eat 5 cucumbers
-  Then I should have 7 cucumbers
-Scenario: eat 5 out of 20
-  Given there are 20 cucumbers
-  When I eat 5 cucumbers
-  Then I should have 15 cucumbers
+Feature: Addition
+  Scenario Outline: Adding numbers
+    Given I have <a>
+    When I add <b>
+    Then I get <result>
+
+    Examples:
+      | a | b | result |
+      | 1 | 2 | 3      |
+      | 4 | 5 | 9      |
+      | 0 | 0 | 0      |
 ```
 
-We can collapse these two similar scenarios into a `Scenario Outline`.
+``` r
 
-Scenario outlines allow us to more concisely express these scenarios
-through the use of a template with `< >`-delimited parameters:
+given("I have {int}", function(n, context) {
+  context$value <- n
+})
+when("I add {int}", function(n, context) {
+  context$value <- context$value + n
+})
+then("I get {int}", function(n, context) {
+  expect_equal(context$value, n)
+})
+```
 
-``` gherkin
-Scenario Outline: eating
-  Given there are <start> cucumbers
-  When I eat <eat> cucumbers
-  Then I should have <left> cucumbers
+``` r
 
-  Examples:
-    | start | eat | left |
-    |    12 |   5 |    7 |
-    |    20 |   5 |   15 |
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Addition
+  Scenario Outline: Adding numbers
+    ✔ Given I have 1
+    ✔ When I add 2
+    ✔ Then I get 3
+  Scenario Outline: Adding numbers
+    ✔ Given I have 4
+    ✔ When I add 5
+    ✔ Then I get 9
+  Scenario Outline: Adding numbers
+    ✔ Given I have 0
+    ✔ When I add 0
+    ✔ Then I get 0
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  3 scenarios (3 passed)
+  9 steps (9 passed)
+  0m00.036s (executing steps: 0m00.009s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 ## Examples
@@ -461,36 +704,128 @@ the examples table. Cucumber will replace these parameters with values
 from the table *before* it tries to match the step against a step
 definition.
 
-If our step definitions use `{string}` parameters, we must use quotes
-around the values in the table for them to match correctly.
+If our step definitions use `{string}` parameters, the substituted text
+must be quoted: either put quotes around the placeholder in the step
+(`"<start>"`) or around the values in the table.
+
+- Quotes in the step
+- Quotes in the table
+
+- features/eating.feature
+- features/setup-steps.R
+- Console
 
 ``` gherkin
-Scenario Outline: eating
-  Given there are <start> cucumbers
-  When I eat <eat> cucumbers
-  Then I should have <left> cucumbers
+Feature: Eating
+  Scenario Outline: eating
+    Given there are "<start>" cucumbers
+    When I eat "<eat>" cucumbers
+    Then I should have "<left>" cucumbers
 
-  Examples:
-    | start    | eat    | left      |
-    | 'twelve' | 'five' | 'seven'   |
-    | 'twenty' | 'five' | 'fifteen' |
+    Examples:
+      | start  | eat  | left    |
+      | twelve | five | seven   |
+      | twenty | five | fifteen |
+```
+
+``` r
+
+numbers <- c(five = 5, seven = 7, twelve = 12, fifteen = 15, twenty = 20)
+given("there are {string} cucumbers", function(start, context) {
+  context$cucumbers <- numbers[[start]]
+})
+when("I eat {string} cucumbers", function(eat, context) {
+  context$cucumbers <- context$cucumbers - numbers[[eat]]
+})
+then("I should have {string} cucumbers", function(left, context) {
+  expect_equal(context$cucumbers, numbers[[left]])
+})
+```
+
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Eating
+  Scenario Outline: eating
+    ✔ Given there are "twelve" cucumbers
+    ✔ When I eat "five" cucumbers
+    ✔ Then I should have "seven" cucumbers
+  Scenario Outline: eating
+    ✔ Given there are "twenty" cucumbers
+    ✔ When I eat "five" cucumbers
+    ✔ Then I should have "fifteen" cucumbers
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  6 steps (6 passed)
+  0m00.032s (executing steps: 0m00.006s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
+- features/eating.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Eating
+  Scenario Outline: eating
+    Given there are <start> cucumbers
+    When I eat <eat> cucumbers
+    Then I should have <left> cucumbers
+
+    Examples:
+      | start    | eat    | left      |
+      | 'twelve' | 'five' | 'seven'   |
+      | 'twenty' | 'five' | 'fifteen' |
+```
+
+``` r
+
+numbers <- c(five = 5, seven = 7, twelve = 12, fifteen = 15, twenty = 20)
+given("there are {string} cucumbers", function(start, context) {
+  context$cucumbers <- numbers[[start]]
+})
+when("I eat {string} cucumbers", function(eat, context) {
+  context$cucumbers <- context$cucumbers - numbers[[eat]]
+})
+then("I should have {string} cucumbers", function(left, context) {
+  expect_equal(context$cucumbers, numbers[[left]])
+})
+```
+
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Eating
+  Scenario Outline: eating
+    ✔ Given there are 'twelve' cucumbers
+    ✔ When I eat 'five' cucumbers
+    ✔ Then I should have 'seven' cucumbers
+  Scenario Outline: eating
+    ✔ Given there are 'twenty' cucumbers
+    ✔ When I eat 'five' cucumbers
+    ✔ Then I should have 'fifteen' cucumbers
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  6 steps (6 passed)
+  0m00.030s (executing steps: 0m00.006s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 This Scenario Outline results in two Scenarios being run, both named
 `eating`. Scenarios that share a name are numbered in test results:
 `eating (1)`, `eating (2)`.
-
-``` gherkin
-Scenario: eating
-  Given there are 'twelve' cucumbers
-  When I eat 'five' cucumbers
-  Then I should have 'seven' cucumbers
-
-Scenario: eating
-  Given there are 'twenty' cucumbers
-  When I eat 'five' cucumbers
-  Then I should have 'fifteen' cucumbers
-```
 
 You can use parameters in the `Scenario Outline` name as well, to give
 each scenario its own name, for example
@@ -499,6 +834,77 @@ each scenario its own name, for example
 You can also use parameters in [multiline step
 arguments](#step-arguments): they’re replaced in Doc Strings and Data
 Tables too.
+
+- features/outline.feature
+- features/setup-steps.R
+- Console
+
+```` gherkin
+Feature: Outlines
+  Scenario Outline: Greeting <name>
+    Given a greeting
+      ```
+      Hello, <name>!
+      ```
+    And a person
+      | name   |
+      | <name> |
+    Then the greeting is for the person
+
+    Examples: People
+      These are the people we greet.
+      | name  |
+      | Alice |
+      | Bob   |
+````
+
+``` r
+
+given("a greeting", function(greeting, context) {
+  context$greeting <- greeting
+})
+given("a person", function(person, context) {
+  context$name <- person$name
+})
+then("the greeting is for the person", function(context) {
+  expect_equal(context$greeting, paste0("Hello, ", context$name, "!"))
+})
+```
+
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+```` console-output
+Feature: Outlines
+  Scenario Outline: Greeting Alice
+    ✔ Given a greeting
+      ```
+      Hello, Alice!
+      ```
+    ✔ And a person
+      | name  |
+      | Alice |
+    ✔ Then the greeting is for the person
+  Scenario Outline: Greeting Bob
+    ✔ Given a greeting
+      ```
+      Hello, Bob!
+      ```
+    ✔ And a person
+      | name |
+      | Bob  |
+    ✔ Then the greeting is for the person
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  6 steps (6 passed)
+  0m00.033s (executing steps: 0m00.006s)
+────────────────────────────────────────────────────────────────────────────────
+````
 
 ## Step Arguments
 
@@ -514,14 +920,49 @@ definition.
 The text should be offset by delimiters consisting of three double-quote
 marks on lines of their own:
 
+- features/docstring.feature
+- features/setup-steps.R
+- Console
+
 ``` gherkin
-Given a blog post named "Random" with Markdown body
-  """
-  Some Title, Eh?
-  ===============
-  Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,  consectetur adipiscing elit.
-  """
+Feature: Doc Strings
+  Scenario: Step with a Doc String
+    Given a message
+      """
+      Hello, world!
+      """
+    Then the message is "Hello, world!"
 ```
+
+``` r
+
+given("a message", function(message, context) {
+  context$message <- message
+})
+then("the message is {string}", function(expected, context) {
+  expect_identical(context$message, expected)
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               1 | Doc Strings
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  1 scenario (1 passed)
+  2 steps (2 passed)
+  0m00.016s (executing steps: 0m00.002s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
+Doc strings also support using three backticks as the delimiter, like in
+the examples below.
 
 In your step definition, there’s no need to find this text and match it
 in your pattern.
@@ -529,11 +970,45 @@ in your pattern.
 It is passed to the step definition as one string, its lines joined by
 `"\n"`, after the step’s parameters and before `context`:
 
+- features/docstring.feature
+- features/setup-steps.R
+- Console
+
+```` gherkin
+Feature: Doc Strings
+  Scenario: Doc String with a parameter
+    Given file "greeting.txt" contains
+      ```
+      Hello!
+      ```
+    Then file "greeting.txt" has content "Hello!"
+````
+
 ``` r
 
-given("a blog post named {string} with Markdown body", function(name, body, context) {
-  ...
+given("file {string} contains", function(filename, content, context) {
+  context$files <- c(context$files, setNames(list(content), filename))
 })
+then("file {string} has content {string}", function(filename, expected, context) {
+  expect_identical(context$files[[filename]], expected)
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               1 | Doc Strings
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  1 scenario (1 passed)
+  2 steps (2 passed)
+  0m00.018s (executing steps: 0m00.002s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 To get a character vector of lines instead, set
@@ -546,33 +1021,116 @@ inside the triple quotes, however, is significant. Each line of the Doc
 String will be dedented according to the opening `"""`. Indentation
 beyond the column of the opening `"""` will therefore be preserved.
 
-Doc strings also support using three backticks as the delimiter:
+- features/docstring.feature
+- features/setup-steps.R
+- Console
 
 ```` gherkin
-Given a blog post named "Random" with Markdown body
-  ```
-  Some Title, Eh?
-  ===============
-  Here is the first paragraph of my blog post.
-  ```
+Feature: Doc Strings
+  Scenario: Delimiter indented past the step
+    Given a message
+      ```
+      foo:
+      - bar: bar_value
+        baz: baz_value
+      ```
+    Then the message is the indented yaml
+  Scenario: Delimiter aligned with the step
+    Given a message
+    ```
+    foo:
+    - bar: bar_value
+      baz: baz_value
+    ```
+    Then the message is the indented yaml
 ````
+
+``` r
+
+given("a message", function(message, context) {
+  context$message <- message
+})
+then("the message is the indented yaml", function(context) {
+  expect_equal(context$message, "foo:\n- bar: bar_value\n  baz: baz_value")
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               2 | Doc Strings
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.024s (executing steps: 0m00.003s)
+────────────────────────────────────────────────────────────────────────────────
+```
 
 You can specify the content type of a Doc String after the opening
 delimiter, for example `"""markdown`. The step definition gets it in the
 `media_type` attribute of the Doc String: `attr(body, "media_type")`.
 
+- features/docstring.feature
+- features/setup-steps.R
+- Console
+
+```` gherkin
+Feature: Doc Strings
+  Scenario: A request body
+    Given a body
+      ```json
+      {"id": 1}
+      ```
+    Then the body is JSON
+  Scenario: Text without a media type
+    Given a body
+      ```
+      Hello
+      ```
+    Then the body has no media type
+````
+
+``` r
+
+given("a body", function(body, context) {
+  context$body <- body
+})
+then("the body is JSON", function(context) {
+  expect_equal(attr(context$body, "media_type"), "json")
+  expect_equal(c(context$body), "{\"id\": 1}")
+})
+then("the body has no media type", function(context) {
+  expect_null(attr(context$body, "media_type"))
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               2 | Doc Strings
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.039s (executing steps: 0m00.017s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
 ## Data Tables
 
 `Data Tables` are handy for passing a list of values to a step
-definition:
-
-``` gherkin
-Given the following users exist:
-  | name   | email              | twitter         |
-  | Aslak  | aslak@cucumber.io  | @aslak_hellesoy |
-  | Julien | julien@cucumber.io | @jbpros         |
-  | Matt   | matt@cucumber.io   | @mattwynne      |
-```
+definition.
 
 Just like `Doc Strings`, `Data Tables` are passed to the step definition
 after the step’s parameters and before `context`, as a tibble whose
@@ -580,24 +1138,97 @@ column names are its first row. See
 [`?step`](https://jakubsob.github.io/cucumber/dev/reference/step.md) for
 details.
 
+- features/table.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Tables
+  Scenario: Step with table
+    Given a list of numbers
+      | value |
+      | 1     |
+      | 2     |
+      | 3     |
+    Then the sum is 6
+```
+
+``` r
+
+given("a list of numbers", function(table, context) {
+  expect_s3_class(table, "tbl_df")
+  context$numbers <- as.integer(table$value)
+})
+then("the sum is {int}", function(n, context) {
+  expect_equal(sum(context$numbers), n)
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               1 | Tables
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  1 scenario (1 passed)
+  2 steps (2 passed)
+  0m00.017s (executing steps: 0m00.002s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
 Every row of a Data Table must have the same number of cells, or the
 feature file fails to parse.
 
 A step can have both a Data Table and a Doc String. The step definition
 gets them in the order they are written:
 
-``` gherkin
-Given a request
-  | header | value |
-  | Accept | json  |
-  """
-  {"id": 1}
-  """
+- features/arguments.feature
+- features/setup-steps.R
+- Console
+
+```` gherkin
+Feature: Step arguments
+  Scenario: Both arguments
+    Given a request
+      | header | value |
+      | Accept | json  |
+      ```json
+      {"id": 1}
+      ```
+    Then the request is ready
+````
+
+``` r
+
+given("a request", function(headers, body, context) {
+  context$headers <- headers
+  context$body <- body
+})
+then("the request is ready", function(context) {
+  expect_equal(list(context$headers$value, c(context$body)), list("json", "{\"id\": 1}"))
+})
 ```
 
 ``` r
 
-given("a request", function(headers, body, context) { ... })
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               1 | Step arguments
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  1 scenario (1 passed)
+  2 steps (2 passed)
+  0m00.016s (executing steps: 0m00.002s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 ### Table Cell Escaping
@@ -606,36 +1237,57 @@ If you want to use a newline character in a table cell, you can write
 this as `\n`. If you need a `|` as part of the cell, you can escape it
 as `\|`. And finally, if you need a `\`, you can escape that with `\\`.
 
+- features/table.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Escapes
+  Scenario: Escaped cells
+    Given cells
+      | text |
+      | a\nb |
+      | a\|b |
+      | a\\b |
+    Then the cells are unescaped
+```
+
+``` r
+
+given("cells", function(table, context) {
+  context$cells <- table$text
+})
+then("the cells are unescaped", function(context) {
+  expect_equal(context$cells, c("a\nb", "a|b", "a\\b"))
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               1 | Escapes
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  1 scenario (1 passed)
+  2 steps (2 passed)
+  0m00.020s (executing steps: 0m00.002s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
 ## Tags
 
-Tags are a great way to organise your features and scenarios.
+Tags organise features and scenarios. Use them to:
 
-They can be used for two purposes:
-
-- Running a subset of scenarios
-- Restricting hooks to a subset of scenarios
-
-Consider the following example:
-
-``` gherkin
-@billing
-Feature: Verify billing
-
-  @important
-  Scenario: Missing product description
-    Given hello
-
-  Scenario: Several products
-    Given hello
-```
+- run a subset of scenarios,
+- restrict hooks to a subset of scenarios.
 
 A feature or scenario can have as many tags as you like. Separate them
-with spaces:
-
-``` gherkin
-@billing @bicker @annoy
-Feature: Verify billing
-```
+with spaces, like `@smoke @fast`.
 
 Tags can be placed above the following Gherkin elements:
 
@@ -645,31 +1297,64 @@ Tags can be placed above the following Gherkin elements:
 - `Scenario Outline`
 - `Examples`
 
-**Note:** Tags placed above `Background` or steps (`Given`, `When`,
-`Then`, `And`, `But`, `*`) make the feature file fail to parse. Place
-tags only on the elements listed above.
-
 In `Scenario Outline`, you can use tags on different sets of examples:
 
+- features/outline.feature
+- features/setup-steps.R
+- Console
+
 ``` gherkin
-Scenario Outline: Steps will run conditionally if tagged
-  Given user is logged in
-  When user clicks <link>
-  Then user will be logged out
+Feature: Platforms
+  Scenario Outline: Running on <n>
+    Given I have <n>
+    Then I get <n>
 
-  @mobile
-  Examples:
-    | link                  |
-    | logout link on mobile |
+    @mobile
+    Examples:
+      | n |
+      | 1 |
+      | 2 |
 
-  @desktop
-  Examples:
-    | link                   |
-    | logout link on desktop |
+    @desktop
+    Examples:
+      | n |
+      | 3 |
 ```
 
-Tags placed in invalid locations will result in an error. For example,
-this is **invalid** and will throw an error:
+``` r
+
+given("I have {int}", function(n, context) {
+  context$value <- n
+})
+then("I get {int}", function(n, context) {
+  expect_equal(context$value, n)
+})
+```
+
+``` r
+
+test("features", tags = "@mobile", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Platforms
+  Scenario Outline: Running on 1
+    ✔ Given I have 1
+    ✔ Then I get 1
+  Scenario Outline: Running on 2
+    ✔ Given I have 2
+    ✔ Then I get 2
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.023s (executing steps: 0m00.004s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
+Tags above a `Background` or a step make the feature file fail to parse:
 
 ``` gherkin
 Feature: Invalid tag usage
@@ -682,9 +1367,6 @@ Feature: Invalid tag usage
     Given a step
 ```
 
-**Note:** It is not possible to place tags above `Background` or steps
-(`Given`, `When`, `Then`, `And` and `But`).
-
 ### Tag inheritance
 
 Tags are inherited by child elements. Tags placed above a `Feature` will
@@ -692,6 +1374,63 @@ be inherited by `Rule`, `Scenario`, `Scenario Outline`, or `Examples`.
 Tags placed above a `Rule` will be inherited by its scenarios.
 Similarly, tags placed above a `Scenario Outline` will be inherited by
 `Examples`.
+
+- features/tagged.feature
+- features/untagged.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+@smoke
+Feature: Tagged
+  Scenario: First
+    Given I have 1
+    Then I get 1
+
+  Scenario: Second
+    Given I have 2
+    Then I get 2
+```
+
+``` gherkin
+Feature: Untagged
+  Scenario: Third
+    Given I have 3
+    Then I get 3
+```
+
+``` r
+
+given("I have {int}", function(n, context) {
+  context$value <- n
+})
+then("I get {int}", function(n, context) {
+  expect_equal(context$value, n)
+})
+```
+
+``` r
+
+test("features", tags = "@smoke", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Tagged
+  Scenario: First
+    ✔ Given I have 1
+    ✔ Then I get 1
+  Scenario: Second
+    ✔ Given I have 2
+    ✔ Then I get 2
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.022s (executing steps: 0m00.004s)
+────────────────────────────────────────────────────────────────────────────────
+```
 
 ### Running a subset of scenarios
 
@@ -718,40 +1457,82 @@ cucumber::test("tests/acceptance", tags = "@wip and not @slow")
 cucumber::test("tests/acceptance", tags = "@gui or @database")
 ```
 
+- features/tagged.feature
+- features/setup-steps.R
+- Console
+
+``` gherkin
+Feature: Tagged
+  @smoke @fast
+  Scenario: Smoke and fast
+    Given I have 1
+    Then I get 1
+
+  @smoke @slow
+  Scenario: Smoke and slow
+    Given I have 2
+    Then I get 2
+
+  @ui @fast
+  Scenario: UI and fast
+    Given I have 3
+    Then I get 3
+
+  @ui @slow
+  Scenario: UI and slow
+    Given I have 4
+    Then I get 4
+
+  Scenario: Untagged
+    Given I have 5
+    Then I get 5
+```
+
+``` r
+
+given("I have {int}", function(n, context) {
+  context$value <- n
+})
+then("I get {int}", function(n, context) {
+  expect_equal(context$value, n)
+})
+```
+
+``` r
+
+test("features", tags = "@smoke", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Tagged
+  Scenario: Smoke and fast
+    ✔ Given I have 1
+    ✔ Then I get 1
+  Scenario: Smoke and slow
+    ✔ Given I have 2
+    ✔ Then I get 2
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  4 steps (4 passed)
+  0m00.036s (executing steps: 0m00.005s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
 ### Tag expressions
 
-A tag expression is an infix boolean expression. Below are some
-examples:
-
-| Expression | Description |
-|----|----|
-| `@fast` | Scenarios tagged with @fast |
-| `@wip and not @slow` | Scenarios tagged with @wip that aren’t also tagged with @slow |
-| `@smoke and @fast` | Scenarios tagged with both @smoke and @fast |
-| `@gui or @database` | Scenarios tagged with either @gui or @database |
-
-For more advanced tag expressions you can use parentheses for clarity,
-or to change operator precedence:
+A tag expression is an infix boolean expression with the lowercase
+operators `and`, `or` and `not`, and parentheses for grouping. `not`
+binds tighter than `and`, and `and` tighter than `or`:
 
 ``` r
 
 cucumber::test("tests/acceptance", tags = "(@smoke or @ui) and (not @slow)")
 ```
 
-#### Tag expression operators
-
-Tag expressions support the following operators:
-
-- `and` - logical AND (both conditions must be true)
-- `or` - logical OR (at least one condition must be true)
-- `not` - logical NOT (negates the condition)
-- `( )` - parentheses for grouping and controlling precedence
-
-**Operator precedence:** `not` has the highest precedence, followed by
-`and`, then `or`. Use parentheses to change the order of evaluation.
-
-The operators are lowercase: `AND` is read as a tag, so
-`@smoke AND @fast` is a syntax error.
+`AND` is read as a tag, so `@smoke AND @fast` is a syntax error.
 
 #### Tag names
 
@@ -764,40 +1545,15 @@ Tag names are case-sensitive: `@Smoke` and `@smoke` are different tags.
 
 ### Using tags for documentation
 
-Your imagination is the only limitation when it comes to using tags for
-documentation.
-
-#### Link to other documents
-
-Tags can refer to IDs in external systems such as requirement management
-tools, issue trackers or test management tools:
+Tags can refer to IDs in external systems such as issue trackers, or
+mark where a feature is in the development process:
 
 ``` gherkin
-@BJ-x98.77 @BJ-z12.33
+@BJ-x98.77 @qa_ready
 Feature: Convert transaction
 ```
 
-You can use custom reporting to turn these tags into links pointing to
-documents in your external tool.
-
-#### Development process
-
-Another creative way to use tags is to keep track of where in the
-development process a certain feature is:
-
-``` gherkin
-@qa_ready
-Feature: Index projects
-```
-
-#### Other common uses
-
-- `@smoke` - Quick smoke tests that run on every commit
-- `@wip` - Work in progress, scenarios that are being developed
-- `@slow` - Long-running tests that might be skipped in development
-- `@manual` - Tests that require manual verification
-- `@bug` - Tests that reproduce a reported bug
-- `@regression` - Regression tests for fixed bugs
+Custom reporting can turn these tags into links.
 
 ## Spoken Languages
 
@@ -807,13 +1563,67 @@ users and domain experts use when they talk about the domain.
 To write a feature file in another language, put a `# language:` header
 on the first line, followed by the language code:
 
+- features/addition.feature
+- features/setup-steps.R
+- Console
+
 ``` gherkin
 # language: fr
 Fonctionnalité: Addition
-  Scénario: Adding one
+  Contexte:
     Soit I have 1
+
+  Scénario: Adding one
     Quand I add 1
     Alors I should have 2
+
+  Plan du scénario: Adding more
+    Quand I add <n>
+    Et I add <n>
+    Alors I should have <total>
+
+    Exemples:
+      | n | total |
+      | 2 | 5     |
+```
+
+``` r
+
+given("I have {int}", function(n, context) {
+  context$n <- n
+})
+when("I add {int}", function(n, context) {
+  context$n <- context$n + n
+})
+then("I should have {int}", function(n, context) {
+  expect_equal(context$n, n)
+})
+```
+
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Fonctionnalité: Addition
+  Scénario: Adding one
+    ✔ Soit I have 1
+    ✔ Quand I add 1
+    ✔ Alors I should have 2
+  Plan du scénario: Adding more
+    ✔ Soit I have 1
+    ✔ Quand I add 2
+    ✔ Et I add 2
+    ✔ Alors I should have 5
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  7 steps (7 passed)
+  0m00.035s (executing steps: 0m00.010s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 A file without the header is in the language of the `cucumber.language`
@@ -841,79 +1651,141 @@ test.
 
 A Markdown document is Gherkin with these changes:
 
-- **Headers** are the `Feature`, `Rule`, `Background`, `Scenario`,
+- Headers are the `Feature`, `Rule`, `Background`, `Scenario`,
   `Scenario Outline` and `Examples`, like `# Feature: Basket` or
   `## Scenario: Add an item`.
-- **List items** that start with a step keyword are steps, like
+- List items that start with a step keyword are steps, like
   `* Given an empty basket` or `- When I add an apple`. A list item that
   doesn’t start with a step keyword is ignored.
-- **Code blocks** under a step are Doc Strings. Their language, like
+- Code blocks under a step are Doc Strings. Their language, like
   ```` ```json ````, is the Doc String’s media type.
-- **Tables** indented 2 to 5 spaces are Data Tables, under a step, and
+- Tables indented 2 to 5 spaces are Data Tables, under a step, and
   Examples, under an `Examples` header. The separator row under the
   header, `| --- |`, isn’t a row. A table that isn’t indented, or is
   indented more, is ignored.
-- **Tags** are written in backticks, on the line above the header they
-  tag: `` `@smoke` ``.
-- **Everything else**, like paragraphs, images and unindented tables, is
+- Tags are written in backticks, on the line above the header they tag:
+  `` `@smoke` ``.
+- Everything else, like paragraphs, images and unindented tables, is
   ignored.
 
-Here is a document with all of them:
+A Markdown document runs like a feature file:
 
-```` markdown
+- features/basket.feature.md
+- features/setup-steps.R
+- Console
+
+``` markdown
 # Feature: Basket
 
 A basket holds the items a customer wants to buy.
-This table is for the reader, not a step argument, because it isn't indented:
+This table isn't Gherkin, because it isn't indented:
 
 | item  | price |
 | ----- | ----- |
 | apple | 1     |
 
-## Background:
+## Scenario Outline: Add <n> apples
 
 * Given an empty basket
-
-## Rule: Items are counted
-
-`@smoke`
-### Scenario Outline: Add <n> apples
-
 * When I add <n> apples
 * Then the basket has <n> items
 
-#### Examples:
+### Examples:
 
   | n |
   | - |
   | 1 |
   | 2 |
+```
 
-## Rule: Items can have a note
+``` r
 
-### Scenario: Add a gift note
+given("an empty basket", function(context) {
+  context$items <- 0
+})
+when("I add {int} apples", function(n, context) {
+  context$items <- context$items + n
+})
+then("the basket has {int} items", function(n, context) {
+  expect_equal(context$items, n)
+})
+```
 
-* When I add these items:
+``` r
+
+test("features", reporter = CucumberPrettyReporter$new())
+```
+
+``` console-output
+Feature: Basket
+  Scenario Outline: Add 1 apples
+    ✔ Given an empty basket
+    ✔ When I add 1 apples
+    ✔ Then the basket has 1 items
+  Scenario Outline: Add 2 apples
+    ✔ Given an empty basket
+    ✔ When I add 2 apples
+    ✔ Then the basket has 2 items
+
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  2 scenarios (2 passed)
+  6 steps (6 passed)
+  0m00.029s (executing steps: 0m00.005s)
+────────────────────────────────────────────────────────────────────────────────
+```
+
+Code blocks and indented tables under a step are its Doc Strings and
+Data Tables, and a code block’s language is in the Doc String’s
+`media_type` attribute:
+
+- features/basket.feature.md
+- features/setup-steps.R
+- Console
+
+```` markdown
+# Feature: Basket
+
+## Scenario: Add items
+
+* Given these items:
   | item   | price |
   | ------ | ----: |
   | apple  | 1     |
   | banana | 2     |
-* And I add a note:
+* When I add a note:
   ```json
   {"gift": true}
   ```
-* Then the order has a note
 ````
-
-Its step definitions are like those of a `.feature` file. The Doc String
-has its media type in the `media_type` attribute:
 
 ``` r
 
-when("I add a note:", function(note, context) {
-  attr(note, "media_type") # "json"
-  context$note <- jsonlite::fromJSON(note)
+given("these items:", function(table, context) {
+  expect_equal(table$item, c("apple", "banana"))
 })
+when("I add a note:", function(note, context) {
+  expect_equal(as.character(note), '{"gift": true}')
+  expect_equal(attr(note, "media_type"), "json")
+})
+```
+
+``` r
+
+test("features")
+```
+
+``` console-output
+  |  F  P  U  S  OK | Feature
+✔ |               1 | Basket
+
+────────────────────────────────────────────────────────────────────────────────
+Summary
+  1 scenario (1 passed)
+  2 steps (2 passed)
+  0m00.017s (executing steps: 0m00.002s)
+────────────────────────────────────────────────────────────────────────────────
 ```
 
 A Markdown document can’t start with `# language:`, as it would be a

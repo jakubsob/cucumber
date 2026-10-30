@@ -19,7 +19,7 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="reporting_files/libs/quarto-html/popper.min.js"></script><script src="reporting_files/libs/quarto-html/tippy.umd.min.js"></script><link href="reporting_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="reporting_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Reports">
+<!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="Reports">
 <meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -46,19 +46,34 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/reference-gherkin.html">Gherkin Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
-    <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
     <li><a class="dropdown-item" href="../articles/testthat.html">cucumber and testthat</a></li>
     <li><a class="dropdown-item" href="../articles/reporting.html">Reports</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">3.0.0</a></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-it-works" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">How it works</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-it-works">
+<li><a class="dropdown-item" href="../articles/how-it-works.html">Running features</a></li>
+    <li><a class="dropdown-item" href="../articles/compatibility.html">Compatibility with Cucumber</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-gherkin.html">Gherkin</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-upgrade" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Upgrade</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-upgrade">
+<li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">To 3.0.0</a></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">To 2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -212,7 +227,12 @@
 <span>  <span class="op">)</span><span class="op">)</span>,</span>
 <span>  stop_on_failure <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<div>
+<blockquote>
+<p><strong>shinytest2 and CRAN</strong></p>
 <p>shinytest2 skips its apps on CRAN, and it takes any run for a CRAN run unless the <code>NOT_CRAN</code> environment variable is <code>"true"</code>. <code>devtools::test()</code> sets it, and <code><a href="../reference/test.html">cucumber::test()</a></code> sets it too when it isn’t set, outside of a testthat run and R CMD check.</p>
+</blockquote>
+</div>
 <p>The report shows the failed step with its error, the screenshot of the app with the error it shows, and the app’s logs, with the R error and where it was raised:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure><p><img src="shinytest2-report.png"></p>

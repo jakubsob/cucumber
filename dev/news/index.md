@@ -2,15 +2,16 @@
 
 ## cucumber 3.0.0
 
-cucumber now follows more closely the Cucumber specification: feature
+cucumber now follows the Cucumber specification more closely: feature
 files are parsed by a port of the [official Gherkin
 parser](https://github.com/cucumber/gherkin) and step descriptions are
 [Cucumber
 Expressions](https://github.com/cucumber/cucumber-expressions). Some
-feature files and step definitions that worked in 2.x need changes. The
-[migration
-guide](https://jakubsob.github.io/cucumber/articles/migration-to-3-0-0.html)
-describes every change in detail, with examples.
+feature files and step definitions that worked in 2.x need changes, see
+the [migration
+guide](https://jakubsob.github.io/cucumber/articles/migration-to-3-0-0.html).
+It also lists how close cucumber is to the official implementations, in
+[`vignette("compatibility")`](https://jakubsob.github.io/cucumber/dev/articles/compatibility.md).
 
 ### Gherkin
 
@@ -45,6 +46,9 @@ describes every change in detail, with examples.
 - ⚠️ Invalid Cucumber Expressions are an error that points at the
   problem. A step definition that uses an undefined parameter type
   defines no step.
+- ⚠️ Snippets for undefined steps are generated like in Cucumber, with
+  every matching parameter type, custom parameter types and `data_table`
+  and `doc_string` arguments.
 - ✨ The rest of the Cucumber Expressions syntax: optional text
   `cucumber(s)`, alternatives `Enter/Return` and the anonymous parameter
   [`{}`](https://rdrr.io/r/base/Paren.html).
@@ -52,10 +56,9 @@ describes every change in detail, with examples.
   `withr::local_options(.local_envir = context)`, runs when the scenario
   ends.
 - ✨ A step’s error shows its backtrace and names the feature file and
-  line, like `Feature: basket.feature:3`.
-- ⚠️ Snippets for undefined steps are generated like in Cucumber, with
-  every matching parameter type, custom parameter types and `data_table`
-  and `doc_string` arguments.
+  line, like `Feature: basket.feature:3`. A step definition with the
+  wrong number of arguments, or without `context` as its last argument,
+  gets an error that shows the function to use.
 
 ### Parameter types
 
@@ -72,7 +75,8 @@ describes every change in detail, with examples.
 - ✨ `{string}` matches escaped quotes.
   [`define_parameter_type()`](https://jakubsob.github.io/cucumber/dev/reference/define_parameter_type.md)
   accepts several regexps, `use_for_snippets` and
-  `prefer_for_regexp_match`, and its `transformer` is optional.
+  `prefer_for_regexp_match`, and its `transformer` is optional. An error
+  of a transformer names the parameter type.
 
 ### Running tests
 
@@ -88,8 +92,7 @@ describes every change in detail, with examples.
 - ⚠️ Tag expressions are parsed like the official
   [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions):
   tags need their `@`, operators are lowercase, and `tags` must be one
-  expression.
-- ⚠️ `filter` must be one regular expression.
+  expression. `filter` must be one regular expression.
 - ⚠️ Each feature file has a snapshot file of its own, like
   `_snaps/checkout-basket.feature.md`, whether run by
   [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
@@ -139,7 +142,6 @@ describes every change in detail, with examples.
   hook skips the whole run, and in an
   [`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
   hook skips that hook.
-- ✨ `context` and `scenario` print readably.
 
 ### Reporters
 
@@ -153,8 +155,9 @@ describes every change in detail, with examples.
   Its `start_feature()`, `end_feature()`, `start_step()` and
   `end_step()` methods are removed.
 - ⚠️ The reporter that prints each step is renamed
-  `CucumberPrettyReporter`. `CucumberProgressReporter`, the default,
-  prints one line per feature. `show_praise` is deprecated.
+  `CucumberPrettyReporter`, and prints a step’s warnings under the step.
+  `CucumberProgressReporter`, the default, prints one line per feature.
+  `show_praise` is deprecated.
 - ⚠️ [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md)
   in a testthat run reports nothing of its own by default: testthat’s
   reporter reports each scenario as a test, at its line of the feature
@@ -164,65 +167,52 @@ describes every change in detail, with examples.
   `CucumberMessagesReporter`, `CucumberHtmlReporter`,
   `CucumberJunitReporter`, `CucumberRerunReporter`,
   `CucumberUsageReporter`, `CucumberSnippetsReporter` and
-  `CucumberMultiReporter`.
-- ✨ Reporters print or write to a file, and `report(file)` reports a
-  run from its stored Cucumber Messages.
+  `CucumberMultiReporter`. They print or write to a file, and
+  `report(file)` reports a run from its stored Cucumber Messages.
 - ✨
   [`read_messages()`](https://jakubsob.github.io/cucumber/dev/reference/read_messages.md)
-  reads the Cucumber Messages of a run as tibbles.
-- ✨ Steps and hooks attach data to the report with `context$attach()`,
-  `context$log()` and `context$link()`.
+  reads the Cucumber Messages of a run as tibbles. Steps and hooks
+  attach data to the report with `context$attach()`, `context$log()` and
+  `context$link()`.
 
 ### Documentation
 
 - ✨
   [`features_rd()`](https://jakubsob.github.io/cucumber/dev/reference/features_rd.md)
   puts scenarios of feature files in a function’s help page.
-- 📝 New articles: Reports,
-  [`vignette("reporting")`](https://jakubsob.github.io/cucumber/dev/articles/reporting.md),
-  and cucumber and testthat,
-  [`vignette("testthat")`](https://jakubsob.github.io/cucumber/dev/articles/testthat.md).
-- 📝 New help pages:
-  [`?cucumber`](https://jakubsob.github.io/cucumber/dev/reference/cucumber-package.md),
-  linking every topic and article, and
+- 📝 New articles: Get started, Reports, cucumber and testthat, and
+  Compatibility with Cucumber. Examples in the articles come from the
+  acceptance tests.
+- 📝 New help pages
+  [`?cucumber`](https://jakubsob.github.io/cucumber/dev/reference/cucumber-package.md)
+  and
   [`?snapshots`](https://jakubsob.github.io/cucumber/dev/reference/snapshots.md).
-  [`?test`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
-  shows how feature files run like testthat test files, and what happens
-  when they can’t be parsed.
+- 📝 “How it works” has a stepper that plays a scenario run: which step
+  definitions and hooks run in which order, with the context and the
+  messages.
 
 ### Bug fixes
 
-- 🐛 A failed expectation in a step fails the test run. Previously the
-  scenario was reported as skipped.
-- 🐛 A step or a hook fails when a `test_that()` test in it fails.
-- 🐛 A scenario whose steps pass without an expectation is reported as
-  passed, not skipped as an empty test.
+- 🐛 A failed expectation in a step, or a failed `test_that()` test in
+  it, fails the test run. Previously the scenario was reported as
+  skipped. A scenario whose steps pass without an expectation is
+  reported as passed, not skipped as an empty test.
 - 🐛 testthat’s reporters show a step’s error as
   `Error: Step "<text>" failed` instead of its classes.
-- 🐛 A step definition with the wrong number of arguments, or without
-  `context` as its last argument, gets an error that shows the function
-  to use.
-- 🐛 An error of a parameter type’s transformer names the parameter
-  type.
-- 🐛 A step’s warnings are printed under the step, not above it.
+- 🐛
+  [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
+  attaches cucumber, so setup files define steps without `cucumber::`,
+  and keeps the step definitions, hooks and parameter types registered
+  before it.
 - 🐛
   [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
   passes its `...` to [`grepl()`](https://rdrr.io/r/base/grep.html) when
-  matching `filter`, and errors on an unknown argument.
-- 🐛
-  [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md),
-  [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md)
+  matching `filter`, and
+  [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
   and
-  [`features_rd()`](https://jakubsob.github.io/cucumber/dev/reference/features_rd.md)
+  [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md)
   check their arguments before anything runs, with an error that names
   the argument.
-- 🐛
-  [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
-  attaches cucumber, so setup files define steps without `cucumber::`.
-- 🐛
-  [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
-  keeps the step definitions, hooks and parameter types registered
-  before it.
 - 🐛 A `test_that()` test after
   [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md) in
   a test file is reported in the test file’s context.

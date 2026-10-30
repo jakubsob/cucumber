@@ -19,7 +19,7 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="testthat_files/libs/quarto-html/popper.min.js"></script><script src="testthat_files/libs/quarto-html/tippy.umd.min.js"></script><link href="testthat_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="testthat_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="cucumber and testthat">
+<!-- pkgdown --><script src="../pkgdown.js"></script><script src="../extra.js"></script><meta property="og:title" content="cucumber and testthat">
 <meta property="og:image" content="https://jakubsob.github.io/cucumber/dev/logo.png">
 <!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-N7MW34VJS3"></script><script>
   window.dataLayer = window.dataLayer || [];
@@ -46,19 +46,34 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/reference-gherkin.html">Gherkin Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/get-started.html">Get started</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/bdd.html">Behavior-Driven Development</a></li>
-    <li><a class="dropdown-item" href="../articles/how-it-works.html">How it works</a></li>
     <li><a class="dropdown-item" href="../articles/testthat.html">cucumber and testthat</a></li>
     <li><a class="dropdown-item" href="../articles/reporting.html">Reports</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Migration guides</h6></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">3.0.0</a></li>
-    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">2.0.0</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-it-works" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">How it works</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-it-works">
+<li><a class="dropdown-item" href="../articles/how-it-works.html">Running features</a></li>
+    <li><a class="dropdown-item" href="../articles/compatibility.html">Compatibility with Cucumber</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Functions</a></li>
+    <li><a class="dropdown-item" href="../articles/reference-gherkin.html">Gherkin</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-upgrade" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Upgrade</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-upgrade">
+<li><a class="dropdown-item" href="../articles/migration-to-3-0-0.html">To 3.0.0</a></li>
+    <li><a class="dropdown-item" href="../articles/migration-to-2-0-0.html">To 2.0.0</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -98,13 +113,79 @@
 
 
 
-    <!-- The tables need the width more than the page needs a table of contents. --><style>
-  #main { width: 100%; max-width: none; }
-</style>
-<p>cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a <code>test_that()</code> test, and step definitions use testthat’s expectations. If you know testthat, most of cucumber works the way you expect. This article lists where the two are alike and where they differ.</p>
-<p><code><a href="../reference/test.html">test()</a></code> is cucumber’s <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code>: it runs the feature files of a directory, by default <code>"tests/acceptance"</code>. <code><a href="../reference/run.html">run()</a></code>, called in a <code>tests/testthat/test-*.R</code> file, runs feature files as part of the package’s testthat tests, e.g. with <code>devtools::test()</code> or <code>R CMD check</code>.</p>
-<section class="section level2"><h2 id="writing-tests">Writing tests<a class="anchor" aria-label="anchor" href="#writing-tests"></a>
+    <p>cucumber runs on testthat. A feature file is run like a testthat test file, each scenario is a <code>test_that()</code> test, and step definitions use testthat’s expectations. If you know testthat, most of cucumber works the way you expect. This article starts with when to use which, then lists where the two are alike and where they differ.</p>
+<section class="section level2"><h2 id="when-to-use-which">When to use which<a class="anchor" aria-label="anchor" href="#when-to-use-which"></a>
 </h2>
+<p>The two answer different questions. testthat tests ask <em>does this code do what I wrote it to do?</em> A cucumber scenario asks <em>does the system behave the way someone needs it to?</em></p>
+<div class="compare">
+<table class="table caption-top">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 39%">
+<col style="width: 52%">
+</colgroup>
+<thead><tr class="header">
+<th></th>
+<th>testthat</th>
+<th>cucumber</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Describes</td>
+<td>How a function or an object behaves</td>
+<td>What a user or another system gets from the whole</td>
+</tr>
+<tr class="even">
+<td>Written in</td>
+<td>R, by developers</td>
+<td>Gherkin, readable by anyone</td>
+</tr>
+<tr class="odd">
+<td>Reads as</td>
+<td>Code: the test says how it checks</td>
+<td>A specification: the scenario says what, the steps say how</td>
+</tr>
+<tr class="even">
+<td>Good for</td>
+<td>Edge cases, many small inputs, internals, fast feedback while you write code</td>
+<td>Agreed examples of behavior, user workflows, business requirements you want to keep readable and true</td>
+</tr>
+<tr class="odd">
+<td>Less suited to</td>
+<td>Behavior agreed with people who don’t read R</td>
+<td>Exhaustive checks of every input of a function</td>
+</tr>
+<tr class="even">
+<td>Failure tells you</td>
+<td>Which expectation, in which file and line</td>
+<td>Which step of which scenario, in terms of the behavior</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Use testthat to test the code you write: functions, edge cases, error messages. Use cucumber to pin down behavior you agreed on with someone, like a user, a product owner or a colleague who doesn’t write R, in examples all of you can read. Many Shiny apps, APIs, data pipelines and packages with a user-facing workflow need both.</p>
+<section class="level2"><h3 id="behavior-tests-of-a-whole-system-with-testthat-alone">Behavior tests of a whole system with testthat alone<a class="anchor" aria-label="anchor" href="#behavior-tests-of-a-whole-system-with-testthat-alone"></a>
+</h3>
+<p>You can test the behavior of a whole system with testthat alone: a <code>test_that()</code> can start an app, call an API or run a pipeline and check the result. cucumber doesn’t make that possible. It gives you an opinionated structure for such tests:</p>
+<ul>
+<li>A specification in a fixed format. Scenarios are <code>Given</code>, <code>When</code> and <code>Then</code> steps in <code>.feature</code> files, parsed as <a href="https://cucumber.io/docs/gherkin/reference/" class="external-link">Gherkin</a>, so everyone on the team writes them the same way.</li>
+<li>Reuse through steps. A step definition, like <code>when("I add {int} to the basket", ...)</code>, is written once and matched by any scenario that uses the sentence. Scenarios are built from steps, so a new scenario is often only new text, no new code.</li>
+<li>State in <code>context</code> and hooks. The steps of a scenario share a <code>context</code> environment that is new for each scenario, so state doesn’t leak between them. <code><a href="../reference/hook.html">before()</a></code> and <code><a href="../reference/hook.html">after()</a></code> hooks, also for a single step, a run or tagged scenarios, set up and clean up what a scenario needs, like an app, a database or a temporary directory.</li>
+</ul>
+<p>Without them you write that structure yourself in helper functions and <code><a href="https://withr.r-lib.org/reference/defer.html" class="external-link">withr::defer()</a></code> calls. See <code><a href="../articles/how-it-works.html">vignette("how-it-works")</a></code> for how steps are matched and how <code>context</code> and hooks work.</p>
+</section><section class="level2"><h3 id="how-they-complement-each-other">How they complement each other<a class="anchor" aria-label="anchor" href="#how-they-complement-each-other"></a>
+</h3>
+<ul>
+<li>Scenarios on top, unit tests below. A scenario states the behavior with a few examples, and its step definitions call functions that testthat tests cover in depth. A failing scenario tells you what broke for the user, a failing unit test tells you where.</li>
+<li>One run. <code><a href="../reference/run.html">run()</a></code> in a <code>tests/testthat/test-*.R</code> file runs feature files with the package’s other tests, with <code>devtools::test()</code> or <code>R CMD check</code>. Or keep them apart in <code>tests/acceptance</code> and run them with <code><a href="../reference/test.html">test()</a></code>. <code><a href="../articles/get-started.html">vignette("get-started")</a></code> shows both layouts.</li>
+<li>The same tools. Step definitions use <code>expect_*()</code>, snapshots and <code>local_mocked_bindings()</code>, and <code>helper-*.R</code>, <code>setup-*.R</code> and <code>teardown-*.R</code> files work as they do in testthat.</li>
+<li>Specifications as documentation. Scenarios can go into the help page of the function they describe with <code><a href="../reference/features_rd.html">features_rd()</a></code>, where they stay true because they run.</li>
+</ul>
+<p>If you’re starting a feature, write its scenarios first, then the code and its unit tests. If you’re adding cucumber to a package, keep your tests and add scenarios for the behavior you most want to spell out.</p>
+<p><code><a href="../reference/test.html">test()</a></code> is cucumber’s <code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code>: it runs the feature files of a directory, by default <code>"tests/acceptance"</code>.</p>
+</section></section><section class="section level2"><h2 id="writing-tests">Writing tests<a class="anchor" aria-label="anchor" href="#writing-tests"></a>
+</h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
 <col style="width: 15%">
@@ -113,8 +194,8 @@
 </colgroup>
 <thead><tr class="header">
 <th></th>
-<th><code>testthat</code></th>
-<th><code>cucumber</code></th>
+<th>testthat</th>
+<th>cucumber</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -151,7 +232,7 @@
 <tr class="even">
 <td>State between tests</td>
 <td>Not shared, unless kept outside the test</td>
-<td>Not shared: each scenario gets a new <code>context</code>
+<td>Not shared: each scenario gets a new <code>context</code>. Keep what the run shares, like a connection, in an environment of a <code>setup-*.R</code> file and set it up in <code><a href="../reference/hook.html">before_all()</a></code>
 </td>
 </tr>
 <tr class="odd">
@@ -161,18 +242,21 @@
 <code>expect_*()</code> in step definitions</td>
 </tr>
 </tbody>
-</table></section><section class="section level2"><h2 id="files">Files<a class="anchor" aria-label="anchor" href="#files"></a>
+</table>
+</div>
+</section><section class="section level2"><h2 id="files">Files<a class="anchor" aria-label="anchor" href="#files"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
-<col style="width: 21%">
-<col style="width: 31%">
-<col style="width: 47%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 67%">
 </colgroup>
 <thead><tr class="header">
 <th></th>
-<th><code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code></th>
-<th><code><a href="../reference/test.html">cucumber::test()</a></code></th>
+<th>testthat</th>
+<th>cucumber</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -186,12 +270,12 @@
 <td><code>helper-*.R</code></td>
 <td>Run before the tests, unless <code>load_helpers = FALSE</code>
 </td>
-<td>The same. Define steps and hooks in <code>setup-*.R</code> files instead: <code>devtools::load_all()</code> runs helper files too, which defines every step twice, making it ambiguous</td>
+<td>The same, but define steps and hooks in <code>setup-*.R</code>: <code>devtools::load_all()</code> also runs helper files, which would define every step twice</td>
 </tr>
 <tr class="odd">
 <td><code>setup-*.R</code></td>
 <td>Run before the tests</td>
-<td>The same. The usual place for step definitions, hooks and parameter types. Loaded again, like by testthat and by <code>test(".")</code>, a setup file defines them again rather than twice</td>
+<td>The same. The place for step definitions, hooks and parameter types. Loading a setup file again redefines them instead of duplicating them</td>
 </tr>
 <tr class="even">
 <td><code>teardown-*.R</code></td>
@@ -226,18 +310,21 @@
 </td>
 </tr>
 </tbody>
-</table></section><section class="section level2"><h2 id="running">Running<a class="anchor" aria-label="anchor" href="#running"></a>
+</table>
+</div>
+</section><section class="section level2"><h2 id="running">Running<a class="anchor" aria-label="anchor" href="#running"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
-<col style="width: 22%">
-<col style="width: 34%">
-<col style="width: 43%">
+<col style="width: 11%">
+<col style="width: 18%">
+<col style="width: 69%">
 </colgroup>
 <thead><tr class="header">
 <th></th>
-<th><code><a href="https://testthat.r-lib.org/reference/test_dir.html" class="external-link">testthat::test_dir()</a></code></th>
-<th><code><a href="../reference/test.html">cucumber::test()</a></code></th>
+<th>testthat</th>
+<th>cucumber</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -300,13 +387,14 @@
 <tr class="even">
 <td>Running in parallel</td>
 <td><code>Config/testthat/parallel: true</code></td>
-<td>Not supported: scenarios run one after another. <code><a href="../reference/run.html">run()</a></code>, and <code>test(".")</code> in a file of <code>tests/testthat</code>, in a parallel testthat run are an error, as testthat would delete the snapshot files of the feature files</td>
+<td>Not supported: scenarios run one after another. <code><a href="../reference/run.html">run()</a></code> in a parallel testthat run is an error, as testthat would delete the feature files’ snapshot files</td>
 </tr>
 </tbody>
 </table>
-<p>With <code><a href="../reference/run.html">run()</a></code> in a testthat file, testthat runs the feature files: everything in the testthat column applies, as for any test file.</p>
-</section><section class="section level2"><h2 id="choosing-and-ordering-tests">Choosing and ordering tests<a class="anchor" aria-label="anchor" href="#choosing-and-ordering-tests"></a>
+</div>
+</section><section class="section level2"><h2 id="choosing-tests">Choosing tests<a class="anchor" aria-label="anchor" href="#choosing-tests"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
 <col style="width: 10%">
@@ -369,13 +457,16 @@
 <code>dry_run = TRUE</code> matches every step to a step definition without running them</td>
 </tr>
 </tbody>
-</table></section><section class="section level2"><h2 id="results">Results<a class="anchor" aria-label="anchor" href="#results"></a>
+</table>
+</div>
+</section><section class="section level2"><h2 id="results">Results<a class="anchor" aria-label="anchor" href="#results"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
-<col style="width: 19%">
-<col style="width: 29%">
-<col style="width: 51%">
+<col style="width: 16%">
+<col style="width: 24%">
+<col style="width: 59%">
 </colgroup>
 <thead><tr class="header">
 <th></th>
@@ -386,7 +477,7 @@
 <tr class="odd">
 <td>A failed expectation</td>
 <td>Fails the test, and the test goes on: later expectations still run</td>
-<td>Fails the step and the scenario. The rest of the step and the steps after it don’t run, and are reported as skipped. Their snapshots aren’t checked, and are kept</td>
+<td>Fails the step and the scenario. The rest of the step and the steps after it don’t run and are reported as skipped</td>
 </tr>
 <tr class="even">
 <td>An error</td>
@@ -425,13 +516,16 @@
 <td>The feature, the scenario, the step and where its step definition is</td>
 </tr>
 </tbody>
-</table></section><section class="section level2"><h2 id="setup-and-teardown">Setup and teardown<a class="anchor" aria-label="anchor" href="#setup-and-teardown"></a>
+</table>
+</div>
+</section><section class="section level2"><h2 id="setup-and-teardown">Setup and teardown<a class="anchor" aria-label="anchor" href="#setup-and-teardown"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
-<col style="width: 12%">
-<col style="width: 16%">
-<col style="width: 71%">
+<col style="width: 7%">
+<col style="width: 9%">
+<col style="width: 82%">
 </colgroup>
 <thead><tr class="header">
 <th></th>
@@ -444,7 +538,7 @@
 <td>Code in the test, <code><a href="https://withr.r-lib.org/reference/defer.html" class="external-link">withr::defer()</a></code>
 </td>
 <td>
-<code><a href="../reference/hook.html">before()</a></code> and <code><a href="../reference/hook.html">after()</a></code> hooks, which get the scenario’s <code>context</code> and details, like its name and tags. <code><a href="https://withr.r-lib.org/reference/defer.html" class="external-link">withr::defer()</a></code> in a step runs when the step ends, and <code>withr::defer(envir = context)</code> when the scenario ends: use <code>context</code> with <code>local_*()</code> functions, like <code>local_mocked_bindings(.env = context)</code>
+<code><a href="../reference/hook.html">before()</a></code> and <code><a href="../reference/hook.html">after()</a></code> hooks, which get the scenario’s <code>context</code>, name and tags. <code><a href="https://withr.r-lib.org/reference/defer.html" class="external-link">withr::defer()</a></code> in a step runs when the step ends. To run it when the scenario ends, pass <code>context</code>: <code>withr::defer(envir = context)</code>, <code>local_mocked_bindings(.env = context)</code>
 </td>
 </tr>
 <tr class="even">
@@ -466,12 +560,15 @@
 </td>
 </tr>
 </tbody>
-</table></section><section class="section level2"><h2 id="snapshots">Snapshots<a class="anchor" aria-label="anchor" href="#snapshots"></a>
+</table>
+</div>
+</section><section class="section level2"><h2 id="snapshots">Snapshots<a class="anchor" aria-label="anchor" href="#snapshots"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
 <col style="width: 10%">
-<col style="width: 25%">
+<col style="width: 26%">
 <col style="width: 63%">
 </colgroup>
 <thead><tr class="header">
@@ -483,50 +580,52 @@
 <tr class="odd">
 <td><code>expect_snapshot()</code></td>
 <td>Works in a test</td>
-<td>Works in a step and in a <code><a href="../reference/hook.html">before()</a></code>, <code><a href="../reference/hook.html">after()</a></code>, <code><a href="../reference/hook.html">before_step()</a></code> or <code><a href="../reference/hook.html">after_step()</a></code> hook, with <code>error</code>, <code>transform</code> and <code>expect_snapshot_value()</code>, not in a <code><a href="../reference/hook.html">before_all()</a></code> or <code><a href="../reference/hook.html">after_all()</a></code> hook. Two feature files can’t share a snapshot file, like <code>basket.feature</code> and <code>basket.feature.md</code>: the run stops with an error</td>
+<td>Works in a step and in <code><a href="../reference/hook.html">before()</a></code>, <code><a href="../reference/hook.html">after()</a></code>, <code><a href="../reference/hook.html">before_step()</a></code> and <code><a href="../reference/hook.html">after_step()</a></code> hooks, not in <code><a href="../reference/hook.html">before_all()</a></code> or <code><a href="../reference/hook.html">after_all()</a></code>
+</td>
 </tr>
 <tr class="even">
 <td>Snapshot file</td>
 <td>
-<code>_snaps/&lt;file&gt;.md</code>, one per test file: <code>_snaps/basket.md</code> for <code>test-basket.R</code>
-</td>
+<code>_snaps/&lt;file&gt;.md</code>, one per test file</td>
 <td>
-<code>_snaps/&lt;feature file&gt;.md</code>, one per feature file, its directories joined by <code>-</code>: <code>_snaps/checkout-basket.feature.md</code> for <code>checkout/basket.feature</code>, and <code>_snaps/basket.feature.md</code> for <code>basket.feature.md</code>
-</td>
+<code>_snaps/&lt;feature file&gt;.md</code>, one per feature file, its directories joined by <code>-</code>: <code>_snaps/checkout-basket.feature.md</code> for <code>checkout/basket.feature</code>. <code>basket.feature</code> and <code>basket.feature.md</code> can’t coexist</td>
 </tr>
 <tr class="odd">
 <td>Snapshot name</td>
 <td>The test’s name</td>
-<td>The scenario’s name, like <code>Scenario: Showing the basket</code>, numbered when scenarios of the feature file share a name, like <code>Scenario: Showing the basket (2)</code>, whichever scenarios run. A scenario of the same name added above them renumbers them: give scenarios that take snapshots names of their own</td>
+<td>The scenario’s name, numbered when scenarios share a name: <code>Showing the basket (2)</code>. Adding a same-named scenario above renumbers the rest, so give scenarios that take snapshots their own names</td>
 </tr>
 <tr class="even">
 <td>Variants and file snapshots</td>
 <td>
 <code>_snaps/&lt;variant&gt;/&lt;file&gt;.md</code>, and <code>expect_snapshot_file()</code> files in <code>_snaps/&lt;file&gt;/</code>
 </td>
-<td>
-<code>_snaps/&lt;variant&gt;/&lt;feature file&gt;.md</code>, like <code>_snaps/linux/checkout-basket.feature.md</code>, and <code>expect_snapshot_file()</code> files in <code>_snaps/&lt;feature file&gt;/</code>, like <code>_snaps/checkout-basket.feature/plot.png</code>. A changed snapshot names what to accept, like <code>snapshot_accept("linux/checkout-basket.feature", "tests/acceptance")</code> for a variant, which testthat’s message leaves out</td>
+<td>The same with the feature file’s name, like <code>_snaps/linux/checkout-basket.feature.md</code>. Accept with <code>snapshot_accept("linux/checkout-basket.feature", "tests/acceptance")</code>
+</td>
 </tr>
 <tr class="odd">
 <td>
 <code><a href="../reference/test.html">test()</a></code> and <code><a href="../reference/run.html">run()</a></code>
 </td>
 <td>—</td>
-<td>Both save to the same snapshot files, so either checks the snapshots of the other</td>
+<td>Both use the same snapshot files, so either checks the snapshots of the other</td>
 </tr>
 <tr class="even">
 <td>A test that errors or is skipped</td>
 <td>Keeps its snapshots</td>
-<td>The same, for a scenario, and for one whose expectation failed. Scenarios that didn’t run keep theirs too. Skip scenarios in a <code><a href="../reference/hook.html">before_all()</a></code> or <code><a href="../reference/hook.html">before()</a></code> hook, not with <code>skip()</code> before <code><a href="../reference/run.html">run()</a></code> in its test file: testthat deletes the snapshot files of feature files that a run of every test file didn’t run</td>
+<td>The same, and so do scenarios that didn’t run. Skip scenarios in a <code><a href="../reference/hook.html">before_all()</a></code> or <code><a href="../reference/hook.html">before()</a></code> hook, not with <code>skip()</code> before <code><a href="../reference/run.html">run()</a></code>: testthat would delete their snapshot files</td>
 </tr>
 <tr class="odd">
 <td>Unused snapshot files</td>
 <td>Deleted at the end of a run of every test file, except on CI</td>
-<td>The same, by <code><a href="../reference/test.html">test()</a></code> and <code><a href="../reference/run.html">run()</a></code>: the snapshot files of deleted feature files, the snapshots of renamed or deleted scenarios, and <code>expect_snapshot_file()</code> files that weren’t taken, unless announced with <code>announce_snapshot_file()</code>. Also outside of <code>tests/testthat</code>, with <code>run("../acceptance")</code>. <code>test(".")</code> in a testthat file of <code>tests/testthat</code> tells testthat which snapshot files its feature files use, so testthat keeps them. A run of some of the scenarios, with <code>filter</code>, <code>name</code>, <code>tags</code>, <code>features</code>, <code>dry_run</code> or <code>fail_fast</code> after a failure, deletes no snapshot file</td>
+<td>The same, for removed feature files, renamed or removed scenarios, and <code>expect_snapshot_file()</code> files not announced with <code>announce_snapshot_file()</code>. A partial run, a dry run or <code>fail_fast</code> deletes nothing</td>
 </tr>
 </tbody>
-</table></section><section class="section level2"><h2 id="reporting">Reporting<a class="anchor" aria-label="anchor" href="#reporting"></a>
+</table>
+</div>
+</section><section class="section level2"><h2 id="reporting">Reporting<a class="anchor" aria-label="anchor" href="#reporting"></a>
 </h2>
+<div class="compare">
 <table class="table caption-top">
 <colgroup>
 <col style="width: 10%">
@@ -563,7 +662,9 @@
 <td>testthat’s reporter prints the scenarios as tests, and a failed expectation names its step, like <code>Step "the result is 2" failed</code>. Pass a <code>reporter</code> to <code><a href="../reference/run.html">run()</a></code> to print the run with cucumber’s reporter too</td>
 </tr>
 </tbody>
-</table></section><script id="quarto-html-after-body" type="application/javascript">
+</table>
+</div>
+</section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
@@ -646,7 +747,8 @@
       }
     }
   });
-  </script></main>
+  </script></main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
