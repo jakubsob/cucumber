@@ -10,6 +10,13 @@ format:
     syntax-definitions: [gherkin.xml]
 ---
 
+```{r, include = FALSE}
+library(cucumber)
+library(testthat)
+
+source("acceptance-examples.R")
+```
+
 `cucumber::test()` runs the `.feature` and `.feature.md` files of a directory, `{r} I(cucumber:::format_option_default("cucumber.path"))` by default, and its subdirectories. A run goes like this:
 
 ::: steps
@@ -27,57 +34,10 @@ format:
 
 # Step execution order
 
-Given such a feature file:
+Each step is called in the order it is written, scenario after scenario:
 
-```gherkin
-# tests/acceptance/sum.feature
-Feature: Sum
-  Scenario: Sum should work for 2 numbers
-    Given I have 1
-    And I have 2
-    When I add them
-    Then I get 3
-
-  Scenario: Sum should work for 3 numbers
-    Given I have 1
-    And I have 2
-    But I have 3
-    When I add them
-    Then I get 6
-```
-
-And such step definitions:
-
-```r
-# tests/acceptance/setup-steps.R
-given("I have {int}", function(int, context) {
-  print("given")
-  context$numbers <- c(context$numbers, int)
-})
-
-when("I add them", function(context) {
-  print("when")
-  context$result <- sum(context$numbers)
-})
-
-then("I get {int}", function(int, context) {
-  print("then")
-  expect_equal(context$result, int)
-})
-```
-
-The order of calling the steps would be:
-
-```r
-#> [1] "given"
-#> [1] "given"
-#> [1] "when"
-#> [1] "then"
-#> [1] "given"
-#> [1] "given"
-#> [1] "given"
-#> [1] "when"
-#> [1] "then"
+```{r, echo = FALSE}
+acceptance_example("passing_steps.feature", "Steps run one by one, in the order they are written")
 ```
 
 Hooks run around them: `before_all()` once before the first scenario, `before()` and `after()` around each scenario, `before_step()` and `after_step()` around each step, and `after_all()` once after the last scenario. See `?hook`.

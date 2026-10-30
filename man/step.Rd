@@ -1328,6 +1328,39 @@ when("I add an item", function(context) \{
 \item Then it passes
 }
 }
+\subsection{Scenario: Steps run one by one, in the order they are written}{
+\itemize{
+\item Given a file named "features/sum.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Sum&#10;  <span class="kw">Scenario:</span> Sum should work for 2 numbers&#10;    <span class="fu">Given</span> I have 1&#10;    <span class="fu">And</span> I have 2&#10;    <span class="fu">When</span> I add them&#10;    <span class="fu">Then</span> I get 3&#10;&#10;  <span class="kw">Scenario:</span> Sum should work for 3 numbers&#10;    <span class="fu">Given</span> I have 1&#10;    <span class="fu">And</span> I have 2&#10;    <span class="fu">But</span> I have 3&#10;    <span class="fu">When</span> I add them&#10;    <span class="fu">Then</span> I get 6</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{given("I have \{int\}", function(int, context) \{
+  print("given")
+  context$numbers <- c(context$numbers, int)
+\})
+
+when("I add them", function(context) \{
+  print("when")
+  context$result <- sum(context$numbers)
+\})
+
+then("I get \{int\}", function(int, context) \{
+  print("then")
+  expect_equal(context$result, int)
+\})}
+\item When I run
+\preformatted{test("features", reporter = NULL)}
+\item Then the output includes
+\preformatted{[1] "given"
+[1] "given"
+[1] "when"
+[1] "then"
+[1] "given"
+[1] "given"
+[1] "given"
+[1] "when"
+[1] "then"}
+}
+}
 \subsection{Scenario: testthat reports a scenario without expectations or steps as passed}{
 \itemize{
 \item Given a file named "tests/testthat/basket.feature" with
@@ -1384,6 +1417,57 @@ Not written yet
       test("features", reporter = NULL)
       """
     Then it passes
+
+  Scenario: Steps run one by one, in the order they are written
+    Given a file named "features/sum.feature" with
+      """
+      Feature: Sum
+        Scenario: Sum should work for 2 numbers
+          Given I have 1
+          And I have 2
+          When I add them
+          Then I get 3
+
+        Scenario: Sum should work for 3 numbers
+          Given I have 1
+          And I have 2
+          But I have 3
+          When I add them
+          Then I get 6
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      given("I have \{int\}", function(int, context) \{
+        print("given")
+        context$numbers <- c(context$numbers, int)
+      \})
+
+      when("I add them", function(context) \{
+        print("when")
+        context$result <- sum(context$numbers)
+      \})
+
+      then("I get \{int\}", function(int, context) \{
+        print("then")
+        expect_equal(context$result, int)
+      \})
+      """
+    When I run
+      """
+      test("features", reporter = NULL)
+      """
+    Then the output includes
+      """
+      [1] "given"
+      [1] "given"
+      [1] "when"
+      [1] "then"
+      [1] "given"
+      [1] "given"
+      [1] "given"
+      [1] "when"
+      [1] "then"
+      """
 
   Scenario: testthat reports a scenario without expectations or steps as passed
     Given a file named "tests/testthat/basket.feature" with

@@ -10,6 +10,13 @@ format:
     syntax-definitions: [gherkin.xml]
 ---
 
+```{r, include = FALSE}
+library(cucumber)
+library(testthat)
+
+source("acceptance-examples.R")
+```
+
 Cucumber 3.0.0 brings the package closer to  the official Cucumber implementations: feature files are parsed by a port of the [official Gherkin parser](https://github.com/cucumber/gherkin) and step descriptions are [Cucumber Expressions](https://github.com/cucumber/cucumber-expressions).
 
 Each section below describes what's new. Where a change can break a project written for 2.2.0, a *Migrating from 2.2.0* subsection shows what to change. The [last section](#summary-of-breaking-changes) lists every breaking change, grouped by where you need to make it: feature files, step definitions, parameter types, hooks, reporters and test runs.
@@ -30,30 +37,20 @@ Given an empty basket
 
 A `Rule` groups scenarios that illustrate one business rule. It can have its own `Background`, which runs after the `Feature`'s one, and passes its tags to its scenarios:
 
-```gherkin
-Feature: Basket
-
-  Rule: An empty basket costs nothing
-
-    Background:
-      Given an empty basket
-
-    Scenario: Checking out
-      When I check out
-      Then I pay 0
+```{r, echo = FALSE}
+acceptance_example(
+  "rule.feature",
+  "A Rule Background runs after the Feature Background, only for its own scenarios",
+  pretty = TRUE
+)
 ```
 
 ## Languages
 
 Feature files can be written in any of the 80 languages of the official Gherkin parser, by starting them with a `# language:` line. Step definitions don't change:
 
-```gherkin
-# language: fr
-Fonctionnalité: Panier
-  Scénario: Ajouter un article
-    Soit un panier vide
-    Quand j'ajoute une pomme
-    Alors le panier contient 1 article
+```{r, echo = FALSE}
+acceptance_example("language.feature", "A feature file written in French", pretty = TRUE)
 ```
 
 The `cucumber.language` option sets the language of feature files without a `# language:` line:
@@ -66,73 +63,54 @@ options(cucumber.language = "fr")
 
 `.feature.md` files run like feature files. Their headers are the Feature, Rule, Background, Scenario and Examples, their list items that start with a step keyword are steps, their code blocks are Doc Strings, and their tables indented 2 to 5 spaces are Data Tables and Examples. Tags are written in backticks. The rest of the Markdown is ignored, like in Cucumber:
 
-````markdown
-# Feature: Basket
-
-## Scenario: Add an item
-
-* Given an empty basket
-* When I add an apple
-* Then the basket contains 1 item
-````
+```{r, echo = FALSE}
+acceptance_example("markdown_with_gherkin.feature", "A Markdown document runs like a feature file", pretty = TRUE)
+```
 
 ## Scenario Outlines
 
-- Placeholders are replaced in Doc Strings and Data Tables, not only in the step text. With `| x |` / `| 1 |` as Examples, the Doc String below is `v=1` and the table is `| 1 |` / `| 1 |`:
+Placeholders are replaced in the name, Doc Strings and Data Tables, not only in the step text:
 
-  ```gherkin
-    Scenario Outline: S
-      Given t
-        """
-        v=<x>
-        """
-      And u
-        | <x> |
-        | <x> |
-  ```
+```{r, echo = FALSE}
+acceptance_example(
+  "scenario_outlines.feature",
+  "Outline placeholders are replaced in the name, Doc Strings and Data Tables",
+  pretty = TRUE
+)
+```
 
-- Examples can have a description:
+Examples can have a name and a description, and `Examples:` under a `Scenario:` makes it an outline, like `Scenario Outline:` does:
 
-  ```gherkin
-      Examples: Some
-        A description.
-        | x |
-        | 1 |
-  ```
-
-- `Examples:` under a `Scenario:` makes it an outline, like `Scenario Outline:` does.
+```{r, echo = FALSE}
+acceptance_example(
+  "scenario_outlines.feature",
+  "Examples under a Scenario make it an outline, and they can have a name and a description",
+  pretty = TRUE
+)
+```
 
 ## Step arguments
 
-- A step can have both a Data Table and a Doc String. The step gets them in the order they are written:
+A step can have both a Data Table and a Doc String. The step gets them in the order they are written:
 
-  ```gherkin
-      Given a request
-        | header | value |
-        | Accept | json  |
-        """
-        {"id": 1}
-        """
-  ```
+```{r, echo = FALSE}
+acceptance_example("data_table_and_doc_string.feature", "A Data Table before a Doc String")
+```
 
-  ```r
-  given("a request", function(headers, body, context) { ... })
-  ```
+A step gets a Doc String as one string, with its lines joined by `"\n"`, instead of a character vector of lines. Its media type, written after `"""` like `"""json`, is in the `media_type` attribute:
 
-- A step gets a Doc String as one string, with its lines joined by `"\n"`, instead of a character vector of lines. Its media type, written after `"""` like `"""json`, is in the `media_type` attribute:
+```{r, echo = FALSE}
+acceptance_example("doc_string.feature", "A Doc String's media type is in its media_type attribute")
+```
 
-  ```r
-  given("a request", function(body, context) {
-    attr(body, "media_type") # "json"
-    jsonlite::fromJSON(body)
-  })
-  ```
+To keep getting a character vector of lines, set the `cucumber.docstring_as_lines` option, e.g. in a `setup-*.R` file next to your feature files:
 
-  To keep getting a character vector of lines, set the `cucumber.docstring_as_lines` option, e.g. in a `setup-*.R` file next to your feature files:
-
-  ```r
-  options(cucumber.docstring_as_lines = TRUE)
-  ```
+```{r, echo = FALSE}
+acceptance_example(
+  "doc_string.feature",
+  "The cucumber.docstring_as_lines option passes a Doc String as a character vector of lines"
+)
+```
 
 ## Other additions
 
@@ -144,10 +122,11 @@ options(cucumber.language = "fr")
 
 Every feature file is parsed before anything runs. If any file can't be parsed, no scenario runs, and every error of every file is reported, each with its line and column:
 
-```
-Can't parse feature files
-✖ Parse error in "broken.feature" (4:5): expected: #EOF, #TableRow, #DocStringSeparator, #StepLine, #TagLine, #ExamplesLine, #ScenarioLine, #RuleLine, #Comment, #Empty, got 'this line is not a step'
-✖ Parse error in "broken.feature" (9:7): inconsistent cell count within the table
+```{r, echo = FALSE}
+acceptance_example(
+  "gherkin_parse_failure.feature",
+  "Every error in a feature file is reported with its line and column"
+)
 ```
 
 Before, the files before the broken one ran, and the files after it were skipped.
