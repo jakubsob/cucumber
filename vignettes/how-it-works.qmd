@@ -12,12 +12,16 @@ format:
 
 `cucumber::test()` runs the `.feature` and `.feature.md` files of a directory, `{r} I(cucumber:::format_option_default("cucumber.path"))` by default, and its subdirectories. A run goes like this:
 
+::: steps
+
 1. **Load the step definitions.** The `helper-*.R` and `setup-*.R` files of the directory are run, like `testthat::test_dir()` runs them. Calls to `given()`, `when()`, `then()`, the hooks and `define_parameter_type()` in them register step definitions, hooks and parameter types for the run.
 2. **Parse the feature files.** The feature files picked by `filter` and `features` are parsed before anything runs. If one can't be parsed, no scenario runs, and every parse error is reported with its file, line and column.
 3. **Compile the scenarios.** Each scenario, and each row of a Scenario Outline's Examples, becomes one test case, with the `Background` steps before its own steps.
 4. **Select and order them**, by `name`, `tags` and the lines of `features`, and by `order`.
 5. **Run them.** Each step is matched to a step definition, and the step definitions are called one by one.
 6. **Report them.** Every outcome of the run is a [Cucumber Message](https://github.com/cucumber/messages), passed to the reporter: the progress in the console, or reports like the HTML report, see `vignette("reporting")`.
+
+:::
 
 `run()` does the same in a testthat test file, where testthat reports each scenario as a test. See `vignette("testthat")` for how cucumber and testthat compare.
 
@@ -92,10 +96,10 @@ A step definition's description is a [Cucumber Expression](https://github.com/cu
 
 Every step gets a result:
 
-- **passed**: its step definition ran without an error or a failed expectation.
-- **failed**: its step definition failed. The steps after it are **skipped**.
-- **pending**: its step definition called `pending()`.
-- **undefined**: no step definition matches it. The run goes on with the next scenario, and shows a snippet of a step definition to paste into a setup file.
-- **ambiguous**: more than one step definition matches it. The error lists them all.
+- [passed]{.status .passed}: its step definition ran without an error or a failed expectation.
+- [failed]{.status .failed}: its step definition failed. The steps after it are [skipped]{.status .skipped}.
+- [pending]{.status .pending}: its step definition called `pending()`.
+- [undefined]{.status .undefined}: no step definition matches it. The run goes on with the next scenario, and shows a snippet of a step definition to paste into a setup file.
+- [ambiguous]{.status .ambiguous}: more than one step definition matches it. The error lists them all.
 
 A scenario with a pending or undefined step fails, unless the run is given `strict = FALSE`. `cucumber::test(dry_run = TRUE)` finds every undefined and ambiguous step without running any.

@@ -372,3 +372,251 @@ img.logo {
   flex-wrap: wrap;
   gap: 0.25rem;
 }
+
+// Status: a result word with its coloured mark, as in the run log -----------
+
+.status {
+  white-space: nowrap;
+  font-weight: 700;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 0.55em;
+    height: 0.55em;
+    margin-right: 0.35em;
+    vertical-align: 0.05em;
+    background: var(--status, var(--rl-muted));
+    border: 1px solid var(--status, var(--rl-muted));
+  }
+
+  &.passed { --status: var(--rl-passed); }
+  &.failed { --status: var(--rl-failed); }
+  &.pending, &.undefined, &.ambiguous { --status: var(--rl-undefined); }
+  &.skipped { --status: var(--rl-skipped); }
+  &.breaking { --status: var(--rl-failed); }
+  &.added { --status: var(--rl-passed); }
+
+  // Outlined for the statuses that aren't a pass or a fail
+  &.skipped::before, &.pending::before { background: transparent; }
+  &.ambiguous::before { background: transparent; border-style: dashed; }
+
+  color: var(--status, inherit);
+}
+
+// A list item that starts with a status carries that mark instead of a bullet
+main ul:not([class]) > li:has(> .status:first-child)::before {
+  display: none;
+}
+
+// Steps: an ordered list as a pipeline, numbered nodes on a rail ------------
+
+.steps > ol {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  counter-reset: step;
+
+  > li {
+    position: relative;
+    counter-increment: step;
+    margin: 0;
+    padding: 0 0 1.25rem 3rem;
+
+    &::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 1;
+      width: 2rem;
+      height: 2rem;
+      display: grid;
+      place-items: center;
+      background: var(--rl-code-bg);
+      border: 1px solid var(--rl-passed);
+      color: var(--rl-ink);
+      font-family: var(--bs-font-monospace);
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    // The rail runs to the next node
+    &:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      left: 1rem;
+      top: 2rem;
+      bottom: 0;
+      border-left: 1px solid var(--rl-rule);
+    }
+  }
+}
+
+// Callouts ------------------------------------------------------------------
+
+// pkgdown renders a Quarto callout as a blockquote that starts with its bold title
+main blockquote {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--rl-skipped);
+  background: var(--rl-code-bg);
+  color: var(--rl-ink);
+
+  > :last-child { margin-bottom: 0; }
+
+  > p:first-child > strong:only-child {
+    display: block;
+    margin: -0.75rem -1rem 0.75rem;
+    padding: 0.4rem 1rem;
+    border-bottom: 1px solid var(--rl-skipped);
+  }
+}
+
+.callout {
+  --callout: var(--rl-skipped);
+  margin: 1.5rem 0;
+  border: 1px solid var(--callout);
+  background: var(--rl-code-bg);
+
+  &.callout-warning, &.callout-caution { --callout: var(--rl-undefined); }
+  &.callout-important { --callout: var(--rl-failed); }
+  &.callout-tip { --callout: var(--rl-passed); }
+
+  .callout-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    font-weight: 700;
+    color: var(--rl-ink);
+    border-bottom: 1px solid var(--callout);
+
+    &::before {
+      content: "";
+      width: 0.55em;
+      height: 0.55em;
+      background: var(--callout);
+    }
+
+    .callout-icon-container { display: none; }
+    .callout-title-container { margin: 0; }
+  }
+
+  .callout-body { padding: 0.75rem 1rem; }
+  .callout-body > :last-child { margin-bottom: 0; }
+  .callout-body-container > :last-child { margin-bottom: 0; }
+}
+
+// Compare: rows of two ways to do one thing ----------------------------------
+
+// A page of compare tables takes the container's width; its text keeps the main column's
+main:has(.compare) {
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: none;
+}
+
+.compare {
+  margin: 1rem 0 1.5rem;
+
+  table {
+    width: 100%;
+    margin: 0;
+    table-layout: fixed;
+    border: 1px solid var(--rl-rule);
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: transparent;
+    --bs-table-color: var(--rl-ink);
+    --bs-table-border-color: var(--rl-rule);
+  }
+
+  thead th {
+    font-family: var(--bs-font-monospace);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--rl-muted);
+    background: var(--rl-code-bg);
+    border-bottom: 1px solid var(--rl-rule);
+
+    &:nth-child(3) { box-shadow: inset 0 2px 0 var(--rl-passed); }
+  }
+
+  th, td {
+    vertical-align: top;
+    padding: 0.6rem 0.875rem;
+    overflow-wrap: anywhere;
+  }
+
+  // Long code breaks inside its cell instead of widening its column
+  code { overflow-wrap: anywhere; }
+
+  // The cucumber column carries the longer text
+  // Quarto sets column widths from the dashes of a pipe table, in a colgroup
+  col:nth-child(1) { width: 18% !important; }
+  col:nth-child(2) { width: 32% !important; }
+  col:nth-child(3) { width: 50% !important; }
+  td:nth-child(1) { font-weight: 700; }
+
+  // The first column is the row's label: stack the row below the table's width
+  @include media-breakpoint-down(md) {
+    table, tbody, tr, td { display: block; width: 100% !important; }
+    thead { display: none; }
+
+    tr { border-bottom: 1px solid var(--rl-rule); padding: 0.5rem 0; }
+    td { border: 0; padding: 0.25rem 0.875rem; }
+
+    td:nth-child(2)::before,
+    td:nth-child(3)::before {
+      display: block;
+      font-family: var(--bs-font-monospace);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--rl-muted);
+    }
+    td:nth-child(2)::before { content: "testthat"; }
+    td:nth-child(3)::before { content: "cucumber"; }
+  }
+}
+
+// Article pager: the next and previous article -----------------------------
+
+.article-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 3rem 0 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rl-rule);
+
+  a {
+    display: block;
+    max-width: 48%;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--rl-rule);
+    color: var(--rl-ink);
+    text-decoration: none;
+
+    &:hover { border-color: var(--rl-passed); }
+    &.next { margin-left: auto; text-align: right; }
+
+    small {
+      display: block;
+      font-family: var(--bs-font-monospace);
+      font-size: 0.75rem;
+      color: var(--rl-muted);
+    }
+  }
+}
+
+// Keywords in Gherkin examples keep their colour and link to the reference
+a.gherkin-keyword {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-thickness: 1px;
+  }
+}

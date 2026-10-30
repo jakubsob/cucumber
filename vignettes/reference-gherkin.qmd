@@ -339,7 +339,7 @@ Example: Multiple Givens
   But I shouldn't see something else
 ```
 
-## \*
+## \* {#asterisk}
 
 Gherkin also supports using an asterisk (`*`) in place of any of the normal step keywords. This can be helpful when you have some steps that are effectively a _list of things_, so you can express it more like bullet points where otherwise the natural language of `And` etc might not read so elegantly.
 

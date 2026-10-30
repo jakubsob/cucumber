@@ -21,6 +21,17 @@ month](http://cranlogs.r-pkg.org/badges/last-month/cucumber)](https://cran.r-pro
 An implementation of the [Cucumber](https://cucumber.io/) testing
 framework in R.
 
+Where to start:
+
+- New to BDD? Read [Behavior-Driven
+  Development](https://jakubsob.github.io/cucumber/articles/bdd.html).
+- Know testthat? See [cucumber and
+  testthat](https://jakubsob.github.io/cucumber/articles/testthat.html).
+- Looking for a function or a Gherkin keyword? Open the
+  [reference](https://jakubsob.github.io/cucumber/reference/) or the
+  [Gherkin
+  reference](https://jakubsob.github.io/cucumber/articles/reference-gherkin.html).
+
 ## Introduction
 
 The package parses
