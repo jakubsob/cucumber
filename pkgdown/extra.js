@@ -124,10 +124,15 @@ document.addEventListener("DOMContentLoaded", function () {
       var frame = frames[index];
       var start = index;
       while (start > 0 && !frames[start].r) start--;
-      var passed = frames.slice(start, index + 1).map(function (f) { return f.p; });
+      var marked = function (key) {
+        return frames.slice(start, index + 1).map(function (f) { return f[key]; });
+      };
+      var results = { passed: marked("p"), failed: marked("failed"), skipped: marked("skipped") };
       featureLines.forEach(function (l, n) {
         l.classList.toggle("active", (frame.f || []).indexOf(n + 1) >= 0);
-        l.classList.toggle("passed", passed.indexOf(n + 1) >= 0);
+        Object.keys(results).forEach(function (status) {
+          l.classList.toggle(status, results[status].indexOf(n + 1) >= 0);
+        });
       });
       codeLines.forEach(function (l, n) {
         l.classList.toggle("active", (frame.k || []).indexOf(n + 1) >= 0);

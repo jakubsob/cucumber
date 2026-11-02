@@ -34,13 +34,14 @@ source("acceptance-examples.R")
 
 # A run, step by step
 
-Step through a scenario, or a scenario outline with a background, to see which code runs when, or press Play. The highlighted lines of the setup file and the feature file are the ones in play.
+Step through a scenario, a scenario outline with a background, or a scenario with a failing step, to see which code runs when, or press Play. The highlighted lines of the setup file and the feature file are the ones in play.
 
 ```{=html}
 <div class="ide-tabs">
 <ul class="nav nav-tabs" role="tablist">
 <li class="nav-item" role="presentation"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#run-scenario" type="button" role="tab">Scenario</button></li>
 <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#run-outline" type="button" role="tab">Scenario Outline with Background</button></li>
+<li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#run-failing" type="button" role="tab">Failing step</button></li>
 </ul>
 <div class="tab-content">
 <div id="run-scenario" class="tab-pane active" role="tabpanel">
@@ -105,12 +106,12 @@ Step through a scenario, or a scenario outline with a background, to see which c
   "after(function(context) message(\"took \", format(Sys.time() - context$start)))",
   "",
   "given(\"a calculator\", function(context) {",
-  "  context$result <- 0",
-  "  print(context$result)",
+  "  context$add <- function(a, b) a + b",
+  "  message(\"calculator ready\")",
   "})",
   "",
   "when(\"I add {int} and {int}\", function(context, a, b) {",
-  "  context$result <- a + b",
+  "  context$result <- context$add(a, b)",
   "  print(context$result)",
   "})",
   "",
@@ -127,17 +128,68 @@ Step through a scenario, or a scenario outline with a background, to see which c
   {"t": "Compile the scenarios", "c": "Each row of the Examples becomes its own test case, so this outline gives two. In each, <code>&lt;a&gt;</code>, <code>&lt;b&gt;</code> and <code>&lt;sum&gt;</code> are replaced by the row's values, and the <code>Background</code> step comes before the scenario's own steps.", "f": [3, 5, 6, 9, 10]},
   {"t": "before_all()", "c": "Runs once, before the first test case, not before each row.", "k": [1], "o": ["run starts"]},
   {"t": "Row 1: before()", "c": "Runs before each test case, so once for every row. The highlighted steps and row are that test case. The test case gets a new, empty <code>context</code>.", "f": [3, 5, 6, 9], "k": [3], "x": "start = 12:00:00", "r": 1},
-  {"t": "Row 1: Given a calculator", "c": "The <code>Background</code> step runs first. Its step definition is called with <code>context</code> and returns without an error, so it passes.", "f": [3], "k": [6, 7, 8], "x": "start = 12:00:00\nresult = 0", "p": 3, "o": ["[1] 0"]},
-  {"t": "Row 1: When I add 1 and 2", "c": "The text is matched after the placeholders became the row's values. Each <code>{int}</code> is cast with <code>as.integer()</code>, and the values are passed after <code>context</code>, in order: <code>a = 1L</code>, <code>b = 2L</code>.", "f": [5, 9], "k": [11, 12, 13], "x": "start = 12:00:00\nresult = 3", "p": 5, "o": ["[1] 3"]},
+  {"t": "Row 1: Given a calculator", "c": "The <code>Background</code> step runs first. Its step definition puts a calculator in <code>context</code>, and the steps after it use it. Without it they would fail, so it runs again for every row.", "f": [3], "k": [6, 7, 8], "x": "start = 12:00:00\nadd = <function>", "p": 3, "o": ["calculator ready"]},
+  {"t": "Row 1: When I add 1 and 2", "c": "The text is matched after the placeholders became the row's values. Each <code>{int}</code> is cast with <code>as.integer()</code>, and the values are passed after <code>context</code>, in order: <code>a = 1L</code>, <code>b = 2L</code>. It calls the calculator that the <code>Background</code> step put in <code>context</code>.", "f": [5, 9], "k": [11, 12, 13], "x": "start = 12:00:00\nadd = <function>\nresult = 3", "p": 5, "o": ["[1] 3"]},
   {"t": "Row 1: Then the result is 3", "c": "<code>sum = 3L</code> comes from the same row. The expectation compares it with the <code>result</code> the previous step left in <code>context</code>, and holds.", "f": [6, 9], "k": [16, 17, 18], "p": 6, "o": ["[1] 3"]},
   {"t": "Row 1: after()", "c": "Runs after the test case. Its <code>context</code> is discarded.", "f": [3, 5, 6, 9], "k": [4], "x": "(discarded)", "o": ["took 0.01 secs"]},
   {"t": "Row 2: before()", "c": "Runs before each test case, so once for every row. The highlighted steps and row are that test case. The test case gets a new, empty <code>context</code>. Nothing is left from the first row.", "f": [3, 5, 6, 10], "k": [3], "x": "start = 12:00:01", "r": 1},
-  {"t": "Row 2: Given a calculator", "c": "The <code>Background</code> step runs first. Its step definition is called with <code>context</code> and returns without an error, so it passes.", "f": [3], "k": [6, 7, 8], "x": "start = 12:00:01\nresult = 0", "p": 3, "o": ["[1] 0"]},
-  {"t": "Row 2: When I add 4 and 5", "c": "The text is matched after the placeholders became the row's values. Each <code>{int}</code> is cast with <code>as.integer()</code>, and the values are passed after <code>context</code>, in order: <code>a = 4L</code>, <code>b = 5L</code>.", "f": [5, 10], "k": [11, 12, 13], "x": "start = 12:00:01\nresult = 9", "p": 5, "o": ["[1] 9"]},
+  {"t": "Row 2: Given a calculator", "c": "The <code>Background</code> step runs first. Its step definition puts a calculator in <code>context</code>, and the steps after it use it. Without it they would fail, so it runs again for every row.", "f": [3], "k": [6, 7, 8], "x": "start = 12:00:01\nadd = <function>", "p": 3, "o": ["calculator ready"]},
+  {"t": "Row 2: When I add 4 and 5", "c": "The text is matched after the placeholders became the row's values. Each <code>{int}</code> is cast with <code>as.integer()</code>, and the values are passed after <code>context</code>, in order: <code>a = 4L</code>, <code>b = 5L</code>. It calls the calculator that the <code>Background</code> step put in <code>context</code>.", "f": [5, 10], "k": [11, 12, 13], "x": "start = 12:00:01\nadd = <function>\nresult = 9", "p": 5, "o": ["[1] 9"]},
   {"t": "Row 2: Then the result is 9", "c": "<code>sum = 9L</code> comes from the same row. The expectation compares it with the <code>result</code> the previous step left in <code>context</code>, and holds.", "f": [6, 10], "k": [16, 17, 18], "p": 6, "o": ["[1] 9"]},
   {"t": "Row 2: after()", "c": "Runs after the test case. Its <code>context</code> is discarded.", "f": [3, 5, 6, 10], "k": [4], "x": "(discarded)", "o": ["took 0.01 secs"]},
   {"t": "after_all()", "c": "Runs once, after the last test case.", "k": [21], "o": ["run ends"]},
   {"t": "Report", "c": "Every message was passed to the reporter as it happened: the progress in the console, or a report written when the run ends."}
+ ]
+}
+</script>
+</div>
+</div>
+<div id="run-failing" class="tab-pane" role="tabpanel">
+<div class="stepper" role="group" aria-label="Failing step, step by step">
+<script type="application/json">
+{
+ "feature": ["Feature: Basket", "  Scenario: Add two items", "    Given an empty basket", "    When I add 2 items", "    Then the basket has 3 items", "    And the basket is not empty"],
+ "code": [
+  "before_all(function() message(\"run starts\"))",
+  "",
+  "before(function(context) context$start <- Sys.time())",
+  "after(function(context) message(\"took \", format(Sys.time() - context$start)))",
+  "",
+  "given(\"an empty basket\", function(context) {",
+  "  context$basket <- character()",
+  "  print(context$basket)",
+  "})",
+  "",
+  "when(\"I add {int} items\", function(context, n) {",
+  "  context$basket <- rep(\"cucumber\", n)",
+  "  print(context$basket)",
+  "})",
+  "",
+  "then(\"the basket has {int} items\", function(context, n) {",
+  "  print(length(context$basket))",
+  "  expect_length(context$basket, n)",
+  "})",
+  "",
+  "then(\"the basket is not empty\", function(context) {",
+  "  expect_gt(length(context$basket), 0)",
+  "})",
+  "",
+  "after_all(function() message(\"run ends\"))"
+ ],
+ "frames": [
+  {"t": "Load the step definitions", "c": "The setup file is run. Nothing executes yet: each call only <em>registers</em> a hook or a step definition.", "k": [1, 3, 4, 6, 11, 16, 21, 25], "x": "(no context yet)"},
+  {"t": "Parse the feature file", "c": "The feature file is parsed into a Gherkin document.", "f": [1, 2, 3, 4, 5, 6]},
+  {"t": "Compile the scenario", "c": "The scenario becomes a test case, with one pickle step for each of its steps.", "f": [3, 4, 5, 6]},
+  {"t": "before_all()", "c": "Runs once, before the first scenario.", "k": [1], "o": ["run starts"]},
+  {"t": "before()", "c": "Runs before each scenario. The scenario gets a new, empty <code>context</code>.", "k": [3], "x": "start = 12:00:00"},
+  {"t": "Given an empty basket", "c": "The step is matched to its step definition and called. It returns without an error, so it passes.", "f": [3], "k": [6, 7, 8], "x": "start = 12:00:00\nbasket = character(0)", "p": 3, "o": ["character(0)"]},
+  {"t": "When I add 2 items", "c": "<code>{int}</code> matches <code>2</code>, and the step definition is called with <code>n = 2L</code>. It passes.", "f": [4], "k": [11, 12, 13], "x": "start = 12:00:00\nbasket = c(\"cucumber\", \"cucumber\")", "p": 4, "o": ["[1] \"cucumber\" \"cucumber\""]},
+  {"t": "Match: Then the basket has 3 items", "c": "The text matches the step definition, with <code>n = 3L</code>.", "f": [5], "k": [16]},
+  {"t": "Run: Then the basket has 3 items", "c": "The basket has 2 items, not 3, so the expectation fails. The error ends the step definition at that line, and the step is <strong>failed</strong>.", "f": [5], "k": [17, 18], "failed": 5, "o": ["[1] 2"]},
+  {"t": "The step after it", "c": "The steps after a failed one are not called: they are <strong>skipped</strong>. Their state would build on a step that did not finish.", "f": [6], "skipped": 6},
+  {"t": "after()", "c": "Runs after the scenario also when a step failed, so it can clean up. Then its <code>context</code> is discarded.", "k": [4], "x": "(discarded)", "o": ["took 0.01 secs"]},
+  {"t": "after_all()", "c": "Runs once, after the last scenario.", "k": [25], "o": ["run ends"]},
+  {"t": "Report", "c": "The scenario is reported as failed, with the step's error, and the run goes on with the next scenario. With <code>fail_fast = TRUE</code> the scenarios after it are skipped instead."}
  ]
 }
 </script>

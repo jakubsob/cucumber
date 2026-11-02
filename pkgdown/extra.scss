@@ -220,7 +220,7 @@ main ul:not([class]) {
       top: 0.62em;
       width: 0.45em;
       height: 0.45em;
-      background: var(--rl-brand);
+      background: var(--rl-passed);
       border: 1px solid var(--rl-passed);
     }
   }
@@ -729,6 +729,8 @@ a.gherkin-keyword {
     color: var(--rl-muted);
 
     &.passed::after { content: "  ✓" / "passed"; color: var(--rl-passed); font-weight: 700; }
+    &.failed::after { content: "  ✗" / "failed"; color: var(--rl-failed); font-weight: 700; }
+    &.skipped::after { content: "  –" / "skipped"; color: var(--rl-skipped); font-weight: 700; }
     &.active {
       color: var(--rl-ink);
       background: color-mix(in srgb, var(--rl-brand) 22%, transparent);
