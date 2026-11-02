@@ -54,6 +54,9 @@ testthat test file.
 ## Articles
 
 - [`vignette("bdd", package = "cucumber")`](https://jakubsob.github.io/cucumber/dev/articles/bdd.md):
+  Behavior-Driven Development, with base R.
+
+- [`vignette("bdd-cucumber", package = "cucumber")`](https://jakubsob.github.io/cucumber/dev/articles/bdd-cucumber.md):
   Behavior-Driven Development with cucumber.
 
 - [`vignette("how-it-works", package = "cucumber")`](https://jakubsob.github.io/cucumber/dev/articles/how-it-works.md):

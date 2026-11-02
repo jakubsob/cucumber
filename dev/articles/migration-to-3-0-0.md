@@ -1100,7 +1100,7 @@ the section. Each feature is shown as one block of Gherkin, with only
 the Rules, Backgrounds and Examples of the selected scenarios. On a
 pkgdown site it’s shown like Markdown with Gherkin, and
 `markdown = FALSE` keeps the block of Gherkin. See
-[`vignette("bdd")`](https://jakubsob.github.io/cucumber/dev/articles/bdd.md).
+[`vignette("bdd-cucumber")`](https://jakubsob.github.io/cucumber/dev/articles/bdd-cucumber.md).
 
 ## Snippets
 

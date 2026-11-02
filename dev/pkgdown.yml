@@ -2,6 +2,7 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  bdd-cucumber: bdd-cucumber.html
   bdd: bdd.html
   compatibility: compatibility.html
   get-started: get-started.html
@@ -11,7 +12,7 @@ articles:
   reference-gherkin: reference-gherkin.html
   reporting: reporting.html
   testthat: testthat.html
-last_built: 2026-11-02T19:01Z
+last_built: 2026-11-02T21:19Z
 urls:
   reference: https://jakubsob.github.io/cucumber/dev//reference
   article: https://jakubsob.github.io/cucumber/dev//articles

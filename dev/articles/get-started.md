@@ -2,7 +2,7 @@
 
 In a few minutes you’ll have a feature file written in plain language,
 steps in R that check it, and a run that tells you which scenarios pass.
-New to the idea behind it? Read
+New to Behavior-Driven Development, the idea behind it? Read
 [`vignette("bdd")`](https://jakubsob.github.io/cucumber/dev/articles/bdd.md)
 first, or come back to it later.
 
@@ -75,7 +75,7 @@ runs the feature files of `tests/acceptance`:
 Summary
   3 scenarios (3 passed)
   6 steps (6 passed)
-  0m00.066s (executing steps: 0m00.009s)
+  0m00.068s (executing steps: 0m00.009s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -125,7 +125,7 @@ Failures:
 Summary
   3 scenarios (1 failed, 2 passed)
   6 steps (1 failed, 5 passed)
-  0m00.053s (executing steps: 0m00.025s)
+  0m00.056s (executing steps: 0m00.027s)
 ────────────────────────────────────────────────────────────────────────────────
 Error: Test failures. 
 ```
@@ -152,7 +152,7 @@ Feature: Addition
 Summary
   3 scenarios (3 passed)
   6 steps (6 passed)
-  0m00.046s (executing steps: 0m00.009s)
+  0m00.051s (executing steps: 0m00.010s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
