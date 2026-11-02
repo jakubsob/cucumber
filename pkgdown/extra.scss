@@ -713,13 +713,11 @@ a.gherkin-keyword {
   }
 
   .stepper-context .stepper-body,
-  .stepper-log .stepper-body {
+  .stepper-console .stepper-body {
     padding: 0.5rem 0.75rem;
     min-height: 4.5rem;
     white-space: pre-wrap;
   }
-
-  .stepper-log .stepper-body { max-height: 11rem; overflow-y: auto; }
 
   .stepper-line {
     display: block;

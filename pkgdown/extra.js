@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var feature = pane(data.featureFile || "features/basket.feature", "stepper-feature");
     var code = pane(data.codeFile || "features/setup-basket.R", "stepper-code");
     var context = pane("context", "stepper-context");
-    var log = pane("messages", "stepper-log");
+    var output = pane("console", "stepper-console");
     var featureLines = lines(feature, data.feature);
     var codeLines = lines(code, data.code);
 
@@ -134,10 +134,9 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       var last = frames.slice(0, index + 1).filter(function (f) { return f.x !== undefined; }).pop();
       context.body.textContent = last ? last.x : "(no context yet)";
-      log.body.textContent = frames.slice(0, index + 1).reduce(function (all, f) {
-        return all.concat(f.m || []);
+      output.body.textContent = frames.slice(0, index + 1).reduce(function (all, f) {
+        return all.concat(f.o || []);
       }, []).join("\n");
-      log.body.scrollTop = log.body.scrollHeight;
       title.textContent = frame.t;
       comment.innerHTML = frame.c;
       counter.textContent = (index + 1) + " / " + frames.length;
@@ -162,7 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
     left.appendChild(feature.box);
     var right = el("div", "stepper-col");
     right.appendChild(context.box);
-    right.appendChild(log.box);
+    right.appendChild(output.box);
     grid.appendChild(left);
     grid.appendChild(right);
     [controls, title, comment, code.box, grid].forEach(function (c) { root.appendChild(c); });
