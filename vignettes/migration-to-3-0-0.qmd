@@ -658,7 +658,7 @@ See `vignette("reporting")` for how to write the HTML report of a run, attach a 
 #' @eval cucumber::features_rd(features = "basket.feature")
 ```
 
-It selects scenarios like `test()`, by `features`, `filter`, `name` and `tags`. By default only scenarios tagged `{r} I(cucumber:::format_option_default("cucumber.rd_tags"))` are selected. The `cucumber.rd_tags` option sets another tag expression, and `section` or the `cucumber.rd_section` option names the section. Each feature is shown as one block of Gherkin, with only the Rules, Backgrounds and Examples of the selected scenarios. On a pkgdown site it's shown like Markdown with Gherkin, and `markdown = FALSE` keeps the block of Gherkin. See `vignette("bdd")`.
+It selects scenarios like `test()`, by `features`, `filter`, `name` and `tags`. By default only scenarios tagged `{r} I(cucumber:::format_option_default("cucumber.rd_tags"))` are selected. The `cucumber.rd_tags` option sets another tag expression, and `section` or the `cucumber.rd_section` option names the section. Each feature is shown as one block of Gherkin, with only the Rules, Backgrounds and Examples of the selected scenarios. On a pkgdown site it's shown like Markdown with Gherkin, and `markdown = FALSE` keeps the block of Gherkin. See `vignette("bdd-cucumber")`.
 
 # Snippets
 

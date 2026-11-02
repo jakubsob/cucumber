@@ -27,7 +27,7 @@ example_run <- function(code, files) {
 }
 ```
 
-In a few minutes you'll have a feature file written in plain language, steps in R that check it, and a run that tells you which scenarios pass. New to the idea behind it? Read `vignette("bdd")` first, or come back to it later.
+In a few minutes you'll have a feature file written in plain language, steps in R that check it, and a run that tells you which scenarios pass. New to Behavior-Driven Development, the idea behind it? Read `vignette("bdd")` first, or come back to it later.
 
 # Install
 

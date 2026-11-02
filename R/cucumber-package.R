@@ -13,7 +13,8 @@
 #' - Documentation: [features_rd()].
 #'
 #' @section Articles:
-#' - `vignette("bdd", package = "cucumber")`: Behavior-Driven Development with cucumber.
+#' - `vignette("bdd", package = "cucumber")`: Behavior-Driven Development, with base R.
+#' - `vignette("bdd-cucumber", package = "cucumber")`: Behavior-Driven Development with cucumber.
 #' - `vignette("how-it-works", package = "cucumber")`: how a run finds and runs steps.
 #' - `vignette("reference-gherkin", package = "cucumber")`: how to write feature files.
 #' - `vignette("testthat", package = "cucumber")`: cucumber compared to testthat.

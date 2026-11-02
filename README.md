@@ -36,7 +36,9 @@ install.packages("cucumber")
   started](https://jakubsob.github.io/cucumber/articles/get-started.html):
   write and run your first feature.
 - **New to BDD?** Read [Behavior-Driven
-  Development](https://jakubsob.github.io/cucumber/articles/bdd.html).
+  Development](https://jakubsob.github.io/cucumber/articles/bdd.html),
+  then [BDD with
+  cucumber](https://jakubsob.github.io/cucumber/articles/bdd-cucumber.html).
 - **Know testthat?** See [cucumber and
   testthat](https://jakubsob.github.io/cucumber/articles/testthat.html).
 - **Looking something up?** Open the [function

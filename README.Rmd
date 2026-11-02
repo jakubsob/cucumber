@@ -66,7 +66,7 @@ install.packages("cucumber")
 ## Where to start
 
 - **New to cucumber?** [Get started](https://jakubsob.github.io/cucumber/articles/get-started.html): write and run your first feature.
-- **New to BDD?** Read [Behavior-Driven Development](https://jakubsob.github.io/cucumber/articles/bdd.html).
+- **New to BDD?** Read [Behavior-Driven Development](https://jakubsob.github.io/cucumber/articles/bdd.html), then [BDD with cucumber](https://jakubsob.github.io/cucumber/articles/bdd-cucumber.html).
 - **Know testthat?** See [cucumber and testthat](https://jakubsob.github.io/cucumber/articles/testthat.html).
 - **Looking something up?** Open the [function reference](https://jakubsob.github.io/cucumber/reference/) or the [Gherkin reference](https://jakubsob.github.io/cucumber/articles/reference-gherkin.html).
 

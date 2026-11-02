@@ -32,7 +32,8 @@ to them. Run them with \code{\link[=test]{test()}}, or with \code{\link[=run]{ru
 \section{Articles}{
 
 \itemize{
-\item \code{vignette("bdd", package = "cucumber")}: Behavior-Driven Development with cucumber.
+\item \code{vignette("bdd", package = "cucumber")}: Behavior-Driven Development, with base R.
+\item \code{vignette("bdd-cucumber", package = "cucumber")}: Behavior-Driven Development with cucumber.
 \item \code{vignette("how-it-works", package = "cucumber")}: how a run finds and runs steps.
 \item \code{vignette("reference-gherkin", package = "cucumber")}: how to write feature files.
 \item \code{vignette("testthat", package = "cucumber")}: cucumber compared to testthat.

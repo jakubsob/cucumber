@@ -47,6 +47,8 @@ navbar:
       menu:
         - text: Behavior-Driven Development
           href: articles/bdd.html
+        - text: BDD with cucumber
+          href: articles/bdd-cucumber.html
         - text: cucumber and testthat
           href: articles/testthat.html
         - text: Reports
