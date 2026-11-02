@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var feature = pane(data.featureFile || "features/basket.feature", "stepper-feature");
     var code = pane(data.codeFile || "features/setup-basket.R", "stepper-code");
     var context = pane("context", "stepper-context");
-    var log = pane("messages", "stepper-log");
+    var output = pane("console", "stepper-console");
     var featureLines = lines(feature, data.feature);
     var codeLines = lines(code, data.code);
 
@@ -124,20 +124,24 @@ document.addEventListener("DOMContentLoaded", function () {
       var frame = frames[index];
       var start = index;
       while (start > 0 && !frames[start].r) start--;
-      var passed = frames.slice(start, index + 1).map(function (f) { return f.p; });
+      var marked = function (key) {
+        return frames.slice(start, index + 1).map(function (f) { return f[key]; });
+      };
+      var results = { passed: marked("p"), failed: marked("failed"), skipped: marked("skipped") };
       featureLines.forEach(function (l, n) {
         l.classList.toggle("active", (frame.f || []).indexOf(n + 1) >= 0);
-        l.classList.toggle("passed", passed.indexOf(n + 1) >= 0);
+        Object.keys(results).forEach(function (status) {
+          l.classList.toggle(status, results[status].indexOf(n + 1) >= 0);
+        });
       });
       codeLines.forEach(function (l, n) {
         l.classList.toggle("active", (frame.k || []).indexOf(n + 1) >= 0);
       });
       var last = frames.slice(0, index + 1).filter(function (f) { return f.x !== undefined; }).pop();
       context.body.textContent = last ? last.x : "(no context yet)";
-      log.body.textContent = frames.slice(0, index + 1).reduce(function (all, f) {
-        return all.concat(f.m || []);
+      output.body.textContent = frames.slice(0, index + 1).reduce(function (all, f) {
+        return all.concat(f.o || []);
       }, []).join("\n");
-      log.body.scrollTop = log.body.scrollHeight;
       title.textContent = frame.t;
       comment.innerHTML = frame.c;
       counter.textContent = (index + 1) + " / " + frames.length;
@@ -162,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
     left.appendChild(feature.box);
     var right = el("div", "stepper-col");
     right.appendChild(context.box);
-    right.appendChild(log.box);
+    right.appendChild(output.box);
     grid.appendChild(left);
     grid.appendChild(right);
     [controls, title, comment, code.box, grid].forEach(function (c) { root.appendChild(c); });

@@ -41,12 +41,14 @@ for how cucumber and testthat compare.
 
 ## A run, step by step
 
-Step through a scenario, or a scenario outline with a background, to see
-which code runs when, or press Play. The highlighted lines of the setup
-file and the feature file are the ones in play.
+Step through a scenario, a scenario outline with a background, or a
+scenario with a failing step, to see which code runs when, or press
+Play. The highlighted lines of the setup file and the feature file are
+the ones in play.
 
 - Scenario
 - Scenario Outline with Background
+- Failing step
 
 Hooks run around the steps:
 [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)

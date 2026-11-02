@@ -60,7 +60,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.058s (executing steps: 0m00.007s)
+  0m00.056s (executing steps: 0m00.007s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -274,7 +274,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.036s (executing steps: 0m00.009s)
+  0m00.035s (executing steps: 0m00.008s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -357,7 +357,7 @@ Feature: Basket
 Summary
   4 scenarios (4 passed)
   13 steps (13 passed)
-  0m00.068s (executing steps: 0m00.012s)
+  0m00.065s (executing steps: 0m00.012s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -686,7 +686,7 @@ Feature: Addition
 Summary
   3 scenarios (3 passed)
   9 steps (9 passed)
-  0m00.036s (executing steps: 0m00.009s)
+  0m00.037s (executing steps: 0m00.008s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -763,7 +763,7 @@ Feature: Eating
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.032s (executing steps: 0m00.006s)
+  0m00.030s (executing steps: 0m00.006s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -902,7 +902,7 @@ Feature: Outlines
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.033s (executing steps: 0m00.006s)
+  0m00.030s (executing steps: 0m00.005s)
 ────────────────────────────────────────────────────────────────────────────────
 ````
 
@@ -957,7 +957,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.016s (executing steps: 0m00.002s)
+  0m00.019s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1068,7 +1068,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.024s (executing steps: 0m00.003s)
+  0m00.027s (executing steps: 0m00.006s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1123,7 +1123,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.039s (executing steps: 0m00.017s)
+  0m00.038s (executing steps: 0m00.013s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1177,7 +1177,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.017s (executing steps: 0m00.002s)
+  0m00.020s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1227,7 +1227,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.016s (executing steps: 0m00.002s)
+  0m00.017s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1275,7 +1275,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.020s (executing steps: 0m00.002s)
+  0m00.016s (executing steps: 0m00.001s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1350,7 +1350,7 @@ Feature: Platforms
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.023s (executing steps: 0m00.004s)
+  0m00.026s (executing steps: 0m00.007s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1428,7 +1428,7 @@ Feature: Tagged
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.022s (executing steps: 0m00.004s)
+  0m00.026s (executing steps: 0m00.004s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1517,7 +1517,7 @@ Feature: Tagged
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.036s (executing steps: 0m00.005s)
+  0m00.030s (executing steps: 0m00.004s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1622,7 +1622,7 @@ Fonctionnalité: Addition
 Summary
   2 scenarios (2 passed)
   7 steps (7 passed)
-  0m00.035s (executing steps: 0m00.010s)
+  0m00.029s (executing steps: 0m00.006s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1732,7 +1732,7 @@ Feature: Basket
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.029s (executing steps: 0m00.005s)
+  0m00.032s (executing steps: 0m00.009s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1784,7 +1784,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.017s (executing steps: 0m00.002s)
+  0m00.020s (executing steps: 0m00.005s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
