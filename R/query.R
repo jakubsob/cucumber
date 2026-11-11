@@ -92,7 +92,70 @@ new_query <- function() {
     severity <- vapply(results, \(result) status_severity(result$status), integer(1))
     results[[max(which(severity == max(severity)))]]
   }
+  # What the reporters print of a test case, from its messages so far: its
+  # pickle and lineage, attempt, status, the steps run with their results, and
+  # the hooks that failed, are pending or skipped it, with the number of steps
+  # run before each
+  q$scenario_of <- function(test_case_started) {
+    pickle <- q$pickle_of(test_case_started)
+    steps <- list()
+    hooks <- list()
+    for (finished in q$test_steps_finished[[test_case_started$id]]) {
+      result <- finished$testStepResult
+      pickle_step_id <- q$test_steps[[finished$testStepId]]$pickleStepId
+      if (!is.null(pickle_step_id)) {
+        steps <- c(steps, list(reported_step(q, q$pickle_steps[[pickle_step_id]], result)))
+      } else if (!is.null(result$message)) {
+        hooks <- c(
+          hooks,
+          list(list(status = tolower(result$status), error = result$message, after_steps = length(steps)))
+        )
+      }
+    }
+    list(
+      pickle = pickle,
+      lineage = q$lineage_of(pickle),
+      attempt = test_case_started$attempt,
+      status = tolower(q$most_severe_result_of(test_case_started)$status %||% "PASSED"),
+      steps = steps,
+      hooks = hooks
+    )
+  }
   q
+}
+
+#' A pickle step and its result, as the reporters print it: its keyword as
+#' written, text, status, error message, and the lines of its Doc String or
+#' the rows of its Data Table
+#'
+#' @keywords internal
+#' @noRd
+reported_step <- function(q, pickle_step, result) {
+  argument <- pickle_step$argument
+  step <- q$step_of(pickle_step)
+  content <- argument$docString$content
+  list(
+    # Its space too, as some keywords have none, like `假如` in Chinese
+    keyword = step$keyword,
+    text = pickle_step$text,
+    status = tolower(result$status),
+    error = result$message,
+    docstring = if (!is.null(argument$docString)) {
+      list(
+        delimiter = step$docString$delimiter %||% '"""',
+        media_type = argument$docString$mediaType,
+        # With its empty lines at the end
+        lines = if (nzchar(content)) stringi::stri_split_fixed(content, "\n")[[1]] else character()
+      )
+    },
+    data_table = if (!is.null(argument$dataTable)) {
+      lapply(argument$dataTable$rows, \(row) {
+        vapply(row$cells, \(cell) cell$value, character(1))
+      })
+    },
+    data_table_first = !is.null(step$dataTable) && !is.null(step$docString) &&
+      step$dataTable$location$line < step$docString$location$line
+  )
 }
 
 #' The steps of a Gherkin document by id, and the lineage of each of its

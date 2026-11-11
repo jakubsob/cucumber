@@ -309,8 +309,6 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{step_statuses}}{Statuses of the reported steps}
-
 \item{\code{scenario_statuses}}{Statuses of the finished scenarios}
 
 \item{\code{current_feature}}{Name of the feature currently executing, like \code{"Feature: Basket"}}
@@ -319,10 +317,6 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 
 \item{\code{current_rule}}{Name of the Rule of the scenario currently executing, like
 \code{"Rule: Removing items"}, or \code{NULL}}
-
-\item{\code{current_steps}}{Steps executed so far in the current scenario}
-
-\item{\code{current_hooks}}{Results of the current scenario's hooks that failed, are pending or skipped it}
 
 \item{\code{failures}}{The scenarios that didn't pass or skip, printed as they finish by some reporters}
 

@@ -1,37 +1,3 @@
-#' A pickle step and its result, as the reporters print it: its keyword as
-#' written, text, status, error message, and the lines of its Doc String or
-#' the rows of its Data Table
-#'
-#' @keywords internal
-#' @noRd
-reported_step <- function(q, pickle_step, result) {
-  argument <- pickle_step$argument
-  step <- q$step_of(pickle_step)
-  content <- argument$docString$content
-  list(
-    # Its space too, as some keywords have none, like `假如` in Chinese
-    keyword = step$keyword,
-    text = pickle_step$text,
-    status = tolower(result$status),
-    error = result$message,
-    docstring = if (!is.null(argument$docString)) {
-      list(
-        delimiter = step$docString$delimiter %||% '"""',
-        media_type = argument$docString$mediaType,
-        # With its empty lines at the end
-        lines = if (nzchar(content)) stringi::stri_split_fixed(content, "\n")[[1]] else character()
-      )
-    },
-    data_table = if (!is.null(argument$dataTable)) {
-      lapply(argument$dataTable$rows, \(row) {
-        vapply(row$cells, \(cell) cell$value, character(1))
-      })
-    },
-    data_table_first = !is.null(step$dataTable) && !is.null(step$docString) &&
-      step$dataTable$location$line < step$docString$location$line
-  )
-}
-
 #' Summary Reporter for Cucumber
 #'
 #' @description
@@ -72,9 +38,6 @@ CucumberSummaryReporter <- R6::R6Class(
   "CucumberSummaryReporter",
   inherit = CucumberReporter,
   public = list(
-    #' @field step_statuses Statuses of the reported steps
-    step_statuses = NULL,
-
     #' @field scenario_statuses Statuses of the finished scenarios
     scenario_statuses = NULL,
 
@@ -87,12 +50,6 @@ CucumberSummaryReporter <- R6::R6Class(
     #' @field current_rule Name of the Rule of the scenario currently executing, like
     #'   `"Rule: Removing items"`, or `NULL`
     current_rule = NULL,
-
-    #' @field current_steps Steps executed so far in the current scenario
-    current_steps = NULL,
-
-    #' @field current_hooks Results of the current scenario's hooks that failed, are pending or skipped it
-    current_hooks = NULL,
 
     #' @field failures The scenarios that didn't pass or skip, printed as they finish by some reporters
     failures = NULL,
@@ -126,9 +83,7 @@ CucumberSummaryReporter <- R6::R6Class(
     #'   directory when the reporter is created. Its directory is created when
     #'   the reporter is, if it doesn't exist.
     initialize = function(file = NULL) {
-      self$step_statuses <- character()
       self$scenario_statuses <- character()
-      self$current_steps <- list()
       self$failures <- list()
       self$issues <- list()
       private$query <- new_query()
@@ -230,14 +185,10 @@ CucumberSummaryReporter <- R6::R6Class(
           }
           self$current_rule <- if (!is.null(lineage$rule)) paste0(lineage$rule$keyword, ": ", lineage$rule$name)
           private$scenario_name <- paste0(lineage$scenario$keyword, ": ", pickle$name)
-          private$attempt <- message$attempt
           self$current_scenario <- paste0(
             private$scenario_name,
             if (message$attempt > 0) paste0(" (attempt ", message$attempt + 1, ")")
           )
-          private$steps_before <- length(self$step_statuses)
-          self$current_steps <- list()
-          self$current_hooks <- list()
           private$on_scenario_start()
         },
         testStepStarted = {
@@ -246,56 +197,38 @@ CucumberSummaryReporter <- R6::R6Class(
           }
         },
         testStepFinished = {
-          test_step <- q$test_steps[[message$testStepId]]
-          result <- message$testStepResult
-          if (!is.null(test_step$pickleStepId)) {
-            step <- reported_step(
-              q,
-              q$pickle_steps[[test_step$pickleStepId]],
-              result
-            )
-            self$current_steps <- c(self$current_steps, list(step))
-            self$step_statuses <- c(self$step_statuses, step$status)
-            private$on_step_end(step)
-          } else if (!is.null(result$message)) {
-            hook <- list(
-              status = tolower(result$status),
-              error = result$message,
-              after_steps = length(self$current_steps)
-            )
-            self$current_hooks <- c(self$current_hooks, list(hook))
-            private$on_hook_end(hook)
+          scenario <- q$scenario_of(q$test_cases_started[[message$testCaseStartedId]])
+          if (!is.null(q$test_steps[[message$testStepId]]$pickleStepId)) {
+            private$on_step_end(scenario$steps[[length(scenario$steps)]])
+          } else if (!is.null(message$testStepResult$message)) {
+            private$on_hook_end(scenario$hooks[[length(scenario$hooks)]])
           }
         },
         testCaseFinished = {
           started <- q$test_cases_started[[message$testCaseStartedId]]
-          status <- tolower(
-            q$most_severe_result_of(started)$status %||% "PASSED"
-          )
-          pickle <- q$pickle_of(started)
+          scenario <- q$scenario_of(started)
           failure <- list(
             feature = self$current_feature,
             scenario = self$current_scenario,
-            location = paste0(pickle$uri, ":", pickle$location$line),
-            status = status,
-            steps = self$current_steps,
-            hooks = self$current_hooks
+            location = paste0(scenario$pickle$uri, ":", scenario$pickle$location$line),
+            status = scenario$status,
+            steps = scenario$steps,
+            hooks = scenario$hooks
           )
           # Only the last attempt of a scenario is counted. A failed one
           # that will be retried is a warning of the summary.
           if (isTRUE(message$willBeRetried)) {
-            self$step_statuses <- self$step_statuses[seq_len(private$steps_before)]
-            failure$scenario <- paste0(private$scenario_name, " (attempt ", private$attempt + 1, ", retried)")
+            failure$scenario <- paste0(private$scenario_name, " (attempt ", started$attempt + 1, ", retried)")
             failure$retried <- TRUE
             self$issues <- c(self$issues, list(failure))
             return(invisible(self))
           }
-          self$scenario_statuses <- c(self$scenario_statuses, status)
-          if (!status %in% c("passed", "skipped")) {
+          self$scenario_statuses <- c(self$scenario_statuses, scenario$status)
+          if (!scenario$status %in% c("passed", "skipped")) {
             self$failures <- c(self$failures, list(failure))
             self$issues <- c(self$issues, list(failure))
           }
-          private$on_scenario_end(status)
+          private$on_scenario_end(scenario$status)
         },
         testRunFinished = private$finish_feature()
       )
@@ -334,13 +267,17 @@ CucumberSummaryReporter <- R6::R6Class(
         "\n",
         sep = ""
       )
+      q <- private$query
+      # Only the last attempt of each scenario is counted
+      step_statuses <- unlist(lapply(q$test_cases_started_final(), \(started) {
+        vapply(q$scenario_of(started)$steps, \(step) step$status, character(1))
+      }))
       cat(
         "  ",
-        format_status_counts(self$step_statuses, "step"),
+        format_status_counts(step_statuses %||% character(), "step"),
         "\n",
         sep = ""
       )
-      q <- private$query
       # A run stopped before it finished has no duration
       if (!is.null(q$test_run_finished)) {
         steps <- unlist(lapply(unlist(q$test_steps_finished, recursive = FALSE), \(finished) {
@@ -405,11 +342,8 @@ CucumberSummaryReporter <- R6::R6Class(
   private = list(
     query = NULL,
     feature_uri = NULL,
-    # The current scenario's keyword and name, and its attempt
+    # The current scenario's keyword and name
     scenario_name = NULL,
-    attempt = 0L,
-    # Number of steps counted before the current attempt of a scenario
-    steps_before = 0L,
 
     finish_feature = function() {
       if (!is.null(private$feature_uri)) {
