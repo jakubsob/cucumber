@@ -130,7 +130,7 @@ run_cucumber <- function(config, cleanup_env, start_file = NULL) {
           run_features(config, cleanup_env = cleanup_env, start_file = start_file)
         },
         # Warnings outside scenarios, like in a before all hook. testthat keeps a
-        # scenario's warnings, so they don't get here: execute_single_pickle() reports them.
+        # scenario's warnings, so they don't get here: execute_scenario() reports them.
         warning = \(w) cucumber_event(reporter, "add_warning", w)
       ),
       error = function(e) error <<- e
@@ -183,10 +183,7 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
   reporter <- config$reporter
   # Before anything can stop the run, or testthat would delete the snapshot
   # files of the features as unused
-  # Every scenario runs: no selection, and not a dry run
-  complete <- is.null(config$filter) && is.null(config$tags) && is.null(config$name) &&
-    is.null(config$features) && !config$dry_run
-  snapshots <- run_snapshots(path, find_features(path), complete)
+  snapshots <- run_snapshots(path, find_features(path), config$complete)
 
   lines <- feature_lines(config$features, path)
   features <- exec(select_features, path, config$filter, lines, !!!config$grepl_args)
@@ -223,34 +220,8 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
     stop(before_error)
   }
 
-  # The scenarios of all features are put in order together
-  pickles <- unlist(
-    map(unname(features), \(path) filter_pickles(sources[[path]]$pickles, config$tags, config$name, lines[[path]])),
-    recursive = FALSE
-  )
-  pickles <- prepare_pickles(
-    order_pickles(pickles, config$order),
-    glue$steps,
-    get_parameters(),
-    hooks,
-    reporter = reporter,
-    test_run_started_id = test_run_started$id
-  )
-  # Consecutive scenarios of a feature run in its testthat context
-  files <- rle(map_chr(pickles, "feature_file"))
-  for (run in split(pickles, rep(seq_along(files$lengths), files$lengths))) {
-    feature_file <- run[[1]]$feature_file
-    if (!is.null(start_file)) start_file(feature_file)
-    failed <- execute_feature(
-      sources[[feature_file]]$document,
-      run,
-      hooks,
-      config,
-      failed = failed,
-      skip = skip,
-      snapshots = snapshots$feature(feature_file, map_chr(sources[[feature_file]]$pickles, "test_name"))
-    )
-  }
+  pickles <- plan_pickles(features, sources, lines, config, glue, hooks, test_run_started$id)
+  failed <- execute_features(pickles, sources, hooks, config, skip, snapshots, start_file)
   # A run that skipped scenarios after a failed one, or all of them in a before
   # all hook, didn't run every scenario
   if (!(config$fail_fast && failed) && is.null(skip)) snapshots$finish()
@@ -483,7 +454,8 @@ check_grepl_args <- function(...) {
 
 #' The settings of a run, from the arguments of `run()` and `test()`, checked
 #' before anything runs, so a mistake is an error that names the argument
-#' @return A list of the arguments, with `retry` an integer, `order` from
+#' @return A list of the arguments, with `complete`, whether every scenario
+#'   runs, `retry` an integer, `order` from
 #'   `resolve_order()` and the arguments of `grepl()` in `grepl_args`
 #' @keywords internal
 #' @noRd
@@ -498,6 +470,8 @@ run_config <- function(path, filter, tags, reporter, strict, dry_run, name, feat
   }
   list(
     path = path,
+    # Every scenario runs: no selection, and not a dry run
+    complete = is.null(filter) && is.null(tags) && is.null(name) && is.null(features) && !dry_run,
     filter = filter,
     tags = tags,
     reporter = reporter,
