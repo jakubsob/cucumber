@@ -5,12 +5,14 @@
 #' @param sources The parsed features by file, with their `pickles`
 #' @param lines The lines of the scenarios to run of each feature file, see `feature_lines()`
 #' @param config The settings of the run, from `run_config()`
-#' @param glue The steps and hooks of the run, from `emit_glue()`
+#' @param glue The steps and hooks of the run, from `emit_glue()`, whose hooks
+#'   are the ones to run: none in a dry run
+#' @param test_run_started_id The id of the run's `testRunStarted` message
 #' @return The pickles to run, each with its matched steps and its test case
 #' @keywords internal
 #' @noRd
 #' @importFrom purrr map map_chr walk
-plan_pickles <- function(features, sources, lines, config, glue, hooks, test_run_started_id) {
+plan_pickles <- function(features, sources, lines, config, glue, test_run_started_id) {
   # The scenarios of all features are put in order together
   pickles <- unlist(
     map(unname(features), \(path) filter_pickles(sources[[path]]$pickles, config$tags, config$name, lines[[path]])),
@@ -20,7 +22,7 @@ plan_pickles <- function(features, sources, lines, config, glue, hooks, test_run
     order_pickles(pickles, config$order),
     glue$steps,
     get_parameters(),
-    hooks,
+    glue$hooks,
     reporter = config$reporter,
     test_run_started_id = test_run_started_id
   )
@@ -48,31 +50,38 @@ prepare_pickles <- function(
   pickles
 }
 
+#' What the scenarios of a run need to run: its settings and hooks, the skip of
+#' a before all hook, and its snapshots
+#'
+#' @param config The settings of the run, from `run_config()`
+#' @param hooks The hooks to run, none in a dry run
+#' @param skip The skip of a before all hook, that skips every scenario, or `NULL`
+#' @param snapshots The snapshots of the run, or of a feature, from
+#'   `run_snapshots()`, or `NULL` to leave snapshots to testthat
+#' @keywords internal
+#' @noRd
+new_run <- function(config, hooks, skip = NULL, snapshots = NULL) {
+  list(config = config, hooks = hooks, skip = skip, snapshots = snapshots)
+}
+
 #' Run the planned pickles, the consecutive ones of a feature in its testthat context
 #'
 #' @param sources The parsed features by file
 #' @param start_file A function called with each feature file before its
 #'   scenarios run, or `NULL`
-#' @param skip The skip of a before all hook, that skips every scenario, or `NULL`
-#' @param snapshots The snapshots of the run, from `run_snapshots()`
+#' @param run The run, from `new_run()`, with the snapshots of the run
 #' @return Whether a scenario failed
 #' @keywords internal
 #' @noRd
-execute_features <- function(pickles, sources, hooks, config, skip, snapshots, start_file = NULL) {
+execute_features <- function(pickles, sources, run, start_file = NULL) {
   failed <- FALSE
   files <- rle(map_chr(pickles, "feature_file"))
-  for (run in split(pickles, rep(seq_along(files$lengths), files$lengths))) {
-    feature_file <- run[[1]]$feature_file
+  for (pickles_of_feature in split(pickles, rep(seq_along(files$lengths), files$lengths))) {
+    feature_file <- pickles_of_feature[[1]]$feature_file
     if (!is.null(start_file)) start_file(feature_file)
-    failed <- execute_feature(
-      sources[[feature_file]]$document,
-      run,
-      hooks,
-      config,
-      failed = failed,
-      skip = skip,
-      snapshots = snapshots$feature(feature_file, map_chr(sources[[feature_file]]$pickles, "test_name"))
-    )
+    feature_run <- run
+    feature_run$snapshots <- run$snapshots$feature(feature_file, map_chr(sources[[feature_file]]$pickles, "test_name"))
+    failed <- execute_feature(sources[[feature_file]]$document, pickles_of_feature, feature_run, failed)
   }
   failed
 }
@@ -81,24 +90,13 @@ execute_features <- function(pickles, sources, hooks, config, skip, snapshots, s
 #'
 #' Each pickle runs as a testthat test, see `execute_scenario()`.
 #'
-#' @param config The settings of the run, from `run_config()`
+#' @param run The run, from `new_run()`, with the snapshots of the feature
 #' @param failed Whether a scenario of an earlier feature failed
-#' @param skip The skip of a before all hook, that skips every scenario, or `NULL`
-#' @param snapshots The snapshots of the feature, from `run_snapshots()`, or
-#'   `NULL` to leave snapshots to testthat
 #' @return Whether a scenario failed, invisibly
 #' @keywords internal
 #' @noRd
 #' @importFrom testthat context_start_file
-execute_feature <- function(
-  document,
-  pickles,
-  hooks,
-  config,
-  failed = FALSE,
-  skip = NULL,
-  snapshots = NULL
-) {
+execute_feature <- function(document, pickles, run, failed = FALSE) {
   # A feature without scenarios to run isn't reported
   if (length(pickles) == 0) {
     return(invisible(failed))
@@ -108,24 +106,12 @@ execute_feature <- function(
   context_start_file(feature_label(document$feature))
 
   # expect_snapshot() saves to the feature's snapshot file
-  if (!is.null(snapshots)) snapshots$local_use()
+  if (!is.null(run$snapshots)) run$snapshots$local_use()
   # Named in their feature, so a scenario's name doesn't depend on which scenarios run
   test_names <- map_chr(pickles, "test_name")
   for (i in seq_along(pickles)) {
     # Skipped like in a dry run, so undefined and ambiguous steps are still reported
-    pickle_failed <- execute_scenario(
-      pickles[[i]],
-      hooks,
-      config,
-      test_names[[i]],
-      skip_steps = config$dry_run || (config$fail_fast && failed) || !is.null(skip),
-      skip_reason = if (!is.null(skip)) {
-        conditionMessage(skip)
-      } else {
-        "A previous scenario failed and `fail_fast = TRUE`."
-      },
-      snapshots = snapshots
-    )
+    pickle_failed <- execute_scenario(pickles[[i]], run, failed, test_names[[i]])
     failed <- failed || pickle_failed
   }
 

@@ -193,7 +193,8 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
   sources <- parse_features(features, reporter)
   glue <- emit_glue(reporter, get_steps(), get_hooks(), get_parameters())
   # A dry run runs no hooks
-  hooks <- if (config$dry_run) .hooks() else glue$hooks
+  if (config$dry_run) glue$hooks <- .hooks()
+  hooks <- glue$hooks
 
   test_run_started <- list(id = new_id(), timestamp = timestamp())
   emit(reporter, "testRunStarted", test_run_started)
@@ -220,8 +221,8 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
     stop(before_error)
   }
 
-  pickles <- plan_pickles(features, sources, lines, config, glue, hooks, test_run_started$id)
-  failed <- execute_features(pickles, sources, hooks, config, skip, snapshots, start_file)
+  pickles <- plan_pickles(features, sources, lines, config, glue, test_run_started$id)
+  failed <- execute_features(pickles, sources, new_run(config, hooks, skip, snapshots), start_file)
   snapshots$finish(failed, !is.null(skip))
 
   invisible(NULL)

@@ -18,7 +18,7 @@ report_feature <- function(feature, reporter) {
   for (pickle in pickles) cucumber:::emit(reporter, "pickle", pickle$message)
   config <- cucumber:::run_config(".", NULL, NULL, reporter, TRUE, FALSE, NULL, NULL, FALSE, 0, "defined")
   pickles <- cucumber:::prepare_pickles(pickles, reporter = reporter)
-  cucumber:::execute_feature(document, pickles, cucumber:::get_hooks(), config)
+  cucumber:::execute_feature(document, pickles, cucumber:::new_run(config, cucumber:::get_hooks()))
 }
 
 describe("CucumberPrettyReporter", {
