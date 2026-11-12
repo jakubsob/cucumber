@@ -278,16 +278,3 @@ emit_suggestion <- function(reporter, step) {
     snippets = lapply(step$snippets, \(code) list(language = "r", code = code))
   ))
 }
-
-#' The statuses that fail a scenario. Failed and ambiguous steps always do,
-#' pending and undefined steps only in strict mode. In a dry run, nothing runs,
-#' so only a failure to run fails it.
-#'
-#' @keywords internal
-#' @noRd
-failing_statuses <- function(strict = TRUE, dry_run = FALSE) {
-  if (dry_run) {
-    return("failed")
-  }
-  c("failed", "ambiguous", if (strict) c("undefined", "pending"))
-}
