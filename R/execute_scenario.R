@@ -38,7 +38,7 @@ execute_scenario <- function(
   # Whether a snapshot wasn't checked, as on CRAN
   state$snapshot_on_cran <- FALSE
   # Snapshots are named after the scenario
-  if (!is.null(snapshots)) start_snapshot_scenario(snapshots, glue("Scenario: {test_name}"))
+  if (!is.null(snapshots)) snapshots$start(glue("Scenario: {test_name}"))
   test_that(glue("Scenario: {test_name}"), {
     run_scenario(state, pickle, hooks, config, skip_steps, snapshots)
     report_scenario(state, pickle, config, skip_steps, skip_reason)
@@ -67,7 +67,7 @@ run_scenario <- function(state, pickle, hooks, config, skip_steps, snapshots) {
       ))
       # Each attempt is a test case started of its own, with a new context
       for (attempt in 0:config$retry) {
-        if (attempt > 0 && !is.null(snapshots)) retry_snapshot_scenario(snapshots)
+        if (attempt > 0 && !is.null(snapshots)) snapshots$retry()
         # testthat gets the warnings and passed expectations of the last attempt only
         state$held <- list()
         state$expectations <- 0
@@ -92,7 +92,7 @@ run_scenario <- function(state, pickle, hooks, config, skip_steps, snapshots) {
       }
     }, error = \(e) if (!is.null(findRestart("cucumber_abort_run"))) invokeRestart("cucumber_abort_run", e))
     state$failed <- state$result$status %in% failing_statuses(config$strict, config$dry_run)
-    if (!is.null(snapshots)) end_snapshot_scenario(snapshots, state$result$status, state$snapshot_on_cran)
+    if (!is.null(snapshots)) snapshots$end(state$result$status, state$snapshot_on_cran)
   },
   # The reporter gets a warning as it's raised. A warning of a hook, or of
   # what a step or a hook deferred, is at the scenario's line.

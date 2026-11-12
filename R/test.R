@@ -183,7 +183,7 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
   reporter <- config$reporter
   # Before anything can stop the run, or testthat would delete the snapshot
   # files of the features as unused
-  snapshots <- run_snapshots(path, find_features(path), config$complete)
+  snapshots <- run_snapshots(config, find_features(path))
 
   lines <- feature_lines(config$features, path)
   features <- exec(select_features, path, config$filter, lines, !!!config$grepl_args)
@@ -222,9 +222,7 @@ run_features <- function(config, cleanup_env, start_file = NULL) {
 
   pickles <- plan_pickles(features, sources, lines, config, glue, hooks, test_run_started$id)
   failed <- execute_features(pickles, sources, hooks, config, skip, snapshots, start_file)
-  # A run that skipped scenarios after a failed one, or all of them in a before
-  # all hook, didn't run every scenario
-  if (!(config$fail_fast && failed) && is.null(skip)) snapshots$finish()
+  snapshots$finish(failed, !is.null(skip))
 
   invisible(NULL)
 }
