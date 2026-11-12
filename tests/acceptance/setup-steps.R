@@ -129,18 +129,7 @@ run_attachments <- function(context) {
   q <- cucumber:::new_query()
   for (envelope in context$run$envelopes) q$update(envelope)
   attachments <- Filter(Negate(is.null), lapply(context$run$envelopes, `[[`, "attachment"))
-  attached_to <- vapply(attachments, \(attachment) {
-    if (!is.null(attachment$testRunHookStartedId)) {
-      hook <- q$hooks[[q$test_run_hooks_started[[attachment$testRunHookStartedId]]$hookId]]
-      return(if (hook$type == "BEFORE_TEST_RUN") "BeforeAll" else "AfterAll")
-    }
-    test_step <- q$test_steps[[attachment$testStepId]]
-    if (is.null(test_step$pickleStepId)) {
-      return(if (startsWith(q$hooks[[test_step$hookId]]$type, "BEFORE")) "Before" else "After")
-    }
-    pickle_step <- q$pickle_steps[[test_step$pickleStepId]]
-    paste0(q$step_of(pickle_step)$keyword, pickle_step$text)
-  }, character(1))
+  attached_to <- vapply(attachments, q$attached_to, character(1))
   tibble::tibble(
     step = attached_to,
     media_type = vapply(attachments, \(attachment) attachment$mediaType, character(1)),

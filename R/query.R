@@ -5,87 +5,152 @@
 #' Gherkin step of a pickle step, the feature, rule and examples a pickle
 #' comes from.
 #'
-#' @return An environment with the messages by id, and functions to find
-#'   them.
+#' @return An environment of functions that find what the messages say. The
+#'   messages themselves are private.
 #' @keywords internal
 #' @noRd
 new_query <- function() {
+  # The messages by id, private to the query: callers use its functions
+  s <- new.env(parent = emptyenv())
   q <- new.env(parent = emptyenv())
-  q$pickles <- list()
-  q$pickle_steps <- list()
-  q$steps <- list()
-  q$lineages <- list()
-  q$test_cases <- list()
-  q$test_steps <- list()
-  q$test_cases_started <- list()
-  q$test_cases_finished <- list()
-  q$test_steps_finished <- list()
-  q$hooks <- list()
-  q$step_definitions <- list()
-  q$test_run_hooks_started <- list()
-  q$test_run_hooks_finished <- list()
-  q$test_run_started <- NULL
-  q$test_run_finished <- NULL
+  s$pickles <- list()
+  s$pickle_steps <- list()
+  s$steps <- list()
+  s$lineages <- list()
+  s$test_cases <- list()
+  s$test_steps <- list()
+  s$test_cases_started <- list()
+  s$test_cases_finished <- list()
+  s$test_steps_finished <- list()
+  s$hooks <- list()
+  s$step_definitions <- list()
+  s$test_run_hooks_started <- list()
+  s$test_run_hooks_finished <- list()
+  s$test_run_started <- NULL
+  s$test_run_finished <- NULL
 
   q$update <- function(envelope) {
     type <- names(envelope)
     message <- envelope[[1]]
     switch(
       type,
-      gherkinDocument = index_document(q, message),
+      gherkinDocument = index_document(s, message),
       pickle = {
-        q$pickles[[message$id]] <- message
-        for (step in message$steps) q$pickle_steps[[step$id]] <- step
+        s$pickles[[message$id]] <- message
+        for (step in message$steps) s$pickle_steps[[step$id]] <- step
       },
-      hook = q$hooks[[message$id]] <- message,
-      stepDefinition = q$step_definitions[[message$id]] <- message,
-      testRunStarted = q$test_run_started <- message,
-      testRunFinished = q$test_run_finished <- message,
-      testRunHookStarted = q$test_run_hooks_started[[message$id]] <- message,
-      testRunHookFinished = q$test_run_hooks_finished <- c(q$test_run_hooks_finished, list(message)),
+      hook = s$hooks[[message$id]] <- message,
+      stepDefinition = s$step_definitions[[message$id]] <- message,
+      testRunStarted = s$test_run_started <- message,
+      testRunFinished = s$test_run_finished <- message,
+      testRunHookStarted = s$test_run_hooks_started[[message$id]] <- message,
+      testRunHookFinished = s$test_run_hooks_finished <- c(s$test_run_hooks_finished, list(message)),
       testCase = {
-        q$test_cases[[message$id]] <- message
-        for (step in message$testSteps) q$test_steps[[step$id]] <- step
+        s$test_cases[[message$id]] <- message
+        for (step in message$testSteps) s$test_steps[[step$id]] <- step
       },
       testCaseStarted = {
-        q$test_cases_started[[message$id]] <- message
-        q$test_steps_finished[[message$id]] <- list()
+        s$test_cases_started[[message$id]] <- message
+        s$test_steps_finished[[message$id]] <- list()
       },
       testStepFinished = {
         id <- message$testCaseStartedId
-        q$test_steps_finished[[id]] <- c(q$test_steps_finished[[id]], list(message))
+        s$test_steps_finished[[id]] <- c(s$test_steps_finished[[id]], list(message))
       },
-      testCaseFinished = q$test_cases_finished[[message$testCaseStartedId]] <- message
+      testCaseFinished = s$test_cases_finished[[message$testCaseStartedId]] <- message
     )
     invisible(q)
   }
 
   # Test cases started that won't be retried, in the order they started
   q$test_cases_started_final <- function() {
-    Filter(\(started) !isTRUE(q$test_cases_finished[[started$id]]$willBeRetried), unname(q$test_cases_started))
+    Filter(\(started) !isTRUE(s$test_cases_finished[[started$id]]$willBeRetried), unname(s$test_cases_started))
   }
   q$pickle_of <- function(test_case_started) {
-    q$pickles[[q$test_cases[[test_case_started$testCaseId]]$pickleId]]
+    s$pickles[[s$test_cases[[test_case_started$testCaseId]]$pickleId]]
   }
   # The pickle's feature, rule, scenario, examples and example row
   q$lineage_of <- function(pickle) {
     ids <- unlist(pickle$astNodeIds)
-    q$lineages[[ids[[length(ids)]]]]
+    s$lineages[[ids[[length(ids)]]]]
   }
   # The Gherkin step of a pickle step
   q$step_of <- function(pickle_step) {
-    q$steps[[pickle_step$astNodeIds[[1]]]]
+    s$steps[[pickle_step$astNodeIds[[1]]]]
   }
-  # Each finished test step of a test case, with its test step
+  # Each finished test step of a test case, with its test step and the pickle
+  # step or hook it runs, the other one being NULL
   q$test_steps_of <- function(test_case_started) {
-    lapply(q$test_steps_finished[[test_case_started$id]], \(finished) {
-      list(finished = finished, test_step = q$test_steps[[finished$testStepId]])
+    lapply(s$test_steps_finished[[test_case_started$id]], \(finished) {
+      test_step <- s$test_steps[[finished$testStepId]]
+      list(
+        finished = finished,
+        test_step = test_step,
+        pickle_step = s$pickle_steps[[test_step$pickleStepId %||% ""]],
+        hook = s$hooks[[test_step$hookId %||% ""]]
+      )
     })
+  }
+  # Each step definition of the run, in the order they were defined
+  q$step_definitions <- function() unname(s$step_definitions)
+  # The test case started that a message of its steps refers to
+  q$started_of <- function(message) {
+    s$test_cases_started[[message$testCaseStartedId]]
+  }
+  # Whether a message of a test step is about a step of the pickle, not a hook
+  q$is_pickle_step <- function(message) {
+    !is.null(s$test_steps[[message$testStepId]]$pickleStepId)
+  }
+  # The status, in capitals, of the worst result of a test case: PASSED when
+  # it has no test steps
+  q$status_of <- function(test_case_started) {
+    q$most_severe_result_of(test_case_started)$status %||% "PASSED"
+  }
+  # Milliseconds a test case took, from when it started to when it finished
+  q$millis_of <- function(test_case_started) {
+    millis_between(test_case_started$timestamp, s$test_cases_finished[[test_case_started$id]]$timestamp)
+  }
+  # Whether the run finished, and when it started (NULL before it did)
+  q$run_finished <- function() !is.null(s$test_run_finished)
+  q$run_started_at <- function() s$test_run_started$timestamp
+  # Milliseconds the run took, from its start to its end
+  q$run_millis <- function() {
+    millis_between(s$test_run_started$timestamp, s$test_run_finished$timestamp)
+  }
+  # Milliseconds all test steps of the run took, every attempt included
+  q$steps_millis <- function() {
+    durations <- lapply(unlist(s$test_steps_finished, recursive = FALSE), \(finished) {
+      duration <- finished$testStepResult$duration
+      duration$seconds * 1000 + duration$nanos / 1e6
+    })
+    sum(unlist(durations))
+  }
+  # Each finished test run hook, with its start and the hook, in the order
+  # they finished
+  q$test_run_hooks <- function() {
+    lapply(s$test_run_hooks_finished, \(finished) {
+      started <- s$test_run_hooks_started[[finished$testRunHookStartedId]]
+      list(finished = finished, started = started, hook = s$hooks[[started$hookId]])
+    })
+  }
+  # What an attachment is attached to, like `When I open the page`, `Before`
+  # or `BeforeAll`
+  q$attached_to <- function(attachment) {
+    if (!is.null(attachment$testRunHookStartedId)) {
+      hook <- s$hooks[[s$test_run_hooks_started[[attachment$testRunHookStartedId]]$hookId]]
+      return(if (hook$type == "BEFORE_TEST_RUN") "BeforeAll" else "AfterAll")
+    }
+    test_step <- s$test_steps[[attachment$testStepId]]
+    if (is.null(test_step$pickleStepId)) {
+      return(if (startsWith(s$hooks[[test_step$hookId]]$type, "BEFORE")) "Before" else "After")
+    }
+    pickle_step <- s$pickle_steps[[test_step$pickleStepId]]
+    paste0(q$step_of(pickle_step)$keyword, pickle_step$text)
   }
   # The result of the test case's test step that is the worst, the last one
   # of them when several are, or NULL when it has no test steps
   q$most_severe_result_of <- function(test_case_started) {
-    results <- lapply(q$test_steps_finished[[test_case_started$id]], \(finished) finished$testStepResult)
+    results <- lapply(s$test_steps_finished[[test_case_started$id]], \(finished) finished$testStepResult)
     if (length(results) == 0) {
       return(NULL)
     }
@@ -100,11 +165,11 @@ new_query <- function() {
     pickle <- q$pickle_of(test_case_started)
     steps <- list()
     hooks <- list()
-    for (finished in q$test_steps_finished[[test_case_started$id]]) {
+    for (finished in s$test_steps_finished[[test_case_started$id]]) {
       result <- finished$testStepResult
-      pickle_step_id <- q$test_steps[[finished$testStepId]]$pickleStepId
+      pickle_step_id <- s$test_steps[[finished$testStepId]]$pickleStepId
       if (!is.null(pickle_step_id)) {
-        steps <- c(steps, list(reported_step(q, q$pickle_steps[[pickle_step_id]], result)))
+        steps <- c(steps, list(reported_step(q, s$pickle_steps[[pickle_step_id]], result)))
       } else if (!is.null(result$message)) {
         hooks <- c(
           hooks,
@@ -116,7 +181,7 @@ new_query <- function() {
       pickle = pickle,
       lineage = q$lineage_of(pickle),
       attempt = test_case_started$attempt,
-      status = tolower(q$most_severe_result_of(test_case_started)$status %||% "PASSED"),
+      status = tolower(q$status_of(test_case_started)),
       steps = steps,
       hooks = hooks
     )
@@ -162,20 +227,20 @@ reported_step <- function(q, pickle_step, result) {
 #' scenarios and example rows
 #' @keywords internal
 #' @noRd
-index_document <- function(q, document) {
+index_document <- function(s, document) {
   feature <- document$feature
   walk <- function(children, rule = NULL) {
     for (child in children) {
       node <- child$background %||% child$scenario
-      for (step in node$steps) q$steps[[step$id]] <- step
+      for (step in node$steps) s$steps[[step$id]] <- step
       if (!is.null(child$scenario)) {
         lineage <- list(document = document, feature = feature, rule = rule, scenario = node)
-        q$lineages[[node$id]] <- lineage
+        s$lineages[[node$id]] <- lineage
         for (i in seq_along(node$examples)) {
           examples <- node$examples[[i]]
           for (j in seq_along(examples$tableBody)) {
             row <- examples$tableBody[[j]]
-            q$lineages[[row$id]] <- c(
+            s$lineages[[row$id]] <- c(
               lineage,
               list(examples = examples, examples_index = i, example = row, example_index = j)
             )

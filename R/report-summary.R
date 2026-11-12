@@ -36,7 +36,7 @@
 #' @export
 CucumberSummaryReporter <- R6::R6Class(
   "CucumberSummaryReporter",
-  inherit = CucumberReporter,
+  inherit = CucumberQueryReporter,
   public = list(
     #' @field scenario_statuses Statuses of the finished scenarios
     scenario_statuses = NULL,
@@ -163,7 +163,6 @@ CucumberSummaryReporter <- R6::R6Class(
     add_message = function(envelope) {
       super$add_message(envelope)
       q <- private$query
-      q$update(envelope)
       message <- envelope[[1]]
       switch(
         names(envelope),
@@ -192,20 +191,20 @@ CucumberSummaryReporter <- R6::R6Class(
           private$on_scenario_start()
         },
         testStepStarted = {
-          if (!is.null(q$test_steps[[message$testStepId]]$pickleStepId)) {
+          if (q$is_pickle_step(message)) {
             private$on_step_start()
           }
         },
         testStepFinished = {
-          scenario <- q$scenario_of(q$test_cases_started[[message$testCaseStartedId]])
-          if (!is.null(q$test_steps[[message$testStepId]]$pickleStepId)) {
+          scenario <- q$scenario_of(q$started_of(message))
+          if (q$is_pickle_step(message)) {
             private$on_step_end(scenario$steps[[length(scenario$steps)]])
           } else if (!is.null(message$testStepResult$message)) {
             private$on_hook_end(scenario$hooks[[length(scenario$hooks)]])
           }
         },
         testCaseFinished = {
-          started <- q$test_cases_started[[message$testCaseStartedId]]
+          started <- q$started_of(message)
           scenario <- q$scenario_of(started)
           failure <- list(
             feature = self$current_feature,
@@ -279,15 +278,11 @@ CucumberSummaryReporter <- R6::R6Class(
         sep = ""
       )
       # A run stopped before it finished has no duration
-      if (!is.null(q$test_run_finished)) {
-        steps <- unlist(lapply(unlist(q$test_steps_finished, recursive = FALSE), \(finished) {
-          duration <- finished$testStepResult$duration
-          duration$seconds * 1000 + duration$nanos / 1e6
-        }))
+      if (q$run_finished()) {
         cat(
           "  ",
-          format_duration(millis_between(q$test_run_started$timestamp, q$test_run_finished$timestamp)),
-          " (executing steps: ", format_duration(sum(steps)), ")\n",
+          format_duration(q$run_millis()),
+          " (executing steps: ", format_duration(q$steps_millis()), ")\n",
           sep = ""
         )
       }

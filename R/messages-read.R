@@ -60,7 +60,7 @@ read_messages <- function(x) {
       name = pickle$name,
       line = (lineage$example %||% lineage$scenario)$location$line,
       tags = list(vapply(pickle$tags, \(tag) tag$name, character(1))),
-      status = tolower(q$most_severe_result_of(case)$status %||% "PASSED"),
+      status = tolower(q$status_of(case)),
       duration = sum(vapply(results, \(result) seconds(result$duration), numeric(1))),
       attempts = (case$attempt %||% 0L) + 1L
     )
@@ -69,8 +69,8 @@ read_messages <- function(x) {
     lapply(q$test_steps_of(case), \(step) {
       result <- step$finished$testStepResult
       status <- tolower(result$status)
-      hook <- q$hooks[[step$test_step$hookId %||% ""]]
-      pickle_step <- q$pickle_steps[[step$test_step$pickleStepId %||% ""]]
+      hook <- step$hook
+      pickle_step <- step$pickle_step
       tibble::tibble(
         scenario_id = case$id,
         scenario = q$pickle_of(case)$name,

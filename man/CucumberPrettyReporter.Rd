@@ -557,7 +557,7 @@ cucumber::test(
 \link{CucumberReporter}
 }
 \section{Super classes}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberSummaryReporter]{cucumber::CucumberSummaryReporter}} -> \code{CucumberPrettyReporter}
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberQueryReporter]{cucumber::CucumberQueryReporter}} -> \code{\link[cucumber:CucumberSummaryReporter]{cucumber::CucumberSummaryReporter}} -> \code{CucumberPrettyReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -588,7 +588,7 @@ for a scenario of another Rule}
 <details><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberQueryReporter" data-id="start_run"><a href='../../cucumber/html/CucumberQueryReporter.html#method-CucumberQueryReporter-start_run'><code>cucumber::CucumberQueryReporter$start_run()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="add_message"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-add_message'><code>cucumber::CucumberSummaryReporter$add_message()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="clear"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-clear'><code>cucumber::CucumberSummaryReporter$clear()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberSummaryReporter" data-id="draw"><a href='../../cucumber/html/CucumberSummaryReporter.html#method-CucumberSummaryReporter-draw'><code>cucumber::CucumberSummaryReporter$draw()</code></a></span></li>

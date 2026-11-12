@@ -303,8 +303,8 @@ cucumber::test("tests/acceptance", reporter = cucumber::CucumberSummaryReporter$
 }
 
 }
-\section{Super class}{
-\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{CucumberSummaryReporter}
+\section{Super classes}{
+\code{\link[cucumber:CucumberReporter]{cucumber::CucumberReporter}} -> \code{\link[cucumber:CucumberQueryReporter]{cucumber::CucumberQueryReporter}} -> \code{CucumberSummaryReporter}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -359,7 +359,7 @@ failed attempts of retried scenarios, in the order they finished}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="report"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-report'><code>cucumber::CucumberReporter$report()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberReporter" data-id="start_run"><a href='../../cucumber/html/CucumberReporter.html#method-CucumberReporter-start_run'><code>cucumber::CucumberReporter$start_run()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="cucumber" data-topic="CucumberQueryReporter" data-id="start_run"><a href='../../cucumber/html/CucumberQueryReporter.html#method-CucumberQueryReporter-start_run'><code>cucumber::CucumberQueryReporter$start_run()</code></a></span></li>
 </ul>
 </details>
 }}

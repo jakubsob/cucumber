@@ -54,7 +54,7 @@ CucumberRerunReporter <- R6::R6Class(
 #' @noRd
 rerun_lines <- function(q) {
   started <- Filter(
-    \(case) (q$most_severe_result_of(case)$status %||% "PASSED") != "PASSED",
+    \(case) q$status_of(case) != "PASSED",
     q$test_cases_started_final()
   )
   pickles <- lapply(started, q$pickle_of)

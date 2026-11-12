@@ -66,31 +66,31 @@ junit_xml <- function(q) {
   lines <- vapply(pickles, \(pickle) as.numeric(pickle$location$line %||% -Inf), numeric(1))
   order <- order(uris, lines, method = "radix")
 
-  statuses <- unlist(lapply(started, \(case) q$most_severe_result_of(case)$status))
-  run_hooks <- Filter(\(finished) !finished$result$status %in% c("PASSED", "SKIPPED"), q$test_run_hooks_finished)
+  statuses <- vapply(started, q$status_of, character(1))
+  run_hooks <- Filter(\(hook) !hook$finished$result$status %in% c("PASSED", "SKIPPED"), q$test_run_hooks())
 
   suite <- xml_start("testsuite", c(
     name = "Cucumber",
-    time = java_seconds(millis_between(q$test_run_started$timestamp, q$test_run_finished$timestamp)),
+    time = java_seconds(q$run_millis()),
     tests = length(started),
     skipped = sum(statuses == "SKIPPED"),
     failures = sum(!statuses %in% c("PASSED", "SKIPPED")),
     errors = 0,
-    timestamp = if (!is.null(q$test_run_started)) iso_instant(q$test_run_started$timestamp)
+    timestamp = if (!is.null(q$run_started_at())) iso_instant(q$run_started_at())
   ))
   c(
     '<?xml version="1.0" encoding="UTF-8"?>\n',
     suite, "\n",
-    unlist(lapply(run_hooks, \(finished) junit_test_run_hook(q, finished))),
+    unlist(lapply(run_hooks, junit_test_run_hook)),
     unlist(lapply(started[order], \(case) junit_test_case(q, case))),
     "</testsuite>\n"
   )
 }
 
-junit_test_run_hook <- function(q, finished) {
-  started <- q$test_run_hooks_started[[finished$testRunHookStartedId]]
-  hook <- q$hooks[[started$hookId]]
-  reference <- hook$sourceReference
+junit_test_run_hook <- function(run_hook) {
+  finished <- run_hook$finished
+  started <- run_hook$started
+  reference <- run_hook$hook$sourceReference
   name <- if (!is.null(reference$uri)) {
     paste0(reference$uri, if (!is.null(reference$location)) paste0(":", reference$location$line))
   } else {
@@ -110,9 +110,9 @@ junit_test_case <- function(q, started) {
   pickle <- q$pickle_of(started)
   lineage <- q$lineage_of(pickle)
   result <- q$most_severe_result_of(started) %||% list(status = "PASSED")
-  steps <- Filter(\(step) !is.null(step$test_step$pickleStepId), q$test_steps_of(started))
+  steps <- Filter(\(step) !is.null(step$pickle_step), q$test_steps_of(started))
   output <- vapply(steps, \(step) {
-    pickle_step <- q$pickle_steps[[step$test_step$pickleStepId]]
+    pickle_step <- step$pickle_step
     text <- paste0(q$step_of(pickle_step)$keyword %||% "", pickle_step$text)
     # At least two dots between the step and its status, up to 76 characters
     paste0(text, "..", strrep(".", max(0, 76 - 2 - nchar(text))), tolower(step$finished$testStepResult$status), "\n")
@@ -121,7 +121,7 @@ junit_test_case <- function(q, started) {
     xml_start("testcase", c(
       classname = lineage$feature$name %||% pickle$uri,
       name = junit_test_name(lineage, pickle),
-      time = java_seconds(millis_between(started$timestamp, q$test_cases_finished[[started$id]]$timestamp))
+      time = java_seconds(q$millis_of(started))
     )), "\n",
     junit_non_passed(result),
     if (length(output) > 0) c("<system-out>", xml_cdata(paste0("\n", paste(output, collapse = ""))), "</system-out>\n"),

@@ -70,7 +70,7 @@ usage_rows <- function(q) {
       ids <- unlist(step$test_step$stepDefinitionIds)
       # An ambiguous step isn't a use of any of its step definitions
       if (length(ids) != 1) next
-      pickle_step <- q$pickle_steps[[step$test_step$pickleStepId]]
+      pickle_step <- step$pickle_step
       result <- step$finished$testStepResult
       matches[[ids]] <- rbind(matches[[ids]], data.frame(
         text = paste0("  ", pickle_step$text),
@@ -81,7 +81,7 @@ usage_rows <- function(q) {
     }
   }
 
-  definitions <- lapply(unname(q$step_definitions), \(definition) {
+  definitions <- lapply(q$step_definitions(), \(definition) {
     steps <- matches[[definition$id]]
     reference <- definition$sourceReference
     pattern <- definition$pattern
