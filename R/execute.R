@@ -13,13 +13,8 @@
 #' @noRd
 #' @importFrom purrr map map_chr walk
 plan_pickles <- function(features, sources, lines, config, glue, test_run_started_id) {
-  # The scenarios of all features are put in order together
-  pickles <- unlist(
-    map(unname(features), \(path) filter_pickles(sources[[path]]$pickles, config$tags, config$name, lines[[path]])),
-    recursive = FALSE
-  )
   prepare_pickles(
-    order_pickles(pickles, config$order),
+    select_pickles(features, sources, lines, config),
     glue$steps,
     get_parameters(),
     glue$hooks,

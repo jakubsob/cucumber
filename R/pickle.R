@@ -289,15 +289,3 @@ interpolate <- function(x, header, values) {
   }
   x
 }
-
-#' Keep the pickles selected by `tags`, any of the regular expressions in `name`,
-#' and any of the `lines` of their feature file, see `test()`
-#' @keywords internal
-#' @noRd
-filter_pickles <- function(pickles, tags = NULL, name = NULL, lines = integer()) {
-  keep(pickles, \(pickle) {
-    evaluate_tag_expression(tags, pickle$tags) &&
-      (is.null(name) || any(vapply(name, grepl, logical(1), x = pickle$name))) &&
-      (length(lines) == 0 || any(pickle$lines %in% lines))
-  })
-}
