@@ -195,59 +195,76 @@ get_hooks_to_run <- function(hooks, name, tags = character()) {
   if (startsWith(name, "after")) rev(hooks) else hooks
 }
 
-#' Run hooks and return the first error, or NULL. Before hooks stop at the
-#' first error, after hooks all run. With `can_skip`, a hook calling
-#' skip_scenario() or testthat::skip() stops the hooks and its condition is
-#' returned. Otherwise skipping is an error.
-#' @param srcref Where the tests in the hooks are in the feature file, see
+#' Call one hook and return its error, or NULL. With `can_skip`, a hook calling
+#' skip_scenario() or testthat::skip() returns its condition. Otherwise skipping
+#' is an error.
+#' @param srcref Where the tests in the hook are in the feature file, see
 #'   `with_nested_tests()`
-#' @param pickle The scenario the hooks run for, named in their errors, or
-#'   `NULL` for before all and after all hooks
+#' @param pickle The scenario the hook runs for, named in its errors, or
+#'   `NULL` for a before all or after all hook
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
-run_hooks <- function(hooks, ..., stop_on_error = TRUE, can_skip = FALSE, srcref = NULL, pickle = NULL) {
+call_hook <- function(hook, ..., can_skip = FALSE, srcref = NULL, pickle = NULL) {
+  tryCatch(
+    {
+      with_nested_tests(hook$fn(...), "hook", srcref)
+      NULL
+    },
+    cucumber_pending = function(cnd) {
+      error_cnd(
+        class = "cucumber_pending",
+        message = glue("{hook_label(hook)} is pending: {cnd$reason}"),
+        trace = empty_trace()
+      )
+    },
+    # skip_scenario() or testthat::skip(). After cucumber_pending, as
+    # pending() is a skip too
+    skip = function(cnd) {
+      if (can_skip) {
+        return(cnd)
+      }
+      fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
+      hook_error(
+        hook,
+        error_cnd(
+          message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step.")
+        ),
+        pickle
+      )
+    },
+    error = \(e) {
+      # A failed expectation is reported as it is, like in a step
+      if (inherits(e, "expectation")) return(e)
+      # The call a hook is run with is cucumber's, not one of the hook, like
+      # `fn()` of a before all or after all hook without arguments
+      if (any(vapply(list(quote(hook$fn(...)), quote(fn())), identical, logical(1), conditionCall(e)))) e$call <- NULL
+      hook_error(hook, e, pickle)
+    }
+  )
+}
+
+#' Run a hook, timed, as a test step: it gets the result of its error, if any
+#' @param ... Arguments of `call_hook()`
+#' @keywords internal
+#' @noRd
+run_hook_step <- function(hook, ...) {
+  start <- Sys.time()
+  error <- call_hook(hook, ...)
+  result <- hook_result(error)
+  result$duration <- seconds_since(start)
+  result
+}
+
+#' Run the before_step or after_step hooks of a step and return the first
+#' error, or NULL. Before hooks stop at the first error, after hooks all run.
+#' @param ... Arguments of `call_hook()`, and of the hooks
+#' @keywords internal
+#' @noRd
+run_step_hooks <- function(hooks, ..., stop_on_error = TRUE) {
   first_error <- NULL
   for (hook in hooks) {
-    error <- tryCatch(
-      {
-        with_nested_tests(hook$fn(...), "hook", srcref)
-        NULL
-      },
-      cucumber_pending = function(cnd) {
-        error_cnd(
-          class = "cucumber_pending",
-          message = glue("{hook_label(hook)} is pending: {cnd$reason}"),
-          trace = empty_trace()
-        )
-      },
-      # skip_scenario() or testthat::skip(). After cucumber_pending, as
-      # pending() is a skip too
-      skip = function(cnd) {
-        if (can_skip) {
-          return(cnd)
-        }
-        fn <- if (inherits(cnd, "cucumber_skip_scenario")) "skip_scenario()" else "testthat::skip()"
-        hook_error(
-          hook,
-          error_cnd(
-            message = glue("`{fn}` can only be called in a `before_all()`, `before()` or `after()` hook or a step.")
-          ),
-          pickle
-        )
-      },
-      error = \(e) {
-        # A failed expectation is reported as it is, like in a step
-        if (inherits(e, "expectation")) return(e)
-        # The call a hook is run with is cucumber's, not one of the hook, like
-        # `fn()` of a before all or after all hook without arguments
-        if (any(vapply(list(quote(hook$fn(...)), quote(fn())), identical, logical(1), conditionCall(e)))) e$call <- NULL
-        hook_error(hook, e, pickle)
-      }
-    )
-    if (inherits(error, "skip")) {
-      return(error)
-    }
+    error <- call_hook(hook, ...)
     first_error <- first_error %||% error
     if (!is.null(error) && stop_on_error) break
   }

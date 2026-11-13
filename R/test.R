@@ -326,7 +326,7 @@ parse_features <- function(paths, reporter = NULL) {
 #' The settings of a run, from the arguments of `run()` and `test()`, checked
 #' before anything runs, so a mistake is an error that names the argument
 #' @return A list of the arguments, with `complete`, whether every scenario
-#'   runs, `retry` an integer, `order` from
+#'   runs, `failing_statuses` that fail a scenario, `retry` an integer, `order` from
 #'   `resolve_order()` and the arguments of `grepl()` in `grepl_args`
 #' @keywords internal
 #' @noRd
@@ -348,6 +348,7 @@ run_config <- function(path, filter, tags, reporter, strict, dry_run, name, feat
     reporter = reporter,
     strict = strict,
     dry_run = dry_run,
+    failing_statuses = failing_statuses(strict, dry_run),
     name = name,
     features = features,
     fail_fast = fail_fast,

@@ -22,20 +22,29 @@ worst_result <- function(results) {
   list(status = status, error = worst$error)
 }
 
-#' A hook that called skip_scenario() or testthat::skip() is skipped, one that
-#' called pending() is pending, any other hook error fails it
+#' The status of a test step that ended with `error`, or passed without one: an
+#' error that skips the scenario, like skip_scenario() or testthat::skip(),
+#' skips it, pending() makes it pending, any other error fails it
 #' @keywords internal
 #' @noRd
-hook_result <- function(error) {
-  status <- if (inherits(error, "skip")) {
+error_status <- function(error = NULL) {
+  if (is.null(error)) {
+    "passed"
+  } else if (inherits(error, "skip")) {
     "skipped"
   } else if (inherits(error, "cucumber_pending")) {
     "pending"
   } else {
     "failed"
   }
+}
+
+#' The result of a hook that ended with `error`, or passed without one
+#' @keywords internal
+#' @noRd
+hook_result <- function(error = NULL) {
   if (inherits(error, "expectation_failure")) error <- variant_snapshot_hint(error)
-  new_hook_result(status, error)
+  new_hook_result(error_status(error), error)
 }
 
 #' A hook's result, with a status of `STEP_STATUSES`

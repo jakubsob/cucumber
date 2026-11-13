@@ -15,16 +15,16 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
   ))
   # The tests in step hooks are at the step's line
   srcref <- feature_srcref(pickle, step$line)
-  before_error <- run_hooks(
+  before_error <- run_step_hooks(
     get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step,
     srcref = srcref, pickle = pickle
   )
   step <- if (is.null(before_error)) {
     execute_single_step(step, context, pickle = pickle)
   } else {
-    new_step_result(step, hook_result(before_error)$status, before_error)
+    new_step_result(step, error_status(before_error), before_error)
   }
-  after_error <- run_hooks(
+  after_error <- run_step_hooks(
     get_hooks_to_run(hooks, "after_step", pickle$tags),
     context,
     c(hook_step, list(status = step$status, error = step$error)),
@@ -77,7 +77,6 @@ step_trace <- function(trace) {
 #' @noRd
 #' @importFrom rlang error_cnd
 execute_single_step <- function(step, context, pickle = NULL) {
-  status <- "passed"
   step_error <- NULL
 
   start <- Sys.time()
@@ -110,7 +109,6 @@ execute_single_step <- function(step, context, pickle = NULL) {
       warning = \(w) warn_at(rlang::cnd_entrace(w), feature_srcref(pickle, step$line))
     ),
     cucumber_pending = function(e) {
-      status <<- "pending"
       step_error <<- error_cnd(
         class = "cucumber_pending",
         message = glue("Step \"{step$text}\" is pending: {e$reason}"),
@@ -120,7 +118,6 @@ execute_single_step <- function(step, context, pickle = NULL) {
     # skip_scenario() or testthat::skip() skips the step and the scenario.
     # After cucumber_pending, as pending() is a skip too
     skip = function(e) {
-      status <<- "skipped"
       step_error <<- e
     },
     expectation_failure = function(e) {
@@ -132,15 +129,13 @@ execute_single_step <- function(step, context, pickle = NULL) {
       e$message <- paste0(rlang::format_error_bullets(step_error_bullets(step, pickle)), "\n", e$message)
       e$parent <- cause
       class(e) <- c("cucumber_step_failure", class(e))
-      status <<- "failed"
       step_error <<- e
     },
     error = function(e) {
       # Keep the full cucumber_step_error for proper error reporting
-      status <<- "failed"
       step_error <<- e
     }
   )
 
-  new_step_result(step, status, step_error, seconds_since(start))
+  new_step_result(step, error_status(step_error), step_error, seconds_since(start))
 }
