@@ -219,6 +219,20 @@ local_feature_snapshots <- function(dir, file, outer, frame, test_names) {
   )
 }
 
+#' The snapshots of a feature when none are kept: every call does nothing, so
+#' `expect_snapshot()` is left to the snapshotter that's active, if any
+#' @return A list of the functions `local_feature_snapshots()` returns
+#' @keywords internal
+#' @noRd
+no_feature_snapshots <- function() {
+  list(
+    local_use = function(frame = parent.frame()) invisible(),
+    start = function(test_name) invisible(),
+    retry = function() invisible(),
+    end = function(status, on_cran = FALSE) invisible()
+  )
+}
+
 #' testthat's hint to accept or review a changed snapshot names the feature's
 #' snapshot file, as it does for a test file, without the variant's directory
 #' the snapshot is in: a variant's is `snapshot_accept("linux/basket.feature")`.

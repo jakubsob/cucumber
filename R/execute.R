@@ -56,11 +56,12 @@ prepare_pickles <- function(
 #' @param config The settings of the run, from `run_config()`
 #' @param hooks The hooks to run, none in a dry run
 #' @param skip The skip of a before all hook, that skips every scenario, or `NULL`
-#' @param snapshots The snapshots of the run, or of a feature, from
-#'   `run_snapshots()`, or `NULL` to leave snapshots to testthat
+#' @param snapshots The snapshots of the run, from `run_snapshots()`, or of a
+#'   feature, from `local_feature_snapshots()`. By default none are kept, see
+#'   `no_feature_snapshots()`.
 #' @keywords internal
 #' @noRd
-new_run <- function(config, hooks, skip = NULL, snapshots = NULL) {
+new_run <- function(config, hooks, skip = NULL, snapshots = no_feature_snapshots()) {
   list(config = config, hooks = hooks, skip = skip, snapshots = snapshots)
 }
 
@@ -106,7 +107,7 @@ execute_feature <- function(document, pickles, run, failed = FALSE) {
   context_start_file(feature_label(document$feature))
 
   # expect_snapshot() saves to the feature's snapshot file
-  if (!is.null(run$snapshots)) run$snapshots$local_use()
+  run$snapshots$local_use()
   # Named in their feature, so a scenario's name doesn't depend on which scenarios run
   test_names <- map_chr(pickles, "test_name")
   for (i in seq_along(pickles)) {

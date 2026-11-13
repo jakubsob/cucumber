@@ -35,29 +35,33 @@ execute_scenario <- function(pickle, run, failed = FALSE, test_name = pickle$nam
   # Skipped like in a dry run, so undefined and ambiguous steps are still reported
   skip_steps <- run$config$dry_run || !is.null(skip_reason)
 
-  # What the scenario's attempts change as they run, and its report reads
-  state <- new.env(parent = emptyenv())
-  state$failed <- FALSE
-  # Whether a snapshot wasn't checked, as on CRAN
-  state$snapshot_on_cran <- FALSE
   # Snapshots are named after the scenario
-  if (!is.null(run$snapshots)) run$snapshots$start(glue("Scenario: {test_name}"))
+  run$snapshots$start(glue("Scenario: {test_name}"))
+  scenario_failed <- FALSE
   test_that(glue("Scenario: {test_name}"), {
-    run_scenario(state, pickle, run, skip_steps)
-    report_scenario(state, pickle, run$config, skip_steps, skip_reason)
+    outcome <- run_scenario(pickle, run, skip_steps)
+    scenario_failed <<- outcome$failed
+    report_scenario(outcome, pickle, run$config, skip_steps, skip_reason)
   })
 
-  invisible(state$failed)
+  invisible(scenario_failed)
 }
 
-#' Run a scenario's attempts. Its warnings and passed expectations are held in
-#' `state`, for `report_scenario()` to report those of the last attempt.
-#' @param state The scenario's state, see `execute_scenario()`
+#' Run a scenario's attempts
+#'
+#' @return The outcome of the last attempt, for `report_scenario()`: the
+#'   `results` of its test steps, their worst `result`, the number of its
+#'   `expectations`, the `held` warnings and passed expectations that testthat
+#'   gets, and whether the scenario `failed`
 #' @keywords internal
 #' @noRd
-run_scenario <- function(state, pickle, run, skip_steps) {
+run_scenario <- function(pickle, run, skip_steps) {
   config <- run$config
   reporter <- config$reporter
+  # What the handlers below catch as the attempts run
+  caught <- new.env(parent = emptyenv())
+  caught$held <- list()
+  caught$snapshot_on_cran <- FALSE
   withCallingHandlers({
     # Errors of the scenario's steps and hooks are caught where they run. An
     # error that gets here is of cucumber itself, and stops the run.
@@ -71,10 +75,9 @@ run_scenario <- function(state, pickle, run, skip_steps) {
       ))
       # Each attempt is a test case started of its own, with a new context
       for (attempt in 0:config$retry) {
-        if (attempt > 0 && !is.null(run$snapshots)) run$snapshots$retry()
+        if (attempt > 0) run$snapshots$retry()
         # testthat gets the warnings and passed expectations of the last attempt only
-        state$held <- list()
-        state$expectations <- 0
+        caught$held <- list()
         test_case_started <- list(
           id = new_id(),
           testCaseId = pickle$test_case$id,
@@ -82,11 +85,11 @@ run_scenario <- function(state, pickle, run, skip_steps) {
           attempt = attempt
         )
         emit(reporter, "testCaseStarted", test_case_started)
-        run_test_steps(state, test_case_started$id, pickle, run, scenario, skip_steps)
-        state$result <- worst_result(state$results)
+        attempted <- run_test_steps(test_case_started$id, pickle, run, scenario, skip_steps)
+        result <- worst_result(attempted$results)
         # Only a failed scenario is retried: pending, undefined or ambiguous
         # steps wouldn't pass on another attempt
-        retried <- state$result$status == "failed" && attempt < config$retry
+        retried <- result$status == "failed" && attempt < config$retry
         emit(reporter, "testCaseFinished", list(
           testCaseStartedId = test_case_started$id,
           timestamp = timestamp(),
@@ -95,8 +98,15 @@ run_scenario <- function(state, pickle, run, skip_steps) {
         if (!retried) break
       }
     }, error = \(e) if (!is.null(findRestart("cucumber_abort_run"))) invokeRestart("cucumber_abort_run", e))
-    state$failed <- state$result$status %in% failing_statuses(config$strict, config$dry_run)
-    if (!is.null(run$snapshots)) run$snapshots$end(state$result$status, state$snapshot_on_cran)
+    failed <- result$status %in% failing_statuses(config$strict, config$dry_run)
+    run$snapshots$end(result$status, caught$snapshot_on_cran)
+    list(
+      results = attempted$results,
+      result = result,
+      expectations = attempted$expectations,
+      held = caught$held,
+      failed = failed
+    )
   },
   # The reporter gets a warning as it's raised. A warning of a hook, or of
   # what a step or a hook deferred, is at the scenario's line.
@@ -106,46 +116,50 @@ run_scenario <- function(state, pickle, run, skip_steps) {
       w <- rlang::cnd_entrace(w)
       w$srcref <- feature_srcref(pickle)
     }
-    state$held <- c(state$held, list(w))
+    caught$held <- c(caught$held, list(w))
     tryInvokeRestart("muffleWarning")
   },
   expectation_success = \(e) {
-    state$held <- c(state$held, list(e))
+    caught$held <- c(caught$held, list(e))
     tryInvokeRestart("muffle_expectation")
   },
   # Not muffled, so testthat skips the test, as it does on CRAN
-  snapshot_on_cran = \(cnd) state$snapshot_on_cran <- TRUE
+  snapshot_on_cran = \(cnd) caught$snapshot_on_cran <- TRUE
   )
 }
 
 #' Run the test steps of an attempt of a scenario: its hooks and steps. Each is
-#' reported as a message when it starts and when it finishes, and its result
-#' kept in `state$results`. The steps' expectations are counted in
-#' `state$expectations`.
-#' @param state The scenario's state, see `execute_scenario()`
+#' reported as a message when it starts and when it finishes.
 #' @param run The run, from `new_run()`
 #' @param scenario The scenario as its hooks get it
+#' @return The `results` of the test steps, and the number of `expectations` of
+#'   the steps
 #' @keywords internal
 #' @noRd
-run_test_steps <- function(state, test_case_started_id, pickle, run, scenario, skip_steps) {
+run_test_steps <- function(test_case_started_id, pickle, run, scenario, skip_steps) {
   reporter <- run$config$reporter
-  state$results <- list()
+  # What the test steps change as they run
+  attempt <- new.env(parent = emptyenv())
+  attempt$results <- list()
+  attempt$expectations <- 0
   # Attachments are of the test step that runs
-  state$test_step_id <- NULL
+  attempt$test_step_id <- NULL
   send <- \(attachment) {
     emit(reporter, "attachment", c(
-      list(testCaseStartedId = test_case_started_id, testStepId = state$test_step_id),
+      list(testCaseStartedId = test_case_started_id, testStepId = attempt$test_step_id),
       attachment
     ))
   }
   # A test step that didn't pass skips the steps after it. A hook or a step
   # that skipped the scenario also skips undefined and ambiguous steps.
-  skipping <- \() skip_steps || any(vapply(state$results, \(result) result$status != "passed", logical(1)))
-  skipped <- \() any(vapply(state$results, \(result) result$status == "skipped" && !is.null(result$error), logical(1)))
+  skipping <- \() skip_steps || any(vapply(attempt$results, \(result) result$status != "passed", logical(1)))
+  skipped <- \() {
+    any(vapply(attempt$results, \(result) result$status == "skipped" && !is.null(result$error), logical(1)))
+  }
 
   # Run a test step: report it as messages, and keep its result
   run_test_step <- function(id, run) {
-    state$test_step_id <- id
+    attempt$test_step_id <- id
     emit(reporter, "testStepStarted", list(
       testCaseStartedId = test_case_started_id,
       testStepId = id,
@@ -158,7 +172,7 @@ run_test_steps <- function(state, test_case_started_id, pickle, run, scenario, s
       testStepResult = test_step_result(result),
       timestamp = timestamp()
     ))
-    state$results <- c(state$results, list(result))
+    attempt$results <- c(attempt$results, list(result))
   }
   run_hook <- function(test_step, skip, ...) {
     run_test_step(test_step$id, \() {
@@ -189,15 +203,16 @@ run_test_steps <- function(state, test_case_started_id, pickle, run, scenario, s
           execute_step_with_hooks(step, .context, pickle, run$hooks)
         }
       })
-    }, expectation = \(e) state$expectations <- state$expectations + 1)
+    }, expectation = \(e) attempt$expectations <- attempt$expectations + 1)
 
     for (test_step in pickle$test_case$after) {
       run_hook(
-        test_step, skip_steps, .context, new_scenario(c(scenario, worst_result(state$results))),
+        test_step, skip_steps, .context, new_scenario(c(scenario, worst_result(attempt$results))),
         can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle
       )
     }
   })
+  list(results = attempt$results, expectations = attempt$expectations)
 }
 
 #' The scenario that before and after hooks get, see `before()`
@@ -218,19 +233,19 @@ print.cucumber_scenario <- function(x, ...) {
 
 #' Report a scenario's last attempt to testthat: its warnings and passed
 #' expectations, then its result
-#' @param state The scenario's state, see `execute_scenario()`
+#' @param outcome The outcome of the scenario, from `run_scenario()`
 #' @keywords internal
 #' @noRd
-report_scenario <- function(state, pickle, config, skip_steps, skip_reason) {
-  for (cnd in state$held) {
+report_scenario <- function(outcome, pickle, config, skip_steps, skip_reason) {
+  for (cnd in outcome$held) {
     if (inherits(cnd, "warning")) warning(cnd) else testthat::exp_signal(cnd)
   }
-  signal_scenario_result(state$results, state$result, failing_statuses(config$strict, config$dry_run), pickle)
+  signal_scenario_result(outcome$results, outcome$result, failing_statuses(config$strict, config$dry_run), pickle)
   # testthat reports a test without expectations as skipped
-  if (!skip_steps && state$result$status == "passed" && state$expectations == 0) {
+  if (!skip_steps && outcome$result$status == "passed" && outcome$expectations == 0) {
     testthat::succeed()
   }
-  if (skip_steps && !config$dry_run && state$result$status == "skipped") {
+  if (skip_steps && !config$dry_run && outcome$result$status == "skipped") {
     skip_at(skip_reason, feature_srcref(pickle))
   }
 }
