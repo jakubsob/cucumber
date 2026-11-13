@@ -251,28 +251,6 @@ step_match_arguments <- function(text, pattern) {
 
 # Test cases --------------------------------------------------------------
 
-#' Plan a pickle's test case: its before hooks, its steps and its after hooks,
-#' each with the id of its test step
-#'
-#' @return The pickle with its `test_case`, and its steps with their
-#'   `test_step_id`
-#' @noRd
-#' @importFrom purrr map
-new_test_case <- function(pickle, hooks) {
-  hook_steps <- function(kind) {
-    map(get_hooks_to_run(hooks, kind, pickle$tags), \(hook) list(id = new_id(), hook = hook))
-  }
-  id <- new_id()
-  before <- hook_steps("before")
-  pickle$steps <- map(pickle$steps, \(step) {
-    step$test_step_id <- new_id()
-    step
-  })
-  after <- hook_steps("after")
-  pickle$test_case <- list(id = id, before = before, after = after)
-  pickle
-}
-
 test_case_message <- function(pickle, test_run_started_id = NULL) {
   hook_step <- \(step) drop_null(list(id = step$id, hookId = step$hook$id))
   pickle_step <- \(step) {
