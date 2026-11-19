@@ -202,7 +202,7 @@ run_test_steps <- function(test_case_started_id, pickle, run, scenario, skip_ste
     for (test_step in pickle$test_case$before) {
       run_hook(
         test_step, skipping(), .context, scenario,
-        can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle
+        can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle, config = run$config
       )
     }
 
@@ -217,7 +217,7 @@ run_test_steps <- function(test_case_started_id, pickle, run, scenario, skip_ste
         } else if (skipping()) {
           new_step_result(step, "skipped")
         } else {
-          execute_step_with_hooks(step, .context, pickle, run$hooks)
+          execute_step_with_hooks(step, .context, pickle, run$hooks, config = run$config)
         }
       })
     }, expectation = \(e) attempt$expectations <- attempt$expectations + 1)
@@ -225,7 +225,7 @@ run_test_steps <- function(test_case_started_id, pickle, run, scenario, skip_ste
     for (test_step in pickle$test_case$after) {
       run_hook(
         test_step, skip_steps, .context, new_scenario(c(scenario, worst_result(attempt$results))),
-        can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle
+        can_skip = TRUE, srcref = feature_srcref(pickle), pickle = pickle, config = run$config
       )
     }
   })

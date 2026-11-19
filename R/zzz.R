@@ -7,6 +7,7 @@ OPTION_DEFAULTS <- list(
   cucumber.docstring_as_lines = FALSE,
   cucumber.reporter_max_docstring_lines = Inf,
   cucumber.reporter_max_table_lines = Inf,
+  cucumber.debug_hint = default_debug_hint,
   cucumber.rd_tags = "@rd",
   cucumber.rd_section = "Behavior"
 )

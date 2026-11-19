@@ -40,6 +40,14 @@
 #'
 #'   default: `r format_option_default("cucumber.reporter_max_table_lines")`
 #'
+#' - `cucumber.debug_hint`
+#'
+#'   A function that returns what `test(debug = TRUE)` prints before the debugger opens in a step
+#'   or a hook, as a character vector of lines, or `NULL` to print nothing. It gets `what`, like
+#'   `step "I have 5 cucumbers"`, and `bullets`, the lines saying where it is.
+#'
+#'   default: a function that prints `what` in bold above `bullets`
+#'
 #' - `cucumber.rd_tags`
 #'
 #'   Tag expression of the scenarios [features_rd()] puts in help pages.

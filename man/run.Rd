@@ -16,6 +16,7 @@ run(
   fail_fast = FALSE,
   retry = 0,
   order = "defined",
+  debug = FALSE,
   ...
 )
 }
@@ -54,6 +55,13 @@ failed scenarios are retried, not pending, undefined or ambiguous ones.}
 and of the scenarios in them, \code{"reverse"}, or \code{"random"}. \code{"random:<seed>"}, like
 \code{"random:1234"}, runs them in the random order of that seed. Without a seed, the seed
 is chosen and shown, to run them in the same order again.}
+
+\item{debug}{If \code{TRUE}, open the debugger at the first line of every step definition and
+scenario or step hook that runs, like \code{debugonce()} on each of them just before it's called.
+When you step past the last line of one, the debugger opens in the next. It needs an
+interactive session, and \code{before_all()} and \code{after_all()} hooks don't open it.
+The \code{cucumber.debug_hint} option sets what it prints before it opens, see \link{opts}.
+Select the scenario to debug with \code{name} or \code{features}, or every scenario stops.}
 
 \item{...}{Additional arguments passed to \code{grepl()}.}
 }

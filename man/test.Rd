@@ -20,6 +20,7 @@ test(
   fail_fast = FALSE,
   retry = 0,
   order = "defined",
+  debug = FALSE,
   ...
 )
 }
@@ -64,6 +65,13 @@ failed scenarios are retried, not pending, undefined or ambiguous ones.}
 and of the scenarios in them, \code{"reverse"}, or \code{"random"}. \code{"random:<seed>"}, like
 \code{"random:1234"}, runs them in the random order of that seed. Without a seed, the seed
 is chosen and shown, to run them in the same order again.}
+
+\item{debug}{If \code{TRUE}, open the debugger at the first line of every step definition and
+scenario or step hook that runs, like \code{debugonce()} on each of them just before it's called.
+When you step past the last line of one, the debugger opens in the next. It needs an
+interactive session, and \code{before_all()} and \code{after_all()} hooks don't open it.
+The \code{cucumber.debug_hint} option sets what it prints before it opens, see \link{opts}.
+Select the scenario to debug with \code{name} or \code{features}, or every scenario stops.}
 
 \item{...}{Additional arguments passed to \code{\link[=grepl]{grepl()}} to control filtering.}
 }
@@ -1784,6 +1792,171 @@ A2 \tab passed
 }}
 
 Source: \code{tests/acceptance/order.feature}
+
+\if{html}{\out{
+<pre hidden></pre >}}
+\if{html}{
+\subsection{Feature: Debugging scenarios}{
+To find out why a scenario fails, run only that scenario with \code{debug = TRUE}, like
+\code{test(features = "basket.feature:3", debug = TRUE)}. Select it with \code{name} or a line of \code{features},
+or the debugger opens in every scenario.
+
+The debugger opens at the first line of every step definition and hook that runs, like \code{debugonce()} on each
+of them just before it's called. Step definitions and hooks are anonymous functions, so just before it opens
+cucumber says which step or hook it is, where in the feature file it runs and where it's defined. There, look into the step's parameters and \code{context}, and step with the
+debugger's commands: \code{n} runs the next line, \code{s} steps into a call, \code{c} continues and \code{Q} stops.
+When you step past the last line of a step or a hook, the debugger opens at the first line of the next one,
+in the order the scenario runs them: its \code{before()} hooks, then for each step its \code{before_step()} hooks,
+the step definition and its \code{after_step()} hooks, and last its \code{after()} hooks.
+\code{before_all()} and \code{after_all()} hooks run for the whole run, not for a scenario, so they don't stop.
+The \code{cucumber.debug_hint} option sets that hint with a function of \code{what} and \code{bullets} that returns
+the lines to print, or \code{NULL} for none.
+
+The debugger needs an interactive session. There is no one to step in a test run, so the scenarios below replace
+it by a line that names where it would open, like the location of \code{debug at ./setup-steps.R#4: \{}.
+\subsection{Background:}{
+\itemize{
+\item Given a package
+\item And the debugger is replaced by one that names where it opens
+\item And a file named "features/basket.feature" with
+\out{<pre class="gherkin"><code><span class="kw">Feature:</span> Basket&#10;&#10;  <span class="kw">Scenario:</span> Eat some cucumbers&#10;    <span class="fu">Given</span> I have 5 cucumbers&#10;    <span class="fu">When</span> I eat 2 cucumbers&#10;    <span class="fu">Then</span> I have 4 cucumbers left&#10;&#10;  <span class="kw">Scenario:</span> Eat none&#10;    <span class="fu">Given</span> I have 5 cucumbers&#10;    <span class="fu">Then</span> I have 5 cucumbers left</code></pre >}
+\item And a file named "features/setup-steps.R" with
+\preformatted{before(function(context, scenario) \{
+  context$cucumbers <- 0
+\})
+given("I have \{int\} cucumbers", function(n_cucumbers, context) \{
+  context$cucumbers <- n_cucumbers
+\})
+when("I eat \{int\} cucumber(s)", function(n_eaten, context) \{
+  context$cucumbers <- context$cucumbers - n_eaten
+\})
+then("I have \{int\} cucumbers left", function(n_left, context) \{
+  expect_equal(context$cucumbers, n_left)
+\})}
+}
+}
+\subsection{Scenario: Debug a scenario that fails}{
+\itemize{
+\item When I run it and it fails
+\preformatted{test("features", name = "Eat some cucumbers", debug = TRUE)}
+\item Then the scenarios have these results:
+\tabular{ll}{
+scenario \tab status \cr
+Eat some cucumbers \tab failed
+}
+\item And the output includes these lines in order:
+\preformatted{Debugging Hook `before()`
+i Feature: basket.feature:3
+i Scenario: Eat some cucumbers
+i Hook defined at: setup-steps.R:1
+Debugger opens in function(context, scenario) at setup-steps.R:1
+Debugging step "I have 5 cucumbers"
+i Feature: basket.feature:4
+i Scenario: Eat some cucumbers
+i Step defined at: setup-steps.R:4
+Debugger opens in function(n_cucumbers, context) at setup-steps.R:4
+Debugging step "I eat 2 cucumbers"
+i Feature: basket.feature:5
+i Scenario: Eat some cucumbers
+i Step defined at: setup-steps.R:7
+Debugger opens in function(n_eaten, context) at setup-steps.R:7
+Debugging step "I have 4 cucumbers left"
+i Feature: basket.feature:6
+i Scenario: Eat some cucumbers
+i Step defined at: setup-steps.R:10
+Debugger opens in function(n_left, context) at setup-steps.R:10}
+\item And the output doesn't include "Eat none"
+}
+}
+}
+}
+\if{text,latex}{\preformatted{Feature: Debugging scenarios
+  To find out why a scenario fails, run only that scenario with `debug = TRUE`, like
+  `test(features = "basket.feature:3", debug = TRUE)`. Select it with `name` or a line of `features`,
+  or the debugger opens in every scenario.
+
+  The debugger opens at the first line of every step definition and hook that runs, like `debugonce()` on each
+  of them just before it's called. Step definitions and hooks are anonymous functions, so just before it opens
+  cucumber says which step or hook it is, where in the feature file it runs and where it's defined. There, look into the step's parameters and `context`, and step with the
+  debugger's commands: `n` runs the next line, `s` steps into a call, `c` continues and `Q` stops.
+  When you step past the last line of a step or a hook, the debugger opens at the first line of the next one,
+  in the order the scenario runs them: its `before()` hooks, then for each step its `before_step()` hooks,
+  the step definition and its `after_step()` hooks, and last its `after()` hooks.
+  `before_all()` and `after_all()` hooks run for the whole run, not for a scenario, so they don't stop.
+  The `cucumber.debug_hint` option sets that hint with a function of `what` and `bullets` that returns
+  the lines to print, or `NULL` for none.
+
+  The debugger needs an interactive session. There is no one to step in a test run, so the scenarios below replace
+  it by a line that names where it would open, like the location of `debug at ./setup-steps.R#4: \{`.
+
+  Background:
+    Given a package
+    And the debugger is replaced by one that names where it opens
+    And a file named "features/basket.feature" with
+      """
+      Feature: Basket
+
+        Scenario: Eat some cucumbers
+          Given I have 5 cucumbers
+          When I eat 2 cucumbers
+          Then I have 4 cucumbers left
+
+        Scenario: Eat none
+          Given I have 5 cucumbers
+          Then I have 5 cucumbers left
+      """
+    And a file named "features/setup-steps.R" with
+      """
+      before(function(context, scenario) \{
+        context$cucumbers <- 0
+      \})
+      given("I have \{int\} cucumbers", function(n_cucumbers, context) \{
+        context$cucumbers <- n_cucumbers
+      \})
+      when("I eat \{int\} cucumber(s)", function(n_eaten, context) \{
+        context$cucumbers <- context$cucumbers - n_eaten
+      \})
+      then("I have \{int\} cucumbers left", function(n_left, context) \{
+        expect_equal(context$cucumbers, n_left)
+      \})
+      """
+
+  Scenario: Debug a scenario that fails
+    When I run it and it fails
+      """
+      test("features", name = "Eat some cucumbers", debug = TRUE)
+      """
+    Then the scenarios have these results:
+      | scenario           | status |
+      | Eat some cucumbers | failed |
+    And the output includes these lines in order:
+      """
+      Debugging Hook `before()`
+      i Feature: basket.feature:3
+      i Scenario: Eat some cucumbers
+      i Hook defined at: setup-steps.R:1
+      Debugger opens in function(context, scenario) at setup-steps.R:1
+      Debugging step "I have 5 cucumbers"
+      i Feature: basket.feature:4
+      i Scenario: Eat some cucumbers
+      i Step defined at: setup-steps.R:4
+      Debugger opens in function(n_cucumbers, context) at setup-steps.R:4
+      Debugging step "I eat 2 cucumbers"
+      i Feature: basket.feature:5
+      i Scenario: Eat some cucumbers
+      i Step defined at: setup-steps.R:7
+      Debugger opens in function(n_eaten, context) at setup-steps.R:7
+      Debugging step "I have 4 cucumbers left"
+      i Feature: basket.feature:6
+      i Scenario: Eat some cucumbers
+      i Step defined at: setup-steps.R:10
+      Debugger opens in function(n_left, context) at setup-steps.R:10
+      """
+    And the output doesn't include "Eat none"
+%</pre>
+}}
+
+Source: \code{tests/acceptance/r-debugging_scenarios.feature}
 
 \if{html}{\out{
 <pre hidden></pre >}}

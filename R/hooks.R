@@ -202,12 +202,18 @@ get_hooks_to_run <- function(hooks, name, tags = character()) {
 #'   `with_nested_tests()`
 #' @param pickle The scenario the hook runs for, named in its errors, or
 #'   `NULL` for a before all or after all hook
+#' @param config The settings of the run, from `run_config()`, to open the debugger
+#'   in the hook with its `debug`, or `NULL`
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
-call_hook <- function(hook, ..., can_skip = FALSE, srcref = NULL, pickle = NULL) {
+call_hook <- function(hook, ..., can_skip = FALSE, srcref = NULL, pickle = NULL, config = NULL) {
   tryCatch(
     {
+      if (isTRUE(config$debug)) {
+        announce_debugger(hook_label(hook), hook_bullets(hook, pickle), config)
+        debugonce(hook$fn)
+      }
       with_nested_tests(hook$fn(...), "hook", srcref)
       NULL
     },

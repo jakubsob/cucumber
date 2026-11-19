@@ -4,7 +4,7 @@
 #'
 #' @keywords internal
 #' @noRd
-execute_step_with_hooks <- function(step, context, pickle, hooks) {
+execute_step_with_hooks <- function(step, context, pickle, hooks, config = NULL) {
   # The step's Data Table and Doc String as its step definition gets them
   hook_step <- drop_null(list(
     keyword = step$keyword,
@@ -17,10 +17,10 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
   srcref <- feature_srcref(pickle, step$line)
   before_error <- run_step_hooks(
     get_hooks_to_run(hooks, "before_step", pickle$tags), context, hook_step,
-    srcref = srcref, pickle = pickle
+    srcref = srcref, pickle = pickle, config = config
   )
   step <- if (is.null(before_error)) {
-    execute_single_step(step, context, pickle = pickle)
+    execute_single_step(step, context, pickle = pickle, config = config)
   } else {
     new_step_result(step, error_status(before_error), before_error)
   }
@@ -30,7 +30,8 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
     c(hook_step, list(status = step$status, error = step$error)),
     stop_on_error = FALSE,
     srcref = srcref,
-    pickle = pickle
+    pickle = pickle,
+    config = config
   )
   # The step gets the worse of its own result and the hook's
   if (!is.null(after_error)) {
@@ -45,8 +46,10 @@ execute_step_with_hooks <- function(step, context, pickle, hooks) {
 #' `step_trace()`
 #' @keywords internal
 #' @noRd
-call_step <- function(fn, args) {
+call_step <- function(fn, args, debug = FALSE) {
   withr::local_options(rlang_trace_top_env = NULL)
+  # Flagged just before it's called, so the debugger opens in every call of it
+  if (debug) debugonce(fn)
   run <- rlang::new_function(
     rlang::pairlist2(... = ),
     bquote({
@@ -76,15 +79,17 @@ step_trace <- function(trace) {
 #' @keywords internal
 #' @noRd
 #' @importFrom rlang error_cnd
-execute_single_step <- function(step, context, pickle = NULL) {
+execute_single_step <- function(step, context, pickle = NULL, config = NULL) {
   step_error <- NULL
 
+  debug <- isTRUE(config$debug)
+  if (debug) announce_debugger(glue("step \"{step$text}\""), step_bullets(step, pickle), config)
   start <- Sys.time()
 
   tryCatch(
     withCallingHandlers(
       with_nested_tests(
-        call_step(step$matched_fn, c(step$arguments(), list(context = context))),
+        call_step(step$matched_fn, c(step$arguments(), list(context = context)), debug = debug),
         "step",
         feature_srcref(pickle, step$line)
       ),

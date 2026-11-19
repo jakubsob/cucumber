@@ -16,7 +16,7 @@ report_feature <- function(feature, reporter) {
   pickles <- cucumber:::create_pickles(document)
   cucumber:::emit(reporter, "gherkinDocument", document)
   for (pickle in pickles) cucumber:::emit(reporter, "pickle", pickle$message)
-  config <- cucumber:::run_config(".", NULL, NULL, reporter, TRUE, FALSE, NULL, NULL, FALSE, 0, "defined")
+  config <- cucumber:::run_config(".", NULL, NULL, reporter, TRUE, FALSE, NULL, NULL, FALSE, 0, "defined", FALSE)
   pickles <- cucumber:::prepare_pickles(pickles, reporter = reporter)
   cucumber:::execute_feature(document, pickles, cucumber:::new_run(config, cucumber:::get_hooks()))
 }

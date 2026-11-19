@@ -763,3 +763,17 @@ then("the snapshot file {string} has no snapshot for {string}", function(file, s
 then("there is no snapshot file {string}", function(file, context) {
   expect_false(fs::file_exists(fs::path(context$tempdir, snapshots_dir, file)))
 })
+
+# There is no one to step in a test run, so the debugger is replaced by a line that names where it would open
+given("the debugger is replaced by one that names where it opens", function(context) {
+  testthat::local_mocked_bindings(
+    debugonce = function(fn) {
+      srcref <- attr(fn, "srcref")
+      signature <- sub("\\).*", ")", as.character(srcref)[1])
+      file <- basename(attr(srcref, "srcfile")$filename)
+      cat("Debugger opens in ", signature, " at ", file, ":", srcref[[1]], "\n", sep = "")
+    },
+    .package = "base",
+    .env = context
+  )
+})

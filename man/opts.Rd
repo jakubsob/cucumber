@@ -38,6 +38,13 @@ Max data table rows \link{CucumberPrettyReporter} prints per step before
 truncating.
 
 default: \code{Inf}
+\item \code{cucumber.debug_hint}
+
+A function that returns what \code{test(debug = TRUE)} prints before the debugger opens in a step
+or a hook, as a character vector of lines, or \code{NULL} to print nothing. It gets \code{what}, like
+\verb{step "I have 5 cucumbers"}, and \code{bullets}, the lines saying where it is.
+
+default: a function that prints \code{what} in bold above \code{bullets}
 \item \code{cucumber.rd_tags}
 
 Tag expression of the scenarios \code{\link[=features_rd]{features_rd()}} puts in help pages.

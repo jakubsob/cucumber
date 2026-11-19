@@ -28,10 +28,7 @@ srcref_location <- function(src) {
 #' @keywords internal
 #' @noRd
 hook_error <- function(hook, error, pickle = NULL) {
-  info <- c(glue("{hook_label(hook)} failed"), scenario_bullets(pickle))
-  location <- srcref_location(hook$srcref)
-  if (!is.null(location))
-    info <- c(info, i = glue("Hook defined at: {location}"))
+  info <- c(glue("{hook_label(hook)} failed"), hook_bullets(hook, pickle))
   rlang::error_cnd(
     class = "cucumber_hook_error",
     message = rlang::format_error_bullets(info),
@@ -64,9 +61,28 @@ scenario_bullets <- function(pickle, line = pickle$source_line) {
 }
 
 step_error_bullets <- function(step, pickle) {
-  info <- c(glue("Step \"{step$text}\" failed"), scenario_bullets(pickle, step$line))
+  c(glue("Step \"{step$text}\" failed"), step_bullets(step, pickle))
+}
+
+#' Where a step is, for its errors and for the debugger: its feature file and
+#' scenario, and where its step definition is
+#' @keywords internal
+#' @noRd
+step_bullets <- function(step, pickle) {
   location <- srcref_location(step$definition_location)
-  if (!is.null(location))
-    info <- c(info, i = glue("Step defined at: {location}"))
-  info
+  c(
+    scenario_bullets(pickle, step$line),
+    if (!is.null(location)) c(i = glue("Step defined at: {location}"))
+  )
+}
+
+#' Where a hook is: the scenario it runs for, and where it's defined
+#' @keywords internal
+#' @noRd
+hook_bullets <- function(hook, pickle) {
+  location <- srcref_location(hook$srcref)
+  c(
+    scenario_bullets(pickle),
+    if (!is.null(location)) c(i = glue("Hook defined at: {location}"))
+  )
 }

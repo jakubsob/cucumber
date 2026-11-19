@@ -35,7 +35,7 @@ cucumber now follows the Cucumber specification more closely: feature files are 
 - ⚠️ Tag expressions are parsed like the official [cucumber/tag-expressions](https://github.com/cucumber/tag-expressions): tags need their `@`, operators are lowercase, and `tags` must be one expression. `filter` must be one regular expression.
 - ⚠️ Each feature file has a snapshot file of its own, like `_snaps/checkout-basket.feature.md`, whether run by `test()` or `run()`.
 - ⚠️ cucumber needs testthat 3.3.2 or later.
-- ✨ New `test()` and `run()` arguments: `dry_run`, `name`, `features` (with lines, like `"addition.feature:12"`), `fail_fast`, `retry` and `order`.
+- ✨ New `test()` and `run()` arguments: `dry_run`, `name`, `features` (with lines, like `"addition.feature:12"`), `fail_fast`, `retry`, `order` and `debug`, which opens the debugger in every step and hook of the scenarios that run, one after the other. The `cucumber.debug_hint` option sets the hint saying which step or hook that is with a function, which can print nothing.
 - ✨ `test()` runs feature files like `testthat::test_dir()` runs test files, without writing a test file into `path`. It reads its default `path` from the `cucumber.path` option, checks snapshots when `NOT_CRAN` isn't set, and its steps see the package's internal functions, like in `testthat::test_local()`.
 - ✨ `run()` runs outside of a testthat run, like in the console.
 

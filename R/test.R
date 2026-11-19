@@ -61,6 +61,7 @@ run <- function(
   fail_fast = FALSE,
   retry = 0,
   order = "defined",
+  debug = FALSE,
   ...
 ) {
   # Before the reporter of the scenarios outside of a testthat run is set
@@ -75,7 +76,9 @@ run <- function(
       )
     )
   }
-  config <- run_config(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
+  config <- run_config(
+    path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, debug, ...
+  )
   # Step definitions and hooks are cleared at the end of testthat's run, as the
   # setup files that registered them run once for all test files
   cleanup_env <- tryCatch(testthat::teardown_env(), error = \(e) NULL) %||% environment()
@@ -330,12 +333,17 @@ parse_features <- function(paths, reporter = NULL) {
 #'   `resolve_order()` and the arguments of `grepl()` in `grepl_args`
 #' @keywords internal
 #' @noRd
-run_config <- function(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...) {
+run_config <- function(
+  path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, debug, ...
+) {
   check_reporter(reporter, call = NULL)
   check_selection(path, filter, tags, name, features, ...)
   check_flag(strict)
   check_flag(dry_run)
   check_flag(fail_fast)
+  check_flag(debug)
+  debug_hint <- getOption("cucumber.debug_hint")
+  check_debug_hint(debug_hint)
   if (!rlang::is_scalar_integerish(retry) || is.na(retry) || retry < 0) {
     abort_user("`retry` must be a whole number of 0 or more, like `retry = 2`.")
   }
@@ -354,6 +362,11 @@ run_config <- function(path, filter, tags, reporter, strict, dry_run, name, feat
     fail_fast = fail_fast,
     retry = as.integer(retry),
     order = resolve_order(order),
+    debug = debug,
+    debug_hint = debug_hint,
+    # What the terminal shows, before testthat turns it off while a step runs
+    num_colors = cli::num_ansi_colors(),
+    unicode = cli::is_utf8_output(),
     grepl_args = list(...)
   )
 }
@@ -420,6 +433,12 @@ check_flag <- function(x, arg = rlang::caller_arg(x)) {
 #'   and of the scenarios in them, `"reverse"`, or `"random"`. `"random:<seed>"`, like
 #'   `"random:1234"`, runs them in the random order of that seed. Without a seed, the seed
 #'   is chosen and shown, to run them in the same order again.
+#' @param debug If `TRUE`, open the debugger at the first line of every step definition and
+#'   scenario or step hook that runs, like `debugonce()` on each of them just before it's called.
+#'   When you step past the last line of one, the debugger opens in the next. It needs an
+#'   interactive session, and `before_all()` and `after_all()` hooks don't open it.
+#'   The `cucumber.debug_hint` option sets what it prints before it opens, see [opts].
+#'   Select the scenario to debug with `name` or `features`, or every scenario stops.
 #' @param env Environment in which to run the tests, e.g. with step definitions and
 #'   code sourced into it, for a project that isn't a package.
 #' @return The results of the run, like [testthat::test_dir()], invisibly.
@@ -456,6 +475,7 @@ check_flag <- function(x, arg = rlang::caller_arg(x)) {
 #'   "fail_fast.feature",
 #'   "retry.feature",
 #'   "order.feature",
+#'   "r-debugging_scenarios.feature",
 #'   "markdown_with_gherkin.feature",
 #'   "gherkin_parse_failure.feature",
 #'   "r-running_like_testthat.feature",
@@ -484,11 +504,14 @@ test <- function(
   fail_fast = FALSE,
   retry = 0,
   order = "defined",
+  debug = FALSE,
   ...
 ) {
   # Before the working directory is `path`, so the arguments are evaluated
   # where test() is called, like `features = readLines("rerun.txt")`
-  config <- run_config(path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, ...)
+  config <- run_config(
+    path, filter, tags, reporter, strict, dry_run, name, features, fail_fast, retry, order, debug, ...
+  )
   check_flag(load_helpers)
   check_flag(stop_on_failure)
   check_flag(stop_on_warning)
