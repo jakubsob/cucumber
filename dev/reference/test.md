@@ -25,6 +25,7 @@ test(
   fail_fast = FALSE,
   retry = 0,
   order = "defined",
+  debug = FALSE,
   ...
 )
 ```
@@ -111,6 +112,22 @@ test(
   `"random:<seed>"`, like `"random:1234"`, runs them in the random order
   of that seed. Without a seed, the seed is chosen and shown, to run
   them in the same order again.
+
+- debug:
+
+  If `TRUE`, open the debugger at the first line of every step
+  definition and scenario or step hook that runs, like
+  [`debugonce()`](https://rdrr.io/r/base/debug.html) on each of them
+  just before it's called. When you step past the last line of one, the
+  debugger opens in the next. It needs an interactive session, and
+  [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+  and
+  [`after_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+  hooks don't open it. The `cucumber.debug_hint` option sets what it
+  prints before it opens, see
+  [opts](https://jakubsob.github.io/cucumber/dev/reference/opts.md).
+  Select the scenario to debug with `name` or `features`, or every
+  scenario stops.
 
 - ...:
 
@@ -1316,6 +1333,121 @@ one left something behind.
   \`order = \\random:"
 
 Source: `tests/acceptance/order.feature`
+
+```
+```
+
+### Feature: Debugging scenarios
+
+To find out why a scenario fails, run only that scenario with
+`debug = TRUE`, like
+`test(features = "basket.feature:3", debug = TRUE)`. Select it with
+`name` or a line of `features`, or the debugger opens in every scenario.
+
+The debugger opens at the first line of every step definition and hook
+that runs, like [`debugonce()`](https://rdrr.io/r/base/debug.html) on
+each of them just before it's called. Step definitions and hooks are
+anonymous functions, so just before it opens cucumber says which step or
+hook it is, where in the feature file it runs and where it's defined.
+There, look into the step's parameters and `context`, and step with the
+debugger's commands: `n` runs the next line, `s` steps into a call, `c`
+continues and `Q` stops. When you step past the last line of a step or a
+hook, the debugger opens at the first line of the next one, in the order
+the scenario runs them: its
+[`before()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+hooks, then for each step its
+[`before_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+hooks, the step definition and its
+[`after_step()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+hooks, and last its
+[`after()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+hooks.
+[`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+and
+[`after_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+hooks run for the whole run, not for a scenario, so they don't stop. The
+`cucumber.debug_hint` option sets that hint with a function of `what`
+and `bullets` that returns the lines to print, or `NULL` for none.
+
+The debugger needs an interactive session. There is no one to step in a
+test run, so the scenarios below replace it by a line that names where
+it would open, like the location of `debug at ./setup-steps.R#4: {`.
+
+#### Background:
+
+- Given a package
+
+- And the debugger is replaced by one that names where it opens
+
+- And a file named "features/basket.feature" with
+
+  ``` gherkin
+  Feature: Basket
+
+    Scenario: Eat some cucumbers
+      Given I have 5 cucumbers
+      When I eat 2 cucumbers
+      Then I have 4 cucumbers left
+
+    Scenario: Eat none
+      Given I have 5 cucumbers
+      Then I have 5 cucumbers left
+  ```
+
+- And a file named "features/setup-steps.R" with
+
+      before(function(context, scenario) {
+        context$cucumbers <- 0
+      })
+      given("I have {int} cucumbers", function(n_cucumbers, context) {
+        context$cucumbers <- n_cucumbers
+      })
+      when("I eat {int} cucumber(s)", function(n_eaten, context) {
+        context$cucumbers <- context$cucumbers - n_eaten
+      })
+      then("I have {int} cucumbers left", function(n_left, context) {
+        expect_equal(context$cucumbers, n_left)
+      })
+
+#### Scenario: Debug a scenario that fails
+
+- When I run it and it fails
+
+      test("features", name = "Eat some cucumbers", debug = TRUE)
+
+- Then the scenarios have these results:
+
+  |                    |        |
+  |--------------------|--------|
+  | scenario           | status |
+  | Eat some cucumbers | failed |
+
+- And the output includes these lines in order:
+
+      Debugging Hook `before()`
+      i Feature: basket.feature:3
+      i Scenario: Eat some cucumbers
+      i Hook defined at: setup-steps.R:1
+      Debugger opens in function(context, scenario) at setup-steps.R:1
+      Debugging step "I have 5 cucumbers"
+      i Feature: basket.feature:4
+      i Scenario: Eat some cucumbers
+      i Step defined at: setup-steps.R:4
+      Debugger opens in function(n_cucumbers, context) at setup-steps.R:4
+      Debugging step "I eat 2 cucumbers"
+      i Feature: basket.feature:5
+      i Scenario: Eat some cucumbers
+      i Step defined at: setup-steps.R:7
+      Debugger opens in function(n_eaten, context) at setup-steps.R:7
+      Debugging step "I have 4 cucumbers left"
+      i Feature: basket.feature:6
+      i Scenario: Eat some cucumbers
+      i Step defined at: setup-steps.R:10
+      Debugger opens in function(n_left, context) at setup-steps.R:10
+
+- And the output doesn't include "Eat none"
+
+Source: `tests/acceptance/r-debugging_scenarios.feature`
 
 ```
 ```

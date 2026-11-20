@@ -178,7 +178,7 @@ test_that("Bookstore: Adding a book to cart", {
   # Then
   bookstore$cart_includes("The Hobbit, J.R.R. Tolkien")
 })
-#> Test passed with 1 success 🌈.
+#> Test passed with 1 success 😸.
 ```
 
 The specification reads as behavior: it names what the customer does and

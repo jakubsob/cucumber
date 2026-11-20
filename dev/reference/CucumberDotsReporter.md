@@ -130,6 +130,8 @@ Source: `tests/acceptance/r-dots_reporter.feature`
 
 [`cucumber::CucumberReporter`](https://jakubsob.github.io/cucumber/dev/reference/CucumberReporter.md)
 -\>
+[`cucumber::CucumberQueryReporter`](https://jakubsob.github.io/cucumber/dev/reference/CucumberQueryReporter.md)
+-\>
 [`cucumber::CucumberSummaryReporter`](https://jakubsob.github.io/cucumber/dev/reference/CucumberSummaryReporter.md)
 -\> `CucumberDotsReporter`
 
@@ -146,7 +148,7 @@ Source: `tests/acceptance/r-dots_reporter.feature`
 Inherited methods
 
 - [`cucumber::CucumberReporter$report()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberReporter.html#method-report)
-- [`cucumber::CucumberReporter$start_run()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberReporter.html#method-start_run)
+- [`cucumber::CucumberQueryReporter$start_run()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberQueryReporter.html#method-start_run)
 - [`cucumber::CucumberSummaryReporter$add_warning()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberSummaryReporter.html#method-add_warning)
 - [`cucumber::CucumberSummaryReporter$clear()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberSummaryReporter.html#method-clear)
 - [`cucumber::CucumberSummaryReporter$draw()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberSummaryReporter.html#method-draw)

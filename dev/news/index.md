@@ -104,7 +104,11 @@ It also lists how close cucumber is to the official implementations, in
   and
   [`run()`](https://jakubsob.github.io/cucumber/dev/reference/run.md)
   arguments: `dry_run`, `name`, `features` (with lines, like
-  `"addition.feature:12"`), `fail_fast`, `retry` and `order`.
+  `"addition.feature:12"`), `fail_fast`, `retry`, `order` and `debug`,
+  which opens the debugger in every step and hook of the scenarios that
+  run, one after the other. The `cucumber.debug_hint` option sets the
+  hint saying which step or hook that is with a function, which can
+  print nothing.
 - ✨
   [`test()`](https://jakubsob.github.io/cucumber/dev/reference/test.md)
   runs feature files like

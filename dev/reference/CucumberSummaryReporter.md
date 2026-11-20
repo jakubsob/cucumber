@@ -206,16 +206,14 @@ scenarios, and failed attempts of retried scenarios, are Warnings.
 
 Source: `tests/acceptance/r-summary_reporter.feature`
 
-## Super class
+## Super classes
 
 [`cucumber::CucumberReporter`](https://jakubsob.github.io/cucumber/dev/reference/CucumberReporter.md)
+-\>
+[`cucumber::CucumberQueryReporter`](https://jakubsob.github.io/cucumber/dev/reference/CucumberQueryReporter.md)
 -\> `CucumberSummaryReporter`
 
 ## Public fields
-
-- `step_statuses`:
-
-  Statuses of the reported steps
 
 - `scenario_statuses`:
 
@@ -234,15 +232,6 @@ Source: `tests/acceptance/r-summary_reporter.feature`
 
   Name of the Rule of the scenario currently executing, like
   `"Rule: Removing items"`, or `NULL`
-
-- `current_steps`:
-
-  Steps executed so far in the current scenario
-
-- `current_hooks`:
-
-  Results of the current scenario's hooks that failed, are pending or
-  skipped it
 
 - `failures`:
 
@@ -312,7 +301,7 @@ Source: `tests/acceptance/r-summary_reporter.feature`
 Inherited methods
 
 - [`cucumber::CucumberReporter$report()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberReporter.html#method-report)
-- [`cucumber::CucumberReporter$start_run()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberReporter.html#method-start_run)
+- [`cucumber::CucumberQueryReporter$start_run()`](https://jakubsob.github.io/cucumber/dev/reference/CucumberQueryReporter.html#method-start_run)
 
 ------------------------------------------------------------------------
 

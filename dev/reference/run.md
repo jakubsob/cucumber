@@ -18,6 +18,7 @@ run(
   fail_fast = FALSE,
   retry = 0,
   order = "defined",
+  debug = FALSE,
   ...
 )
 ```
@@ -93,6 +94,22 @@ run(
   `"random:<seed>"`, like `"random:1234"`, runs them in the random order
   of that seed. Without a seed, the seed is chosen and shown, to run
   them in the same order again.
+
+- debug:
+
+  If `TRUE`, open the debugger at the first line of every step
+  definition and scenario or step hook that runs, like
+  [`debugonce()`](https://rdrr.io/r/base/debug.html) on each of them
+  just before it's called. When you step past the last line of one, the
+  debugger opens in the next. It needs an interactive session, and
+  [`before_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+  and
+  [`after_all()`](https://jakubsob.github.io/cucumber/dev/reference/hook.md)
+  hooks don't open it. The `cucumber.debug_hint` option sets what it
+  prints before it opens, see
+  [opts](https://jakubsob.github.io/cucumber/dev/reference/opts.md).
+  Select the scenario to debug with `name` or `features`, or every
+  scenario stops.
 
 - ...:
 

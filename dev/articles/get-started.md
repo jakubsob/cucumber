@@ -75,7 +75,7 @@ runs the feature files of `tests/acceptance`:
 Summary
   3 scenarios (3 passed)
   6 steps (6 passed)
-  0m00.068s (executing steps: 0m00.009s)
+  0m00.044s (executing steps: 0m00.006s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -125,7 +125,7 @@ Failures:
 Summary
   3 scenarios (1 failed, 2 passed)
   6 steps (1 failed, 5 passed)
-  0m00.056s (executing steps: 0m00.027s)
+  0m00.034s (executing steps: 0m00.017s)
 ────────────────────────────────────────────────────────────────────────────────
 Error: Test failures. 
 ```
@@ -152,7 +152,7 @@ Feature: Addition
 Summary
   3 scenarios (3 passed)
   6 steps (6 passed)
-  0m00.051s (executing steps: 0m00.010s)
+  0m00.031s (executing steps: 0m00.004s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 

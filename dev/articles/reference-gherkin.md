@@ -60,7 +60,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.057s (executing steps: 0m00.007s)
+  0m00.040s (executing steps: 0m00.005s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -186,7 +186,7 @@ test("features")
 Summary
   0 scenarios
   0 steps
-  0m00.001s (executing steps: 0m00.000s)
+  0m00.000s (executing steps: 0m00.000s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -274,7 +274,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.039s (executing steps: 0m00.010s)
+  0m00.022s (executing steps: 0m00.003s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -357,7 +357,7 @@ Feature: Basket
 Summary
   4 scenarios (4 passed)
   13 steps (13 passed)
-  0m00.067s (executing steps: 0m00.012s)
+  0m00.043s (executing steps: 0m00.007s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -586,7 +586,7 @@ Feature: Background example
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.026s (executing steps: 0m00.004s)
+  0m00.013s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -686,7 +686,7 @@ Feature: Addition
 Summary
   3 scenarios (3 passed)
   9 steps (9 passed)
-  0m00.038s (executing steps: 0m00.009s)
+  0m00.023s (executing steps: 0m00.005s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -763,7 +763,7 @@ Feature: Eating
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.031s (executing steps: 0m00.006s)
+  0m00.022s (executing steps: 0m00.005s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -819,7 +819,7 @@ Feature: Eating
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.031s (executing steps: 0m00.006s)
+  0m00.018s (executing steps: 0m00.003s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -902,7 +902,7 @@ Feature: Outlines
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.032s (executing steps: 0m00.008s)
+  0m00.021s (executing steps: 0m00.004s)
 ────────────────────────────────────────────────────────────────────────────────
 ````
 
@@ -957,7 +957,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.019s (executing steps: 0m00.002s)
+  0m00.014s (executing steps: 0m00.001s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1007,7 +1007,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.018s (executing steps: 0m00.002s)
+  0m00.015s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1068,7 +1068,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.028s (executing steps: 0m00.003s)
+  0m00.019s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1123,7 +1123,7 @@ test("features")
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.039s (executing steps: 0m00.013s)
+  0m00.030s (executing steps: 0m00.015s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1177,7 +1177,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.021s (executing steps: 0m00.002s)
+  0m00.011s (executing steps: 0m00.001s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1227,7 +1227,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.017s (executing steps: 0m00.002s)
+  0m00.010s (executing steps: 0m00.001s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1275,7 +1275,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.017s (executing steps: 0m00.002s)
+  0m00.012s (executing steps: 0m00.001s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1350,7 +1350,7 @@ Feature: Platforms
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.028s (executing steps: 0m00.005s)
+  0m00.014s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1428,7 +1428,7 @@ Feature: Tagged
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.027s (executing steps: 0m00.007s)
+  0m00.017s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1517,7 +1517,7 @@ Feature: Tagged
 Summary
   2 scenarios (2 passed)
   4 steps (4 passed)
-  0m00.034s (executing steps: 0m00.004s)
+  0m00.020s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1622,7 +1622,7 @@ Fonctionnalité: Addition
 Summary
   2 scenarios (2 passed)
   7 steps (7 passed)
-  0m00.030s (executing steps: 0m00.007s)
+  0m00.020s (executing steps: 0m00.004s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1732,7 +1732,7 @@ Feature: Basket
 Summary
   2 scenarios (2 passed)
   6 steps (6 passed)
-  0m00.032s (executing steps: 0m00.005s)
+  0m00.024s (executing steps: 0m00.005s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
@@ -1784,7 +1784,7 @@ test("features")
 Summary
   1 scenario (1 passed)
   2 steps (2 passed)
-  0m00.020s (executing steps: 0m00.002s)
+  0m00.018s (executing steps: 0m00.002s)
 ────────────────────────────────────────────────────────────────────────────────
 ```
 
